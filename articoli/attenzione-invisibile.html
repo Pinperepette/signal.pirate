@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Attenzione Invisibile | Signal Pirate</title>
+  <meta name="description" content="I 7 segnali nascosti di Phoenix: modelli matematici, teoria dell'informazione e strategie di exploit per l'algoritmo di X/Twitter.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Signal Cards === */
+    .signal-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .signal-card {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 1.2rem;
+      transition: var(--transition);
+    }
+    .signal-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .signal-card .signal-name {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 0.5rem;
+    }
+    .signal-card .signal-type {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .signal-card .signal-desc {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p {
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+    .strategy-table .weight-positive {
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .strategy-table .weight-negative {
+      color: var(--accent-reaction);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    /* === Recipe Steps === */
+    .recipe-steps {
+      counter-reset: recipe;
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+    }
+    .recipe-steps li {
+      counter-increment: recipe;
+      position: relative;
+      padding: 1rem 1rem 1rem 3.5rem;
+      margin-bottom: 0.8rem;
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      line-height: 1.6;
+      transition: var(--transition);
+    }
+    .recipe-steps li:hover {
+      border-color: var(--border-glow);
+    }
+    .recipe-steps li::before {
+      content: counter(recipe);
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      width: 1.8rem;
+      height: 1.8rem;
+      background: var(--accent-attention);
+      color: var(--bg-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Two Column Charts === */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+      .signal-cards { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .signal-cards { grid-template-columns: 1fr; }
+    }
+
+    /* === Accent helper === */
+    .accent { color: var(--accent-attention); }
+
+    /* === Bold text yellow === */
+    .article-content strong {
+      color: #f5c518;
+    }
+
+    /* === Inline code === */
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Heatmap canvas container === */
+    .heatmap-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-14 | Pinperepette</p>
+  <h1 class="article-page-title">L'Attenzione <span class="accent">Invisibile</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    I 7 segnali nascosti di Phoenix. Matematica, informazione e exploit
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Segnali Nascosti</span>
+    <span class="tag tag-highlight">Bayesian</span>
+    <span class="tag tag-reaction">Hawkes Process</span>
+    <span class="tag tag-amplification">Fisher Information</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — INTRODUZIONE                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Dalla superficie al profondo</h2>
+<span class="section-number">Sezione 01. Introduzione</span>
+
+<p>
+  Ne abbiamo parlato <a href="https://x.com/Pinperepette/status/2015124341285953740" target="_blank" rel="noopener" style="color: var(--accent-attention);">su Twitter</a>: le metriche pubbliche di X (likes, retweet, reply) sono solo la punta visibile dell'iceberg. Power law, disuguaglianza estrema, concentrazione dell'attenzione. Roba che vedi nel conteggio sotto ogni tweet.
+</p>
+<p>
+  Ma sotto la superficie succede qualcosa di molto più inquietante. L'algoritmo Phoenix misura <strong>7 segnali nascosti</strong> che catturano la tua attenzione <em>prima</em> che tu decida di interagire. Sono invisibili. Non appaiono da nessuna parte. Ma determinano tutto.
+</p>
+<p>
+  Mia moglie (la iena) dice che non la ascolto mai. Ecco, Phoenix la pensa diversamente: secondo l'algoritmo io ascolto <em>troppo</em>, e lo sa perché misura ogni millisecondo che passo fermo su un tweet. L'ironia è che un algoritmo mi conosce meglio di chi ci vive insieme.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="7" data-suffix="">0</div>
+    <div class="stat-label">Segnali nascosti</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="1" data-suffix="">0</div>
+    <div class="stat-label">Variabile latente</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="0" data-suffix="">0</div>
+    <div class="stat-label">Visibilità pubblica</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="15" data-suffix="s">0s</div>
+    <div class="stat-label">Finestra critica</div>
+  </div>
+</div>
+
+<div class="signal-cards fade-in">
+  <div class="signal-card">
+    <div class="signal-name">dwellTimeMs</div>
+    <div class="signal-type">continuo (ms)</div>
+    <div class="signal-desc">Tempo trascorso sul tweet. Il segnale più ricco di informazione.</div>
+  </div>
+  <div class="signal-card">
+    <div class="signal-name">isDetailExpanded</div>
+    <div class="signal-type">binario</div>
+    <div class="signal-desc">L'utente ha cliccato per espandere il dettaglio del tweet.</div>
+  </div>
+  <div class="signal-card">
+    <div class="signal-name">isBookmarked</div>
+    <div class="signal-type">binario</div>
+    <div class="signal-desc">Salvato nei preferiti. Segnale forte di valore percepito.</div>
+  </div>
+  <div class="signal-card">
+    <div class="signal-name">isProfileClicked</div>
+    <div class="signal-type">binario</div>
+    <div class="signal-desc">L'utente ha visitato il profilo dell'autore.</div>
+  </div>
+  <div class="signal-card">
+    <div class="signal-name">isVideoPlayback50</div>
+    <div class="signal-type">binario</div>
+    <div class="signal-desc">Ha guardato almeno il 50% del video allegato.</div>
+  </div>
+  <div class="signal-card">
+    <div class="signal-name">isPhotoExpanded</div>
+    <div class="signal-type">binario</div>
+    <div class="signal-desc">Ha espanso un'immagine a schermo intero.</div>
+  </div>
+  <div class="signal-card">
+    <div class="signal-name">isOpenLinked</div>
+    <div class="signal-type">binario</div>
+    <div class="signal-desc">Ha cliccato su un link esterno. Attenzione: peso NEGATIVO.</div>
+  </div>
+</div>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-attention);">
+  <p><strong>Dataset e fonti.</strong> Questa analisi si basa su tre fonti:</p>
+  <ul style="margin: 0.8rem 0 0; padding-left: 1.2rem; line-height: 1.8;">
+    <li><strong>Dataset Zenodo (~893K tweet)</strong> per le metriche pubbliche di engagement (likes, RT, reply). Scaricabile da: <a href="https://zenodo.org/records/7711071" target="_blank" rel="noopener" style="color: var(--accent-attention);">zenodo.org/records/7711071</a></li>
+    <li><strong>Codice sorgente dell'algoritmo di X/Twitter</strong>, open-sourced nel 2023. I 7 segnali nascosti e la struttura dello score Phoenix sono documentati nel repo: <a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/twitter/the-algorithm</a></li>
+    <li><strong>Modelli teorici e simulazioni</strong> per le distribuzioni bayesiane, i processi di Hawkes, le traiettorie drift-diffusion e la Fisher Information. I dati sono generati analiticamente nel codice JavaScript di questa pagina (niente black box, tutto verificabile).</li>
+  </ul>
+</div>
+
+<h3 style="color: var(--accent-attention); margin-top: 2.5rem;">Il contesto empirico: i numeri dal dataset</h3>
+
+<p>
+  Prima di entrare nella matematica, guardiamo cosa succede davvero. L'analisi del dataset Zenodo (~893K tweet) rivela una realtà brutale.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number red" data-count="53" data-suffix="%">0%</div>
+    <div class="stat-label">Tweet con zero interazioni</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number orange" data-count="94" data-suffix="%">0%</div>
+    <div class="stat-label">Tweet senza reply</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="91" data-suffix="%">0%</div>
+    <div class="stat-label">Gini likes</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="48" data-suffix="%">0%</div>
+    <div class="stat-label">Interazioni al top 1%</div>
+  </div>
+</div>
+
+<p>
+  Il <strong>53.1% dei tweet</strong> riceve esattamente zero interazioni. Niente likes, niente RT, niente reply. Più della metà del contenuto pubblicato esiste in un vuoto sociale completo. Il <strong>94.6%</strong> non riceve nemmeno una risposta.
+</p>
+
+<p>
+  La concentrazione è misurata dal coefficiente di Gini. Per i likes è <strong>0.91</strong>, per i RT <strong>0.90</strong>, per le reply <strong>0.97</strong>. Per mettere in prospettiva:
+</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Sistema</th>
+        <th>Gini</th>
+        <th>Fonte</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Reddito USA</td>
+        <td>0.39</td>
+        <td>Census Bureau</td>
+      </tr>
+      <tr>
+        <td>Ricchezza globale</td>
+        <td>0.80</td>
+        <td>Credit Suisse</td>
+      </tr>
+      <tr>
+        <td style="color: var(--accent-attention);">Likes su Twitter</td>
+        <td class="weight-positive">0.91</td>
+        <td>Dataset Zenodo</td>
+      </tr>
+      <tr>
+        <td style="color: var(--accent-attention);">Reply su Twitter</td>
+        <td class="weight-positive">0.97</td>
+        <td>Dataset Zenodo</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  L'attenzione su Twitter è più concentrata della ricchezza globale. E la cosa peggiore: questa concentrazione è <strong>largamente indipendente dal contenuto</strong>. La Mutual Information tra feature del contenuto (lunghezza, hashtag, media) e il punteggio di attenzione è inferiore a <strong>0.06 bit</strong>, trascurabile rispetto all'entropia dell'attenzione stessa (0.515 bit). Non è la qualità del messaggio a decidere chi vince. È il meccanismo di distribuzione.
+</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Top-K</th>
+        <th>Likes</th>
+        <th>Retweet</th>
+        <th>Reply</th>
+        <th>Totale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Top 0.1%</td>
+        <td>19.9%</td>
+        <td>9.9%</td>
+        <td>15.3%</td>
+        <td>25.7%</td>
+      </tr>
+      <tr>
+        <td>Top 1%</td>
+        <td class="weight-positive">45.1%</td>
+        <td class="weight-positive">34.3%</td>
+        <td class="weight-positive">52.8%</td>
+        <td class="weight-positive">48.0%</td>
+      </tr>
+      <tr>
+        <td>Top 5%</td>
+        <td>70.3%</td>
+        <td>60.9%</td>
+        <td>77.4%</td>
+        <td>70.9%</td>
+      </tr>
+      <tr>
+        <td>Top 10%</td>
+        <td>82.5%</td>
+        <td>74.1%</td>
+        <td>87.6%</td>
+        <td>81.3%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>L'1% dei tweet cattura il 48% di tutte le interazioni.</strong> Il 10% cattura l'81.3%. Il restante 90% si spartisce le briciole. Questo non è un mercato libero, è un sistema winner-takes-all dove l'algoritmo decide chi vince. I 7 segnali nascosti sono il meccanismo con cui Phoenix fa questa scelta, ed è quello che analizziamo nelle sezioni seguenti.</p>
+</div>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$S_{\text{phoenix}} = \sum_{i=1}^{7} w_i \cdot \sigma(s_i)$$</div>
+  <p class="formula-label">Score di Phoenix: somma pesata di funzioni sigmoide sui 7 segnali nascosti</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — MODELLO A VARIABILE LATENTE (SEM)             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Modello a Variabile Latente</h2>
+<span class="section-number">Sezione 02. Structural Equation Modeling</span>
+
+<p>
+  I 7 segnali non sono indipendenti. Sono tutti <strong>manifestazioni osservabili</strong> di una singola variabile latente: l'<em>attenzione</em> \(A\). Questo è un modello SEM (Structural Equation Modeling) a un fattore.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$X_i = \lambda_i \cdot A + \varepsilon_i \quad \text{dove} \quad \varepsilon_i \sim \mathcal{N}(0, \psi_i)$$</div>
+  <p class="formula-label">Measurement model. Ogni segnale è una proiezione rumorosa dell'attenzione</p>
+</div>
+
+<p>
+  In forma matriciale, il vettore dei 7 segnali osservati \(\mathbf{X}\) si scrive come:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{X} = \boldsymbol{\Lambda} \cdot A + \boldsymbol{\varepsilon} \qquad \Sigma = \boldsymbol{\Lambda}\boldsymbol{\Lambda}^\top + \boldsymbol{\Psi}$$</div>
+  <p class="formula-label">Forma matriciale. Σ è la matrice di covarianza implied</p>
+</div>
+
+<p>
+  La <strong>communality</strong> \(h_i^2 = \lambda_i^2\) misura quanto del segnale è "spiegato" dall'attenzione. La <strong>uniqueness</strong> \(u_i = 1 - h_i^2\) è il rumore specifico.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$h_i^2 = \lambda_i^2 \qquad u_i = 1 - \lambda_i^2$$</div>
+  <p class="formula-label">Communality e uniqueness per ciascun segnale</p>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Factor Loadings dei 7 segnali nascosti</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="factor-loadings-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> <code>dwellTimeMs</code> ha il factor loading più alto (λ = 0.92). È un segnale <em>continuo</em> con alta banda passante: contiene più informazione di tutti i 6 segnali binari combinati. Ogni millisecondo che passi su un tweet viene misurato e usato.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — INFERENZA BAYESIANA IN TEMPO REALE            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Inferenza Bayesiana in Tempo Reale</h2>
+<span class="section-number">Sezione 03. Stima sequenziale dell'attenzione</span>
+
+<p>
+  Phoenix non aspetta che tu finisca di leggere. Stima la tua attenzione <strong>in tempo reale</strong>, aggiornando un modello bayesiano man mano che i segnali arrivano. Ogni segnale restringe l'intervallo di credibilità.
+</p>
+
+<p>
+  Il prior sull'attenzione è una distribuzione Beta:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$A \sim \text{Beta}(\alpha, \beta) \qquad f(A) = \frac{A^{\alpha-1}(1-A)^{\beta-1}}{B(\alpha, \beta)}$$</div>
+  <p class="formula-label">Prior coniugato: Beta(α, β), flessibile, supporto [0,1]</p>
+</div>
+
+<p>
+  La likelihood dipende dal tipo di segnale. Per i segnali <strong>binari</strong> (click/non-click) si usa una sigmoide:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(s_i = 1 \mid A) = \sigma(\gamma_i \cdot A - \delta_i) = \frac{1}{1 + e^{-(\gamma_i A - \delta_i)}}$$</div>
+  <p class="formula-label">Likelihood sigmoide per segnali binari</p>
+</div>
+
+<p>
+  Per il segnale <strong>continuo</strong> (dwell time) si usa una distribuzione LogNormale:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{dwellTime} \mid A \sim \text{LogNormal}(\mu_0 + \kappa A, \, \sigma^2)$$</div>
+  <p class="formula-label">Likelihood LogNormale per il dwell time</p>
+</div>
+
+<p>
+  Il posterior si aggiorna con la regola di Bayes, sequenzialmente per ogni nuovo segnale:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(A \mid s_1, \ldots, s_k) \propto P(A) \cdot \prod_{i=1}^{k} P(s_i \mid A)$$</div>
+  <p class="formula-label">Update sequenziale: ogni segnale restringe il posterior</p>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Prior vs Posterior</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="bayesian-prior-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Evoluzione dell'update bayesiano</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="bayesian-update-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Dopo 2-3 segnali, la stima converge. I <strong>primi 15 secondi</strong> di esposizione decidono tutto: il dwell time iniziale fissa la distribuzione, e i click binari la affinano. Il tuo destino algoritmico si gioca nella prima impressione. (La iena dice che anche lei mi valuta nei primi 15 secondi quando torno a casa. Se non dico "ciao" subito, il suo posterior su "mi sta ignorando" converge a 1.0 istantaneamente.)</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — TEORIA DELL'INFORMAZIONE                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Teoria dell'Informazione</h2>
+<span class="section-number">Sezione 04. Entropia, Mutual Information e KL Divergence</span>
+
+<p>
+  Quanto "sa" ciascun segnale sull'attenzione? La teoria dell'informazione fornisce la risposta esatta.
+</p>
+
+<p>
+  L'<strong>entropia di Shannon</strong> misura l'incertezza:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$H(A) = -\int_0^1 f(A) \log f(A) \, dA$$</div>
+  <p class="formula-label">Entropia dell'attenzione: incertezza a priori</p>
+</div>
+
+<p>
+  La <strong>Mutual Information</strong> quantifica quanta incertezza un segnale rimuove:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$I(S_i; A) = H(A) - H(A \mid S_i) = \int \int p(s_i, A) \log \frac{p(s_i, A)}{p(s_i) \cdot p(A)} \, ds_i \, dA$$</div>
+  <p class="formula-label">Mutual Information: riduzione di incertezza grazie al segnale Sᵢ</p>
+</div>
+
+<p>
+  La <strong>MI condizionale</strong> misura l'informazione <em>residua</em> dopo aver già osservato un altro segnale:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$I(S_i; A \mid S_j) = H(A \mid S_j) - H(A \mid S_i, S_j)$$</div>
+  <p class="formula-label">Mutual Information condizionale: informazione incrementale</p>
+</div>
+
+<p>
+  La <strong>KL Divergence</strong> misura quanto il modello della piattaforma diverge dal comportamento reale dell'utente:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$D_{\text{KL}}(P \| Q) = \int P(x) \log \frac{P(x)}{Q(x)} \, dx \geq 0$$</div>
+  <p class="formula-label">KL Divergence, asimmetria fondamentale: D_KL(P‖Q) ≠ D_KL(Q‖P)</p>
+</div>
+
+<p>
+  Vale il <strong>Data Processing Inequality</strong>: qualsiasi elaborazione successiva non può creare informazione nuova.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$A \to S_i \to \hat{A} \implies I(A; \hat{A}) \leq I(A; S_i)$$</div>
+  <p class="formula-label">Data Processing Inequality: l'informazione può solo diminuire</p>
+</div>
+
+<p>
+  La <strong>Channel Capacity</strong> rappresenta il massimo teorico di informazione trasmissibile:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$C = \max_{p(A)} I(A; \mathbf{S}) = \max_{p(A)} \left[ H(\mathbf{S}) - H(\mathbf{S} \mid A) \right]$$</div>
+  <p class="formula-label">Channel Capacity: limite superiore del canale attenzione→segnali</p>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Mutual Information per segnale I(Sᵢ; A)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="mi-signals-chart"></canvas>
+  </div>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Matrice MI condizionale I(Sᵢ; A | Sⱼ)</div>
+    <div class="heatmap-container">
+      <canvas id="conditional-mi-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">KL Divergence: piattaforma vs profili utente</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="kl-divergence-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> <code>dwellTimeMs</code> da solo porta <strong>0.482 bit</strong> di informazione sull'attenzione, più di tutti i 6 segnali binari combinati (0.742 bit totali). Questo perché un segnale continuo ha una "banda passante" infinitamente più ampia di un bit binario.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — MODELLO DRIFT-DIFFUSION                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Modello Drift-Diffusion Cognitivo</h2>
+<span class="section-number">Sezione 05. Come il cervello decide se fermarsi</span>
+
+<p>
+  La decisione "continuo a leggere o scrollo via" non è istantanea. Il cervello accumula evidenza fino a raggiungere una soglia. Questo processo è descritto da un <strong>Drift-Diffusion Model</strong> (DDM).
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$dA(t) = \mu \, dt + \sigma \, dW(t)$$</div>
+  <p class="formula-label">SDE: equazione differenziale stocastica con drift μ e diffusione σ</p>
+</div>
+
+<p>
+  Dove \(\mu\) è il <strong>drift</strong> (qualità del contenuto, controllabile dal creatore), \(\sigma\) è il rumore cognitivo, e \(W(t)\) è un processo di Wiener (moto browniano). La decisione avviene quando \(A(t)\) raggiunge la barriera superiore (engage) o inferiore (skip).
+</p>
+
+<p>
+  La densità di probabilità dell'accumulatore è governata dall'equazione di <strong>Fokker-Planck</strong>:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\frac{\partial p}{\partial t} = -\mu \frac{\partial p}{\partial x} + \frac{\sigma^2}{2} \frac{\partial^2 p}{\partial x^2}$$</div>
+  <p class="formula-label">Equazione di Fokker-Planck per la distribuzione dell'accumulatore</p>
+</div>
+
+<p>
+  Il <strong>Mean First Passage Time</strong>, cioè il tempo medio per raggiungere la barriera, ha una soluzione analitica:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbb{E}[T] = \frac{a}{\mu} \tanh\left(\frac{a\mu}{\sigma^2}\right)$$</div>
+  <p class="formula-label">Tempo medio di decisione: dipende dal rapporto μ/σ² (signal-to-noise)</p>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Traiettorie drift-diffusion</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="drift-paths-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Distribuzione del tempo di primo passaggio</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="first-passage-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Il drift \(\mu\) è la variabile che il creatore può controllare: un hook forte nel primo secondo aumenta \(\mu\), spostando la distribuzione verso tempi di decisione brevi e favorevoli. Contenuto noioso → basso \(\mu\) → lo scroll vince.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — PROCESSO DI HAWKES                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Processo di Hawkes. Cascate di Segnali</h2>
+<span class="section-number">Sezione 06. Self-exciting point process</span>
+
+<p>
+  I segnali non arrivano in modo indipendente. Ogni interazione <strong>eccita</strong> la probabilità di interazioni future. Un utente che espande il dettaglio è più propenso a cliccare il profilo. Un bookmark dopo un long dwell innesca una cascata.
+</p>
+
+<p>
+  Questo è catturato dal <strong>processo di Hawkes</strong>:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\lambda(t) = \mu + \sum_{t_i < t} \alpha \cdot e^{-\beta(t - t_i)}$$</div>
+  <p class="formula-label">Funzione di intensità: ogni evento passato tᵢ aumenta la probabilità di eventi futuri</p>
+</div>
+
+<p>
+  Il parametro cruciale è il <strong>branching ratio</strong> \(n^*\), che determina il regime:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$n^* = \frac{\alpha}{\beta} \qquad \begin{cases} n^* < 1 & \text{subcritico: la cascata si spegne} \\ n^* = 1 & \text{critico: transizione di fase} \\ n^* > 1 & \text{supercritico: esplosione virale} \end{cases}$$</div>
+  <p class="formula-label">Branching ratio: soglia critica per la viralità</p>
+</div>
+
+<p>
+  In regime stazionario, il numero atteso di eventi discendenti da un singolo evento è:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbb{E}[N_{\text{totale}}] = \frac{\mu}{1 - n^*} \quad (n^* < 1) \qquad \to \infty \text{ quando } n^* \to 1$$</div>
+  <p class="formula-label">Numero atteso di eventi: diverge alla transizione di fase</p>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Funzione di intensità λ(t) nel tempo</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="hawkes-intensity-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Diagramma di fase: subcritico vs supercritico</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="hawkes-phase-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Quando \(n^* \to 1\), avviene una <strong>transizione di fase</strong>. Un piccolo aumento dell'engagement iniziale (ad esempio passare da 2 a 3 interazioni nei primi secondi) può far saltare il sistema dal regime subcritico a quello supercritico, trasformando un tweet ignorato in un tweet virale.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — FISHER INFORMATION & CRAMÉR-RAO               -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Fisher Information & Cramér-Rao</h2>
+<span class="section-number">Sezione 07. Limiti fondamentali della stima</span>
+
+<p>
+  La <strong>Fisher Information</strong> quantifica la massima precisione ottenibile nella stima dell'attenzione a partire dai segnali. Per un segnale binario e uno continuo:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$I_{\text{bin}}(A) = \frac{[\sigma'(\gamma A - \delta)]^2}{\sigma(\gamma A - \delta)(1 - \sigma(\gamma A - \delta))} \cdot \gamma^2$$</div>
+  <p class="formula-label">Fisher Information per un segnale binario (sigmoide)</p>
+</div>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$I_{\text{cont}}(A) = \frac{\kappa^2}{\sigma^2}$$</div>
+  <p class="formula-label">Fisher Information per il dwell time (LogNormale), proporzionale a κ²/σ²</p>
+</div>
+
+<p>
+  Il <strong>bound di Cramér-Rao</strong> stabilisce il limite inferiore per la varianza di qualsiasi stimatore non distorto. La proprietà additiva della Fisher Information è fondamentale:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{Var}(\hat{A}) \geq \frac{1}{I_{\text{tot}}(A)} = \frac{1}{\sum_{i=1}^{7} I_i(A)}$$</div>
+  <p class="formula-label">Bound di Cramér-Rao: la varianza minima decresce come 1/I_tot</p>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Fisher Information per segnale</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="fisher-info-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Cramér-Rao Bound vs segnali osservati</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="cramer-rao-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> <code>dwellTimeMs</code> contribuisce circa il <strong>52%</strong> della Fisher Information totale. Questo significa che Phoenix può stimare la tua attenzione con buona precisione anche usando <em>solo</em> il tempo di permanenza. Gli altri segnali affinano ma non sono strettamente necessari. (La iena dice sempre "correggimi se sbaglio". Attenzione: è una trappola. Il bound di Cramér-Rao ti garantisce che la stima è già ottimale. Se la correggi davvero, sei morto. È un alert, non una domanda.)</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — SCORE FUNCTION & OTTIMIZZAZIONE (L'EXPLOIT)   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Funzione di Score e Ottimizzazione</h2>
+<span class="section-number">Sezione 08. L'Exploit</span>
+
+<p>
+  Ecco dove la teoria diventa arma. Lo score di Phoenix è una funzione differenziabile, e quindi <strong>ottimizzabile</strong>.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$S = \sum_{i=1}^{7} w_i \cdot \sigma(s_i) \qquad w_i \in \mathbb{R}, \quad \sigma(x) = \frac{1}{1+e^{-x}}$$</div>
+  <p class="formula-label">Score function: somma pesata di sigmoidi, differenziabile ovunque</p>
+</div>
+
+<p>
+  Il gradiente rispetto al contenuto (ciò che il creatore controlla) è:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\frac{\partial S}{\partial \text{content}} = \sum_{i=1}^{7} w_i \cdot \sigma(s_i)(1 - \sigma(s_i)) \cdot \frac{\partial s_i}{\partial \text{content}}$$</div>
+  <p class="formula-label">Gradiente della funzione obiettivo rispetto al contenuto</p>
+</div>
+
+<p>
+  L'ottimizzazione vincolata (risorse limitate del creatore) si formalizza con la <strong>Lagrangiana</strong>:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathcal{L} = \sum_i w_i \cdot \sigma(s_i) - \lambda \left(\sum_i c_i - B\right) \qquad \text{KKT:} \quad w_i \cdot \sigma'(s_i) = \lambda \cdot \frac{\partial c_i}{\partial s_i}$$</div>
+  <p class="formula-label">Lagrangiana con vincolo di budget, condizioni KKT per l'ottimo</p>
+</div>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Segnale</th>
+        <th>Peso wᵢ</th>
+        <th>Tipo</th>
+        <th>Strategia ottimale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>dwellTimeMs</code></td>
+        <td class="weight-positive">+0.30</td>
+        <td>Continuo</td>
+        <td>Thread lungo, hook iniziale, rivelazione progressiva</td>
+      </tr>
+      <tr>
+        <td><code>isBookmarked</code></td>
+        <td class="weight-positive">+0.22</td>
+        <td>Binario</td>
+        <td>Contenuto di riferimento, dati salvabili, cheat sheet</td>
+      </tr>
+      <tr>
+        <td><code>isDetailExpanded</code></td>
+        <td class="weight-positive">+0.18</td>
+        <td>Binario</td>
+        <td>Scrivere lungo: X tronca e mostra "Mostra altro"</td>
+      </tr>
+      <tr>
+        <td><code>isVideoPlayback50</code></td>
+        <td class="weight-positive">+0.14</td>
+        <td>Binario</td>
+        <td>Video brevi (&lt;60s) con hook nei primi 3 secondi</td>
+      </tr>
+      <tr>
+        <td><code>isProfileClicked</code></td>
+        <td class="weight-positive">+0.12</td>
+        <td>Binario</td>
+        <td>Firma autorevole, bio curata, identità riconoscibile</td>
+      </tr>
+      <tr>
+        <td><code>isPhotoExpanded</code></td>
+        <td class="weight-positive">+0.08</td>
+        <td>Binario</td>
+        <td>Immagini con dettagli che richiedono zoom</td>
+      </tr>
+      <tr>
+        <td><code>isOpenLinked</code></td>
+        <td class="weight-negative">-0.04</td>
+        <td>Binario</td>
+        <td>EVITARE link esterni. L'utente esce dalla piattaforma</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Paesaggio dello score S(dwell, binari)</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="score-landscape-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Sensitività ∂S/∂segnale</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="sensitivity-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> <code>isOpenLinked</code> ha peso <strong>NEGATIVO</strong>. Ogni link esterno che inserisci nel tweet <em>penalizza</em> lo score. L'algoritmo vuole che l'utente resti sulla piattaforma. Se devi linkare, fallo nel reply, mai nel tweet principale.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — FEEDBACK LOOP COME TEORIA DEL CONTROLLO       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Feedback Loop come Teoria del Controllo</h2>
+<span class="section-number">Sezione 09. Biforcazione e amplificazione</span>
+
+<p>
+  L'algoritmo di Phoenix non è statico: è un <strong>sistema di controllo a feedback</strong>. L'engagement iniziale influenza la distribuzione futura, che influenza l'engagement successivo. L'equazione di stato:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\dot{x}(t) = f(x(t), u(t)) = \gamma \cdot x(t) \cdot \left(1 - \frac{x(t)}{K}\right) + \beta \cdot u(t)$$</div>
+  <p class="formula-label">Equazione di stato: crescita logistica con input di controllo u(t)</p>
+</div>
+
+<p>
+  Il comportamento ottimale del creatore si ottiene risolvendo l'equazione di <strong>Hamilton-Jacobi-Bellman</strong>:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$-\frac{\partial V}{\partial t} = \max_u \left[ r(x, u) + \frac{\partial V}{\partial x} f(x, u) \right]$$</div>
+  <p class="formula-label">HJB: il valore ottimale V(x,t) soddisfa questa PDE</p>
+</div>
+
+<p>
+  Il sistema presenta un <strong>punto di biforcazione</strong>: sotto una soglia critica di engagement iniziale il tweet muore; sopra, l'amplificazione lo fa esplodere.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\gamma_{\text{crit}} = \frac{\beta \cdot u_{\text{min}}}{K \cdot (1 - x_0/K)} \qquad \text{Se } \gamma > \gamma_{\text{crit}} \implies \text{amplificazione}$$</div>
+  <p class="formula-label">Condizione di biforcazione: soglia critica per la transizione</p>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Traiettorie subcritica vs supercritica con punto di biforcazione</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="bifurcation-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Esiste una <strong>soglia critica</strong> di engagement precoce. Sotto → il tweet muore lentamente nell'oblio algoritmico. Sopra → il feedback loop si auto-amplifica. La differenza tra un tweet da 100 view e uno da 100K view può dipendere da pochi segnali nascosti nei primi 15 secondi.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — GUIDA PRATICA ALL'EXPLOIT (IL PLAYBOOK)       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Playbook. Guida Pratica all'Exploit</h2>
+<span class="section-number">Sezione 10. Dalla teoria all'azione</span>
+
+<p>
+  Tutta la matematica converge in un'unica strategia: <strong>massimizzare i segnali nascosti nei primi 15 secondi</strong>. Ecco come.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Radar strategico: ottimale vs medio vs avanzato</div>
+  <div class="chart-wrapper-wide" style="max-width: 500px;">
+    <canvas id="strategy-radar-chart"></canvas>
+  </div>
+</div>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">La Ricetta della Cascata di Attenzione</h3>
+
+<ol class="recipe-steps fade-in">
+  <li><strong>Hook nei primi 3 secondi.</strong> La prima riga deve creare un open loop cognitivo. Domanda provocatoria, dato scioccante, contraddizione. Obiettivo: aumentare il drift μ nel modello drift-diffusion. (La iena mi fa notare che lei usa la stessa tecnica quando dice "dobbiamo parlare". Drift istantaneo verso la barriera di panico.)</li>
+  <li><strong>Scrivi lungo e lascia che Twitter tronchi.</strong> Quando il tweet supera i ~280 caratteri visibili nel feed, X mostra automaticamente il pulsante "Mostra altro". Quel click attiva <code>isDetailExpanded</code> e vale +0.18 nello score. Non devi fare niente di speciale: basta scrivere abbastanza da forzare il troncamento. Esempio reale: <em>"Parrhesepstein: piattaforma AI open source per analizzare i file Epstein. Testatela. 9 agenti investigativi autonomi, ricerca semantica su migliaia di documenti declassificati, mappa dei voli, grafi delle connessioni e analisi delle reti di influenza. Uno strumento costruito per"</em> → <strong>Mostra altro</strong>. Il contenuto dopo il taglio deve valere il click.</li>
+  <li><strong>Struttura a rivelazione progressiva.</strong> Ogni paragrafo deve mantenere il dwell time alto. Usa micro-hook interni: "Ma ecco il punto...", "Il dato che nessuno cita..."</li>
+  <li><strong>Immagine con micro-dettagli.</strong> Un'infografica con testo piccolo forza <code>isPhotoExpanded</code> (+0.08). L'utente deve zoomare per leggere.</li>
+  <li><strong>Contenuto salvabile.</strong> Cheat sheet, lista numerata, framework riutilizzabile. Obiettivo: <code>isBookmarked</code> (+0.22). Dì esplicitamente "salva questo".</li>
+  <li><strong>MAI link esterni nel tweet principale.</strong> <code>isOpenLinked</code> ha peso NEGATIVO (-0.04). Se devi linkare, usa il primo reply.</li>
+  <li><strong>Pubblica quando il tuo audience è online.</strong> I primi 15 minuti determinano il branching ratio \(n^*\). Se i primi utenti che vedono il tweet generano segnali forti, il sistema passa al regime supercritico.</li>
+</ol>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Ottimizzazione del Timing</h3>
+
+<p>
+  Il timing è critico per il processo di Hawkes. Se i primi \(k\) utenti interagiscono rapidamente, la funzione di intensità \(\lambda(t)\) sale prima che il decadimento esponenziale la riporti alla baseline. L'obiettivo è raggiungere \(n^* \geq 1\) nella finestra iniziale.
+</p>
+
+<p>
+  In pratica: pubblica quando il tuo audience è più attivo (tipicamente 8-9 del mattino o 18-20 della sera), e usa i primi 2-3 reply per innescare interazioni immediate (domande aperte, take controverso).
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"L'attenzione non si cattura. Si ingegnerizza."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Phoenix misura 7 dimensioni della tua attenzione che tu stesso non sai di emettere. Ogni millisecondo di dwell time, ogni espansione di dettaglio, ogni bookmark: sono dati in un modello bayesiano che ti classifica in tempo reale. La buona notizia: il modello è differenziabile, e ciò che è differenziabile è ottimizzabile. (La iena dice che se dedicassi alla relazione lo stesso dwell time che dedico a Twitter, avremmo un branching ratio supercritico da anni. Probabilmente ha ragione.)
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/attention-hidden-charts.js"></script>
+
+</body>
+</html>

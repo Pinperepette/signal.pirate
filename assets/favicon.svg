@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ff88"/>
+      <stop offset="100%" stop-color="#7c4dff"/>
+    </linearGradient>
+  </defs>
+  <!-- Signal waves -->
+  <path d="M8 32 Q16 16, 24 32 Q32 48, 40 32 Q48 16, 56 32" fill="none" stroke="url(#g)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M12 24 Q20 12, 28 24" fill="none" stroke="#00ff88" stroke-width="2" opacity="0.6"/>
+  <path d="M36 24 Q44 12, 52 24" fill="none" stroke="#7c4dff" stroke-width="2" opacity="0.6"/>
+  <!-- Skull (pirate) -->
+  <circle cx="32" cy="38" r="12" fill="none" stroke="url(#g)" stroke-width="2.5"/>
+  <circle cx="28" cy="36" r="2.5" fill="#00ff88"/>
+  <circle cx="36" cy="36" r="2.5" fill="#00ff88"/>
+  <path d="M28 43 L30 41 L32 43 L34 41 L36 43" fill="none" stroke="#00ff88" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Crossbones as antennas -->
+  <line x1="20" y1="28" x2="14" y2="18" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="14" cy="17" r="2" fill="#7c4dff"/>
+  <line x1="44" y1="28" x2="50" y2="18" stroke="#7c4dff" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="50" cy="17" r="2" fill="#7c4dff"/>
+</svg>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Pirate — Laboratorio di un pirata</title>
+  <meta name="description" content="Signal Pirate smonta gli algoritmi dei social network. Laboratorio di un pirata, a cura di Andrea Amani aka The Pirate.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="glitch-title" data-text="SIGNAL PIRATE">SIGNAL PIRATE</h1>
+      <p class="typing-subtitle">
+        <span id="typing-text"></span><span class="typing-cursor"></span>
+      </p>
+      <p class="hero-bio">
+        Pinperepette. Security engineer.<br>
+        Smonto cose, studio come funzionano e scrivo quello che trovo.
+      </p>
+    </div>
+    <div class="hero-scroll-hint">
+      <svg viewBox="0 0 24 24">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Articles Section -->
+  <section class="section" id="articoli">
+    <h2 class="section-title">// <span class="accent">Articoli</span></h2>
+    <p class="section-subtitle">Analisi tecniche degli algoritmi che controllano il tuo feed</p>
+
+    <div class="articles-grid">
+
+      <!-- Article Card: L'Attenzione Invisibile -->
+      <a href="articoli/attenzione-invisibile.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-02-14</div>
+        <h3 class="article-card-title">L'Attenzione Invisibile</h3>
+        <p class="article-card-abstract">
+          I 7 segnali nascosti di Phoenix misurano la tua attenzione senza che tu lo sappia.
+          Modelli bayesiani, teoria dell'informazione, processi di Hawkes e strategie di exploit.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">Segnali Nascosti</span>
+          <span class="tag tag-highlight">Bayesian</span>
+          <span class="tag tag-amplification">Fisher Info</span>
+        </div>
+      </a>
+
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate &mdash; <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
