@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Impronta nel Rumore | Signal Pirate</title>
+  <meta name="description" content="Come Shazam riconosce una canzone in 5 secondi in un ristorante pieno. FFT, constellation map, hashing combinatoriale e reverse engineering dell'APK.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* === Two Column Charts === */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+
+    /* === Image Placeholder === */
+    .img-placeholder {
+      background: linear-gradient(135deg, rgba(0,255,136,0.04), rgba(124,77,255,0.04));
+      border: 2px dashed rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .img-placeholder-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-attention);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .img-placeholder p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: #f5c518; }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-14 | Pinperepette</p>
+  <h1 class="article-page-title">L'Impronta <span class="accent">nel Rumore</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Come Shazam riconosce una canzone in 5 secondi. Fourier, constellation map, reverse engineering e una cena di San Valentino.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">FFT</span>
+    <span class="tag tag-highlight">Constellation Map</span>
+    <span class="tag tag-reaction">Reverse Engineering</span>
+    <span class="tag tag-amplification">Audio Fingerprint</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — LA CENA                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Cena di San Valentino</h2>
+<span class="section-number">Sezione 01. L'antefatto</span>
+
+<p>
+  San Valentino. 26 anni di matrimonio. La iena ed io a cena fuori, come due persone normali. Lei non ha nemmeno il telefono. Anzi ce l'ha, da qualche parte in fondo alla borsa, spento o scarico, non si sa, non le interessa. È una delle ultime persone al mondo che esce di casa senza controllare se ha il telefono addosso. Io invece ce l'ho in tasca, vibrante, con le notifiche di Twitter che si accumulano come pacchetti in un buffer pieno.
+</p>
+
+<p>
+  Stiamo parlando. Cioè, lei sta parlando. Delle api. La iena si è data all'apicoltura anni fa e da allora le api sono diventate l'argomento dominante di qualsiasi conversazione, pasto, viaggio in macchina e, a quanto pare, cena di San Valentino. Le api stanno bene. Le api hanno fatto il primo volo di pulizia. La regina nuova è promettente. Io annuisco con la frequenza giusta, circa 0.3 Hz, un cenno ogni tre secondi, sufficienti a simulare attenzione attiva.
+</p>
+
+<p>
+  "Ti ricordi quella pianta che avevamo messo nell'orto l'anno scorso?" No. Non mi ricordo. Non ricordo nemmeno cosa ho mangiato a pranzo. Ma annuisco. 0.3 Hz. Costante. Lei passa dall'orto alle galline. Abbiamo delle galline in montagna. Le galline stanno bene. La Bionda ha ricominciato a fare le uova. La Nera no, la Nera è una delusione, non fa un uovo da ottobre. Annuisco. Non me ne frega veramente un cazzo, ma dopo 26 anni ho perfezionato la faccia di chi ascolta con trasporto.
+</p>
+
+<p>
+  Poi succede la cosa. In sottofondo, tra il rumore dei piatti, le cinquanta conversazioni simultanee, i camerieri che gridano ordini e la macchina del caffè che sembra un motore a reazione, sento una canzone. Quei primi accordi al piano, quella voce. La conosco. L'ho sentita mille volte. Ma il titolo non mi viene. La classica tortura cognitiva che ti mangia il cervello per il resto della serata.
+</p>
+
+<p>
+  La iena sta spiegando la differenza tra l'ape ligustica e la carnica. O forse è passata alle potature. Non sono sicuro. Ma il mio cervello ha già cambiato contesto, un <em>context switch</em> involontario, come un thread ad alta priorità che interrompe il main loop. Devo sapere che canzone è.
+</p>
+
+<p>
+  "Scusa un secondo."
+</p>
+
+<p>
+  Lo sguardo della iena è un pacchetto ICMP con TTL=1. Ma io ho già il telefono in mano. Apro Shazam. Il ristorante è un muro di rumore: 50 persone, posate su ceramica, "TAVOLO SETTE!", il frullatore del bar, e la iena che ha smesso di parlare di api per guardarmi con un'intensità che nessun microfono potrebbe catturare. Premo il pulsante. Cinque secondi. <strong>"I Will Always Love You", Whitney Houston</strong>.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/screen_app.jpg" alt="Shazam riconosce I Will Always Love You di Whitney Houston" style="max-width: 320px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Shazam su iPhone. Whitney Houston. Al ristorante. A San Valentino. Con la iena che mi guarda.</figcaption>
+</figure>
+
+<p>
+  Whitney Houston. 1992. Al ristorante, a San Valentino, mentre la iena mi parla delle api e io tiro fuori il telefono. "I Will Always Love You". L'ironia è talmente perfetta che nemmeno un algoritmo avrebbe potuto inventarla.
+</p>
+
+<p>
+  "Ecco! Whitney Houston!" dico, come se avessi appena risolto un teorema. La iena mi guarda con un'espressione che in 26 anni ho imparato a classificare come <strong>threat level: elevated</strong>. Rimetto il telefono in tasca. "Scusa, dimmi. Le api."
+</p>
+
+<p>
+  La cena prosegue. Le api. L'orto. La Nera che non fa le uova. La iena mi perdona, più o meno, perché dopo 26 anni sa che sono recuperabile ma non modificabile. Io fingo di aver dimenticato. Ma non ho dimenticato un cazzo. La domanda è già lì, piantata nella corteccia prefrontale come un processo zombie che non puoi killare:
+</p>
+
+<p style="font-size: 1.2rem; text-align: center; color: var(--accent-attention); font-family: var(--font-mono); margin: 2rem 0;">
+  Come cazzo ha fatto?
+</p>
+
+<p>
+  Il viaggio di ritorno a casa. Guido. La iena continua a parlare, adesso è passata alla figlia. Che domani deve andare a fare dei lavori da Serena. Che ha comprato una borsa nuova. Che quella gonna non le stava bene. Io annuisco. 0.3 Hz. Ma non sto ascoltando. Sto pensando a Shazam.
+</p>
+
+<p>
+  "Sei d'accordo?" chiede la iena.
+</p>
+
+<p>
+  "Assolutamente" rispondo, senza la minima idea di cosa abbia appena accettato. Potrei aver dato il consenso a comprare altre dieci galline, ad allargare l'orto, a un terzo apiario. Non importa. Il mio cervello è già su un'altra frequenza. Letteralmente.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="44100" data-suffix="">0</div>
+    <div class="stat-label">Campioni / secondo</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="5" data-suffix="s">0s</div>
+    <div class="stat-label">Tempo di cattura</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="12" data-suffix="">0</div>
+    <div class="stat-label">Match candidati</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="70" data-suffix="M+">0M+</div>
+    <div class="stat-label">Canzoni nel database</div>
+  </div>
+</div>
+
+<p>
+  50 persone che parlano. Piatti. Caffè. L'ape ligustica e la carnica. La Nera e le sue uova mancanti. La voce della iena che copriva almeno 20 dB di banda utile. E un'app, in 5 secondi, ha identificato una canzone tra 70 milioni di tracce, da un segnale sommerso nel rumore. Ha guardato 5 secondi di caos acustico e ha detto <em>"è questa, al secondo 95 del brano originale, con uno sfasamento temporale di 0.00008 secondi"</em>. Come cazzo ha fatto?
+</p>
+
+<p>
+  Shazam non sente la canzone. Non la "ascolta" in nessun senso umano del termine. Cattura <strong>44100 numeri al secondo</strong> dal microfono, li tritura con trasformate, ne estrae un'impronta digitale, la spedisce a un server, e in meno di 5 secondi riceve indietro titolo, artista, album, copertina e link ad Apple Music. In un ristorante pieno. Con la iena che parla. In un frastuono in cui <em>io</em> non riuscivo nemmeno a ricordare il titolo, e io la canzone la conoscevo.
+</p>
+
+<p>
+  Mi chiudo in ufficio. La iena dorme. Io no.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — I TENTATIVI                                   -->
+<!-- ======================================================= -->
+<h2 id="reverse"><span class="accent">//</span> I Tentativi</h2>
+<span class="section-number">Sezione 02. Intercettare il traffico di Shazam</span>
+
+<p>
+  Il primo istinto del pirata: intercettare il traffico. Vedere cosa manda l'app al server, cosa torna indietro, leggere i byte. Per farlo serve un man-in-the-middle: mettere un proxy tra il telefono e il server di Shazam.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">I telefoni di casa</h3>
+
+<p>
+  Apro il cassetto dei muletti. Due Apple e nessun Android, l'ho usato settimana scorsa, dove cazzo l'ho messo. Nessuno dei due è jailbreakabile. iOS recente, bootchain locked, exploit chain chiusa. Per intercettare HTTPS servono certificati custom installati come root CA, e senza jailbreak o root non c'è modo di bypassare il certificate pinning di Shazam. Primo tentativo, prima parete.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/muletti.jpg" alt="Il cassetto dei muletti" style="max-width: 500px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Il cassetto dei muletti. Nessuno jailbreakabile. Primo tentativo, prima parete.</figcaption>
+</figure>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">L'emulatore Android</h3>
+
+<p>
+  Piano B: emulare. Emulatore Android su Mac, Shazam installato, mitmproxy come proxy HTTPS, Frida per hookare il certificate pinning a runtime. Il setup funziona: l'emulatore parte, Shazam si installa, mitmproxy cattura il traffico. Vedo le richieste a <code>googleapis.com</code>, <code>facebook.com</code>, <code>app-measurement.com</code>. L'app è una festa di tracker. Ma la request che mi interessa, quella verso <code>amp.shazam.com/match</code>, non arriva mai.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/start.jpg" alt="Setup di reverse engineering: emulatore Android con Shazam, mitmproxy, terminale" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Il setup: emulatore Android con Shazam, mitmproxy che intercetta il traffico HTTPS, terminale con i log. La sera di San Valentino spesa bene.</figcaption>
+</figure>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Il certificate pinning</h3>
+
+<p>
+  Shazam usa <strong>OkHttp3 CertificatePinner</strong> con pinning su tre domini: <code>amp.shazam.com</code>, <code>cdn.shazam.com</code> e <code>*.music.apple.com</code>. L'app accetta solo certificati specifici, hardcoded nel codice. Il certificato di mitmproxy viene rifiutato. Con Frida scrivo uno script che hooka le classi Java di verifica SSL e disabilita il pinning. Funziona. Il traffico HTTPS ora passa dal proxy. Ma Shazam crasha prima di generare il fingerprint.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Il crash di Frida</h3>
+
+<p>
+  Il problema è più in basso. L'emulatore gira su <strong>x86_64</strong>, ma <code>libsigx.so</code>, il motore di fingerprinting nativo di Shazam, è compilato per <strong>ARM64</strong>. L'NDK Translation Layer tenta di tradurre le istruzioni ARM in x86 al volo. Ma quando <code>libsigx.so</code> esegue operazioni FPCR (Floating Point Control Register specifico di ARM64), il traduttore va in panico:
+</p>
+
+<div class="code-block" data-lang="crash log">
+<span class="key">FATAL</span>: vendor/unbundled_google/libs/ndk_translation/
+  intrinsics/intrinsics_impl_x86_64.cc:86
+  <span class="cm">CHECK failed: 524288 == 0</span>
+
+Thread: <span class="st">AudioFeaturesPr</span>
+Backtrace:
+  <span class="fn">com.shazam.sigx.FeatureExtractor.flow</span>(Native method)
+  &rarr; ndk_translation::intrinsics::<span class="key">Arm64WriteToFpcr</span>
+</div>
+
+<p>
+  Le istruzioni ARM64 per il controllo della precisione floating point non hanno equivalente diretto in x86. Il fingerprinting muore. Nessun fingerprint, nessuna request al server, niente da intercettare. Secondo tentativo, seconda parete.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">La decompilazione dell'APK</h3>
+
+<p>
+  Non potendo intercettare il traffico live, prendo l'altra strada: <strong>decompilare l'APK</strong>. Estraggo il bytecode smali con <code>apktool</code> per leggere le classi Java, e per il binario nativo <code>libsigx.so</code> (il motore di fingerprinting ARM64) apro <a href="https://github.com/Pinperepette/Aether" target="_blank" rel="noopener">Aether</a>, un disassembler per macOS che ho scritto io. Se non posso vedere il traffico in transito, posso almeno leggere il codice che lo genera. Le classi chiave:
+</p>
+
+<div class="code-block" data-lang="file structure">
+smali_classes2/
+  com/shazam/sigx/
+    <span class="fn">SigX.smali</span>                    <span class="cm"># JNI wrapper per libsigx.so</span>
+    <span class="fn">FeatureExtractor.smali</span>        <span class="cm"># Reti neurali CREMA/CREPE</span>
+  com/shazam/server/
+    request/recognition/
+      <span class="fn">RecognitionRequest.smali</span>    <span class="cm"># Body della POST</span>
+      <span class="fn">Signature.smali</span>             <span class="cm"># Wrapper del fingerprint</span>
+    response/match/
+      <span class="fn">Match.smali</span>                 <span class="cm"># Risultato match</span>
+      <span class="fn">Song.smali</span>                  <span class="cm"># Metadati canzone</span>
+  H9/                             <span class="cm"># OkHttp interceptors</span>
+  I9/c.smali                      <span class="cm"># Auth interceptor (Bearer token)</span>
+  M9/a.smali                      <span class="cm"># Pinned domains</span>
+
+assets/
+  <span class="fn">crema.pte</span>                       <span class="cm"># Modello neurale melodico (1.9 MB)</span>
+  <span class="fn">crepe.pte</span>                       <span class="cm"># Modello neurale pitch (1.9 MB)</span>
+
+lib/arm64-v8a/
+  <span class="fn">libsigx.so</span>                      <span class="cm"># Engine di fingerprinting (nativo)</span>
+</div>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/Aether-1.jpg" alt="Aether: disassembly ARM64 di libsigx.so con control flow graph e decompiler" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;"><a href="https://github.com/Pinperepette/Aether" target="_blank" rel="noopener">Aether</a>: libsigx.so aperto. Disassembly ARM64, control flow graph, decompiler pseudo-C. Le funzioni shazam_sigx_high_* sono il cuore del fingerprinting.</figcaption>
+</figure>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/Aether-2.jpg" alt="Aether: hex dump e decompiler di libsigx.so" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Hex dump del binario e pseudo-C decompilato. Ogni byte di libsigx.so è stato reversato senza mai uscire dalla scrivania.</figcaption>
+</figure>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">La classe Signature</h3>
+
+<p>
+  Dalla decompilazione di <code>Signature.smali</code> emerge la struttura esatta del fingerprint inviato al server:
+</p>
+
+<div class="code-block" data-lang="smali (decompiled)">
+<span class="cm"># com.shazam.server.request.recognition.Signature</span>
+<span class="cm"># Kotlin data class decompilata in Smali</span>
+
+<span class="kw">.field private final</span> sampleMilliseconds:J
+    <span class="cm">@SerializedName("samplems")</span>       <span class="cm"># durata campione in ms</span>
+
+<span class="kw">.field private final</span> timestamp:J
+    <span class="cm">@SerializedName("timestamp")</span>      <span class="cm"># Unix timestamp della registrazione</span>
+
+<span class="kw">.field private final</span> uri:Ljava/lang/String;
+    <span class="cm">@SerializedName("uri")</span>            <span class="cm"># data:audio/vnd.shazam.sig;base64,...</span>
+
+<span class="kw">.field private final</span> audioSource:LAudioSource;
+    <span class="cm">@SerializedName("audioSource")</span>    <span class="cm"># { "type": "MIC" }</span>
+</div>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Il protocollo HTTP ricostruito</h3>
+
+<p>
+  Dalla catena di interceptor OkHttp decompilata (<code>H9/a</code>, <code>H9/b</code>, <code>H9/c</code>, <code>H9/e</code>), ricostruisco la request completa:
+</p>
+
+<div class="code-block" data-lang="http request">
+<span class="kw">POST</span> <span class="st">https://amp.shazam.com/match</span> HTTP/2
+<span class="fn">Content-Type:</span> application/json
+<span class="fn">X-Shazam-Platform:</span> ANDROID
+<span class="fn">X-Shazam-AppVersion:</span> 16.28.0
+<span class="fn">Content-Language:</span> it-IT
+<span class="fn">Authorization:</span> Bearer &lt;token&gt;
+
+{
+  <span class="key">"timestamp"</span>: <span class="nb">1739538000000</span>,
+  <span class="key">"timezone"</span>: <span class="st">"Europe/Rome"</span>,
+  <span class="key">"signatures"</span>: [
+    {
+      <span class="key">"samplems"</span>: <span class="nb">5000</span>,
+      <span class="key">"timestamp"</span>: <span class="nb">1739538000000</span>,
+      <span class="key">"uri"</span>: <span class="st">"data:audio/vnd.shazam.sig;base64,&lt;FINGERPRINT&gt;"</span>,
+      <span class="key">"audioSource"</span>: { <span class="key">"type"</span>: <span class="st">"MIC"</span> }
+    }
+  ]
+}
+</div>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Lo script Python</h3>
+
+<p>
+  Ora so cosa manda l'app. Ma non riesco a farglielo mandare per davvero, perché <code>libsigx.so</code> crasha sull'emulatore. Allora cambio approccio: se conosco il protocollo, posso replicarlo. Esiste una libreria Python, <code>shazamio</code>, che implementa il fingerprinting e parla direttamente con i server di Shazam. Niente telefoni, niente emulatori, niente Frida. Solo Python, un file audio e una POST.
+</p>
+
+<div class="code-block" data-lang="python">
+<span class="kw">from</span> shazamio <span class="kw">import</span> Shazam
+
+shazam = Shazam()
+result = <span class="kw">await</span> shazam.<span class="fn">recognize</span>(<span class="st">"canzone.mp3"</span>)
+
+<span class="cm"># result contiene esattamente la stessa response</span>
+<span class="cm"># che riceverebbe l'app: matches, track, metadata</span>
+print(result[<span class="st">"track"</span>][<span class="st">"title"</span>])    <span class="cm"># "I Will Always Love You"</span>
+print(result[<span class="st">"track"</span>][<span class="st">"subtitle"</span>]) <span class="cm"># "Whitney Houston"</span>
+</div>
+
+<p>
+  Funziona. La response è identica a quella che riceverebbe l'app. Tre righe di Python e ho il protocollo completo: fingerprint generato, request inviata, response con 12 match candidati, metadata, copertina, link Apple Music. Tutto.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il fingerprint</strong> è dentro il campo <code>uri</code> della request: un blob binario (Protobuf serializzato, poi Base64) di ~100-500 byte. Contiene gli hash della constellation map generati dal motore di fingerprinting. Tutto il resto (timestamp, timezone, audioSource) sono metadati. Quei ~500 byte sono tutto ciò che serve per identificare una canzone tra 70 milioni.</p>
+</div>
+
+<p>
+  Ora ho il protocollo, la response, la struttura dell'app decompilata. Ma la domanda resta: cosa c'è in quei 500 byte? Come fa il motore a ridurre 5 secondi di casino in un'impronta che identifica una canzone su 70 milioni? Per capirlo, serve la matematica.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — IL SUONO È NUMERI                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Suono è Solo Numeri</h2>
+<span class="section-number">Sezione 03. Campionamento e digitalizzazione</span>
+
+<p>
+  Il suono è una variazione di pressione nell'aria. Il microfono la converte in tensione elettrica. Il convertitore ADC la trasforma in numeri. Fine della magia analogica. Da qui in poi è tutta matematica.
+</p>
+
+<p>
+  Shazam campiona a <strong>44100 Hz</strong>, mono, 16 bit PCM. Significa 44100 misurazioni al secondo, ciascuna un intero a 16 bit (valori da -32768 a +32767). In 5 secondi di registrazione: <code>44100 &times; 5 = 220500</code> numeri. Circa 430 KB di dati grezzi. Tutto quello che serve.
+</p>
+
+<p>
+  Ma perché proprio 44100? La risposta è nel <strong>teorema di Nyquist-Shannon</strong>: per catturare fedelmente un segnale, la frequenza di campionamento deve essere almeno il doppio della frequenza massima da rappresentare.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$f_s \geq 2 \cdot f_{\max} \qquad \Rightarrow \qquad f_{\max} = \frac{f_s}{2} = \frac{44100}{2} = 22050 \text{ Hz}$$</div>
+  <p class="formula-label">Teorema di Nyquist-Shannon: la frequenza massima catturabile</p>
+</div>
+
+<p>
+  L'orecchio umano arriva a circa 20000 Hz (in teoria, in pratica dopo i 30 anni si perde progressivamente). 44100 Hz copre tutto lo spettro udibile con margine. La iena dice che il mio udito si ferma a 14000 Hz dopo anni di concerti. Nyquist conferma: sto perdendo 6000 Hz di informazione. Ma per Shazam non importa, perché le frequenze utili per il riconoscimento musicale stanno quasi tutte sotto i 5000 Hz.
+</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-attention);">
+  <p><strong>PCM 16 bit mono</strong>: il formato più semplice possibile. Nessuna compressione, nessuna perdita. Ogni campione è un numero intero che rappresenta l'ampiezza istantanea del segnale. La <strong>risoluzione dinamica</strong> è \(20 \cdot \log_{10}(2^{16}) \approx 96\) dB, più che sufficiente per catturare musica in qualsiasi ambiente.</p>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Segnale audio: dominio del tempo (pulito vs rumoroso)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="waveform-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  Nel grafico qui sopra vedete un segnale musicale simulato (mix di frequenze) e lo stesso segnale immerso nel rumore di un ristorante. A occhio non si distingue niente. Ma le frequenze originali sono ancora lì dentro. Servono gli strumenti giusti per tirarle fuori.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — FOURIER                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Fourier: Scomporre il Caos</h2>
+<span class="section-number">Sezione 04. Dalla forma d'onda allo spettrogramma</span>
+
+<p>
+  Il segnale nel dominio del tempo è un casino. Un muro di numeri che salgono e scendono. Per trovare le note musicali serve un cambio di prospettiva radicale: passare dal <strong>dominio del tempo</strong> al <strong>dominio delle frequenze</strong>.
+</p>
+
+<p>
+  Questo è esattamente quello che fa la <strong>Discrete Fourier Transform</strong> (DFT). Prende un blocco di campioni temporali e li decompone nelle sinusoidi che li compongono. Ogni frequenza presente nel segnale diventa un picco nello spettro.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-j \frac{2\pi}{N} kn} \qquad k = 0, 1, \ldots, N-1$$</div>
+  <p class="formula-label">Discrete Fourier Transform: da N campioni temporali a N coefficienti frequenziali</p>
+</div>
+
+<p>
+  In pratica si usa la <strong>FFT</strong> (Fast Fourier Transform), l'algoritmo di Cooley-Tukey che calcola la DFT in \(O(N \log N)\) invece di \(O(N^2)\). Con \(N = 1024\) campioni per finestra, la FFT viene calcolata centinaia di volte al secondo.
+</p>
+
+<p>
+  Ma una singola FFT ti dice <em>quali</em> frequenze ci sono, non <em>quando</em> appaiono. La musica cambia nel tempo. Serve una FFT che scorre lungo il segnale: la <strong>Short-Time Fourier Transform</strong> (STFT).
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$S(m, k) = \sum_{n=0}^{N-1} x[n + mH] \cdot w[n] \cdot e^{-j \frac{2\pi}{N} kn}$$</div>
+  <p class="formula-label">STFT: FFT su finestre scorrevoli. m = indice temporale, H = hop size, w[n] = finestra</p>
+</div>
+
+<p>
+  La funzione finestra \(w[n]\) (Hann, Hamming, o simili) evita artefatti ai bordi del frame. L'<strong>hop size</strong> \(H\) determina la sovrapposizione: con \(N = 1024\) e \(H = 512\), ogni finestra si sovrappone al 50% con la precedente.
+</p>
+
+<p>
+  Il risultato è lo <strong>spettrogramma</strong>: una mappa 2D dove l'asse X è il tempo, l'asse Y è la frequenza, e il colore (o intensità) è la potenza spettrale.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(m, k) = |S(m, k)|^2 = \text{Re}(S)^2 + \text{Im}(S)^2$$</div>
+  <p class="formula-label">Power Spectrum: l'intensità energetica ad ogni punto tempo-frequenza</p>
+</div>
+
+<p>
+  Se Fourier esistesse per le conversazioni, scopriremmo che la frequenza dominante della iena è "non mi ascolti mai" a circa 3000 Hz, con armoniche a "lo dico sempre" e "ecco, l'avevo detto". Un segnale stazionario con zero varianza.
+</p>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Spettro FFT: picchi alle frequenze della canzone</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="fft-spectrum-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Energia per banda di frequenza</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="energy-bands-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Spettrogramma: mappa tempo &times; frequenza (potenza spettrale)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="spectrogram-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Lo spettrogramma è la rappresentazione fondamentale su cui Shazam lavora. Ma non usa <em>tutto</em> lo spettrogramma, sarebbe troppo denso e troppo sensibile al rumore. Il passo successivo è estrarre solo i <strong>picchi</strong>: i punti di massima energia locale. Questi picchi sono le "stelle" nella constellation map.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — LA MAPPA DELLE STELLE                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Mappa delle Stelle</h2>
+<span class="section-number">Sezione 05. Constellation Map, l'intuizione geniale</span>
+
+<p>
+  Siamo nel 1999. <strong>Avery Li-Chun Wang</strong>, ingegnere a Stanford, ha un'idea che diventerà un brevetto da miliardi: e se invece di confrontare interi spettrogrammi, confrontassimo solo i <strong>picchi spettrali</strong>?
+</p>
+
+<p>
+  L'idea è brutalmente semplice. Nello spettrogramma, i punti di massima energia locale (le note dominanti, gli attacchi, le percussioni) sono <strong>stabili</strong>. Anche se aggiungi rumore, riverbero, distorsione, i picchi non si spostano. Cambiano di ampiezza, ma la loro posizione nel piano tempo-frequenza resta quasi identica.
+</p>
+
+<p>
+  Questi picchi, estratti dallo spettrogramma e plottati come punti su un piano (tempo, frequenza), formano una <strong>constellation map</strong>, una mappa delle stelle sonore. Ogni canzone ha la sua costellazione unica.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Constellation Map: picchi spettrali estratti (tempo &times; frequenza)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="constellation-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  Ogni punto nel grafico è un <strong>landmark</strong>: un massimo locale nello spettrogramma. In 5 secondi di audio, Shazam ne estrae tipicamente <strong>30-60</strong>. Pochi punti, ma sufficienti.
+</p>
+
+<p>
+  I picchi sono come le stelle: stabili. Come i punti che la iena segna mentalmente ogni volta che dimentico qualcosa. Una constellation map della mia inadeguatezza. Persistente, robusta al rumore, impossibile da cancellare.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Dall'ancora al target: le coppie hash</h3>
+
+<p>
+  Un singolo picco non basta per identificare una canzone. Troppi falsi positivi. L'innovazione di Wang è usare <strong>coppie di picchi</strong>: un <em>anchor point</em> e un <em>target point</em>, collegati da una relazione tempo-frequenza.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{hash} = \mathcal{H}(f_{\text{anchor}}, \, f_{\text{target}}, \, \Delta t) \qquad \text{dove} \quad \Delta t = t_{\text{target}} - t_{\text{anchor}}$$</div>
+  <p class="formula-label">Fingerprint hash: tre parametri, un indirizzo univoco nel database</p>
+</div>
+
+<p>
+  Ogni coppia genera un <strong>hash</strong> compatto (tipicamente 32 bit) che codifica tre informazioni: la frequenza dell'ancora, la frequenza del target, e il delta temporale tra i due. Questo hash è l'<strong>impronta digitale</strong>, il fingerprint.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Coppie Anchor-Target: come nascono gli hash</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="hash-pairs-chart"></canvas>
+  </div>
+</div>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Parametro</th>
+        <th>Valore tipico</th>
+        <th>Ruolo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>f_anchor</code></td>
+        <td>10 bit (~0-5000 Hz)</td>
+        <td>Frequenza del punto ancora</td>
+      </tr>
+      <tr>
+        <td><code>f_target</code></td>
+        <td>10 bit (~0-5000 Hz)</td>
+        <td>Frequenza del punto target</td>
+      </tr>
+      <tr>
+        <td><code>&Delta;t</code></td>
+        <td>12 bit (~0-4 secondi)</td>
+        <td>Differenza temporale tra i due punti</td>
+      </tr>
+      <tr>
+        <td><strong>Hash totale</strong></td>
+        <td><strong>32 bit</strong></td>
+        <td><strong>~4.3 miliardi di indirizzi possibili</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Con 32 bit di hash e ~70 milioni di canzoni nel database, ogni bucket contiene in media poche decine di entry. La ricerca è <strong>O(1)</strong>, tempo costante. Non serve confrontare il campione con tutte le 70M canzoni. L'hash ti porta direttamente ai candidati.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — IL MATCH                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Match: Trovare l'Ago nel Pagliaio</h2>
+<span class="section-number">Sezione 06. Offset histogram e significatività statistica</span>
+
+<p>
+  Hai catturato 5 secondi di audio. Ne hai estratto ~200 hash. Li hai inviati al server. Il database ha restituito migliaia di candidati, canzoni che condividono almeno un hash con il tuo campione. Come scegli quella giusta?
+</p>
+
+<p>
+  La chiave è l'<strong>allineamento temporale</strong>. Se il tuo campione corrisponde realmente a una canzone nel database, allora tutti gli hash che matchano devono essere coerenti nel tempo. Se il tuo campione inizia al secondo 95 della canzone, <em>tutti</em> gli hash devono puntare a offset ~95.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\delta_i = t_{i}^{\text{db}} - t_{i}^{\text{query}} \qquad \text{score}(c) = \max_{\delta} \; \#\{i : \delta_i = \delta \text{ per canzone } c\}$$</div>
+  <p class="formula-label">Offset histogram: il picco nel conteggio degli offset identifica il match</p>
+</div>
+
+<p>
+  In pratica: per ogni canzone candidata, calcoli l'offset temporale di ogni hash che matcha. Poi costruisci un <strong>istogramma</strong>. Se c'è un vero match, l'istogramma avrà uno spike pronunciato ad un singolo valore di offset. Se è un falso positivo, gli offset saranno distribuiti uniformemente.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Offset Histogram: lo spike identifica il match vero</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="offset-histogram-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  La probabilità che \(k\) hash su \(B = 2^{32}\) bucket collidano per caso <em>tutti allo stesso offset</em> è astronomicamente bassa:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(\text{falso positivo}) \approx \binom{n}{k} \left(\frac{1}{B \cdot T}\right)^{k-1} \ll 10^{-10} \text{ per } k \geq 5$$</div>
+  <p class="formula-label">Con 5+ hash allineati, la probabilità di errore è trascurabile</p>
+</div>
+
+<p>
+  La response che abbiamo catturato aveva <strong>12 match candidati</strong>, tutti con offset coerente intorno a 95 secondi. Non è un caso: è la firma matematica di un match certo.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Il genio del sistema è che non serve un match perfetto. Bastano <strong>5-10 hash allineati</strong> sullo stesso offset per avere certezza statistica. Questo è il motivo per cui funziona nel rumore: anche se il 70% degli hash va perso a causa del casino del ristorante, il 30% rimanente è più che sufficiente.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — LA PIPELINE COMPLETA                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Pipeline Completa</h2>
+<span class="section-number">Sezione 07. Da onda sonora a "I Will Always Love You" in 5 secondi</span>
+
+<p>
+  Ricapitoliamo il flusso completo. Dal momento in cui premi il pulsante al momento in cui vedi il titolo sullo schermo:
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Cattura</div>
+    <div class="step-detail">44100 Hz PCM mono</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">FFT</div>
+    <div class="step-detail">STFT con finestra Hann</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Picchi</div>
+    <div class="step-detail">Massimi locali spettrali</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Hash</div>
+    <div class="step-detail">Coppie anchor-target</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Invio</div>
+    <div class="step-detail">POST amp.shazam.com</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">06</div>
+    <div class="step-name">Match</div>
+    <div class="step-detail">Offset histogram</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">07</div>
+    <div class="step-name">Risultato</div>
+    <div class="step-detail">Track + metadata</div>
+  </div>
+</div>
+
+<p>
+  Nel caso specifico di Shazam (dalla decompilazione dell'APK, sezione 02), la pipeline include anche una fase di <strong>feature extraction neurale</strong>: due modelli PyTorch (<code>crema.pte</code> e <code>crepe.pte</code>, ~1.9 MB ciascuno) che estraggono caratteristiche melodiche e di pitch. Questo è un'evoluzione rispetto al paper originale del 2003: il core resta la constellation map, ma le reti neurali aggiungono robustezza.
+</p>
+
+<p>
+  I dati finali vengono serializzati in <strong>Protobuf</strong>, codificati in <strong>Base64</strong>, e inviati come campo <code>uri</code> nel JSON della request. Il formato è <code>data:audio/vnd.shazam.sig;base64,...</code>.
+</p>
+
+<p>
+  In 5 secondi: 220500 campioni &rarr; ~430 frame FFT &rarr; ~50 picchi &rarr; ~200 hash &rarr; 1 request HTTP &rarr; 12 match candidati &rarr; titolo sullo schermo. E la iena nemmeno se ne è accorta. (Spoiler: se ne è accorta eccome.)
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — LA RESPONSE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Response: 12 Match Candidati</h2>
+<span class="section-number">Sezione 08. Anatomia della risposta di amp.shazam.com</span>
+
+<p>
+  La response JSON di Shazam per "Flowers", catturata riproducendo il protocollo via <code>shazamio</code>, contiene <strong>12 match candidati</strong> e un oggetto <code>track</code> con tutti i metadati.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">I match candidati</h3>
+
+<div class="code-block" data-lang="json response">
+{
+  <span class="key">"matches"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="st">"649332351"</span>,
+      <span class="key">"offset"</span>: <span class="nb">95.528515625</span>,      <span class="cm">// secondi nel brano originale</span>
+      <span class="key">"timeskew"</span>: <span class="nb">-8.4877e-05</span>,     <span class="cm">// deviazione temporale</span>
+      <span class="key">"frequencyskew"</span>: <span class="nb">0.0</span>          <span class="cm">// deviazione in frequenza</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="st">"659180843"</span>,
+      <span class="key">"offset"</span>: <span class="nb">88.470726562</span>,
+      <span class="key">"timeskew"</span>: <span class="nb">0.00033807</span>,
+      <span class="key">"frequencyskew"</span>: <span class="nb">0.00053715</span>
+    },
+    <span class="cm">// ... altri 10 candidati</span>
+  ],
+  <span class="key">"track"</span>: {
+    <span class="key">"title"</span>: <span class="st">"Flowers"</span>,
+    <span class="key">"subtitle"</span>: <span class="st">"Miley Cyrus"</span>,
+    <span class="key">"isrc"</span>: <span class="st">"USSM12209777"</span>,
+    <span class="key">"genres"</span>: { <span class="key">"primary"</span>: <span class="st">"Pop"</span> },
+    <span class="key">"releasedate"</span>: <span class="st">"12-01-2023"</span>,
+    <span class="key">"albumadamid"</span>: <span class="st">"1674691585"</span>
+    <span class="cm">// + images, streaming URLs, Apple Music links...</span>
+  }
+}
+</div>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/json.jpg" alt="Response JSON completa di Shazam in nvim" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La response completa in nvim. 207 righe di JSON: hub Apple Music, metadata, ISRC, link streaming. Tutto da tre righe di Python.</figcaption>
+</figure>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Cosa significano i campi</h3>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Campo</th>
+        <th>Tipo</th>
+        <th>Significato</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>id</code></td>
+        <td>String</td>
+        <td>ID della traccia nel database Shazam (diversi ID = diverse release/versioni)</td>
+      </tr>
+      <tr>
+        <td><code>offset</code></td>
+        <td>Float (sec)</td>
+        <td>Punto esatto nel brano originale dove il campione combacia. ~95s = il campione era al minuto 1:35</td>
+      </tr>
+      <tr>
+        <td><code>timeskew</code></td>
+        <td>Float</td>
+        <td>Deviazione temporale tra campione e originale. Vicino a 0 = match preciso</td>
+      </tr>
+      <tr>
+        <td><code>frequencyskew</code></td>
+        <td>Float</td>
+        <td>Deviazione in frequenza (pitch shift). 0 = stessa tonalità dell'originale</td>
+      </tr>
+      <tr>
+        <td><code>isrc</code></td>
+        <td>String</td>
+        <td>International Standard Recording Code, identificativo univoco mondiale della registrazione</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  12 candidati, ma guardate gli <code>offset</code>: vanno da 87.8 a 143.3 secondi. Il grosso si concentra intorno a <strong>95 secondi</strong>. Questo è l'offset histogram in azione: i match con offset coerente sono il segnale, il resto è rumore. I diversi <code>id</code> corrispondono a versioni diverse della stessa canzone nel database (single, album, remix, versione internazionale).
+</p>
+
+<p>
+  Il <code>timeskew</code> è particolarmente interessante: valori dell'ordine di \(10^{-4}\) indicano una deviazione temporale di 0.01%. La <code>frequencyskew</code> cattura eventuali variazioni di pitch, utile se la canzone è riprodotta leggermente accelerata o rallentata. Nel ristorante, con gli altoparlanti normali, entrambi i valori sono vicini a zero. Tutto torna.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> La response include anche l'URL della <strong>preview audio</strong> su Apple Music (un file .m4a), la copertina dell'album, i link per Snapchat e Twitter, e l'<code>adamid</code> di Apple Music. Shazam non è solo riconoscimento, è una pipeline di monetizzazione che converte 5 secondi di audio in un potenziale acquisto su iTunes.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — PERCHÉ FUNZIONA NEL RUMORE                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Perché Funziona nel Casino</h2>
+<span class="section-number">Sezione 09. La matematica della robustezza al rumore</span>
+
+<p>
+  Il ristorante di San Valentino. 50 persone che parlano. Posate su ceramica. La macchina del caffè. La iena che dice "hai rimesso via quel telefono?". Eppure Shazam trova la canzone. Come?
+</p>
+
+<p>
+  La risposta sta nella natura del <strong>rumore ambientale</strong> rispetto alla <strong>musica</strong>. Il rumore di un ristorante è <em>a banda larga</em>: copre tutte le frequenze in modo relativamente uniforme. Le voci umane occupano la banda 300-3000 Hz. I piatti e le posate generano impulsi transitori brevi.
+</p>
+
+<p>
+  La musica, invece, ha <strong>struttura</strong>: note a frequenze discrete, armoniche a multipli interi della fondamentale, pattern ripetitivi nel tempo. Nello spettrogramma, la musica appare come linee orizzontali (note tenute) e punti brillanti (attacchi). Il rumore è una nebbia uniforme.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{SNR} = 10 \cdot \log_{10} \frac{P_{\text{segnale}}}{P_{\text{rumore}}} \text{ dB}$$</div>
+  <p class="formula-label">Signal-to-Noise Ratio: in un ristorante tipico, SNR &asymp; -5 a +5 dB</p>
+</div>
+
+<p>
+  Con un SNR di 0 dB (segnale e rumore alla stessa potenza), potresti pensare che sia impossibile distinguere qualcosa. Ma i <strong>picchi spettrali</strong> della musica sono localmente molto più intensi del rumore di fondo. Anche se globalmente il rumore ha la stessa energia della musica, <em>localmente</em>, nei bin di frequenza dove c'è una nota, il segnale domina.
+</p>
+
+<p>
+  Questo è il motivo per cui la constellation map funziona: i picchi sono <strong>massimi locali</strong>. Il rumore alza il pavimento, ma non sposta i picchi. Le stelle restano visibili anche con la nebbia.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Robustezza al rumore: % di hash sopravvissuti vs SNR</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="noise-robustness-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  Il rumore del ristorante distrugge il 50-70% degli hash. Ma il match richiede solo 5-10 hash allineati. Se il campione pulito produce ~200 hash, e il rumore ne lascia in piedi 60-100, la probabilità di match resta altissima. La <strong>ridondanza combinatoriale</strong> è il segreto: il sistema è progettato per funzionare con dati parziali.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(\text{match} \mid k \text{ hash sopravvissuti}) = 1 - \left(1 - \frac{1}{B \cdot T}\right)^{\binom{k}{2}} \approx 1 \text{ per } k \geq 10$$</div>
+  <p class="formula-label">Con 10+ hash sopravvissuti al rumore, la probabilità di match converge a 1</p>
+</div>
+
+<p>
+  Il rumore del ristorante è a banda larga, copre tutte le frequenze uniformemente. Come il brusio della iena quando guardo il telefono a cena: costante, onnipresente, ma non abbastanza strutturato da spostare i picchi del segnale che sto cercando. Shazam ignora il rumore e trova la musica. Io dovrei imparare a fare lo stesso. (La iena, se legge questo, mi ammazzerà. Ma con un <code>timeskew</code> vicino a zero, il che mi dà almeno la soddisfazione della precisione.)
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> Shazam funziona fino a circa <strong>-5 dB di SNR</strong> (rumore doppio rispetto al segnale). Il paper originale di Wang (2003) riporta un tasso di riconoscimento del 95% in condizioni "moderatamente rumorose". Il ristorante di San Valentino, a posteriori, era ben dentro il range operativo.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Magia è Solo Matematica</h2>
+<span class="section-number">Sezione 10. Conclusione</span>
+
+<p>
+  Ricapitoliamo. In 5 secondi, il telefono ha:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li>Catturato 220500 campioni a 44100 Hz</li>
+  <li>Applicato la STFT con finestra Hann su ~430 frame sovrapposti</li>
+  <li>Estratto ~50 picchi spettrali (la constellation map)</li>
+  <li>Generato ~200 hash combinatoriali da coppie di picchi</li>
+  <li>Serializzato tutto in ~500 byte di Protobuf + Base64</li>
+  <li>Inviato una POST a <code>amp.shazam.com/match</code></li>
+  <li>Ricevuto 12 match candidati con offset a ~95 secondi</li>
+  <li>Mostrato titolo, artista, copertina e link Apple Music</li>
+</ol>
+
+<p>
+  Nessuna intelligenza artificiale magica (anche se i modelli CREMA/CREPE aggiungono il loro). Nessuna comprensione del significato musicale. Solo <strong>Fourier</strong> che decompone onde, <strong>picchi</strong> che resistono al rumore, <strong>hash</strong> che permettono ricerche in O(1), e <strong>statistica</strong> che rende i falsi positivi impossibili.
+</p>
+
+<p>
+  La prossima volta che siete in un ristorante rumoroso e Shazam vi dice il titolo della canzone in 5 secondi, ricordatevi: non è magia. È un signore francese del 1807 che ha capito che qualsiasi segnale si può scomporre in sinusoidi, un ingegnere di Stanford che nel 1999 ha pensato di usare solo i picchi, e un bel po' di hash table.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Non è magia. È solo matematica che funziona nel rumore."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    5 secondi. 220500 campioni. 50 picchi. 200 hash. 12 match. 1 canzone. Zero magia.
+    Fourier ha fatto il lavoro pesante. Avery Wang ha avuto l'intuizione. E io ho finalmente scoperto cosa suonava al ristorante mentre la iena mi guardava male. 26 anni di matrimonio sopravvissuti a Nyquist, alla constellation map e a un telefono tirato fuori a San Valentino. Se il nostro rapporto fosse un segnale, avrebbe un SNR bassissimo ma evidentemente abbastanza picchi stabili per un match. La robustezza non sta nella potenza del segnale. Sta nella struttura.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/shazam-charts.js"></script>
+
+</body>
+</html>
