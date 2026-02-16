@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Come Pensa la Macchina | Signal Pirate</title>
+  <meta name="description" content="Smontare un LLM pezzo per pezzo. Tokenizzazione, embeddings, attention, transformer e hallucinations. Ollama in locale, math pesante, zero fuffa.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* === Two Column Charts === */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Token visualization === */
+    .token-vis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin: 1rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    .token-vis .tok {
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+      line-height: 1;
+    }
+    .token-vis .tok:nth-child(odd) { background: rgba(124,77,255,0.15); }
+    .token-vis .tok:nth-child(even) { background: rgba(0,255,136,0.12); }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: #f5c518; }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-16 | Pinperepette</p>
+  <h1 class="article-page-title">Come Pensa <span class="accent">la Macchina</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Un LLM smontato pezzo per pezzo. Tokenizzazione, embeddings, attention, hallucinations. Ollama in locale, zero fuffa.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Transformer</span>
+    <span class="tag tag-highlight">Embeddings</span>
+    <span class="tag tag-reaction">Attention</span>
+    <span class="tag tag-amplification">Ollama</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — L'ANEDDOTO                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Apicoltrice e il Pappagallo</h2>
+<span class="section-number">Sezione 01. L'antefatto</span>
+
+<p>
+  La iena usa ChatGPT sull'iPad. Non per lavoro. Per le api, per le galline, per capire perché la Nera non fa un uovo da ottobre, per sapere se la regina nuova è buona. Le cose che le interessano. Lo usa come userebbe un'enciclopedia, con la differenza che l'enciclopedia non si contraddiceva da sola.
+</p>
+
+<p>
+  L'altra sera stava chiedendo qualcosa sulle api. Il modello le ha risposto, e da qualche parte nella risposta si è contraddetto. Non so cosa esattamente, perché quando la iena ha iniziato a spiegarmi il problema io ero già in modalità automatica: annuisco a 0.3 Hz, lo sguardo fisso che simula attenzione, il cervello su un altro thread. La stessa frequenza di campionamento della cena di San Valentino. Funziona da 26 anni, non vedo motivo di cambiarla.
+</p>
+
+<p>
+  Quello che ho sentito, filtrato dal mio passa-basso cognitivo, è stato più o meno: "...si è contraddetto... ha scritto una cosa e poi il contrario... bla bla bla... l'intelligenza artificiale non serve a niente... bla bla bla... non capisco come fai ad avere tutto questo lavoro con una roba così stupida... bla bla bla... non sostituirà mai nessuno... bla bla bla..."
+</p>
+
+<p>
+  Annuisco. 0.3 Hz. "Hai ragione." Non ho la minima idea di cosa abbia detto ChatGPT di sbagliato sulle api. Ma la iena ha ragione su una cosa, anche se non nel senso che intende lei: c'è un problema enorme con come la gente parla di intelligenza artificiale.
+</p>
+
+<p>
+  Perché ci penso, quella sera, dopo che la iena si è addormentata. E mi rendo conto che ho letto decine di articoli su come funzionano gli LLM. Centinaia forse. E il 99,9999% erano cagate. "L'AI capisce il contesto." "I neuroni si attivano come nel cervello." "Il modello ragiona." Metafore colorate, infografiche carine con le frecce, zero formule, zero codice, zero esperimenti. Gente che spiega cose che non capisce, usando parole che non significano quello che pensano. Una catena di pappagalli che scrivono articoli sui pappagalli.
+</p>
+
+<p>
+  Allora lo scrivo io. Smonto la macchina pezzo per pezzo. Ho <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> sul Mac con una decina di modelli. Scelgo il più piccolo: <code>llama3.1:8b</code>, 8 miliardi di parametri, 4.9 gigabyte su disco. Il più facile da maneggiare senza sbatti, e tanto l'architettura è identica per tutti: che siano 8 miliardi o 405 miliardi, il meccanismo è lo stesso. Cambiano le dimensioni delle matrici, non come funziona la macchina. Lo apro dal terminale, guardo i byte, e seguo il percorso completo: dal testo che entra al testo che esce. Ogni passaggio, ogni formula, ogni decisione matematica. Niente metafore del cervello. Niente fuffa. Se vuoi capire come funziona una cosa, la smonti. Non leggi chi ne scrive.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="8" data-suffix="B">0B</div>
+    <div class="stat-label">Parametri</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="4" data-suffix=".9 GB">0 GB</div>
+    <div class="stat-label">Dimensione su disco</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="32" data-suffix="">0</div>
+    <div class="stat-label">Transformer layer</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="128" data-suffix="K">0K</div>
+    <div class="stat-label">Vocabolario token</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — 4 GIGA DI COSCIENZA                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 4 Giga di Coscienza</h2>
+<span class="section-number">Sezione 02. Dentro il file</span>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/desktop.jpg" alt="La scrivania di notte: terminale aperto, Ollama che gira, la iena dorme" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La scrivania. La iena dorme. Il terminale è aperto. Si smonta.</figcaption>
+</figure>
+
+<p>
+  La iena dorme. Io apro il terminale. Il modello è un file. Un singolo file da 4.920.738.944 byte, seduto nella cartella <code>~/.ollama/models/blobs/</code>. Tutto quello che "sa" Llama 3.1 8B, tutto quello che ha "imparato" da terabyte di testo, è compresso in quei byte. Niente magia, niente coscienza. Numeri.
+</p>
+
+<p>
+  I primi byte li leggo con <code>xxd</code>:
+</p>
+
+<div class="code-block" data-lang="hex dump">
+<span class="nb">00000000</span>: <span class="st">4747 5546</span> 0300 0000 2401 0000 0000 0000  <span class="fn">GGUF</span>....$.......
+<span class="nb">00000010</span>: 1d00 0000 0000 0000 1400 0000 0000 0000  ................
+<span class="nb">00000020</span>: <span class="st">6765 6e65 7261 6c2e 6172 6368 6974 6563</span>  <span class="fn">general.architec</span>
+<span class="nb">00000030</span>: <span class="st">7475 7265</span> 0800 0000 0500 0000 0000 0000  <span class="fn">ture</span>............
+<span class="nb">00000040</span>: <span class="st">6c6c 616d 61</span> 0c00 0000 0000 0000 67656e  <span class="fn">llama</span>........gen
+</div>
+
+<p>
+  <code>GGUF</code>: i primi quattro byte. Il magic number del formato. Come <code>%PDF</code> all'inizio di un PDF, o <code>PK</code> in uno ZIP. Dice al software che tipo di file è. Dopo il magic: la versione (3), il numero di tensori (292) e il numero di metadati (29).
+</p>
+
+<p>
+  Lo apro dal terminale con <code>xxd</code>, lo stesso approccio che userei per qualsiasi binario. Non è codice eseguibile, è un formato dati, ma il principio è lo stesso: vuoi capire una cosa, guardi i byte. L'header si legge in chiaro: architettura, numero di layer, dimensione dei vettori, tipo di quantizzazione. Tutto scritto nei primi kilobyte.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/aether-gguf.png" alt="Hex dump del file GGUF di Llama 3.1 8B con header e metadati" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">xxd: il file GGUF di Llama 3.1 8B aperto dal terminale. 4.9 GB di matrici quantizzate. Il magic "GGUF" si legge nei primi 4 byte.</figcaption>
+</figure>
+
+<p>
+  GGUF sta per <strong>GPT-Generated Unified Format</strong>. È il formato inventato da Georgi Gerganov per <code>llama.cpp</code>, il progetto che ha reso possibile far girare LLM su hardware consumer. Un singolo file, autodescrittivo, che contiene tutto: metadati, vocabolario, pesi. Nessuna dipendenza esterna.
+</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Campo</th>
+        <th>Valore</th>
+        <th>Significato</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>magic</code></td>
+        <td>GGUF</td>
+        <td>Identificativo formato</td>
+      </tr>
+      <tr>
+        <td><code>version</code></td>
+        <td>3</td>
+        <td>Versione del formato GGUF</td>
+      </tr>
+      <tr>
+        <td><code>tensor_count</code></td>
+        <td>292</td>
+        <td>Matrici di pesi nel modello</td>
+      </tr>
+      <tr>
+        <td><code>general.name</code></td>
+        <td>Meta Llama 3.1 8B Instruct</td>
+        <td>Modello e variante</td>
+      </tr>
+      <tr>
+        <td><code>general.file_type</code></td>
+        <td>Q4_K_M</td>
+        <td>Quantizzazione a 4 bit (medium)</td>
+      </tr>
+      <tr>
+        <td><code>llama.block_count</code></td>
+        <td>32</td>
+        <td>Numero di layer del transformer</td>
+      </tr>
+      <tr>
+        <td><code>llama.embedding_length</code></td>
+        <td>4096</td>
+        <td>Dimensione dei vettori interni</td>
+      </tr>
+      <tr>
+        <td><code>llama.attention.head_count</code></td>
+        <td>32</td>
+        <td>Teste di attenzione per layer</td>
+      </tr>
+      <tr>
+        <td><code>llama.attention.head_count_kv</code></td>
+        <td>8</td>
+        <td>Teste KV (Grouped-Query Attention)</td>
+      </tr>
+      <tr>
+        <td><code>llama.vocab_size</code></td>
+        <td>128.256</td>
+        <td>Token nel vocabolario</td>
+      </tr>
+      <tr>
+        <td><code>llama.context_length</code></td>
+        <td>131.072</td>
+        <td>Finestra di contesto (128K token)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  I numeri originali del modello sono in <strong>float16</strong> (16 bit per parametro). 8 miliardi di parametri &times; 2 byte = 16 GB. Non ci stanno nella RAM della maggior parte delle macchine consumer. La soluzione: <strong>quantizzazione</strong>. Q4_K_M significa che ogni peso è stato compresso da 16 bit a circa 4.5 bit, con un algoritmo che preserva la precisione dove conta di più (i pesi con magnitudine maggiore). Il risultato: 4.9 GB invece di 16 GB. Corre sul mio Mac con 96 GB di RAM. Perde un po' di qualità, ma non troppa.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{Dimensione} = \frac{N_{\text{params}} \times b_{\text{quant}}}{8} \approx \frac{8 \times 10^9 \times 4.5}{8} \approx 4.5 \text{ GB}$$</div>
+  <p class="formula-label">Il rapporto: parametri &times; bit per parametro / 8 = byte su disco</p>
+</div>
+
+<p>
+  292 tensori. Ogni tensore è una matrice di numeri: pesi delle connessioni, bias, parametri di normalizzazione. Organizzati in 32 layer identici, ognuno con le stesse matrici: <code>attention.wq</code>, <code>attention.wk</code>, <code>attention.wv</code>, <code>attention.wo</code>, <code>feed_forward.w1</code>, <code>feed_forward.w2</code>, <code>feed_forward.w3</code>, <code>attention_norm</code>, <code>ffn_norm</code>. Più il layer di embedding iniziale e quello finale.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/tensori.png" alt="Script Python che calcola le dimensioni dei tensori di Llama 3.1 8B e output con il conteggio parametri" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Le ossa del modello: 292 tensori, ~8 miliardi di parametri. Ogni layer ha le stesse 9 matrici, ripetute 32 volte.</figcaption>
+</figure>
+
+<div class="insight-box fade-in">
+  <p><strong>Cosa c'è nel file:</strong> nessuna "conoscenza" in senso umano. Nessun database di fatti. Nessun motore di ricerca interno. Solo 292 matrici di numeri che, moltiplicate nel giusto ordine, trasformano una sequenza di token in ingresso in una distribuzione di probabilità sul token successivo. Tutto il "sapere" del modello è codificato nelle relazioni statistiche tra questi numeri. È per questo che può scrivere che la regina "esce dall'alveare per fondare una nuova colonia" e che le operaie "si addormentano" in inverno nello stesso paragrafo: non ha un concetto di "ape", ha pattern statistici sul testo.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — IL MONDO A PEZZI                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Mondo a Pezzi</h2>
+<span class="section-number">Sezione 03. Tokenizzazione</span>
+
+<p>
+  Il modello non vede lettere. Non vede parole. Vede <strong>token</strong>: pezzi di testo, a volte parole intere, a volte frammenti, a volte singoli caratteri. Il primo passaggio di qualsiasi LLM è spezzare il testo di input in questa sequenza di pezzi.
+</p>
+
+<p>
+  Quando la iena scrive "La regina delle api depone", il modello non riceve cinque parole. Riceve sei numeri:
+</p>
+
+<div class="token-vis fade-in">
+  <span class="tok">La<sub style="opacity:0.5;font-size:0.7em">8921</sub></span>
+  <span class="tok">&nbsp;regina<sub style="opacity:0.5;font-size:0.7em">1239</sub></span>
+  <span class="tok">&nbsp;delle<sub style="opacity:0.5;font-size:0.7em">2259</sub></span>
+  <span class="tok">&nbsp;api<sub style="opacity:0.5;font-size:0.7em">28071</sub></span>
+  <span class="tok">&nbsp;dep<sub style="opacity:0.5;font-size:0.7em">6464</sub></span>
+  <span class="tok">one<sub style="opacity:0.5;font-size:0.7em">2219</sub></span>
+</div>
+
+<p>
+  "La", "regina", "delle", "api" sono token interi. Ma "depone" si spezza in "dep" + "one". Perché? Perché il tokenizzatore non conosce la parola "depone" come unità. Il suo vocabolario di 128.256 token è stato costruito da testo prevalentemente inglese, e "depone" non è abbastanza frequente da meritare un token dedicato. "dep" e "one" separatamente sono più comuni.
+</p>
+
+<p>
+  L'algoritmo si chiama <strong>Byte Pair Encoding</strong> (BPE). Funziona così: parti dai singoli byte (256 token base), poi iterativamente fondi le coppie più frequenti nel corpus di addestramento. "th" + "e" → "the". "in" + "g" → "ing". Dopo centinaia di migliaia di fusioni, ottieni un vocabolario che bilancia compressione ed espressività.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{BPE: }\underset{(a,b)}{\operatorname{argmax}}\; \text{count}(a,b) \;\to\; \text{merge}(a,b) \;\to\; \text{nuovo token}$$</div>
+  <p class="formula-label">Ad ogni passo, la coppia più frequente viene fusa in un nuovo token</p>
+</div>
+
+<p>
+  La conseguenza è brutale e quasi mai spiegata: <strong>il modello non vede il mondo allo stesso modo in tutte le lingue</strong>. "The queen bee lays eggs" costa 5 token. "La regina delle api depone uova" ne costa 9. Quasi il doppio. "intelligenza artificiale" ne costa 7; "artificial intelligence" ne costa 3. "depone" viene spezzato in "dep" + "one", "uova" in altri pezzi. "lays" e "eggs" restano interi. Il tokenizzatore è stato costruito su testo inglese, e l'italiano paga il conto.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Token count: italiano vs inglese sulla stessa frase</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="token-count-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  Questo ha conseguenze concrete. Un testo italiano consuma più token di uno inglese. Riempie prima la finestra di contesto. Costa di più (le API fatturano per token). E il modello ha meno "spazio" per ragionare. Quando la iena scrive le sue domande sulle api in italiano, il modello sta già lavorando con un handicap strutturale.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> il tokenizzatore è il primo punto di fallimento. Un vocabolario costruito su testo inglese tratta le altre lingue come cittadini di seconda classe. Non è un bug, è un bias architetturale. Il modello "pensa" in token, e i token sono disegnati per l'inglese. (La iena, se sapesse che il modello la penalizza perché scrive in italiano, aggiungerebbe questo alla lista delle ragioni per cui la tecnologia è sopravvalutata.)</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — NUMERI CHE CATTURANO SIGNIFICATO              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Numeri che Catturano Significato</h2>
+<span class="section-number">Sezione 04. Embeddings</span>
+
+<p>
+  Ogni token è un numero intero. "regina" = 1239. Ma un numero intero non porta informazione semantica. 1239 non è "vicino" a 1240 in nessun senso linguistico. Serve una rappresentazione che catturi il <em>significato</em>. Servono gli <strong>embeddings</strong>.
+</p>
+
+<p>
+  Il layer di embedding è una matrice gigante: <strong>128.256 righe &times; 4.096 colonne</strong>. Ogni riga è il vettore che rappresenta un token nello spazio semantico. Quando il token 1239 ("regina") entra nel modello, viene sostituito dal suo vettore di 4.096 numeri. Quei numeri non sono casuali: sono stati calibrati durante l'addestramento affinché token con significati simili abbiano vettori simili.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{e}_i = \mathbf{W}_E[\text{token}_i] \in \mathbb{R}^{d} \qquad d = 4096$$</div>
+  <p class="formula-label">Ogni token viene mappato a un vettore di d dimensioni tramite la matrice di embedding W_E</p>
+</div>
+
+<p>
+  Come si misura la "somiglianza" tra due vettori? Con la <strong>cosine similarity</strong>: il coseno dell'angolo tra i due vettori nello spazio 4096-dimensionale.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{cos}(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{||\mathbf{a}|| \; ||\mathbf{b}||} = \frac{\sum_i a_i b_i}{\sqrt{\sum_i a_i^2} \cdot \sqrt{\sum_i b_i^2}}$$</div>
+  <p class="formula-label">Cosine similarity: 1 = identici, 0 = ortogonali, -1 = opposti</p>
+</div>
+
+<p>
+  Ho estratto gli embeddings reali da <code>nomic-embed-text</code> (un modello di embedding che gira su Ollama) e calcolato le similarità coseno:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/cosine.png" alt="Output del terminale con le similarità coseno tra coppie di parole calcolate con nomic-embed-text" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Cosine similarity calcolata in locale con nomic-embed-text su Ollama. I numeri non mentono: "neurone" e "rete neurale" sono vicini, "gatto" e "algebra" no.</figcaption>
+</figure>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Cosine similarity tra coppie di parole (embeddings reali)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="embedding-similarity-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  "neurone" e "rete neurale" hanno similarità <strong>0.625</strong>. "ape" e "regina" <strong>0.468</strong>. "gatto" e "algebra" <strong>0.353</strong>. I numeri catturano relazioni semantiche reali. Non perfettamente, non come un umano, ma abbastanza da essere utili.
+</p>
+
+<p>
+  Nello spazio degli embeddings, "ape" è vicino a "regina", "miele", "alveare". "Computer" è vicino a "tastiera", "schermo", "software". Le parole che appaiono in contesti simili durante l'addestramento finiscono in regioni simili dello spazio vettoriale. Questo è il <strong>distributional hypothesis</strong> di Firth: <em>"You shall know a word by the company it keeps."</em>
+</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-attention);">
+  <p><strong>Insight chiave:</strong> gli embeddings non "capiscono" il significato. Catturano <em>co-occorrenza statistica</em>. "Regina" è vicino a "ape" perché appaiono spesso insieme nel testo di addestramento, non perché il modello sa cos'è un'ape. Questa differenza è fondamentale: la co-occorrenza statistica funziona bene l'80% delle volte. Ma quando serve conoscenza vera, quella che la iena ha per aver aperto le arnie per anni, i numeri non bastano.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — LA PAROLA CHE GUARDA LE ALTRE                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Parola che Guarda le Altre</h2>
+<span class="section-number">Sezione 05. Self-Attention</span>
+
+<p>
+  Adesso abbiamo una sequenza di vettori: ogni token è diventato un punto in uno spazio a 4.096 dimensioni. Ma ogni vettore è isolato: "regina" non sa che prima c'è "la" e dopo c'è "delle api". Serve un meccanismo che permetta a ogni token di <strong>guardare tutti gli altri</strong> e decidere a chi prestare attenzione. Questo meccanismo è la <strong>self-attention</strong>, l'innovazione centrale del paper "Attention Is All You Need".
+</p>
+
+<p>
+  Per ogni token, il modello calcola tre vettori:
+</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Vettore</th>
+        <th>Simbolo</th>
+        <th>Ruolo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Query</strong></td>
+        <td>\(\mathbf{q}_i\)</td>
+        <td>"Cosa sto cercando?" - ciò che il token vuole sapere</td>
+      </tr>
+      <tr>
+        <td><strong>Key</strong></td>
+        <td>\(\mathbf{k}_i\)</td>
+        <td>"Cosa offro?" - ciò che il token rappresenta per gli altri</td>
+      </tr>
+      <tr>
+        <td><strong>Value</strong></td>
+        <td>\(\mathbf{v}_i\)</td>
+        <td>"Cosa porto?" - l'informazione effettiva da trasmettere</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{q}_i = \mathbf{W}_Q \mathbf{x}_i \qquad \mathbf{k}_i = \mathbf{W}_K \mathbf{x}_i \qquad \mathbf{v}_i = \mathbf{W}_V \mathbf{x}_i$$</div>
+  <p class="formula-label">Proiezioni lineari: tre matrici di pesi trasformano ogni embedding</p>
+</div>
+
+<p>
+  Poi si calcola quanto ogni token dovrebbe "prestare attenzione" a ogni altro token:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}$$</div>
+  <p class="formula-label">Scaled Dot-Product Attention: il cuore del transformer</p>
+</div>
+
+<p>
+  Smontiamo pezzo per pezzo:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li><strong>\(\mathbf{Q}\mathbf{K}^\top\)</strong> - prodotto scalare tra query e key. Misura la "compatibilità" tra ogni coppia di token. Se la query di "depone" è allineata con la key di "regina", il punteggio sarà alto.</li>
+  <li><strong>\(\div \sqrt{d_k}\)</strong> - divisione per la radice della dimensione. Senza questo, i prodotti scalari crescono con la dimensione e mandano in saturazione la softmax. Con \(d_k = 128\) (dimensione per testa), si divide per \(\sqrt{128} \approx 11.3\).</li>
+  <li><strong>softmax</strong> - normalizza i punteggi in pesi di attenzione che sommano a 1. I token con punteggio alto ricevono più peso.</li>
+  <li><strong>\(\times \mathbf{V}\)</strong> - media pesata dei vettori value. L'output per ogni token è una combinazione di tutti gli altri, pesata per l'attenzione.</li>
+</ol>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{softmax}(z_i) = \frac{e^{z_i}}{\sum_{j=1}^{n} e^{z_j}}$$</div>
+  <p class="formula-label">Softmax: trasforma punteggi arbitrari in una distribuzione di probabilità</p>
+</div>
+
+<p>
+  Il modello ha <strong>32 teste di attenzione</strong> per layer, ognuna con la sua tripletta \(\mathbf{W}_Q, \mathbf{W}_K, \mathbf{W}_V\). Ogni testa impara a cercare un tipo diverso di relazione: una testa potrebbe specializzarsi sulle relazioni soggetto-verbo, un'altra sulle dipendenze a lunga distanza, un'altra ancora sulla posizione relativa.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{MultiHead}(\mathbf{X}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_{32}) \; \mathbf{W}_O$$</div>
+  <p class="formula-label">Multi-Head Attention: 32 prospettive diverse concatenate e proiettate</p>
+</div>
+
+<p>
+  Llama 3.1 usa <strong>Grouped-Query Attention</strong> (GQA): 32 teste per le query, ma solo 8 per key e value (rapporto 4:1). Quattro teste di query condividono le stesse key e value. Riduce la memoria necessaria del 75% per le KV cache, senza perdita significativa di qualità. Questo è il motivo per cui il modello riesce a gestire una finestra di contesto da 128K token su hardware consumer.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Pesi di attenzione: "depone" guarda indietro alla frase</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="attention-weights-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> l'attention è ciò che permette al modello di "mettere in relazione" token distanti. Quando il modello genera testo sulle api, il token "depone" può guardare indietro a "regina" e dare peso alto a quella connessione. Ma l'attention non verifica la coerenza logica. Non controlla se "la regina esce per fondare una colonia" e "le operaie si addormentano" siano cazzate. Vede relazioni statistiche tra token, non relazioni logiche tra concetti.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — LA CATENA DI MONTAGGIO                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Catena di Montaggio</h2>
+<span class="section-number">Sezione 06. Il Transformer, layer by layer</span>
+
+<p>
+  L'attention è solo un pezzo. Il transformer completo è una catena di 32 blocchi identici, ognuno con la stessa struttura:
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">RMSNorm</div>
+    <div class="step-detail">Normalizzazione</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Attention</div>
+    <div class="step-detail">GQA 32 teste</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Residual</div>
+    <div class="step-detail">x + attention(x)</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">RMSNorm</div>
+    <div class="step-detail">Normalizzazione</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">FFN</div>
+    <div class="step-detail">SwiGLU 14336-d</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">06</div>
+    <div class="step-name">Residual</div>
+    <div class="step-detail">x + ffn(x)</div>
+  </div>
+</div>
+
+<p>
+  <strong>RMSNorm</strong> (Root Mean Square Layer Normalization) stabilizza i valori prima di ogni sub-layer. Senza normalizzazione, i numeri crescerebbero o collasserebbero passando attraverso 32 layer.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{RMSNorm}(\mathbf{x}) = \frac{\mathbf{x}}{\sqrt{\frac{1}{d}\sum_{i=1}^d x_i^2 + \epsilon}} \odot \boldsymbol{\gamma}$$</div>
+  <p class="formula-label">RMSNorm: normalizzazione per la magnitudine, con parametri apprendibili &gamma;</p>
+</div>
+
+<p>
+  Il <strong>Feed-Forward Network</strong> (FFN) è dove il modello "ragiona" localmente su ogni token. In Llama 3.1 usa l'architettura <strong>SwiGLU</strong>:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{FFN}(\mathbf{x}) = (\text{SiLU}(\mathbf{x}\mathbf{W}_1) \odot \mathbf{x}\mathbf{W}_3) \; \mathbf{W}_2$$</div>
+  <p class="formula-label">SwiGLU FFN: gated linear unit con attivazione SiLU (Swish)</p>
+</div>
+
+<p>
+  La dimensione interna del FFN è 14.336, 3.5 volte la dimensione dell'embedding (4.096). Ogni token viene proiettato in questo spazio più grande, trasformato non-linearmente, e riproiettato indietro. È qui che si trovano la maggior parte dei parametri del modello.
+</p>
+
+<p>
+  Le <strong>connessioni residuali</strong> (\(\mathbf{x} + f(\mathbf{x})\)) sono fondamentali: permettono al gradiente di fluire senza degradarsi attraverso 32 layer durante l'addestramento. Senza residual connections, i transformer profondi non si addestrano.
+</p>
+
+<p>
+  Infine, il <strong>positional encoding</strong>. L'attention non ha nozione intrinseca dell'ordine dei token. "Il gatto mangia il topo" e "Il topo mangia il gatto" produrrebbero la stessa attention senza informazione posizionale. Llama 3.1 usa <strong>RoPE</strong> (Rotary Position Embedding): una rotazione nel piano complesso che codifica la posizione relativa.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{RoPE}(\mathbf{x}, m) = \mathbf{x} \odot \cos(m\boldsymbol{\theta}) + \text{rotate}(\mathbf{x}) \odot \sin(m\boldsymbol{\theta})$$</div>
+  <p class="formula-label">RoPE: rotazione che codifica la posizione m. &theta; = frequenze base a 500.000</p>
+</div>
+
+<p>
+  Con <code>rope.freq_base = 500000</code>, il modello supporta fino a 128K token di contesto. Ogni posizione è una rotazione unica nello spazio, e la distanza tra due posizioni si riflette nell'angolo relativo.
+</p>
+
+<p>
+  Il flusso completo per un singolo token, dall'ingresso all'uscita:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/pipline.png" alt="Pipeline completa di un token attraverso Llama 3.1 8B: tokenizer, embedding, 32 layer transformer, softmax, campionamento" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Il viaggio di un token: dal testo in ingresso al dado pesato. 32 layer, stessa struttura, ripetuta.</figcaption>
+</figure>
+
+<div class="code-block" data-lang="pipeline">
+<span class="cm"># Input: sequenza di token [t₁, t₂, ..., tₙ]</span>
+
+<span class="fn">1.</span> x = <span class="kw">Embedding</span>(tokens)                <span class="cm"># [n, 4096]</span>
+
+<span class="cm"># Ripetuto 32 volte (un layer per volta):</span>
+<span class="fn">2.</span>   h = <span class="kw">RMSNorm</span>(x)                      <span class="cm"># normalizza</span>
+<span class="fn">3.</span>   Q, K = <span class="kw">RoPE</span>(W_Q·h, W_K·h, pos)     <span class="cm"># posizionale su Q e K</span>
+<span class="fn">4.</span>   h = <span class="kw">GQA_Attention</span>(Q, K, W_V·h)     <span class="cm"># 32Q/8KV teste</span>
+<span class="fn">5.</span>   x = x + h                            <span class="cm"># residual</span>
+<span class="fn">6.</span>   h = <span class="kw">RMSNorm</span>(x)                      <span class="cm"># normalizza</span>
+<span class="fn">7.</span>   h = <span class="kw">SwiGLU_FFN</span>(h)                   <span class="cm"># 4096→14336→4096</span>
+<span class="fn">8.</span>   x = x + h                            <span class="cm"># residual</span>
+
+<span class="fn">9.</span>  x = <span class="kw">RMSNorm</span>(x)                       <span class="cm"># normalizzazione finale</span>
+<span class="fn">10.</span> logits = x @ <span class="kw">W_vocab</span>                 <span class="cm"># [n, 128256]</span>
+<span class="fn">11.</span> probs = <span class="kw">softmax</span>(logits / T)           <span class="cm"># distribuzione</span>
+</div>
+
+<p>
+  Alla fine dei 32 layer, il vettore dell'ultimo token viene moltiplicato per la matrice del vocabolario (128.256 righe), producendo un punteggio per ogni possibile token successivo. La softmax trasforma questi punteggi in probabilità. E qui succede la magia. E l'inganno.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — IL DADO PESATO                                -->
+<!-- ======================================================= -->
+<h2 id="dado-pesato"><span class="accent">//</span> Il Dado Pesato</h2>
+<span class="section-number">Sezione 07. Next-token prediction</span>
+
+<p>
+  Ecco il segreto sporco degli LLM, quello che quasi nessun articolo divulgativo spiega chiaramente: <strong>un LLM non ragiona, non capisce, non sa</strong>. Un LLM lancia un dado pesato. Ripetutamente.
+</p>
+
+<p>
+  Dato il testo "La regina delle api depone", il modello calcola una distribuzione di probabilità su 128.256 possibili token successivi. Forse il token "uova" ha probabilità 0.35, "circa" ha 0.15, "le" ha 0.10. Il modello <em>campiona</em> da questa distribuzione. Se esce "uova", quel token viene aggiunto alla sequenza e il modello ricalcola la distribuzione per il token dopo "uova". E così via, token dopo token, fino a generare l'intera risposta.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(t_{n+1} \mid t_1, \ldots, t_n) = \text{softmax}\left(\frac{\mathbf{W}_{\text{vocab}} \cdot \mathbf{h}_n}{T}\right)$$</div>
+  <p class="formula-label">La probabilità del prossimo token, data tutta la sequenza precedente</p>
+</div>
+
+<p>
+  Il parametro \(T\) è la <strong>temperatura</strong>. Controlla quanto il dado è "pesato":
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li><strong>\(T = 0\)</strong> (o molto vicino a 0): il modello sceglie sempre il token più probabile. Deterministico, ripetitivo, "sicuro".</li>
+  <li><strong>\(T = 1\)</strong>: campiona dalla distribuzione naturale. Bilanciato.</li>
+  <li><strong>\(T > 1\)</strong>: appiattisce la distribuzione, dando più chance ai token meno probabili. Più "creativo", più imprevedibile, più incline all'errore.</li>
+</ul>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{softmax}(z_i / T) = \frac{e^{z_i/T}}{\sum_j e^{z_j/T}} \qquad \begin{cases} T \to 0 & \text{argmax (deterministico)} \\ T = 1 & \text{distribuzione originale} \\ T \to \infty & \text{uniforme (casuale)} \end{cases}$$</div>
+  <p class="formula-label">La temperatura modula l'entropia della distribuzione</p>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Distribuzione next-token: T=0.3 (freddo)</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="temp-cold-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Distribuzione next-token: T=1.5 (caldo)</div>
+    <div class="chart-wrapper-wide">
+      <canvas id="temp-hot-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<p>
+  Oltre alla temperatura, ci sono strategie di campionamento per limitare i candidati:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li><strong>Top-K</strong>: considera solo i K token più probabili. Con K=50, il modello sceglie tra i 50 candidati migliori.</li>
+  <li><strong>Top-P</strong> (nucleus sampling): considera i token più probabili finché la probabilità cumulata supera P. Con P=0.9, prende i token che coprono il 90% della massa di probabilità.</li>
+</ul>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> ogni token generato è un lancio di dado. La "intelligenza" apparente dell'output è il risultato di miliardi di parametri calibrati per dare i pesi giusti al dado. Ma resta un dado. Non c'è ragionamento, non c'è pianificazione, non c'è verifica. Il modello non "sa" che la prossima parola è giusta. Sa che è <em>probabile</em>. E probabile non significa corretto.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — L'ADDESTRAMENTO                               -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come si Pesano i Dadi</h2>
+<span class="section-number">Sezione 08. L'addestramento</span>
+
+<p>
+  I pesi del modello non cadono dal cielo. Vengono <strong>addestrati</strong> su terabyte di testo: libri, articoli, Wikipedia, codice sorgente, forum, pagine web. L'algoritmo è concettualmente semplice: prendi un testo, nascondi il token successivo, chiedi al modello di predirlo, misura l'errore, aggiusta i pesi. Ripeti miliardi di volte.
+</p>
+
+<p>
+  L'errore si misura con la <strong>cross-entropy loss</strong>:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathcal{L} = -\frac{1}{N}\sum_{i=1}^{N} \log P_\theta(t_i \mid t_1, \ldots, t_{i-1})$$</div>
+  <p class="formula-label">Cross-entropy: il logaritmo negativo della probabilità assegnata al token corretto</p>
+</div>
+
+<p>
+  Se il modello assegna probabilità 0.9 al token corretto, il loss è \(-\log(0.9) = 0.105\), basso. Se assegna 0.01, il loss è \(-\log(0.01) = 4.6\), alto. Il modello viene penalizzato esponenzialmente per le predizioni sbagliate.
+</p>
+
+<p>
+  I pesi si aggiornano con il <strong>gradient descent</strong>: calcola il gradiente del loss rispetto a ogni peso, e sposta ogni peso nella direzione che riduce il loss.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\theta_{t+1} = \theta_t - \eta \cdot \nabla_\theta \mathcal{L}(\theta_t)$$</div>
+  <p class="formula-label">Gradient descent: η è il learning rate, ∇ è il gradiente</p>
+</div>
+
+<p>
+  In pratica si usa <strong>AdamW</strong>, una variante sofisticata che adatta il learning rate per ogni parametro e include weight decay per la regolarizzazione. Il gradiente viene calcolato con la <strong>backpropagation</strong>, che propaga l'errore all'indietro attraverso i 32 layer usando la regola della catena.
+</p>
+
+<p>
+  Llama 3.1 8B è stato addestrato su <strong>15 trilioni di token</strong>. Per dare un'idea della scala: se ogni token fosse una parola, e leggessi una parola al secondo senza mai fermarti, ci metteresti <strong>475.000 anni</strong>. I costi di addestramento stimati: decine di milioni di dollari in compute GPU.
+</p>
+
+<p>
+  Dopo il pre-training viene la fase di <strong>fine-tuning</strong> (Instruct): il modello viene addestrato su conversazioni curate, con RLHF (Reinforcement Learning from Human Feedback), per trasformarlo da predittore di testo generico a assistente conversazionale. È questa fase che gli fa rispondere con "Certamente!" invece di continuare il testo come un autocomplete impazzito.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Cross-entropy loss: come il modello impara durante l'addestramento</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="training-loss-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> l'addestramento ottimizza un unico obiettivo: predire il token successivo. Non ottimizza la correttezza fattuale. Non ottimizza la coerenza logica. Non ottimizza la veridicità. Ottimizza la <em>plausibilità statistica</em>. Se nel corpus di addestramento "la regina depone" è spesso seguito da "uova", il modello impara questa associazione. Ma se il corpus contiene anche testi imprecisi sulle api (blog, forum, articoli scritti male), il modello impara anche quelli. Garbage in, garbage out. Pesato statisticamente.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — PERCHÉ LA IENA HA RAGIONE                     -->
+<!-- ======================================================= -->
+<h2 id="hallucination"><span class="accent">//</span> Perché la Iena Ha Ragione</h2>
+<span class="section-number">Sezione 09. Anatomia di un'allucinazione</span>
+
+<p>
+  Torniamo alla iena e al suo iPad. ChatGPT le ha scritto qualcosa sulle api che si contraddiceva. Non so cosa di preciso perché non stavo ascoltando, ma il punto è che lei se ne è accorta e il modello no. E adesso sappiamo il perché.
+</p>
+
+<p>
+  Quando un LLM si contraddice, non è un bug. È una conseguenza diretta dell'architettura. Il modello genera un token alla volta, e ogni token è il risultato di una distribuzione di probabilità condizionata alla sequenza precedente. Non c'è un controllore logico che verifica la coerenza. Non c'è un modulo che torna indietro e dice "aspetta, tre righe fa ho scritto il contrario". C'è solo il token successivo più probabile, dato quello che è venuto prima.
+</p>
+
+<p>
+  Per fare un esempio concreto, ho chiesto a Llama 3.1 (8B, quello che gira sul mio Mac con Ollama) una domanda sulle api. Il modello ha scritto che la regina "esce dall'alveare per cercare un luogo adatto dove fondare una nuova colonia", che le operaie "si addormentano" durante l'ibernazione, e che la regina e le operaie "si svegliano e iniziano a riprodursi nuovamente". Cazzate su cazzate. La iena le avrebbe intercettate in mezzo secondo. Il modello le ha scritte senza battere ciglio perché per lui non sono né contraddizioni né cazzate: sono sequenze di token ad alta probabilità nei rispettivi contesti locali.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/terminale-ollama.png" alt="Terminale con Ollama che genera una risposta sulle api contenente errori fattuali e contraddizioni" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Llama 3.1 8B in locale: la regina che "esce dall'alveare per fondare una nuova colonia", le operaie che "si addormentano". Fluente, sicuro, sbagliato.</figcaption>
+</figure>
+
+<p>
+  Questo fenomeno si chiama <strong>hallucination</strong>: il modello genera contenuto che è linguisticamente fluente, stilisticamente coerente, ma fattualmente falso. Smontiamo il meccanismo:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Il contesto locale domina.</strong> L'attention lavora su relazioni tra token, non su coerenza logica tra paragrafi. Quando il modello genera la seconda frase, la prima è statisticamente irrilevante rispetto al contesto immediato.</li>
+  <li><strong>I pattern statistici generalizzano male.</strong> "Ape" + "colonia" → "fondare" è un pattern plausibile nel corpus. Molti insetti fondano colonie. Ma la regina delle api non esce a fondare niente, resta nell'alveare. Il modello non ha il concetto di "eccezione", ha distribuzioni di probabilità.</li>
+  <li><strong>I numeri sono plausibili, non verificati.</strong> Il modello non ha un database di fatti. Genera numeri che "sembrano giusti" nel contesto. Rotondi, nel range biologico, sufficientemente specifici da sembrare autorevoli.</li>
+</ol>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(\text{frase corretta}) \neq P(\text{frase probabile})$$</div>
+  <p class="formula-label">Il cuore del problema: correttezza e plausibilità statistica non coincidono</p>
+</div>
+
+<p>
+  La hallucination è inevitabile per un predittore di token successivo. Il modello non ha modo di distinguere tra un fatto, un pattern statistico fuorviante, e un testo sbagliato nel corpus di addestramento. Per lui sono tutti sequenze di token. La cross-entropy loss non premia la verità, premia la predizione del token che era nel testo originale, vero o falso che fosse.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">La confidence del modello non correla con la correttezza</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="confidence-accuracy-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  La iena non sa cos'è un'hallucination e non le interessa. Sa cos'è un'ape. Ha conoscenza <strong>grounded</strong>, radicata nell'esperienza: ha visto regine sopravvivere a inverni interi, ha contato i telaini in primavera, ha aperto arnie col fumatore mentre io stavo al computer. Questa conoscenza non è una distribuzione di probabilità su token. È roba verificata con le mani.
+</p>
+
+<p>
+  Il modello ha conoscenza <strong>ungrounded</strong>: pattern statistici estratti da testo scritto da altri. Quando il testo è corretto, i pattern funzionano. Quando il testo è sbagliato, o il pattern è fuorviante, il modello sbaglia con la stessa sicurezza con cui indovina. E non c'è modo, dall'output, di sapere quale delle due sta succedendo. Per questo la iena dice che l'intelligenza artificiale non serve a niente. Ha torto in generale, ma ha ragione su una cosa precisa: per le cose che lei sa davvero, che ha imparato facendole, il modello è meno affidabile di un libro scritto da qualcuno che le api le ha tenute davvero.
+</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-reaction);">
+  <p><strong>Insight chiave:</strong> la differenza tra conoscenza statistica e conoscenza vera è la differenza tra leggere mille ricette di torta e aver fatto una torta. Il modello ha letto tutte le ricette. La iena ne sa fare una. Quando la ricetta è scritta bene, il modello la ripete perfettamente. Quando è scritta male, la ripete con la stessa sicurezza. La iena assaggia e dice "fa schifo". Il modello non assaggia niente.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — PERCHÉ FUNZIONANO                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Ma Allora Perché Funzionano</h2>
+<span class="section-number">Sezione 10. L'utilità del pappagallo</span>
+
+<p>
+  Ho passato nove sezioni a smontare la macchina e a spiegare perché è stupida. La iena a questo punto direbbe "te l'avevo detto". Ma la iena ha sempre torto. Sposarmi è stata la sua unica hallucination riuscita. Perché la macchina, nonostante tutto quello che ho scritto, funziona. Funziona dannatamente bene, se sai come usarla.
+</p>
+
+<p>
+  Il trucco è capire cosa stai usando. Non è un oracolo. Non è un esperto. È un motore statistico estremamente potente che manipola linguaggio. E il linguaggio è l'interfaccia di quasi tutto: codice, documenti, analisi, comunicazione. Un dado pesato su 128.256 facce, lanciato miliardi di volte, con i pesi calibrati su tutto il testo che l'umanità ha prodotto. Non è intelligenza, ma è uno strumento che non è mai esistito prima.
+</p>
+
+<p>
+  Il modello da solo sbaglia sulle api. Ma il modello non deve lavorare da solo. La chiave è il <strong>contesto</strong>: se gli dai i documenti giusti, le informazioni corrette, i vincoli precisi, il dado pesato viene pesato meglio. Non più sulla statistica generica di internet, ma sui dati che gli hai messo davanti. Questo si chiama <strong>RAG</strong>, Retrieval Augmented Generation: il modello non inventa, cerca prima nei documenti che gli hai dato e genera basandosi su quelli.
+</p>
+
+<p>
+  E poi ci sono gli <strong>agenti</strong>. Un agente è un LLM con degli strumenti: può cercare su internet, leggere file, interrogare database, eseguire codice, scaricare PDF, estrarre testo. Non è più un pappagallo chiuso in una gabbia che ripete quello che ha sentito. È un pappagallo con le mani. Che può andare a verificare. Che può cercare la fonte. Che può incrociare i dati.
+</p>
+
+<p>
+  E quando metti insieme più agenti, ognuno specializzato su un compito diverso, uno che pianifica, uno che cerca, uno che analizza, uno che verifica, ottieni qualcosa che un singolo modello non potrebbe fare. Non perché è diventato intelligente, ma perché la pipeline compensa i limiti di ogni singolo passo.
+</p>
+
+<p>
+  Per le hallucination non sei impotente. Ci sono tecniche concrete per tenerle a bada. Il <strong>system prompt</strong> è la prima linea di difesa: regole esplicite che dicono al modello cosa può e cosa non può fare, come deve comportarsi, quali fonti usare. Non sono suggerimenti, sono vincoli che condizionano la distribuzione di probabilità di ogni token generato. Poi c'è la <strong>temperatura bassa</strong>: più la abbassi, più il modello si attacca ai token più probabili, meno inventa. Il RAG che ho descritto prima è il pezzo grosso: il dado pesato viene ripesato sui dati che contano, non sulla media di internet. E infine la <strong>verifica automatica</strong>: prendi l'output del modello, estrai le affermazioni verificabili, e le controlli contro le fonti. Se il modello dice che il documento EFTA01234567 prova qualcosa, vai a controllare che quel documento esista e dica davvero quello.
+</p>
+
+<p>
+  Ho costruito un progetto open source che mette insieme tutte queste tecniche: <a href="https://github.com/Pinperepette/parrhesepstein" target="_blank" rel="noopener"><strong>Parrhesepstein</strong></a>. È una piattaforma investigativa sui file Epstein declassificati dal Dipartimento di Giustizia americano. Il nome viene da <em>parrhesia</em>, il greco per "parlare senza paura". Usa le API di Claude, non modelli in locale, perché qui serve potenza: analizzare migliaia di documenti legali, incrociare nomi, tracciare flussi finanziari, decodificare riferimenti indiretti. E i documenti sono pubblici, rilasciati dal DOJ, non c'è nulla di privato da proteggere. Serve il modello più capace possibile.
+</p>
+
+<p>
+  Dentro ci sono 6 agenti AI che lavorano in squadra: un direttore che pianifica la strategia di ricerca, un ricercatore che scarica i documenti dal sito del DOJ, un analista che estrae fatti e connessioni, uno specialista bancario che traccia i flussi finanziari, uno specialista di cifratura che decodifica alias e riferimenti indiretti, e un sintetizzatore che produce il report finale. Ogni documento viene scaricato, estratto (OCR per quelli scansionati), indicizzato in un database vettoriale (ChromaDB), e reso disponibile per la ricerca semantica. Quando un agente genera un'affermazione, il sistema estrae i codici dei documenti citati e li verifica contro il database del DOJ. Il fact-checker automatico produce un punteggio: verde sopra l'80%, giallo sopra il 50%, rosso sotto. Così sai quanto fidarti.
+</p>
+
+<p>
+  Per altri task, i modelli in locale hanno senso eccome. Ollama sul Mac, modelli scaricati, nessun dato che esce dalla macchina. I tuoi dati restano tuoi. Il tuo codice resta tuo. Le tue conversazioni restano tue. Un modello da 8 miliardi di parametri non è Claude o GPT-4, ma per generazione di codice, analisi di testo, automazione, estrazione dati, è più che sufficiente. E non deve chiedere permesso a nessuno.
+</p>
+
+<p>
+  La iena non capisce perché le aziende continuano a chiedere sistemi con AI. Per lei è una moda, una roba che sbaglia sulle api e che non sostituirà mai nessuno. Non riesce a spiegarsi perché tutti vogliono agenti, automazioni, chatbot. La risposta è semplice: perché nel 2026 c'è ancora gente che inserisce dati a mano nei gestionali, che gira fogli Excel come fossero tecnologia di punta, che non automatizza niente. E questo è assurdo. È assurdo avere montagne di dati e non usarli per predire, per ottimizzare, per eliminare il lavoro ripetitivo che un agente farebbe in secondi. Quei sei agenti di Parrhesepstein, ognuno un dado pesato, messi in fila con i documenti giusti davanti, le regole giuste nel system prompt, e la verifica automatica alla fine, producono report che un singolo ricercatore umano impiegherebbe anni a compilare. Non perché sono intelligenti. Perché sono veloci, instancabili, e hanno i dati sotto il naso. Il pappagallo con le mani. E il pappagallo con le mani, nel 2026, dovrebbe essere in ogni azienda. Non per sostituire le persone, ma per smettere di farle lavorare come se fossimo nell'età della pietra.
+</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-highlight);">
+  <p><strong>Insight chiave:</strong> un LLM da solo è un pappagallo statistico che inventa con sicurezza. Un LLM con system prompt restrittivi, RAG sui documenti reali, temperatura bassa, e verifica automatica dell'output è uno strumento che non esisteva cinque anni fa. La differenza non è nel modello, è in come lo usi. Il dado pesato resta un dado. Ma se lo vincoli con le regole giuste, gli metti davanti i documenti giusti, e controlli quello che dice, diventa utile. Non intelligente. Utile. Che è molto meglio.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 — CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Pappagallo e l'Apicoltrice</h2>
+<span class="section-number">Sezione 11. Conclusione</span>
+
+<p>
+  Ricapitoliamo. Il percorso da "La regina delle api" a "la regina esce per fondare una nuova colonia" passa per:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li>Il testo viene spezzato in <strong>token</strong> da un algoritmo BPE con vocabolario da 128K</li>
+  <li>Ogni token diventa un <strong>vettore di 4.096 numeri</strong> tramite la matrice di embedding</li>
+  <li>32 layer di transformer trasformano questi vettori, ognuno con <strong>attention</strong> (32 teste) e <strong>FFN</strong> (SwiGLU)</li>
+  <li>L'ultimo vettore viene proiettato su 128.256 logit, uno per ogni possibile token successivo</li>
+  <li>La <strong>softmax</strong> trasforma i logit in probabilità</li>
+  <li>Un token viene <strong>campionato</strong> dalla distribuzione</li>
+  <li>Si ripete dal punto 3, token dopo token</li>
+</ol>
+
+<p>
+  Nessun ragionamento. Nessuna comprensione. Nessun database di fatti. Nessuna verifica. Solo 292 matrici di numeri, calibrate su 15 trilioni di token, che trasformano una sequenza in ingresso in una distribuzione di probabilità sul token successivo. Ripetutamente.
+</p>
+
+<p>
+  Il risultato è spesso impressionante: il modello produce testo fluente, coerente, apparentemente intelligente. Ma è lo stesso meccanismo che produce "la regina esce per fondare una nuova colonia" con la sicurezza di un esperto. La fluenza non è intelligenza. La coerenza sintattica non è correttezza fattuale. La probabilità non è verità.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Non pensa. Lancia dadi pesati molto bene."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    8 miliardi di parametri. 4.9 GB su disco. 32 layer. 128K token di vocabolario. 15 trilioni di token di addestramento.
+    Tutto questo per produrre un dado pesato molto sofisticato che genera un token alla volta.
+    Impressionante? Sì. Intelligente? No. Affidabile? Chiedete alla iena.
+    Lei ha aperto l'arnia, ha guardato i telaini, ha contato le uova. Il modello ha letto qualcosa su internet.
+    Quando il pattern statistico e la realtà coincidono, il modello sembra geniale.
+    Quando divergono, il modello dice che la regina esce per fondare una colonia e che le operaie si addormentano in inverno.
+    Con la stessa sicurezza.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/llm-charts.js"></script>
+
+</body>
+</html>
