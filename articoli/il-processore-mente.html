@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Processore Mente | Signal Pirate</title>
+  <meta name="description" content="Il tuo processore legge dati che non dovrebbe toccare e fa finta di niente. Tre esperimenti in C, un Mac Intel, zero permessi. Spectre v1 spiegato smontandolo.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Memory Map === */
+    .memory-map {
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .cache-line {
+      display: flex;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 0.3rem;
+    }
+    .mem-cell {
+      padding: 0.7rem 0.8rem;
+      border-right: 1px dashed var(--border-subtle);
+      text-align: center;
+      line-height: 1.4;
+    }
+    .mem-cell:last-child { border-right: none; }
+    .mem-cell.flush { background: rgba(255,136,0,0.18); color: #ff8800; }
+    .mem-cell.hot { background: rgba(0,255,136,0.15); color: #00ff88; }
+    .mem-cell.dead { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+    .mem-cell.empty { background: rgba(120,120,160,0.12); color: #8888aa; }
+    .cl-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.65rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-weight: 700;
+      margin: 0.5rem 0 0.3rem;
+      font-size: 0.9rem;
+    }
+    .step-detail {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.8rem 1rem;
+      text-align: left;
+    }
+    .strategy-table td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.05), rgba(124,77,255,0.05));
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 3rem 0 2rem;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.6;
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== NAV ========== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ========== HEADER ========== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-17 | Pinperepette</p>
+  <h1 class="article-page-title">Il Processore <span class="accent">Mente</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Tre esperimenti in C, un Mac Intel, zero permessi. Spectre v1 smontato pezzo per pezzo.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-reaction">Spectre</span>
+    <span class="tag tag-attention">Side-Channel</span>
+    <span class="tag tag-highlight">Cache</span>
+    <span class="tag tag-amplification">Intel</span>
+  </div>
+</header>
+
+<!-- ========== ARTICLE ========== -->
+<article class="article-content">
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - APERTURA                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Tutti Mentono</h2>
+<span class="section-number">Sezione 00. L'antefatto</span>
+
+<p>L'idea per questo articolo mi e' venuta guardando Motorvalley su Netflix. Non guardo quasi mai la tv, e quando capita il cervello non si spegne, si mette in parallelo. Piloti che spingono al limite, ingegneri che tolgono peso, ottimizzano, accorciano i tempi. E il pensiero che mi si e' piantato in testa: la velocita' ha un prezzo. Sempre. Nel motore e' l'usura. Nel processore e' qualcosa di peggio.</p>
+
+<p>La iena arriva in ufficio, si ferma sulla porta e mi guarda. "Ancora qui?" "Avresti dovuto sposare un computer." Io non alzo neanche gli occhi dal terminale. "No, perche' il processore mente." Lei resta ferma un secondo, come quando Panna fissa il muro e non capisci se ha visto un ragno o se si e' disconnessa. "Tutti mentono," dice, e se ne va.</p>
+
+<p>Ha ragione. Tutti mentono. Ma il processore mente in un modo particolare, e io l'ho beccato.</p>
+
+<p>La settimana scorsa ho scritto un articolo su <a href="come-pensa-la-macchina.html">come pensa un'intelligenza artificiale</a>. L'ho smontata pezzo per pezzo: transformer, attention, embedding. Conclusione: non pensa. Moltiplica matrici e calcola probabilita'.</p>
+
+<p>Ma sotto quella macchina software ce n'e' una hardware. Il processore. E quello, pensavo, e' l'unica cosa onesta. Fa quello che gli dici. Niente di piu', niente di meno. Come Panna quando le dici "seduta". In teoria obbedisce. In pratica fa quello che le pare, e se le conviene finge di non averti sentito.</p>
+
+<p><strong>Il processore fa uguale.</strong></p>
+
+<p>Non fa solo quello che gli dici. Fa anche quello che <em>pensa</em> gli dirai. Anticipa. Specula. Esegue istruzioni prima di sapere se sono legittime. E quando scopre di aver sbagliato, fa marcia indietro. Annulla tutto. Come se niente fosse.</p>
+
+<p>Quasi tutto. Perche' la cache ricorda. E la cache non mente.</p>
+
+<p>Questo e' Spectre. Questo articolo e' la confessione.</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="26" data-suffix=" cicli">0</div>
+    <div class="stat-label">Cache hit</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="314" data-suffix=" cicli">0</div>
+    <div class="stat-label">Cache miss</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="12" data-suffix="x">0</div>
+    <div class="stat-label">Rapporto</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="20" data-suffix="/20">0</div>
+    <div class="stat-label">Byte rubati</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - IL CRONOMETRO                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Cronometro Atomico</h2>
+<span class="section-number">Sezione 01. Contare i cicli</span>
+
+<p>Ogni processore Intel ha un contatore che si incrementa ad ogni ciclo di clock. Si chiama <strong>Time Stamp Counter</strong> (TSC). Sul mio Mac (Xeon W a 2.7 GHz) un ciclo dura meno di mezzo miliardesimo di secondo.</p>
+
+<p>Abbastanza preciso per misurare quanto tempo ci mette il processore a leggere un byte dalla memoria.</p>
+
+<p>L'istruzione si chiama <code>rdtscp</code>. Legge il TSC e lo mette in un registro. Due letture, una prima e una dopo l'accesso, e hai il tempo esatto in cicli. Zero permessi speciali. Nessuna system call. <code>rdtscp</code> e' un'istruzione disponibile a qualsiasi processo in user space. Chiunque puo' cronometrare la memoria.</p>
+
+<p>E il tempo rivela tutto.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - ESPERIMENTO 1                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Esperimento 1: Toccare e Misurare</h2>
+<span class="section-number">Sezione 02. Cache hit vs cache miss</span>
+
+<p>Il processore ha una gerarchia di memoria. Si chiama <strong>cache</strong>. Ho un amico che ha fatto studi classici e mi ha detto che "cache" si scrive cosi' perche' deriva da "cacca". Non e' vero, viene dal francese <em>cacher</em> (nascondere), ma la sua versione mi piace di piu' perche' descrive meglio quello che ci troverai dentro. Piu' la memoria e' vicina al processore, piu' e' veloce:</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">L1</div>
+    <div class="step-name">Cache L1</div>
+    <div class="step-detail">32 KB, ~4 cicli</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">L2</div>
+    <div class="step-name">Cache L2</div>
+    <div class="step-detail">256 KB, ~12 cicli</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">L3</div>
+    <div class="step-name">Cache L3</div>
+    <div class="step-detail">6-12 MB, ~40 cicli</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="color: var(--accent-reaction);">RAM</div>
+    <div class="step-name">Memoria</div>
+    <div class="step-detail">16 GB, ~200+ cicli</div>
+  </div>
+</div>
+
+<p>Quando leggi un dato gia' in cache (un <strong>hit</strong>), ci vogliono pochi cicli. Quando il dato non c'e' e il processore deve andare in RAM (un <strong>miss</strong>), ci vogliono centinaia di cicli.</p>
+
+<p>L'esperimento e' brutale nella sua semplicita': leggere lo stesso byte due volte (hit), poi forzarlo fuori dalla cache con <code>clflush</code> e rileggerlo (miss). Mille volte. Misurare ogni lettura.</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/spectre-code-01.png" alt="01_cache_timing.c: misura cache hit vs miss con rdtscp e clflush"
+       style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<p>Il risultato sul mio Mac (Intel Xeon W, 24 core, 2.7 GHz):</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/spectre-term-exp1.png" alt="Output esperimento 1: Cache HIT 26.8 cicli, Cache MISS 314.3 cicli, rapporto 11.7x"
+       style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<p>11.7 volte piu' lento. Ogni punto e' sotto soglia (veloce, in cache). Ogni cancelletto e' sopra soglia (lento, in RAM). Zero sovrapposizioni. Il canale e' perfetto.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Cache Hit vs Miss: 1000 misurazioni</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="cache-timing-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Punto chiave:</strong> qualsiasi programma puo' misurare se un indirizzo di memoria e' in cache o no. Senza permessi. Senza root. Senza niente. E questa informazione e' sufficiente per estrarre segreti.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - FLUSH+RELOAD                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Esperimento 2: Origliare la Cache</h2>
+<span class="section-number">Sezione 03. Flush+Reload</span>
+
+<p>Se posso misurare cosa c'e' in cache, posso spiare cosa ha toccato qualcun altro.</p>
+
+<p>L'idea: preparo un array di 256 pagine. Una pagina per ogni possibile valore di un byte (0x00-0xFF). Fluscio tutto, lascio che il "segreto" tocchi una pagina, poi scansiono tutte e 256. Quella veloce e' quella che e' stata toccata. E il suo indice e' il valore del segreto.</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Flush</div>
+    <div class="step-detail">Butta fuori tutte le 256 pagine</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Accesso</div>
+    <div class="step-detail">Il segreto tocca una pagina</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Reload</div>
+    <div class="step-detail">Scansiona: la pagina calda e' il segreto</div>
+  </div>
+</div>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/spectre-code-02.png" alt="02_flush_reload.c: probe array di 256 pagine, flush, accesso segreto, reload scan"
+       style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<p>Ho nascosto la parola <code>"PIRATA"</code> in memoria e ho provato a estrarla byte per byte. 500 su 500 per ogni byte. Nessun errore. Il canale laterale funziona perfettamente. Posso leggere qualsiasi byte che qualcuno ha toccato nella cache.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Flush+Reload: distribuzione hit per il byte 'A' (0x41)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="flush-reload-chart"></canvas>
+  </div>
+</div>
+
+<p>"Bello," diresti, "ma il tuo codice accede al segreto <em>esplicitamente</em>. In un programma vero chi lo fa?"</p>
+
+<p>Il processore. Speculando.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - SPECULATIVE EXECUTION                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Ottimismo Fatale</h2>
+<span class="section-number">Sezione 04. La speculazione</span>
+
+<p>Il tuo processore non esegue le istruzioni una alla volta. Sarebbe troppo lento. Quando incontra un <code>if</code>, non aspetta di sapere il risultato. <strong>Indovina.</strong></p>
+
+<p>Ha un componente dedicato, il <strong>branch predictor</strong>, che ricorda la storia recente di ogni branch. Se un <code>if</code> e' stato vero le ultime 50 volte, il predictor scommette che sara' vero anche la prossima.</p>
+
+<p>E mentre aspetta la conferma, il processore va avanti. Esegue le istruzioni dentro l'<code>if</code> come se la condizione fosse vera. Calcola, legge memoria, scrive risultati. Tutto <em>speculativamente</em>.</p>
+
+<p>Se la predizione era giusta (e lo e' nel 95-99% dei casi), il processore ha guadagnato decine di cicli. Se era sbagliata, butta via tutto. Annulla i registri, cancella i risultati. Come se non fosse mai successo.</p>
+
+<p><strong>Quasi.</strong></p>
+
+<p>Perche' i dati caricati speculativamente restano in cache. Il processore annulla i registri e i risultati architetturali, ma non la cache. E la cache, come abbiamo visto, parla a chiunque sappia misurare il tempo.</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-reaction);">
+  <p><strong>Il problema fondamentale:</strong> l'esecuzione speculativa bypassa i controlli di sicurezza (bounds check, permessi) perche' "tanto poi annullo tutto". Ma la cache non viene annullata. E la cache e' un canale di comunicazione.</p>
+</div>
+
+<p>Questo e' il cuore di Spectre. Non e' un bug nel codice. Non e' un buffer overflow. Non e' un errore del programmatore. E' un difetto nell'architettura stessa del processore. Ogni CPU che specula e' vulnerabile. Intel, AMD, ARM. Tutte.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - SPECTRE V1 CONCEPT                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Spectre v1: L'Idea</h2>
+<span class="section-number">Sezione 05. Bounds Check Bypass</span>
+
+<p>Immagina questo codice:</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/spectre-code-03.png" alt="03_spectre_v1.c: victim_function, timed_read, calibrazione, steal_byte con selezione branchless"
+       style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<p>Sembra sicuro. Se <code>x</code> e' fuori dai limiti, il codice dentro l'<code>if</code> non viene eseguito. Il bounds check protegge.</p>
+
+<p>Ma il branch predictor non lo sa.</p>
+
+<p>L'attacco funziona cosi':</p>
+
+<p><strong>Fase 1: Allenamento.</strong> Chiamo <code>victim_function</code> molte volte con valori validi di <code>x</code> (dentro i limiti). Il branch predictor impara: "il branch viene sempre preso".</p>
+
+<p><strong>Fase 2: Flush.</strong> Fluscio <code>array1_size</code> dalla cache. Adesso il processore non puo' risolvere <code>x &lt; array1_size</code> velocemente, perche' <code>array1_size</code> e' in RAM.</p>
+
+<p><strong>Fase 3: Attacco.</strong> Chiamo <code>victim_function</code> con un valore di <code>x</code> fuori dai limiti. Il processore non puo' verificare il bounds check (il dato e' in RAM, servono 300 cicli). Ma il predictor dice "prendi il branch". Cosi' il processore <strong>specula</strong>: esegue <code>probe[array1[x] * PAGE]</code> con l'indice illegale.</p>
+
+<p><strong>Fase 4: Traccia.</strong> L'accesso speculativo carica una pagina del probe array in cache. Quale pagina? Quella corrispondente al valore di <code>array1[x]</code>, cioe' al byte segreto.</p>
+
+<p><strong>Fase 5: Lettura.</strong> Il processore si accorge dell'errore e annulla tutto. Ma la pagina e' ancora in cache. Io la trovo con Flush+Reload.</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">
+    $$\text{pagina\_calda} = \texttt{array1}[x_{\text{malicious}}] \times \text{PAGE}$$
+  </div>
+  <p class="formula-label">L'indice della pagina calda rivela il byte segreto</p>
+</div>
+
+<p>In cinque passi, il processore ha letto un byte che non aveva il permesso di leggere, e me l'ha detto attraverso la cache.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - IL CODICE                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Attacco nel Codice</h2>
+<span class="section-number">Sezione 06. Ogni riga conta</span>
+
+<p>Il cuore dell'attacco e' un loop che alterna training e attacco. 30 iterazioni: 25 con un indice valido (training), 5 con l'indice malevolo (attacco). Il predictor vede 25 "vero" e specula che anche il 26esimo sara' vero.</p>
+
+<p>Ma c'e' un problema: se usiamo un <code>if</code> per scegliere tra training e attacco, il branch predictor vedrebbe <em>quel</em> branch e potrebbe capire il pattern. Serve una selezione <strong>senza branch</strong>.</p>
+
+<p>Nessun branch. Il predictor non vede differenza tra le iterazioni di training e quelle di attacco. Per lui sono tutte uguali.</p>
+
+<p>5000 tentativi per byte. Dopo ogni tentativo, Flush+Reload scansiona le 256 pagine del probe. Il byte con piu' hit e' il segreto.</p>
+
+<p>Ho compilato. <code>clang -O0</code>. Eseguito.</p>
+
+<p>Zero segnale.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - IL BUG                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 64 Byte di Troppo</h2>
+<span class="section-number">Sezione 07. La cache line maledetta</span>
+
+<p>Il primo tentativo ha dato 0 su 20. Niente. Zero. Il processore non stava speculando, o se lo faceva la traccia non arrivava alla cache.</p>
+
+<p>Ho guardato gli indirizzi in memoria:</p>
+
+<p>Ed ecco il problema. <code>array1_size</code> e' all'indirizzo <code>0x...000</code>. <code>array1</code> e' all'indirizzo <code>0x...010</code>. Solo <strong>16 byte di distanza</strong>.</p>
+
+<p>Una <strong>cache line</strong> e' 64 byte. Significa che <code>array1_size</code> e <code>array1</code> erano sulla <strong>stessa riga di cache</strong>.</p>
+
+<div class="memory-map fade-in">
+  <div style="color: var(--accent-reaction); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;">PRIMA (stesso cache line):</div>
+  <div class="cache-line">
+    <div class="mem-cell flush" style="flex: 1;">array1_size<br><small>4 byte</small></div>
+    <div class="mem-cell flush" style="flex: 3;">array1[0..15]<br><small>16 byte</small></div>
+    <div class="mem-cell flush" style="flex: 3;">secret_data<br><small>21 byte</small></div>
+    <div class="mem-cell empty" style="flex: 1.5;">pad<br><small>23 byte</small></div>
+  </div>
+  <div class="cl-label">Cache Line 0 (64 byte) &larr; UN SOLO flush butta via TUTTO</div>
+</div>
+
+<p>Quando faccio <code>clflush(&amp;array1_size)</code> per rallentare il bounds check, fluscio anche <code>array1</code>. Ma la speculazione ha bisogno che <code>array1[x]</code> sia in cache per procedere velocemente. Se <code>array1</code> e' freddo, la speculazione si blocca aspettando il dato, e nel frattempo il bounds check si risolve e la CPU annulla.</p>
+
+<p><strong>Stavo sabotando il mio stesso attacco.</strong></p>
+
+<p>La soluzione: separare <code>array1</code> su una cache line diversa con <code>__attribute__((aligned(64)))</code>.</p>
+
+<div class="memory-map fade-in">
+  <div style="color: var(--accent-attention); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;">DOPO (cache line separate):</div>
+  <div class="cache-line">
+    <div class="mem-cell flush" style="flex: 1;">array1_size<br><small>4 byte</small></div>
+    <div class="mem-cell empty" style="flex: 5;">vuoto<br><small>60 byte</small></div>
+  </div>
+  <div class="cl-label">Cache Line 0 &larr; flush tocca SOLO array1_size</div>
+  <div class="cache-line">
+    <div class="mem-cell hot" style="flex: 2;">array1[0..15]<br><small>16 byte</small></div>
+    <div class="mem-cell hot" style="flex: 3;">secret_data<br><small>21 byte</small></div>
+    <div class="mem-cell empty" style="flex: 1.5;">pad<br><small>27 byte</small></div>
+  </div>
+  <div class="cl-label">Cache Line 1 &larr; resta IN CACHE &rarr; la speculazione procede</div>
+</div>
+
+<p>Adesso quando fluscio <code>array1_size</code>, solo <code>array1_size</code> viene buttato fuori. <code>array1</code> e <code>secret_data</code> restano in cache, sulla loro cache line separata. La speculazione puo' leggere <code>array1[x]</code> velocemente, calcolare l'indice nel probe, e lasciare la traccia nella cache prima che il bounds check si risolva.</p>
+
+<p>Un attributo. <code>aligned(64)</code>. Sei caratteri. E tutto e' cambiato.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - I RISULTATI                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Venti su Venti</h2>
+<span class="section-number">Sezione 08. La confessione</span>
+
+<p>Ricompilato. Rieseguito. Il segreto in memoria era la frase <code>"Il processore mente."</code>. 20 byte. Il programma non aveva nessun accesso legittimo a quei byte. L'unico modo per leggerli era attraverso la speculazione.</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/spectre-term-after.png" alt="Output Spectre v1: 20/20 byte estratti correttamente"
+       style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<p>Venti su venti.</p>
+
+<p>Ogni byte letto speculativamente. Hit che vanno da 1268 a 5000 su 5000 tentativi. I byte con bassa confidenza (<code>'e'</code> con 1268 hit) sono quelli piu' comuni nella stringa, dove il rumore di fondo fa piu' fatica a distinguersi. Ma anche quelli, estratti correttamente.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Spectre v1: hit per byte estratto (5000 tentativi)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="spectre-results-chart"></canvas>
+  </div>
+</div>
+
+<p>Il processore ha letto <code>"Il processore mente."</code> attraverso un bounds check. Ha letto la sua stessa condanna.</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-attention);">
+  <p><strong>Nota:</strong> il programma di attacco e il segreto sono nello stesso processo. In un attacco reale, Spectre v1 permette a codice JavaScript in un browser di leggere la memoria del processo del browser, o a una VM di leggere la memoria dell'hypervisor. Il principio e' identico.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - LE DIFESE                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Le Difese (e il Prezzo)</h2>
+<span class="section-number">Sezione 09. Quanto costa la fiducia</span>
+
+<p>Spectre e' stato reso pubblico il 3 gennaio 2018 da Jann Horn (Google Project Zero) e dal team di Paul Kocher. Da quel giorno, ogni sistema operativo, ogni browser, ogni hypervisor ha dovuto correre ai ripari.</p>
+
+<p>Le contromisure principali:</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Difesa</th>
+        <th>Come funziona</th>
+        <th>Costo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>lfence dopo branch</strong></td>
+        <td>Inserisce una barriera che impedisce l'esecuzione speculativa dopo il bounds check</td>
+        <td>Rallenta ogni if con accesso a memoria</td>
+      </tr>
+      <tr>
+        <td><strong>Retpoline</strong></td>
+        <td>Sostituisce i jump indiretti con una sequenza che "intrappola" la speculazione in un loop infinito</td>
+        <td>5-10% overhead su system call intensive</td>
+      </tr>
+      <tr>
+        <td><strong>IBRS/IBPB</strong></td>
+        <td>Microcode update che isola il branch predictor tra contesti (user/kernel, VM/hypervisor)</td>
+        <td>Flush del predictor ad ogni context switch</td>
+      </tr>
+      <tr>
+        <td><strong>Array index masking</strong></td>
+        <td>Forza l'indice dentro i limiti con un AND bit-a-bit prima dell'accesso</td>
+        <td>Minimo, ma richiede modifica del codice sorgente</td>
+      </tr>
+      <tr>
+        <td><strong>Site isolation</strong></td>
+        <td>Ogni tab del browser in un processo separato (Chrome)</td>
+        <td>Piu' memoria per tab, piu' processi</td>
+      </tr>
+      <tr>
+        <td><strong>Timer degradation</strong></td>
+        <td>Riduce la precisione di <code>performance.now()</code> nel browser</td>
+        <td>Attaccanti usano SharedArrayBuffer come timer alternativo</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Il costo complessivo? Dipende dal workload. I benchmark parlano di 2-8% di overhead su carichi normali, fino al 25% su workload intensivi di I/O e system call. Datacenter come AWS e Google hanno visto un impatto reale sulle bollette.</p>
+
+<p>Ma il costo piu' grande non e' in percentuale. E' concettuale.</p>
+
+<p>Per 30 anni abbiamo progettato processori sulla fiducia: "la speculazione e' invisibile, perche' annulliamo tutto". Era un'assunzione architetturale. Era sbagliata. E non si puo' fixare con una patch. Si puo' solo mitigare, rallentando la macchina, mettendo barriere dove prima c'era velocita'.</p>
+
+<p>Come mettere un semaforo in autostrada perche' qualcuno ha scoperto che si puo' tagliare attraverso il guard rail.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 - CONCLUSIONE                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Tutti Mentono</h2>
+<span class="section-number">Sezione 10. Epilogo</span>
+
+<p>Ricapitoliamo. In tre esperimenti abbiamo:</p>
+
+<ol style="line-height: 2;">
+  <li>Dimostrato che il tempo di accesso alla memoria e' un canale di informazione (hit: 26 cicli, miss: 314 cicli, rapporto 12x)</li>
+  <li>Costruito un canale laterale Flush+Reload che legge qualsiasi byte dalla cache con il 100% di accuratezza</li>
+  <li>Usato l'esecuzione speculativa per far leggere alla CPU un byte oltre i limiti di un array, e recuperato il valore attraverso il canale cache</li>
+  <li>Scoperto che il layout della memoria fino al singolo cache line (64 byte) determina se l'attacco funziona o no</li>
+  <li>Estratto 20 byte di segreto (<em>"Il processore mente."</em>) con il 100% di accuratezza, senza nessun permesso speciale, in user space, su macOS</li>
+</ol>
+
+<p>Tutto con 245 righe di C, un compilatore, e zero privilegi.</p>
+
+<p>Il processore non fa quello che gli dici. Fa di piu'. Corre avanti, scommette, specula. E quando sbaglia, prova a nascondere le prove. Ma la cache e' un testimone che non si puo' zittire.</p>
+
+<p>La iena e' tornata la sera. Ha guardato il terminale, ha letto "20/20 byte", ha alzato le spalle.</p>
+
+<p>"Te l'avevo detto. Tutti mentono."</p>
+
+<p>"Anche il processore."</p>
+
+<p>"Soprattutto il processore. Almeno le mie api, quando mentono, ti pungono. Cosi' lo sai."</p>
+
+<p>Difficile darle torto.</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Il processore mente. La cache no."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Spectre ci ha insegnato che la velocita' ha un prezzo. Che l'ottimizzazione piu' elegante puo' essere la vulnerabilita' piu' profonda.
+    E che per far confessare un processore, bastano un cronometro, un po' di pazienza, e 64 byte di separazione.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+
+</article>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ========== SCRIPTS ========== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/spectre-charts.js"></script>
+
+</body>
+</html>

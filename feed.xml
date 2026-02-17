@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Processore Mente</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-processore-mente.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-processore-mente.html</guid>
+    <pubDate>Tue, 17 Feb 2026 12:00:00 +0100</pubDate>
+    <description>Il tuo processore legge dati che non dovrebbe toccare e fa finta di niente. Tre esperimenti in C, un Mac Intel, zero permessi. Spectre v1 smontato pezzo per pezzo.</description>
+  </item>
+
+  <item>
     <title>Il Telefono Parla nel Sonno</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-telefono-parla-nel-sonno.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-telefono-parla-nel-sonno.html</guid>
