@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Telefono Parla nel Sonno | Signal Pirate</title>
+  <meta name="description" content="La iena parla nel sonno. Il telefono anche. bettercap, 16 ore di cattura e la scoperta che il tuo iPhone non dorme mai. 1314 pacchetti, 43 server Apple, zero interazioni umane.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* === Two Column Charts === */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-17 | Pinperepette</p>
+  <h1 class="article-page-title">Il Telefono <span class="accent">Parla nel Sonno</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    La iena parla nel sonno. Il telefono anche. bettercap, 16 ore di cattura e la scoperta che il tuo iPhone non dorme mai.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">bettercap</span>
+    <span class="tag tag-highlight">Traffic Analysis</span>
+    <span class="tag tag-reaction">FFT</span>
+    <span class="tag tag-amplification">Information Theory</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — LA IENA PARLA NEL SONNO                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Iena Parla nel Sonno</h2>
+<span class="section-number">Sezione 01. L'antefatto</span>
+
+<p>
+  La iena parla nel sonno. Da 26 anni. Borbotta frasi incomprensibili, a volte nomi, a volte lamentele. Una volta ha detto chiaramente "le galline". Un'altra volta "non hai comprato il latte". Io mi sveglio, ascolto, e dopo un po' ho capito che anche nel sonno la iena comunica. Non sa di farlo. Non lo controlla. Ma se stai attento, capisci tutto: con chi ce l'ha, cosa la preoccupa, cosa ha dimenticato di dirti da sveglia.
+</p>
+
+<p>
+  Il telefono sta sul comodino. Schermo spento. Dorme anche lui. Nel dormiveglia il cervello fa quello che fa sempre: collega cose che non c'entrano niente. Se la iena parla nel sonno senza saperlo... il telefono lo fa anche lui?
+</p>
+
+<p>
+  Mi alzo. Prendo un muletto dal cassetto. Un iPhone senza SIM, connesso al WiFi di casa. Nessuna app installata, nessun account di terze parti, solo iCloud. Lo appoggio sul tavolo, lancio bettercap e torno a dormire. Domattina guardo.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="16" data-suffix="h">0h</div>
+    <div class="stat-label">Cattura continua</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="1314" data-suffix="">0</div>
+    <div class="stat-label">Pacchetti dal target</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="43" data-suffix="">0</div>
+    <div class="stat-label">Server Apple contattati</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="0" data-suffix="">0</div>
+    <div class="stat-label">Interazioni umane</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — L'ASCOLTO                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Ascolto</h2>
+<span class="section-number">Sezione 02. bettercap setup</span>
+
+<p>
+  Lo strumento è <a href="https://www.bettercap.org/" target="_blank" rel="noopener" style="color: var(--accent-attention);">bettercap</a>, una delle tante chicche che ha regalato al mondo il mio amico Simone (<a href="https://twitter.com/evilsocket" target="_blank" rel="noopener" style="color: var(--accent-attention);">@evilsocket</a>). Non seguo il calcio, ma TikTok ogni tanto mi propone quei video dove i più forti difensori italiani di sempre (Maldini, Cannavaro, Nesta) parlano di Ronaldo. Ti senti forte, ma lui è molto più forte. Ti senti veloce, ma lui ha un altro passo. Ecco, Simone è quel tipo di fenomeno lì. Il concetto di bettercap è semplice: con l'<strong>ARP spoofing</strong> dico al telefono "il router sono io" e al router "il telefono sono io". Tutto il traffico passa dal mio desktop. Io lo registro in un file <code>.pcap</code> e lo analizzo con calma. Il telefono non se ne accorge. Come la iena non si accorge che la ascolto parlare nel sonno. Differenza: la iena, se scopre che la registro, mi ammazza. Il telefono non può fare niente.
+</p>
+
+<div class="code-block fade-in" data-lang="bash">
+<span class="cm"># Lancia bettercap sull'interfaccia di rete</span>
+<span class="kw">sudo</span> bettercap -iface en0
+
+<span class="cm"># Dentro bettercap:</span>
+<span class="fn">net.probe</span> on                              <span class="cm"># Scopri tutti i dispositivi sulla rete</span>
+<span class="fn">net.sniff</span> on                               <span class="cm"># Cattura tutto il traffico</span>
+<span class="kw">set</span> arp.spoof.targets <span class="st">192.168.1.53</span>         <span class="cm"># Il muletto iPhone</span>
+<span class="kw">set</span> arp.spoof.fullduplex <span class="st">true</span>              <span class="cm"># Spoof bidirezionale</span>
+<span class="fn">arp.spoof</span> on                               <span class="cm"># Via. Vado a dormire.</span>
+</div>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/bettercap.jpg" alt="bettercap in azione sulla rete locale" style="max-width: 100%; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">bettercap in azione. 16 ore di cattura. Il telefono dorme. Io dormo. bettercap no.</figcaption>
+</figure>
+
+
+<p>
+  La iena dorme già. Il cane dorme. Il telefono sul tavolo sembra morto. Lo schermo è nero. Nessuna notifica, nessun suono, nessuna vibrazione. Silenzio.
+</p>
+
+<p>
+  bettercap, invece, registra.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — LA PRIMA NOTTE                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Prima Notte</h2>
+<span class="section-number">Sezione 03. I dati grezzi</span>
+
+<p>
+  La mattina. Apro il pcap. Mi aspettavo silenzio. Trovo <strong>1314 pacchetti</strong>.
+</p>
+
+<p>
+  Il telefono, a schermo spento, senza SIM, senza app, senza nessuno che lo toccasse, ha comunicato con internet per 16 ore (lo so, nessuno dorme 16 ore, un articolo vuole la sua narrativa). Ha avuto picchi di traffico alle 19:41 (52KB), alle 02:03 (22KB), alle 03:17 (65KB, il più grosso). Alle 3:17 di notte il telefono si sveglia e scarica 65 kilobyte da un server Apple in 40 millisecondi. Io dormivo. La iena dormiva (e parlava). Il telefono scaricava.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Pacchetti per ora (15:00 - 07:00)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="packets-hourly-chart"></canvas>
+  </div>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Bytes trasferiti per ora</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="bytes-hourly-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  I grafici parlano chiaro. Il traffico non è costante. Ha un ritmo. Ha picchi e valli. Di sera è più attivo (il telefono sincronizza), poi cala, poi riparte alle 2-3 di notte con burst pesanti. Non è rumore casuale. È un organismo che respira.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>58 MB di pcap</strong>, di cui 1314 pacchetti dal target (il resto è broadcast di rete, ARP, traffico del router). Il muletto ha generato circa 200 KB di traffico in uscita e scaricato circa 200 KB di dati in entrata. Senza che nessuno lo toccasse. Per 16 ore.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — I TRE CHE BUSSANO DI NOTTE                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Tre Che Bussano di Notte</h2>
+<span class="section-number">Sezione 04. Classificazione del traffico</span>
+
+<p>
+  Chi parla col telefono di notte? Tre attori.
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">mDNS</div>
+    <div class="step-detail">Il chiacchierone. 1691 broadcast.</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">APNs</div>
+    <div class="step-detail">Il postino. Porta 5223.</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">iCloud</div>
+    <div class="step-detail">Il ladro silenzioso. Porta 443.</div>
+  </div>
+</div>
+
+<p>
+  <strong>mDNS. Il chiacchierone.</strong> Ogni 10 minuti, tutta la notte, il telefono grida alla rete: "Sono un iPhone, cerco il Mac Pro, supporto HomeKit, cerco companion-link, cerco sleep-proxy." 1691 broadcast in 16 ore. Come la iena che anche dormendo fa sapere a tutti la sua posizione nel letto con gomitate strategiche.
+</p>
+
+<div class="code-block fade-in" data-lang="mDNS broadcast">
+<span class="key">Tipo:</span>        <span class="st">mDNS (Multicast DNS)</span>
+<span class="key">Dest:</span>        <span class="st">224.0.0.251:5353</span>
+<span class="key">Frequenza:</span>   <span class="st">~ogni 10 minuti</span>
+<span class="key">Contenuto:</span>
+  <span class="fn">_remotepairing._tcp.local</span>        <span class="cm"># cerca pairing con Mac</span>
+  <span class="fn">_companion-link._tcp.local</span>       <span class="cm"># cerca Continuity</span>
+  <span class="fn">_sleep-proxy._udp.local</span>          <span class="cm"># cerca sleep proxy</span>
+  <span class="fn">_homekit._tcp.local</span>              <span class="cm"># cerca dispositivi HomeKit</span>
+  <span class="fn">_apple-mobdev2._tcp.local</span>        <span class="cm"># annuncia se stesso</span>
+<span class="key">Nome:</span>        <span class="st">iPhone.local</span>
+<span class="key">UUID:</span>        <span class="st">72F54B8B-XXXX-XXXX-XXXX-XXXXXXXXXXXX</span>
+<span class="key">MAC:</span>         <span class="st">70:31:7f:XX:XX:XX</span>
+</div>
+
+<p>
+  <strong>APNs. Il postino che non molla.</strong> Apple Push Notification Service, porta 5223. Il server Apple bussa al telefono ogni 10 minuti. Se il telefono non risponde, Apple ribatte con backoff esponenziale: 0.2s, 0.5s, 1s, 2s, 4s, 8s. Come quando chiami la iena e non risponde: richiami dopo 30 secondi, poi dopo un minuto, poi dopo due. Apple fa uguale ma in millisecondi.
+</p>
+
+<p>
+  <strong>iCloud. Il ladro silenzioso.</strong> Porta 443, server Apple. I burst grossi: 52KB alle 19:41, 65KB alle 3:17, 29KB alle 3:27. Download bulk a pacchetti da 1448 byte (MTU). Sync iCloud? Aggiornamento configurazione? Telemetria? Non lo sappiamo, è cifrato. Ma sappiamo che succede, quando, e quanto pesa.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Classificazione traffico per servizio</div>
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Servizio</th>
+        <th>Protocollo</th>
+        <th>Pacchetti</th>
+        <th>Bytes</th>
+        <th>Ruolo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>mDNS</strong></td>
+        <td>UDP :5353</td>
+        <td>1691</td>
+        <td>~340 KB</td>
+        <td>Broadcast identità e servizi</td>
+      </tr>
+      <tr>
+        <td><strong>APNs</strong></td>
+        <td>TCP :5223</td>
+        <td>412</td>
+        <td>~48 KB</td>
+        <td>Push notifications / keepalive</td>
+      </tr>
+      <tr>
+        <td><strong>iCloud</strong></td>
+        <td>TCP :443</td>
+        <td>386</td>
+        <td>~195 KB</td>
+        <td>Sync, config, telemetria</td>
+      </tr>
+      <tr>
+        <td><strong>DNS</strong></td>
+        <td>UDP :53</td>
+        <td>87</td>
+        <td>~12 KB</td>
+        <td>Risoluzione nomi (in chiaro)</td>
+      </tr>
+      <tr>
+        <td><strong>Altro</strong></td>
+        <td>vario</td>
+        <td>52</td>
+        <td>~8 KB</td>
+        <td>NTP, NetBIOS, ARP</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Distribuzione pacchetti per servizio</div>
+    <canvas id="service-pie-chart"></canvas>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Distribuzione bytes per servizio</div>
+    <canvas id="service-bytes-pie-chart"></canvas>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — L'OROLOGIO BIOLOGICO                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Orologio Biologico del Telefono</h2>
+<span class="section-number">Sezione 05. Analisi temporale e FFT</span>
+
+<p>
+  Il telefono ha un ritmo. Come un organismo vivente. L'mDNS batte ogni ~10 minuti (periodicità quasi perfetta). L'APNs ogni ~10 minuti. Ma i burst iCloud sono irregolari, arrivano in cluster.
+</p>
+
+<p>
+  Per estrarre la periodicità dominante, usiamo la stessa matematica dell'<a href="shazam-sotto-il-cofano.html" style="color: var(--accent-attention);">articolo su Shazam</a>: la <strong>Fourier Transform</strong>. Se Shazam trova le note in una canzone, qui troviamo il "battito cardiaco" del telefono. Prendiamo gli intervalli tra broadcast mDNS consecutivi, applichiamo la FFT, e cerchiamo il picco dominante.
+</p>
+
+<p>
+  Il picco è a <strong>~600 secondi (10 minuti)</strong>. Il telefono ha un orologio biologico.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Autocorrelazione degli intervalli mDNS</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="mdns-autocorr-chart"></canvas>
+  </div>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Spettro FFT degli intervalli mDNS (picco a 10 min)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="fft-mdns-chart"></canvas>
+  </div>
+</div>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Servizio</th>
+        <th>Periodo dominante</th>
+        <th>Regolarità</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>mDNS</strong></td>
+        <td>~600s (10 min)</td>
+        <td>Quasi perfetta, jitter &lt; 5s</td>
+      </tr>
+      <tr>
+        <td><strong>APNs keepalive</strong></td>
+        <td>~600s (10 min)</td>
+        <td>Regolare con backoff occasionale</td>
+      </tr>
+      <tr>
+        <td><strong>iCloud sync</strong></td>
+        <td>Aperiodico</td>
+        <td>Cluster tra le 2 e le 4 di notte</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  La iena ha il suo ritmo nel sonno: ogni 40 minuti circa cambia posizione e borbotta qualcosa. Il telefono ogni 10 minuti. Entrambi prevedibili. Entrambi inconsapevoli.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — QUANTO SA IL POSTINO                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Quanto sa il Postino?</h2>
+<span class="section-number">Sezione 06. Information theory e classificazione bayesiana</span>
+
+<p>
+  Shannon, Bayes, mutual information. Il telefono spento trasmette informazione senza volerlo. Quantifichiamo.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Il classificatore bayesiano</h3>
+
+<p>
+  Abbiamo visto che le dimensioni dei burst sono diverse per mDNS, APNs e iCloud. Ma quanto è affidabile questa classificazione? Possiamo quantificarlo con il <strong>teorema di Bayes</strong>.
+</p>
+
+<p>
+  Definiamo le classi: $C \in \{\text{mDNS}, \text{APNs}, \text{iCloud}, \text{DNS}, \text{altro}\}$. La feature osservabile è la dimensione del burst $X$ in byte. Il classificatore calcola:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(C \mid X) = \frac{P(X \mid C) \cdot P(C)}{P(X)} = \frac{P(X \mid C) \cdot P(C)}{\sum_{c} P(X \mid c) \cdot P(c)}$$</div>
+  <p class="formula-label">Teorema di Bayes: la probabilità a posteriori del tipo di servizio data la dimensione del burst</p>
+</div>
+
+<p>
+  Le probabilità a priori le estraiamo direttamente dalla cattura di 16 ore:
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Classe $C$</th>
+        <th>Pacchetti</th>
+        <th>$P(C)$</th>
+        <th>Dimensione tipica</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>mDNS</td>
+        <td>1691</td>
+        <td>0.643</td>
+        <td>$150\text{ - }250\text{ B}$</td>
+      </tr>
+      <tr>
+        <td>APNs</td>
+        <td>412</td>
+        <td>0.157</td>
+        <td>$90\text{ - }500\text{ B}$</td>
+      </tr>
+      <tr>
+        <td>iCloud</td>
+        <td>386</td>
+        <td>0.147</td>
+        <td>$1\text{ KB - }65\text{ KB}$</td>
+      </tr>
+      <tr>
+        <td>DNS</td>
+        <td>87</td>
+        <td>0.033</td>
+        <td>$60\text{ - }150\text{ B}$</td>
+      </tr>
+      <tr>
+        <td>Altro</td>
+        <td>52</td>
+        <td>0.020</td>
+        <td>variabile</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  I range di dimensione sono <strong>quasi disgiunti</strong>. Un burst da 65KB non è mai un mDNS broadcast. Un pacchetto da 200 byte verso 224.0.0.251 non è mai un download iCloud. Questo significa che la probabilità a posteriori converge rapidamente a 1.
+</p>
+
+<p>
+  Esempio concreto. Osserviamo un burst da 1448 byte verso un IP nel range 17.x.x.x su porta 443. Quanto siamo sicuri che sia iCloud?
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$P(\text{iCloud} \mid 1448\text{B, :443, 17.x}) = \frac{P(1448\text{B, :443, 17.x} \mid \text{iCloud}) \cdot P(\text{iCloud})}{\sum_c P(1448\text{B, :443, 17.x} \mid c) \cdot P(c)} \approx 0.99$$</div>
+  <p class="formula-label">99% di probabilità: porta + IP + dimensione identificano il servizio senza ambiguità</p>
+</div>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Probabilità a priori P(C)</div>
+    <canvas id="prior-chart"></canvas>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Posteriori P(C | burst 1448B :443)</div>
+    <canvas id="posterior-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>99% a posteriori, 93% di information leakage.</strong> Se lo quantifichi con l'entropia di Shannon, i metadati (porta, IP, dimensione) rivelano il 93% dell'informazione sul tipo di servizio. La crittografia protegge il restante 7%. È come mettere una porta blindata su una casa con le finestre aperte.</p>
+</div>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">L'information leakage dell'mDNS</h3>
+
+<p>
+  Ma l'information leakage più grave è nell'<strong>mDNS</strong>. Ogni singolo broadcast rivela:
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Informazione</th>
+        <th>Bit stimati</th>
+        <th>Come la ottieni</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Nome dispositivo</strong></td>
+        <td>~10 bit</td>
+        <td><code>iPhone.local</code> nel campo mDNS</td>
+      </tr>
+      <tr>
+        <td><strong>UUID</strong></td>
+        <td>~128 bit</td>
+        <td>UUID univoco nel broadcast</td>
+      </tr>
+      <tr>
+        <td><strong>MAC address</strong></td>
+        <td>~48 bit</td>
+        <td>Header Ethernet del frame</td>
+      </tr>
+      <tr>
+        <td><strong>Servizi supportati</strong></td>
+        <td>~8 bit</td>
+        <td>HomeKit, companion-link, sleep-proxy, ecc.</td>
+      </tr>
+      <tr>
+        <td><strong>Timing (attività)</strong></td>
+        <td>~4 bit/ora</td>
+        <td>Periodicità e burst</td>
+      </tr>
+      <tr>
+        <td><strong>Relazioni</strong></td>
+        <td>~12 bit</td>
+        <td>Cerca il Mac Pro, cerca dispositivi specifici</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Information leakage per tipo di evento (bit per evento)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="info-leakage-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  Il telefono spento leaka più informazione della iena addormentata. La iena nel sonno rivela al massimo l'argomento delle preoccupazioni del giorno. Il telefono rivela: identità (nome, UUID, MAC), capacità (HomeKit, companion-link), timing (quando è attivo), relazioni (cerca il Mac Pro), e volumi di sync (iCloud).
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il paradosso:</strong> il telefono "spento" (schermo nero, nessuna interazione) rivela più informazione identificativa di una persona addormentata. L'mDNS da solo trasmette ~200 bit di informazione unica per broadcast, 1691 volte in 16 ore. Sono 338.200 bit di informazione identitaria sparati in broadcast sulla rete locale. Per un telefono che "non fa niente".</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — IL DOWNLOAD DELLE 3:17                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Download delle 3:17</h2>
+<span class="section-number">Sezione 07. Anatomia di un burst</span>
+
+<p>
+  Zoomiamo sul burst più grosso. 03:17:01, 48 pacchetti, 65KB, 40 millisecondi. Tutto da <code>17.248.179.231</code> porta 443.
+</p>
+
+<div class="code-block fade-in" data-lang="pcap dump">
+<span class="cm"># t = 03:17:01.002</span>
+<span class="nb">17.248.179.231</span>:443 → iPhone  <span class="st">1448 byte</span>  TLS Data  <span class="cm">pkt 1/48</span>
+<span class="nb">17.248.179.231</span>:443 → iPhone  <span class="st">1448 byte</span>  TLS Data  <span class="cm">pkt 2/48</span>
+<span class="nb">17.248.179.231</span>:443 → iPhone  <span class="st">1448 byte</span>  TLS Data  <span class="cm">pkt 3/48</span>
+<span class="cm">... (raffica continua, zero gap) ...</span>
+<span class="nb">17.248.179.231</span>:443 → iPhone  <span class="st">1448 byte</span>  TLS Data  <span class="cm">pkt 46/48</span>
+<span class="nb">17.248.179.231</span>:443 → iPhone  <span class="st">1448 byte</span>  TLS Data  <span class="cm">pkt 47/48</span>
+<span class="nb">17.248.179.231</span>:443 → iPhone  <span class="st">892 byte</span>   TLS Data  <span class="cm">pkt 48/48 (ultimo)</span>
+iPhone → <span class="nb">17.248.179.231</span>:443  <span class="st">66 byte</span>    TCP ACK
+
+<span class="cm"># t = 03:17:01.042 — 40ms totali</span>
+<span class="key">Totale: 48 pacchetti, 65.2 KB, durata 40ms</span>
+<span class="key">Server: 17.248.179.231 (Apple, range 17.0.0.0/8)</span>
+<span class="key">Connessione: già aperta (no handshake TLS visibile)</span>
+</div>
+
+<p>
+  Pacchetti da 1448 byte (MTU) in raffica. Pattern classico di bulk download TLS. Il server manda, il telefono riceve. Non c'è handshake, la connessione era già aperta. Il telefono si è svegliato, ha chiesto qualcosa a iCloud, e iCloud ha risposto con 65KB di dati.
+</p>
+
+<p>
+  Cosa c'è in quei 65KB? Non lo sappiamo. TLS. Ma la dimensione parla: non è un keepalive (26 byte), non è una notifica push (500 byte). È un download. Configurazione? Sync di un database locale? Aggiornamento del modello ML on-device? 65KB alle 3 di notte, mentre il proprietario dorme.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Anatomia del burst 03:17, dimensione per pacchetto nel tempo</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="burst-anatomy-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Il pattern è classico</strong> del bulk download: raffica di pacchetti MTU, zero gap inter-pacchetto, ACK finale. Lo vedresti identico scaricando una foto su WhatsApp o un allegato su Gmail. Solo che qui non c'è WhatsApp. Non c'è nessuno. È Apple che parla con il tuo telefono alle 3 di notte. E il telefono risponde.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — IL TELEFONO È COME LA IENA                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Telefono è Come la Iena</h2>
+<span class="section-number">Sezione 08. Pattern matching</span>
+
+<p>
+  A questo punto il parallelo è strutturale.
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>La Iena</th>
+        <th>Il Telefono</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Periodicità</strong></td>
+        <td>~40 min cambia posizione</td>
+        <td>~10 min mDNS broadcast</td>
+      </tr>
+      <tr>
+        <td><strong>Contenuto</strong></td>
+        <td>Borbottii incomprensibili</td>
+        <td>Pacchetti cifrati</td>
+      </tr>
+      <tr>
+        <td><strong>Metadati</strong></td>
+        <td>Tono, volume, frequenza</td>
+        <td>Dimensione, timing, destinazione</td>
+      </tr>
+      <tr>
+        <td><strong>Burst notturni</strong></td>
+        <td>"Le galline!" (2-3 per notte)</td>
+        <td>iCloud sync (3-4 per notte)</td>
+      </tr>
+      <tr>
+        <td><strong>Consapevolezza</strong></td>
+        <td>Zero</td>
+        <td>Zero</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  Ma possiamo andare oltre il parallelo qualitativo. I tre flussi di traffico (mDNS, APNs, iCloud) sono sincronizzati o indipendenti? Calcoliamo la <strong>cross-correlazione</strong>:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$R_{AB}(\tau) = \frac{1}{T}\int_0^T s_A(t) \cdot s_B(t+\tau)\, dt$$</div>
+  <p class="formula-label">Cross-correlazione tra flussi di traffico: APNs vs iCloud</p>
+</div>
+
+<p>
+  Scoperta: i burst iCloud sono spesso preceduti da un APNs push (~0.7s prima). Il postino bussa (APNs), il telefono apre (iCloud scarica). Apple usa questo meccanismo per tutto: il push notification service sveglia il dispositivo, e il dispositivo poi apre la connessione iCloud per scaricare i dati. Lo stesso pattern che WhatsApp usa per consegnare i messaggi.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Cross-correlazione APNs &harr; iCloud (picco a &tau; &asymp; 0.7s)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="cross-corr-chart"></canvas>
+  </div>
+</div>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\rho_{\text{APNs,iCloud}}(\tau = 0.7\text{s}) \approx 0.84$$</div>
+  <p class="formula-label">Correlazione di Pearson tra burst APNs e burst iCloud: 0.84 con lag di 0.7 secondi</p>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Il meccanismo è universale:</strong> sia WhatsApp che iCloud usano APNs come trigger. Il push arriva, il dispositivo si sveglia, la connessione dati si apre. La firma temporale (lag ~0.7s) è la stessa in entrambi i casi. Se vedi un burst APNs seguito da traffico porta 443 con un ritardo di 0.7 secondi, sai che il telefono ha appena scaricato qualcosa. Non serve sapere cosa.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — 43 INDIRIZZI, ZERO PERMESSI                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 43 Indirizzi, Zero Permessi</h2>
+<span class="section-number">Sezione 09. La mappa dei server</span>
+
+<p>
+  Il telefono senza SIM, senza app di terze parti, parla con <strong>43 IP diversi</strong>. Tutti Apple (range 17.x.x.x) più Akamai e Fastly (CDN di Apple).
+</p>
+
+<p>
+  <strong>Nessun server non-Apple.</strong> Questo telefono è un muletto pulito. Zero app installate. E parla comunque con 43 server.
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Server</th>
+        <th>Esempi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Push notification</strong></td>
+        <td>7</td>
+        <td><code>courier-push-apple.com</code>, <code>eu-central-courier-4.push-apple.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>iCloud content</strong></td>
+        <td>12</td>
+        <td><code>p51-content.icloud.com</code>, <code>p13-ckdatabase.icloud.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>Apple config</strong></td>
+        <td>5</td>
+        <td><code>configuration.apple.com</code>, <code>mesu.apple.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>Apple auth</strong></td>
+        <td>3</td>
+        <td><code>gsa.apple.com</code>, <code>setup.icloud.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>Apple analytics</strong></td>
+        <td>2</td>
+        <td><code>xp.apple.com</code>, <code>idiagnostics.apple.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>CDN (Akamai + Fastly)</strong></td>
+        <td>3</td>
+        <td><code>a1887.dscq.akamai.net</code>, <code>apple.com.edgekey.net</code></td>
+      </tr>
+      <tr>
+        <td><strong>Time (NTP)</strong></td>
+        <td>2</td>
+        <td><code>time.apple.com</code>, <code>time.euro.apple.com</code></td>
+      </tr>
+      <tr>
+        <td style="color: var(--accent-attention);"><strong>Router locale</strong></td>
+        <td>1</td>
+        <td><code>192.168.1.254</code>, interroga via NetBIOS :137</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  Il <strong>DNS in chiaro</strong> grida tutto: <code>courier-push-apple.com</code>, <code>eu-central-courier-4.push-apple.com</code>, <code>p51-content.icloud.com</code>. Il DNS rivela dove vanno i pacchetti prima ancora che il TLS li cifri.
+</p>
+
+<p>
+  E c'è un dettaglio curioso: il router Fastweb (192.168.1.254) interroga il telefono via <strong>NetBIOS</strong> (porta 137): "come ti chiami?" Anche il router è curioso. Il telefono risponde. Senza che nessuno glielo abbia chiesto.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Timeline completa: 16 ore di traffico (tutti i burst)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="full-timeline-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>43 server per un telefono che "non fa niente".</strong> Se installi WhatsApp, Instagram, Gmail, entrano Facebook, Google, Cloudflare, AWS, e decine di tracker. Il traffico di un telefono in uso è ordini di grandezza superiore. Questo è il minimo sindacale. Lo scheletro. E già parla con 43 server.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — E SE LO SVEGLI?                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> E Se lo Svegli?</h2>
+<span class="section-number">Sezione 10. Da sonno a megafono</span>
+
+<p>
+  Questo era il telefono a schermo spento. Senza SIM. Senza app. Il minimo sindacale. Il telefono è come la iena: parla nel sonno senza saperlo. Ma la iena quella notte aveva detto anche un'altra cosa.
+</p>
+
+<p>
+  Stavo quasi per addormentarmi quando si è girata e ha borbottato: <em>"i pacchi della Sere... devo stare a casa domani..."</em>.
+</p>
+
+<p>
+  La Sere è nostra figlia. Compra roba online con una frequenza che farebbe invidia a un processo cron senza rate limiting. Vestiti, creme, aggeggi, cose che non sapevo esistessero e che probabilmente non esistevano fino a quando un algoritmo di Instagram non gliele ha messe davanti. Il problema è che vive da sola, e non è mai a casa. Mai. Una presenza quantistica: esiste, ma se provi a osservarla nel suo appartamento la funzione d'onda collassa e lei è altrove. Quindi si fa spedire tutto qui, perché qui c'è sempre qualcuno. Noi. La iena, io, il cane. La logistica inversa della generazione Z: produci ordini da casa tua, falli consegnare a casa dei tuoi genitori.
+</p>
+
+<p>
+  Risultato: il corriere suona il campanello tre volte a settimana. A volte quattro. A volte cinque. A novembre, a ridosso del Black Friday, ho smesso di contare. E io, senza aprire un singolo pacco, so tutto. So che ha comprato da Amazon lunedì perché il pacco ha il sorriso stampato sopra. So che mercoledì era Zalando perché la scatola è arancione. So che venerdì è arrivata una busta imbottita da un sito coreano di skincare con un nome impronunciabile. So che il pacco lungo e sottile è un treppiede perché nessun essere umano spedisce bastoni per altri motivi. So che la busta morbida è una cover per il telefono. So che quando arrivano tre pacchi lo stesso giorno c'è stato un momento di debolezza emotiva, probabilmente correlato a un lunedì difficile al lavoro. So che prima di Natale il ritmo raddoppia, e dopo Natale c'è il picco dei resi, che è l'equivalente logistico del rimorso.
+</p>
+
+<p>
+  Non ho aperto niente. Leggo le etichette. Peso le scatole. Conto la frequenza. Correlo i pattern. So tutto della Sere senza aprire una busta.
+</p>
+
+<p>
+  E la Sere non manda solo pacchi fisici. Manda messaggi su WhatsApp. Cifrati end-to-end. Pacchi chiusi. Ma se lo capisco io dai pacchi di cartone, posso capirlo anche dal traffico di rete?
+</p>
+
+<p>
+  Accendi lo schermo. Apri WhatsApp. Mandi un messaggio. Il traffico esplode. I server non sono più solo Apple, entrano Facebook, Cloudflare, analytics, tracker. I burst passano da 65KB a megabyte. Le connessioni simultanee da 3 a 30.
+</p>
+
+<p>
+  20 minuti di cattura con WhatsApp attivo. 21 eventi distinti. La classificazione per dimensione è banale:
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Dimensione burst</th>
+        <th>Tipo contenuto</th>
+        <th>Pacchetti tipici</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>&lt; 500 B</code></td>
+        <td>Keepalive / ACK</td>
+        <td>1-2 pkt da 107 byte</td>
+      </tr>
+      <tr>
+        <td><code>1 - 8 KB</code></td>
+        <td><strong>Messaggio di testo</strong></td>
+        <td>APNs burst + 3-5 pkt da 418 byte</td>
+      </tr>
+      <tr>
+        <td><code>40 - 80 KB</code></td>
+        <td><strong>Foto</strong></td>
+        <td>30-80 pkt da 1514 byte (MTU)</td>
+      </tr>
+      <tr>
+        <td><code>100 - 200 KB</code></td>
+        <td><strong>Video breve</strong></td>
+        <td>60-100 pkt da 1514 byte</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="chart-container fade-in">
+  <canvas id="whatsapp-burst-chart" height="300"></canvas>
+</div>
+
+<div class="stats-row fade-in" style="grid-template-columns: 1fr 1fr;">
+  <div style="display:flex; align-items:center; justify-content:center; max-width:280px; margin:0 auto;">
+    <canvas id="whatsapp-type-chart"></canvas>
+  </div>
+  <div style="display:flex; flex-direction:column; justify-content:center; gap:1rem; font-family:var(--font-mono); font-size:0.85rem;">
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <span style="width:14px;height:14px;border-radius:50%;background:#6a6a8a;display:inline-block;"></span>
+      <span style="color:var(--text-secondary);">8 keepalive / ACK</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <span style="width:14px;height:14px;border-radius:50%;background:#4ecdc4;display:inline-block;"></span>
+      <span style="color:var(--text-secondary);">7 messaggi di testo</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <span style="width:14px;height:14px;border-radius:50%;background:#ff8800;display:inline-block;"></span>
+      <span style="color:var(--text-secondary);">4 foto</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <span style="width:14px;height:14px;border-radius:50%;background:#ff6b6b;display:inline-block;"></span>
+      <span style="color:var(--text-secondary);">2 video brevi</span>
+    </div>
+  </div>
+</div>
+
+<p>
+  La sequenza è sempre la stessa. Un messaggio WhatsApp non arriva diretto. Passa per tre mani:
+</p>
+
+<div class="server-flow fade-in">
+  <div class="server-node">
+    <div class="server-icon">APNs</div>
+    <div class="server-name">Apple Push</div>
+    <div class="server-detail">17.57.146.x :5223</div>
+    <div class="server-role">Sveglia il telefono</div>
+  </div>
+  <div class="server-arrow">→</div>
+  <div class="server-node">
+    <div class="server-icon">WA</div>
+    <div class="server-name">WhatsApp Chat Edge</div>
+    <div class="server-detail">MXP2, Milano Malpensa</div>
+    <div class="server-role">Consegna il messaggio</div>
+  </div>
+  <div class="server-arrow">→</div>
+  <div class="server-node">
+    <div class="server-icon">CF</div>
+    <div class="server-name">Cloudflare CDN</div>
+    <div class="server-detail">162.159.140.x :443</div>
+    <div class="server-role">Scarica i media</div>
+  </div>
+</div>
+
+<p>
+  Il reverse DNS non lascia dubbi: <code>whatsapp-chatd-edge-shv-01-mxp2.facebook.com</code>, datacenter <strong>MXP2, Milano Malpensa</strong>. Sai dove passano i tuoi dati.
+</p>
+
+<p>
+  Il DNS grida tutto in chiaro: <code>resolve whatsapp-chatd-edge-shv-01-mxp2.facebook.com</code>, <code>resolve media.fcdn.whatsapp.net</code>. Nomi, ruoli, provider. Il DNS è il postino che grida ad alta voce l'indirizzo del destinatario prima ancora di prendere in mano la busta.
+</p>
+
+<p>
+  Non ho letto un singolo messaggio. Non ho decifrato niente. Ho solo guardato le dimensioni delle buste. Un burst da 75KB da Cloudflare è una foto (probabilità bayesiana: 97%). Un burst da 418 byte dopo un push APNs è un messaggio di testo. 188KB è un video. Il classificatore è banalmente accurato: non perché il modello sia sofisticato, ma perché i dati sono così ben separati che non serve sofisticazione.
+</p>
+
+<p>
+  Il telefono che parla nel sonno è già loquace. Da sveglio è un megafono. E il postino sorride.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 — COSA SA IL POSTINO                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Cosa sa il Postino</h2>
+<span class="section-number">Sezione 11. Il riassunto</span>
+
+<p>
+  Ricapitoliamo. 16 ore di ARP spoofing sulla mia rete di casa. Nessuna decifratura. Nessun exploit. Nessuna vulnerabilità. Solo osservazione del traffico che passa. Ecco cosa so:
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Informazione</th>
+        <th>Come la ottengo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Che dispositivo hai</strong></td>
+        <td>mDNS broadcast: iPhone, UUID, MAC</td>
+      </tr>
+      <tr>
+        <td><strong>Cos'altro c'è in casa</strong></td>
+        <td>mDNS: altri Apple, Chromecast, HomeKit</td>
+      </tr>
+      <tr>
+        <td><strong>Quando il telefono è attivo</strong></td>
+        <td>Periodicità mDNS e APNs (ogni 10 minuti)</td>
+      </tr>
+      <tr>
+        <td><strong>Quando scarica dati</strong></td>
+        <td>Burst iCloud su porta 443: dimensione, timing</td>
+      </tr>
+      <tr>
+        <td><strong>Quanto scarica</strong></td>
+        <td>Conteggio pacchetti da 1448 byte (MTU)</td>
+      </tr>
+      <tr>
+        <td><strong>Dove vanno i dati</strong></td>
+        <td>DNS in chiaro: <code>courier-push-apple.com</code>, <code>p51-content.icloud.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>Quando dormi</strong> e quando sei sveglio</td>
+        <td>Pattern dei burst: cluster notturni tra le 2 e le 4</td>
+      </tr>
+      <tr>
+        <td><strong>Se il telefono è in uso</strong></td>
+        <td>Volume traffico: 200KB dormendo, megabyte da sveglio</td>
+      </tr>
+      <tr>
+        <td><strong>Quali server contatti</strong></td>
+        <td>43 IP: APNs, iCloud, config, auth, analytics, CDN</td>
+      </tr>
+      <tr>
+        <td><strong>Che app usi</strong> (da sveglio)</td>
+        <td>DNS: <code>whatsapp-chatd-edge-shv-01-mxp2.facebook.com</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  Con una settimana di cattura ricostruisci la routine di chiunque. Quando si sveglia, quando va a dormire, quanto è attivo durante il giorno, se ha un picco di messaggi la sera. Il postino non sa cosa sogni, ma sa esattamente quando smetti di comunicare e quando ricominci.
+</p>
+
+<p>
+  E tutto questo senza toccare la crittografia. Senza exploit. Senza zero-day. Solo guardando le buste passare.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 — E ALLORA CHE SI FA                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> E Allora Che si Fa?</h2>
+<span class="section-number">Sezione 12. Mitigazioni</span>
+
+<p>
+  Il problema lo abbiamo visto. La domanda è: si può fare qualcosa? La risposta breve è: sì, in parte. La risposta lunga è che ogni contromisura copre un pezzo del problema, nessuna li copre tutti.
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Contromisura</th>
+        <th>Cosa protegge</th>
+        <th>Cosa non protegge</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>VPN</strong></td>
+        <td>Nasconde il traffico al tuo ISP e a chi è sulla tua rete locale</td>
+        <td>Il provider VPN vede tutto. Sposti il problema, non lo risolvi</td>
+      </tr>
+      <tr>
+        <td><strong>Tor</strong></td>
+        <td>Nasconde origine e destinazione del traffico con routing a cipolla</td>
+        <td>Latenza alta, molti servizi non funzionano bene, l'exit node vede i metadati</td>
+      </tr>
+      <tr>
+        <td><strong>DNS over HTTPS / DNS over TLS</strong></td>
+        <td>Cifra le query DNS, il postino non grida più l'indirizzo</td>
+        <td>L'IP di destinazione resta visibile. Sai comunque dove vanno i pacchetti</td>
+      </tr>
+      <tr>
+        <td><strong>Disabilitare mDNS</strong></td>
+        <td>Ferma i 1691 broadcast che gridano nome, UUID, MAC</td>
+        <td>Rompe AirDrop, Handoff, HomeKit, e tutto l'ecosistema Apple</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  Stewart Baker, ex consigliere generale della NSA, l'ha detto meglio di me: "I metadati ti dicono assolutamente tutto sulla vita di qualcuno. Se hai abbastanza metadati, non hai bisogno del contenuto."
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>La verità scomoda:</strong> non esiste una soluzione completa. Puoi cifrare il contenuto, cifrare il DNS, nascondere il mittente, instradare su Tor. Ma finché mandi pacchetti su una rete, quei pacchetti hanno una dimensione, un timing e una destinazione. E quei tre numeri raccontano quasi tutto. L'unico modo per non far sapere niente al postino è non spedire la lettera.</p>
+</div>
+
+<p>
+  E io l'ho fatto su un muletto, in una sera, con un tool gratuito. Ma il tuo ISP lo fa da sempre. Fastweb, TIM, Vodafone, chiunque ti porti internet a casa: loro sono il postino permanente. Non hanno bisogno dell'ARP spoofing perché il traffico passa già da loro. Vedono tutto quello che ho visto io, 24 ore su 24, 365 giorni l'anno. E la normativa europea sulla data retention gli impone di conservare i metadati delle comunicazioni per mesi. Quello che per me è stato un esperimento di una notte, per loro è il mestiere.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 13 — CONCLUSIONE                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Non Dorme. Parla nel Sonno.</h2>
+<span class="section-number">Sezione 13. Conclusione</span>
+
+<p>
+  Il telefono è come la iena. Parla nel sonno. Non sa di farlo. Non lo controlla. Ma se metti bettercap sul comodino (metaforicamente), senti tutto: con chi parla, quando, quanto, e con che ritmo.
+</p>
+
+<p>
+  In 16 ore, a schermo spento:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li><strong>1314 pacchetti</strong> dal target</li>
+  <li><strong>43 server Apple</strong> contattati</li>
+  <li><strong>1691 broadcast mDNS</strong> ("sono qui, sono qui, sono qui")</li>
+  <li><strong>~200 KB</strong> scaricati di notte</li>
+  <li>Il burst più grosso alle <strong>3:17</strong>: 65 KB in 40 ms</li>
+  <li>Periodicità dominante: <strong>10 minuti</strong> (mDNS e APNs)</li>
+  <li>Correlazione APNs &rarr; iCloud: <strong>&rho; = 0.84</strong> con lag 0.7s</li>
+</ul>
+
+<p>
+  La crittografia protegge il contenuto. Ma il postino (che sia il router Fastweb, il tuo ISP, o il pirata con bettercap) vede tutto il resto. E il resto racconta tutto.
+</p>
+
+<p>
+  La prossima volta che metti il telefono sul comodino e pensi che sia spento, ricordati: non sta dormendo. Sta parlando. Come la iena. Solo che il telefono parla con Cupertino, e la iena parla delle galline.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Non dorme. Parla nel sonno.<br>Come tutti, in questa casa."</div>
+  <p style="color: var(--text-secondary); font-size: 0.85rem;">
+    16 ore. 1314 pacchetti. 43 server. 1691 broadcast. 200 KB scaricati nel buio.<br>
+    Il telefono non dormiva. Parlava con Cupertino.<br>
+    La iena parlava delle galline.<br>
+    Io stavo in mezzo, come sempre. Solo che stavolta registravo.
+  </p>
+</div>
+
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate, <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+</footer>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- KaTeX -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<!-- Main JS -->
+<script src="../js/main.js"></script>
+
+<!-- Article Charts -->
+<script src="../js/charts/telefono-charts.js"></script>
+
+<script>
+  // Render KaTeX
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false}
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+</body>
+</html>
