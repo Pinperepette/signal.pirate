@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Signal Pirate</title>
+  <link>https://pinperepette.github.io/signal.pirate/</link>
+  <description>Smonto cose, studio come funzionano e scrivo quello che trovo.</description>
+  <language>it</language>
+  <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
+
+  <item>
+    <title>Il Telefono Parla nel Sonno</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-telefono-parla-nel-sonno.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-telefono-parla-nel-sonno.html</guid>
+    <pubDate>Mon, 17 Feb 2026 00:00:00 +0100</pubDate>
+    <description>La iena parla nel sonno. Il telefono anche. bettercap, 16 ore di cattura e la scoperta che il tuo iPhone non dorme mai. 1314 pacchetti, 43 server Apple, zero interazioni umane.</description>
+  </item>
+
+  <item>
+    <title>Come Pensa la Macchina</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/come-pensa-la-macchina.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/come-pensa-la-macchina.html</guid>
+    <pubDate>Sun, 16 Feb 2026 00:00:00 +0100</pubDate>
+    <description>Smontare un LLM pezzo per pezzo. Tokenizzazione, embeddings, attention, transformer e hallucinations. Ollama in locale, math pesante, zero fuffa.</description>
+  </item>
+
+  <item>
+    <title>L'Impronta nel Rumore</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/shazam-sotto-il-cofano.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/shazam-sotto-il-cofano.html</guid>
+    <pubDate>Fri, 14 Feb 2026 00:00:00 +0100</pubDate>
+    <description>Come Shazam riconosce una canzone in 5 secondi in un ristorante pieno. FFT, constellation map, hashing combinatoriale e reverse engineering dell'APK.</description>
+  </item>
+
+  <item>
+    <title>L'Attenzione Invisibile</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/attenzione-invisibile.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/attenzione-invisibile.html</guid>
+    <pubDate>Fri, 14 Feb 2026 00:00:00 +0100</pubDate>
+    <description>I 7 segnali nascosti di Phoenix: modelli matematici, teoria dell'informazione e strategie di exploit per l'algoritmo di X/Twitter.</description>
+  </item>
+
+</channel>
+</rss>
