@@ -230,11 +230,15 @@ function generatePhasePoints() {
 /* ========================================================= */
 /* COLORI E DEFAULTS                                         */
 /* ========================================================= */
+const _hcStyle = getComputedStyle(document.documentElement);
 const HC = {
   green: '#00ff88', red: '#ff6b6b', cyan: '#4ecdc4',
   orange: '#ff8800', purple: '#7c4dff', yellow: '#ffd93d',
-  pink: '#ff6eb4', bg: '#0a0a0f', card: '#12121a',
-  text: '#e0e0e0', muted: '#8888aa'
+  pink: '#ff6eb4',
+  bg: _hcStyle.getPropertyValue('--bg-primary').trim() || '#0a0a0f',
+  card: _hcStyle.getPropertyValue('--bg-secondary').trim() || '#12121a',
+  text: _hcStyle.getPropertyValue('--chart-text').trim() || '#e0e0e0',
+  muted: _hcStyle.getPropertyValue('--chart-text').trim() || '#8888aa'
 };
 
 function setupHiddenChartDefaults() {

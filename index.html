@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Signal Pirate — Laboratorio di un pirata</title>
@@ -21,6 +22,10 @@
       <li><a href="#articoli">Articoli</a></li>
       <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
     </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
   </nav>
 
   <!-- Hero Section -->
@@ -48,6 +53,21 @@
     <p class="section-subtitle">Analisi tecniche degli algoritmi che controllano il tuo feed</p>
 
     <div class="articles-grid">
+
+      <!-- Article Card: Il Telefono Parla nel Sonno -->
+      <a href="articoli/il-telefono-parla-nel-sonno.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-02-17</div>
+        <h3 class="article-card-title">Il Telefono Parla nel Sonno</h3>
+        <p class="article-card-abstract">
+          La iena parla nel sonno. Il telefono anche. 16 ore di cattura bettercap su un iPhone a schermo spento.
+          1314 pacchetti, 43 server Apple, 1691 broadcast mDNS. Zero interazioni umane.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">bettercap</span>
+          <span class="tag tag-highlight">Traffic Analysis</span>
+          <span class="tag tag-reaction">FFT</span>
+        </div>
+      </a>
 
       <!-- Article Card: Come Pensa la Macchina -->
       <a href="articoli/come-pensa-la-macchina.html" class="article-card" style="text-decoration:none">

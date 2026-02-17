@@ -4,10 +4,78 @@
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initThemeToggle();
   initTypingEffect();
   initScrollAnimations();
   initCounterAnimations();
 });
+
+/* ---- Theme Toggle ---- */
+function getTheme() {
+  // 1) URL param (funziona sempre, anche file://)
+  if (location.search.indexOf('t=l') > -1) return 'light';
+  if (location.search.indexOf('t=d') > -1) return 'dark';
+  // 2) localStorage (funziona su HTTP)
+  try { var s = localStorage.getItem('theme'); if (s) return s; } catch(e) {}
+  return 'dark';
+}
+
+function tagLinks(theme) {
+  var code = theme === 'light' ? 'l' : 'd';
+  document.querySelectorAll('a[href]').forEach(function(a) {
+    var h = a.getAttribute('href');
+    if (!h || h.charAt(0) === '#' || h.indexOf('://') > -1) return;
+    // strip old param
+    h = h.replace(/[?&]t=[ld]/g, '').replace(/\?$/, '');
+    // split path and hash: ?t= must go before #
+    var hash = '';
+    var hi = h.indexOf('#');
+    if (hi > -1) { hash = h.slice(hi); h = h.slice(0, hi); }
+    var sep = h.indexOf('?') > -1 ? '&' : '?';
+    a.setAttribute('href', h + sep + 't=' + code + hash);
+  });
+}
+
+function initThemeToggle() {
+  var theme = getTheme();
+  document.documentElement.dataset.theme = theme;
+  try { localStorage.setItem('theme', theme); } catch(e) {}
+  tagLinks(theme);
+
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+
+  btn.addEventListener('click', function() {
+    var next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch(e) {}
+    tagLinks(next);
+    updateChartColors();
+  });
+}
+
+function updateChartColors() {
+  if (typeof Chart === 'undefined') return;
+  var style = getComputedStyle(document.documentElement);
+  var textColor = style.getPropertyValue('--chart-text').trim();
+  var gridColor = style.getPropertyValue('--chart-grid').trim();
+
+  Object.values(Chart.instances).forEach(function(chart) {
+    if (chart.options.scales) {
+      Object.values(chart.options.scales).forEach(function(scale) {
+        if (scale.ticks) scale.ticks.color = textColor;
+        if (scale.grid) scale.grid.color = gridColor;
+        if (scale.title) scale.title.color = textColor;
+        if (scale.angleLines) scale.angleLines.color = gridColor;
+        if (scale.pointLabels) scale.pointLabels.color = textColor;
+      });
+    }
+    if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+      chart.options.plugins.legend.labels.color = textColor;
+    }
+    chart.update();
+  });
+}
 
 /* ---- Typing Effect ---- */
 function initTypingEffect() {

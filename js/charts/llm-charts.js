@@ -6,14 +6,15 @@
 (function() {
   'use strict';
 
+  const _rs = getComputedStyle(document.documentElement);
   const GREEN = '#00ff88';
   const PURPLE = '#7c4dff';
   const CYAN = '#4ecdc4';
   const RED = '#ff6b6b';
   const ORANGE = '#ff8800';
   const YELLOW = '#f5c518';
-  const GRID_COLOR = 'rgba(255,255,255,0.06)';
-  const TEXT_COLOR = 'rgba(255,255,255,0.6)';
+  const GRID_COLOR = _rs.getPropertyValue('--chart-grid').trim() || 'rgba(255,255,255,0.06)';
+  const TEXT_COLOR = _rs.getPropertyValue('--chart-text').trim() || 'rgba(255,255,255,0.6)';
 
   const baseOptions = {
     responsive: true,
