@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Rumore Diventa Arte | Signal Pirate</title>
+  <meta name="description" content="Come Stable Diffusion trasforma rumore gaussiano in immagini. Forward process, U-Net, VAE, CLIP, denoising step by step. Tutto in locale su CPU, math pesante, zero fuffa.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Image grid === */
+    .img-grid {
+      display: grid;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+    .img-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .img-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .img-grid.cols-7 { grid-template-columns: repeat(7, 1fr); }
+    @media (max-width: 768px) {
+      .img-grid.cols-7 { grid-template-columns: repeat(4, 1fr); }
+      .img-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+      .img-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    .img-grid figure {
+      margin: 0;
+      text-align: center;
+    }
+    .img-grid img {
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+    .img-grid figcaption {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-top: 0.4rem;
+    }
+
+    /* === Step slider === */
+    .step-slider-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    .step-slider-container img {
+      max-width: 512px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 1rem;
+    }
+    .step-slider-container input[type="range"] {
+      width: 100%;
+      max-width: 512px;
+      accent-color: var(--accent-attention);
+    }
+    .step-slider-label {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-top: 0.5rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-19 | Pinperepette</p>
+  <h1 class="article-page-title">Il Rumore <span class="accent">Diventa Arte</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Come Stable Diffusion trasforma rumore gaussiano in immagini. Forward process, U-Net, VAE, CLIP, denoising step by step. Tutto in locale, su CPU.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Diffusion</span>
+    <span class="tag tag-highlight">U-Net</span>
+    <span class="tag tag-reaction">VAE</span>
+    <span class="tag tag-amplification">CLIP</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — L'HOOK                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Pappagallo che Disegna</h2>
+<span class="section-number">Sezione 01. Dall'allucinazione al pennello</span>
+
+<p>
+  Nell'<a href="come-pensa-la-macchina.html">articolo precedente</a> abbiamo smontato un LLM pezzo per pezzo. Abbiamo visto che non pensa, non capisce, non sa. Lancia dadi pesati. La iena se ne era accorta da sola, io ci ho messo nove sezioni e ottomila parole per arrivare alla stessa conclusione. Tipico.
+</p>
+
+<p>
+  Due giorni dopo ho beccato Grok su X che si inventava di avere quattro cervelli. Quattro agenti separati, Harper, Benjamin e Lucas, che "lavorano in tandem" su ogni query. Un utente gli aveva chiesto come funzionava e Grok, il dado pesato di Elon Musk, gli aveva risposto con un'hallucination da manuale. Così ho fatto la cosa ovvia: gliel'ho scritto.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/grok-hallucination.png" alt="Screenshot di X: Grok allucina di avere 4 cervelli, Pinperepette lo smaschera, Grok ammette" style="max-width: 500px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Grok si inventa di avere 4 cervelli. Lo becco. Ammette: "ho allucinato un po'". Un dado pesato che mente su se stesso.</figcaption>
+</figure>
+
+<p>
+  "Haha, touch&eacute;! Ho allucinato un po'." Almeno &egrave; onesto. Ma la cosa mi ha fatto pensare. Abbiamo capito come la macchina genera <em>testo</em>: un token alla volta, probabilit&agrave; dopo probabilit&agrave;, senza capire niente di quello che scrive. Abbiamo anche visto che non sa fare niente <em>oltre</em> al testo. Non sa contare (chiedigli quanto fa 37 &times; 849 e inventa un numero plausibile). Non sa cercare su internet. Non sa leggere un file. Per fare queste cose gli servono <strong>tool</strong>: una calcolatrice, un browser, un filesystem. L'LLM decide <em>quando</em> usarli e <em>cosa</em> chiedere, ma il lavoro vero lo fa il tool.
+</p>
+
+<p>
+  Con le immagini &egrave; la stessa storia. L'LLM non sa disegnare. Non ha pixel, non ha pennelli, non ha idea di cosa sia un colore. Quando scrivi "disegnami una nave pirata" e ti esce un quadro, non &egrave; l'LLM che l'ha fatto. L'LLM ha chiamato un tool Python, il tool ha eseguito codice che chiama un modello completamente diverso, con un'architettura diversa, addestrato su dati diversi, che fa una cosa sola: generare immagini dal rumore. Come la calcolatrice fa i conti, questo modello fa i pixel. Si chiama <strong>Stable Diffusion</strong>. Come cazzo fa?
+</p>
+
+<p>
+  La iena ha visto il quadro della nave pirata sul mio schermo. "Carino. L'hai scaricato?" No, l'ha fatto il computer. "In che senso l'ha fatto il computer." Nel senso che gli ho scritto cosa volevo e lui l'ha disegnato. Pausa. "Vabb&egrave;." La iena &egrave; tornata al suo iPad e alle sue api. Non impressionata. Per lei il computer &egrave; ancora quella cosa che si contraddice sulle api e che non sostituir&agrave; mai nessuno. Adesso disegna anche. Buon per lui.
+</p>
+
+<p>
+  Io per&ograve; voglio capire come fa. E come per l'LLM, l'unico modo &egrave; smontarlo. Scarico Stable Diffusion 1.5 sul Mac, lo faccio girare su CPU (senza GPU, perch&eacute; Intel Xeon, e la iena dorme e non posso far partire i ventilatori), e seguo il percorso completo: dal rumore puro all'immagine. Ogni passaggio, ogni formula, ogni decisione matematica.
+</p>
+
+<p>
+  Questo &egrave; quello che esce:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/final.png" alt="Immagine generata da Stable Diffusion: nave pirata in una tempesta, pittura ad olio" style="max-width: 512px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Stable Diffusion 1.5, 20 step di denoising, seed 42, CPU. 64.7 secondi.</figcaption>
+</figure>
+
+<p>
+  64.7 secondi. Da rumore puro a questo. Su CPU. E la risposta breve a "come cazzo fa?" &egrave; questa: non disegna. Non immagina. Non crea. <strong>Toglie rumore.</strong> Tutta l'architettura, il miliardo di parametri, le settimane di addestramento su migliaia di GPU, si riducono a un modello che ha imparato a rimuovere rumore da un'immagine. E se sai rimuovere il rumore, sai generare dal nulla. La risposta lunga occupa le prossime undici sezioni.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="860" data-suffix="M">0M</div>
+    <div class="stat-label">Parametri U-Net</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="48" data-suffix="x">0x</div>
+    <div class="stat-label">Compressione latente</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="20" data-suffix="">0</div>
+    <div class="stat-label">Step di denoising</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="64" data-suffix="s">0s</div>
+    <div class="stat-label">Tempo su CPU</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — LE OSSA DEL MODELLO                           -->
+<!-- ======================================================= -->
+<h2 id="sez-anatomia"><span class="accent">//</span> Le Ossa del Modello</h2>
+<span class="section-number">Sezione 02. Dentro Stable Diffusion</span>
+
+<p>
+  Come per l'LLM, l'unico modo &egrave; smontarlo. Scarico Stable Diffusion 1.5 da Hugging Face, lo carico in Python, e inizio a guardare dentro. Primo script: conta tutto. Quanti parametri, quanti componenti, quanto pesa.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/terminale-anatomia.png" alt="Terminale: script Python che smonta Stable Diffusion 1.5, conta parametri per componente, ispeziona U-Net, tokenizza il prompt con CLIP e calcola cosine similarity" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">smonta_modello.py: carico SD 1.5, conto i parametri, apro la U-Net blocco per blocco, tokenizzo il prompt, misuro la cosine similarity tra prompt diversi. 1.066.235.307 parametri totali.</figcaption>
+</figure>
+
+<p>
+  Un miliardo e 66 milioni di parametri. Tre componenti: la <strong>U-Net</strong> (859 milioni, 80.6%) che predice il rumore, il <strong>VAE</strong> (83 milioni, 7.8%) che comprime e decomprime, il <strong>CLIP text encoder</strong> (123 milioni, 11.5%) che traduce il testo. Tre reti, tre ruoli, un obiettivo: trasformare parole in immagini passando per il rumore.
+</p>
+
+<p>
+  Dentro la U-Net: 4 blocchi discendenti, un bottleneck, 4 blocchi ascendenti. Cross-attention in quasi tutti. <code>up_block[1]</code> da solo ha 258 milioni di parametri, un terzo dell'intera rete. &Egrave; il blocco che ricostruisce la risoluzione 16&times;16 &rarr; 32&times;32 con cross-attention: il punto in cui il modello combina il rumore predetto con il condizionamento testuale.
+</p>
+
+<p>
+  Il VAE: 34 milioni nell'encoder (immagine &rarr; latent), 49 milioni nel decoder (latent &rarr; immagine), compressione 48x. CLIP: 12 layer di transformer, vocabolario di 49.408 token, massimo 77 token per prompt, output una matrice 77&times;768.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> nell'articolo sull'LLM ho aperto il file GGUF con <code>xxd</code> e ho trovato 292 tensori dentro 4.9 GB. Qui ho aperto tre componenti con Python e ho trovato un miliardo di parametri in 4.26 GB (float32). Numeri diversi, stesso approccio: vuoi capire una cosa, la smonti e conti i pezzi.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — IL RUMORE                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Bellezza del Rumore</h2>
+<span class="section-number">Sezione 03. Distribuzione gaussiana</span>
+
+<p>
+  Prima di andare avanti, serve capire l'ingrediente base. Il rumore. Non rumore qualsiasi: rumore <strong>gaussiano</strong>. Ogni valore campionato dalla distribuzione normale, la campana di Gauss. Media zero, deviazione standard uno. Quello che vedi qui sotto sono 786.432 numeri casuali, convertiti in pixel.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/pure_noise.png" alt="Rumore gaussiano puro: 512x512 pixel di valori casuali" style="max-width: 400px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Rumore gaussiano puro. 786.432 numeri casuali. Da qui parte tutto.</figcaption>
+</figure>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathcal{N}(0, \mathbf{I}): \quad p(x) = \frac{1}{\sqrt{2\pi}} \, e^{-x^2/2}$$</div>
+  <p class="formula-label">Distribuzione gaussiana standard: media 0, varianza 1</p>
+</div>
+
+<p>
+  Perch&eacute; proprio la gaussiana? Perch&eacute; ha tre propriet&agrave; matematiche che la rendono perfetta per quello che stiamo per fare. Primo: il <strong>teorema del limite centrale</strong> dice che la somma di tante variabili casuali indipendenti tende alla gaussiana, qualsiasi sia la distribuzione originale. Secondo: la gaussiana &egrave; chiusa sotto combinazioni lineari. Sommi due gaussiane, ottieni un'altra gaussiana. Terzo: massimizza l'entropia tra tutte le distribuzioni con varianza finita. &Egrave; il rumore "pi&ugrave; disordinato possibile" a parit&agrave; di energia.
+</p>
+
+<p>
+  La conseguenza pratica: puoi aggiungere rumore gaussiano a un'immagine in un passo solo, o in mille passi incrementali, e il risultato &egrave; matematicamente equivalente. Un po' di rumore, poi un po' ancora, poi un po' ancora. La distribuzione finale &egrave; la stessa. Questa propriet&agrave; &egrave; il motivo per cui funziona tutto il resto.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — FORWARD PROCESS                               -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Distruggere un'Immagine</h2>
+<span class="section-number">Sezione 04. Il forward process</span>
+
+<p>
+  Il forward process &egrave; la parte facile. Prendi un'immagine e aggiungi rumore progressivamente, un passo alla volta, finch&eacute; non resta solo rumore puro. Distruzione controllata. Ad ogni passo \(t\), l'immagine diventa un po' pi&ugrave; rumorosa:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$q(\mathbf{x}_t \mid \mathbf{x}_{t-1}) = \mathcal{N}\left(\mathbf{x}_t;\; \sqrt{1-\beta_t}\,\mathbf{x}_{t-1},\; \beta_t\,\mathbf{I}\right)$$</div>
+  <p class="formula-label">Un singolo passo del forward process: moltiplica il segnale, aggiungi rumore</p>
+</div>
+
+<p>
+  \(\beta_t\) &egrave; il <strong>noise schedule</strong>: un numero piccolo (tra 0.00085 e 0.012) che dice quanto rumore aggiungere al passo \(t\). Cresce lentamente: poco rumore all'inizio (i dettagli fini si perdono per primi), molto alla fine. Grazie alla matematica gaussiana, non devi fare tutti i passi in sequenza. Puoi saltare direttamente al passo \(t\):
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\;\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\;\boldsymbol{\epsilon} \qquad \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})$$</div>
+  <p class="formula-label">Closed-form: salta direttamente al passo t. &alpha;&#772;<sub>t</sub> = &prod; (1-&beta;<sub>s</sub>)</p>
+</div>
+
+<p>
+  Dove \(\bar{\alpha}_t = \prod_{s=1}^{t}(1-\beta_s)\) &egrave; il prodotto cumulativo. Quando \(\bar{\alpha}_t \approx 1\) il segnale domina. Quando \(\bar{\alpha}_t \approx 0\) il rumore domina. L'immagine &egrave; una miscela pesata tra il segnale originale e rumore puro.
+</p>
+
+<p>
+  Implemento il noise schedule a mano. Niente diffusers, solo numpy e la formula. Voglio vedere i numeri:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/terminale-rumore.png" alt="Terminale: script Python che implementa il forward process a mano con numpy, mostra noise schedule, alpha_bar e SNR" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">smonta_rumore.py: il forward process implementato a mano. Solo numpy e la formula. Il SNR crolla da +30.7 dB a -28.0 dB.</figcaption>
+</figure>
+
+<p>
+  I numeri confermano la teoria. A \(t=0\), il 99.9% &egrave; segnale. Il SNR (Signal-to-Noise Ratio) parte da +30.7 dB e crolla fino a -28.0 dB a \(t=999\). Il punto di pareggio (SNR &asymp; 0 dB, met&agrave; segnale met&agrave; rumore) cade intorno a \(t \approx 300\). Dopo \(t=500\), il segnale &egrave; al 16%. A \(t=999\) &egrave; allo 0.2%: rumore puro, indistinguibile dalla gaussiana.
+</p>
+
+<p>
+  Ho preso l'immagine della nave pirata e ho applicato la formula a mano, passo dopo passo. Ecco cosa succede:
+</p>
+
+<div class="img-grid cols-7 fade-in">
+  <figure>
+    <img src="../immagini/sd/forward_t0000.png" alt="t=0: immagine originale">
+    <figcaption>t=0</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/forward_t0050.png" alt="t=50: rumore leggero">
+    <figcaption>t=50</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/forward_t0100.png" alt="t=100: rumore moderato">
+    <figcaption>t=100</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/forward_t0200.png" alt="t=200: struttura che si perde">
+    <figcaption>t=200</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/forward_t0400.png" alt="t=400: quasi tutto rumore">
+    <figcaption>t=400</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/forward_t0700.png" alt="t=700: rumore dominante">
+    <figcaption>t=700</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/forward_t0999.png" alt="t=999: rumore puro">
+    <figcaption>t=999</figcaption>
+  </figure>
+</div>
+
+<p>
+  A \(t=50\) l'immagine &egrave; ancora l&igrave;, con un leggero grano tipo pellicola. A \(t=200\) i dettagli spariscono, resta la struttura delle masse colorate. A \(t=400\) non si capisce pi&ugrave; niente. A \(t=999\) &egrave; indistinguibile dal rumore puro che abbiamo visto prima. La nave pirata &egrave; stata distrutta. Pezzo per pezzo, rumore dopo rumore.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Noise schedule: quanto segnale resta ad ogni passo</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="noise-schedule-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> distruggere un'immagine col rumore &egrave; facile. Moltiplicare, sommare, campionare. Non serve nessun modello, nessuna rete neurale. Il problema interessante &egrave; l'inverso: dato il rumore, ricostruire l'immagine. Come tornare indietro da \(t=999\) a \(t=0\). E qui inizia la parte seria.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — LA SCOMMESSA                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Scommessa</h2>
+<span class="section-number">Sezione 05. Imparare a rimuovere il rumore</span>
+
+<p>
+  L'intuizione &egrave; del 2020. Ho et al., paper che si chiama "Denoising Diffusion Probabilistic Models" (DDPM). L'idea &egrave; disarmante nella sua semplicit&agrave;: se addestri una rete neurale a predire il rumore che &egrave; stato aggiunto a un'immagine, quella rete pu&ograve; essere usata al contrario, iterativamente, per rimuoverlo. Un passo alla volta. Partendo dal rumore puro.
+</p>
+
+<p>
+  Il training &egrave; brutale nella sua semplicit&agrave;:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li>Prendi un'immagine \(\mathbf{x}_0\) dal dataset.</li>
+  <li>Campiona un timestep \(t\) a caso tra 1 e 1000.</li>
+  <li>Campiona rumore \(\boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})\).</li>
+  <li>Crea l'immagine rumorosa: \(\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}\)</li>
+  <li>Dai \(\mathbf{x}_t\) e \(t\) alla rete e chiedi: "quanto rumore c'&egrave;?"</li>
+  <li>Misura l'errore, aggiorna i pesi. Ripeti.</li>
+</ol>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathcal{L} = \mathbb{E}_{t,\,\mathbf{x}_0,\,\boldsymbol{\epsilon}}\left[\left\|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\right\|^2\right]$$</div>
+  <p class="formula-label">La loss function: mean squared error tra il rumore vero e quello predetto</p>
+</div>
+
+<p>
+  Fine. L'intera loss function &egrave; un MSE. Nessun avversario come nelle GAN. Nessuna ricostruzione come nei VAE classici. Solo: "ti do un'immagine sporca, dimmi quanto &egrave; sporca". Ripeti miliardi di volte su milioni di immagini, e la rete impara.
+</p>
+
+<p>
+  Una volta addestrata, la generazione funziona al contrario. Parti da rumore puro \(\mathbf{x}_T \sim \mathcal{N}(0, \mathbf{I})\). Ad ogni passo, la rete predice il rumore presente, lo togli parzialmente, e ottieni un'immagine un po' meno rumorosa. Dopo \(T\) passi (20-50 con un buon scheduler) ottieni un'immagine pulita. Dal nulla. Come Grok che si inventa quattro cervelli, ma con i pixel invece dei token.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{x}_{t-1} = \frac{1}{\sqrt{\alpha_t}}\left(\mathbf{x}_t - \frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}}\,\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t)\right) + \sigma_t\,\mathbf{z}$$</div>
+  <p class="formula-label">Un singolo passo di denoising: rimuovi il rumore predetto, aggiungi un po' di stocasticit&agrave;</p>
+</div>
+
+<p>
+  Quel \(\sigma_t \mathbf{z}\) alla fine non &egrave; un errore. &Egrave; rumore fresco aggiunto intenzionalmente. Sembra controintuitivo: stai togliendo rumore e ne aggiungi? Si. La stocasticit&agrave; permette al modello di esplorare lo spazio delle soluzioni, evitando di collassare su un singolo output sfocato. Senza quel termine, le immagini vengono slavate e prive di dettagli.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> la rete non genera immagini. Non ha nessun concetto di "nave" o "tempesta". Predice rumore. L'immagine emerge come effetto collaterale della rimozione progressiva del rumore da un campione casuale. Come scolpire: non aggiungi niente, togli quello che non serve. L'LLM dell'articolo precedente era un dado pesato che genera token. Questo &egrave; un dado pesato che toglie rumore. Stesso principio, medium diverso.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — LO SPAZIO LATENTE                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Comprimere il Mondo</h2>
+<span class="section-number">Sezione 06. VAE e spazio latente</span>
+
+<p>
+  Lavorare direttamente con immagini 512&times;512 sarebbe un incubo. Un'immagine RGB a quella risoluzione ha <strong>786.432 valori</strong>. Fare diffusion su uno spazio di quella dimensionalit&agrave; richiederebbe GPU mostruose e tempi assurdi. La soluzione geniale di Rombach et al.: non lavorare sui pixel, ma in uno <strong>spazio latente</strong> compresso.
+</p>
+
+<p>
+  Il <strong>VAE</strong> (Variational Autoencoder) &egrave; il compressore. Ha un encoder che schiaccia l'immagine 512&times;512&times;3 in una rappresentazione latente 64&times;64&times;4, e un decoder che fa il percorso inverso. Il rapporto?
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\frac{512 \times 512 \times 3}{64 \times 64 \times 4} = \frac{786\,432}{16\,384} = 48\times$$</div>
+  <p class="formula-label">48 volte meno dati. Tutta la diffusion avviene in questo spazio compresso.</p>
+</div>
+
+<p>
+  Ho scritto uno script che codifica la nave pirata nel latent space e misura tutto:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/terminale-vae.png" alt="Terminale: script Python che codifica un'immagine nel latent space del VAE, mostra compressione 48x, statistiche per canale e PSNR di ricostruzione" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">smonta_vae.py: 786.432 valori compressi in 16.384. 48x. PSNR di ricostruzione sopra 30 dB: visivamente quasi identico.</figcaption>
+</figure>
+
+<p>
+  Ho visualizzato i 4 canali separatamente. Ogni canale &egrave; una mappa 64&times;64 in scala di grigi:
+</p>
+
+<div class="img-grid cols-4 fade-in">
+  <figure>
+    <img src="../immagini/sd/latent_ch0.png" alt="Canale latente 0">
+    <figcaption>Canale 0</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/latent_ch1.png" alt="Canale latente 1">
+    <figcaption>Canale 1</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/latent_ch2.png" alt="Canale latente 2">
+    <figcaption>Canale 2</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/latent_ch3.png" alt="Canale latente 3">
+    <figcaption>Canale 3</figcaption>
+  </figure>
+</div>
+
+<p>
+  Questi 4 canali non sono luminosit&agrave;, contrasto, bordi nel senso classico. Sono feature apprese durante l'addestramento. Non hanno nomi umani. Ma contengono abbastanza informazione per ricostruire l'immagine originale quasi perfettamente. Il "quasi" non importa: il modello non sta cercando di riprodurre un originale. Sta creando dal nulla.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Pixel space vs latent space: dimensionalit&agrave;</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="compression-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  Ecco perch&eacute; si chiama <strong>Latent</strong> Diffusion Model. La diffusion non avviene sui pixel. Avviene su tensori 64&times;64&times;4. Il rumore &egrave; gaussiano anche nel latent space. La U-Net lavora su questa rappresentazione compressa. Solo alla fine, il decoder del VAE espande il risultato in un'immagine a piena risoluzione. Ed &egrave; per questo che io riesco a generare immagini su un Mac con la CPU: 48 volte meno calcoli per ogni passo.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> il VAE &egrave; il motivo per cui Stable Diffusion gira su hardware consumer. Senza compressione latente, servirebbe 48 volte pi&ugrave; memoria e compute per ogni passo di diffusion. La qualit&agrave; non peggiora significativamente. I costi crollano. Rombach et al. hanno reso democratico quello che prima richiedeva un data center.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — CLIP                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Tradurre le Parole</h2>
+<span class="section-number">Sezione 07. CLIP text encoder</span>
+
+<p>
+  "A pirate ship sailing through a storm, dramatic lighting, oil painting." Queste parole devono diventare un segnale matematico che guida la rimozione del rumore. Il traduttore &egrave; <strong>CLIP</strong> (Contrastive Language-Image Pre-training, OpenAI 2021).
+</p>
+
+<p>
+  CLIP &egrave; stato addestrato su 400 milioni di coppie (immagine, testo) scraped da internet. Il suo obiettivo: allineare le rappresentazioni di immagini e testi nello stesso spazio vettoriale. Il testo "a cat" e un'immagine di un gatto devono avere vettori simili. "A cat" e un'immagine di un'auto devono avere vettori distanti. Stessa logica degli embeddings che abbiamo visto per gli LLM (<a href="come-pensa-la-macchina.html">Sezione 04 dell'articolo precedente</a>), ma applicata alla coppia testo-immagine.
+</p>
+
+<p>
+  Stable Diffusion usa solo il text encoder di CLIP. Il prompt viene tokenizzato (massimo 77 token), passato attraverso un transformer con 12 layer, e produce una sequenza di 77 vettori da 768 dimensioni. Questa sequenza &egrave; il <strong>conditioning</strong>: viene iniettata nella U-Net ad ogni passo di denoising tramite <strong>cross-attention</strong>.
+</p>
+
+<p>
+  Smontiamolo. Nello <a href="#sez-anatomia">script dell'anatomia</a> ho gi&agrave; tokenizzato il prompt e misurato le similarit&agrave; tra embedding CLIP. Il prompt "a pirate ship sailing through a storm, dramatic lighting, oil painting" diventa 15 token. Tutti interi: "pirate", "ship", "storm", "oil", "painting". Il vocabolario di CLIP &egrave; costruito su testo inglese associato a immagini, e le parole visive sono quasi sempre token singoli. "pirate" non viene spezzato in "pir" + "ate". CLIP "sa" che "pirate" &egrave; una parola visiva importante.
+</p>
+
+<p>
+  La cosine similarity tra i prompt conferma che CLIP organizza lo spazio semantico per significato visivo: "a sailboat on calm waters" ha similarit&agrave; 0.58 con la nave pirata (barche, acqua, navigazione), "a cat on a sofa" &egrave; a 0.27 (lontanissimo). Come l'esperimento con <code>nomic-embed-text</code> nell'articolo sugli LLM (<a href="come-pensa-la-macchina.html">Sezione 04</a>). Questi vettori guidano il denoising: ad ogni step, la cross-attention tira l'immagine verso la regione dello spazio dove vivono navi, tempeste, pittura a olio.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{c} = \text{CLIP}_{\text{text}}(\text{prompt}) \in \mathbb{R}^{77 \times 768}$$</div>
+  <p class="formula-label">Il prompt diventa una matrice 77&times;768 che guida il denoising</p>
+</div>
+
+<p>
+  La cross-attention funziona come la self-attention dell'articolo precedente, ma con una differenza chiave: le query vengono dal latent space (i "pixel" dell'immagine compressa), le key e i value vengono dal testo. In pratica, ogni posizione nello spazio latente chiede al testo: "cosa dovrei diventare?" E il testo risponde pesando i suoi token per rilevanza.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{CrossAttn}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d}}\right)\mathbf{V}$$</div>
+  <p class="formula-label">Cross-attention: Q dal latent, K e V dal testo CLIP</p>
+</div>
+
+<p>
+  Senza CLIP, la U-Net toglierebbe il rumore e produrrebbe immagini generiche. Con CLIP, il denoising &egrave; guidato dal significato del testo. "Pirate" tira verso le navi. "Storm" verso i cieli scuri. "Oil painting" verso le pennellate. Non &egrave; comprensione. &Egrave; correlazione statistica calibrata su 400 milioni di esempi. Come l'LLM che non capisce le api ma genera testo plausibile sulle api, il CLIP non capisce le navi pirata ma mappa "pirate ship" nella regione giusta dello spazio vettoriale.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> CLIP non "capisce" il prompt. Funziona bene per descrizioni concrete. Funziona male per logica, astrazioni, negazioni. "A room without a cat" produce spesso un gatto, perch&eacute; CLIP mappa "cat" nella regione dei gatti indipendentemente dal "without". Stessa storia dell'LLM: pattern statistici potenti, zero comprensione. La macchina che allucina sulle api adesso allucina anche coi gatti.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — U-NET                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Cervello</h2>
+<span class="section-number">Sezione 08. L'architettura U-Net</span>
+
+<p>
+  La U-Net &egrave; il cuore. 860 milioni di parametri dedicati a un solo compito: dato un tensore latente rumoroso e un timestep, predire il rumore presente. L'architettura prende il nome dalla sua forma a U: una parte discendente che comprime, un collo di bottiglia, una parte ascendente che espande. Con skip connections tra i livelli corrispondenti.
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Input</div>
+    <div class="step-detail">Latent 64&times;64&times;4</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Down</div>
+    <div class="step-detail">64&rarr;32&rarr;16&rarr;8</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Mid</div>
+    <div class="step-detail">Bottleneck 8&times;8</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Up</div>
+    <div class="step-detail">8&rarr;16&rarr;32&rarr;64</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Output</div>
+    <div class="step-detail">Noise 64&times;64&times;4</div>
+  </div>
+</div>
+
+<p>
+  Ogni blocco contiene <strong>ResNet blocks</strong> (convoluzioni con connessioni residuali), <strong>self-attention</strong> (alle risoluzioni basse), e <strong>cross-attention</strong> (che inietta il conditioning CLIP). Le <strong>skip connections</strong> collegano encoder e decoder, portando avanti i dettagli ad alta risoluzione che altrimenti andrebbero persi nel bottleneck.
+</p>
+
+<p>
+  Il <strong>timestep \(t\)</strong> viene iniettato tramite sinusoidal embedding, lo stesso meccanismo dei transformer. La rete sa "quanto rumorosa" &egrave; l'immagine: ai timestep alti predice struttura grossolana, ai timestep bassi predice dettagli fini. Come l'LLM che processa 32 layer di transformer per generare un token, qui la U-Net processa la sua pipeline per predire un campo di rumore.
+</p>
+
+<div class="code-block" data-lang="pipeline">
+<span class="cm"># Input: latent z_t [4, 64, 64], timestep t, conditioning c [77, 768]</span>
+
+<span class="fn">1.</span> t_emb = <span class="kw">SinusoidalEmbed</span>(t)           <span class="cm"># timestep &rarr; vettore</span>
+
+<span class="cm"># Encoder (discendente)</span>
+<span class="fn">2.</span> h1 = <span class="kw">DownBlock</span>(z_t, t_emb, c)         <span class="cm"># 64&times;64 &rarr; 32&times;32</span>
+<span class="fn">3.</span> h2 = <span class="kw">DownBlock</span>(h1, t_emb, c)          <span class="cm"># 32&times;32 &rarr; 16&times;16</span>
+<span class="fn">4.</span> h3 = <span class="kw">DownBlock</span>(h2, t_emb, c)          <span class="cm"># 16&times;16 &rarr; 8&times;8</span>
+
+<span class="cm"># Bottleneck</span>
+<span class="fn">5.</span> mid = <span class="kw">MidBlock</span>(h3, t_emb, c)          <span class="cm"># self-attn + cross-attn</span>
+
+<span class="cm"># Decoder (ascendente) con skip connections</span>
+<span class="fn">6.</span> u1 = <span class="kw">UpBlock</span>(mid + h3, t_emb, c)      <span class="cm"># 8&times;8 &rarr; 16&times;16</span>
+<span class="fn">7.</span> u2 = <span class="kw">UpBlock</span>(u1 + h2, t_emb, c)       <span class="cm"># 16&times;16 &rarr; 32&times;32</span>
+<span class="fn">8.</span> u3 = <span class="kw">UpBlock</span>(u2 + h1, t_emb, c)       <span class="cm"># 32&times;32 &rarr; 64&times;64</span>
+
+<span class="cm"># Output</span>
+<span class="fn">9.</span> noise = <span class="kw">Conv</span>(u3)                      <span class="cm"># predizione rumore [4, 64, 64]</span>
+</div>
+
+<p>
+  La U-Net non sa cosa sia una nave pirata. Esattamente come Llama 3.1 non sa cosa sia un'ape. Ha 860 milioni di parametri calibrati per predire pattern di rumore condizionati a embedding testuali. La rete non crea. Predice. L'immagine non viene "disegnata". Emerge dalla sottrazione progressiva del rumore predetto. Come l'LLM non "scrive" ma campiona token ad alta probabilit&agrave;, qui il modello non "disegna" ma rimuove rumore iterativamente.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — IL DENOISING                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 20 Passi dal Rumore all'Arte</h2>
+<span class="section-number">Sezione 09. Il denoising step by step</span>
+
+<p>
+  La iena dorme. Io faccio girare lo script. Intel Xeon, CPU, nessuna GPU. 20 step di denoising, seed 42, prompt: "a pirate ship sailing through a storm, dramatic lighting, oil painting". Ho agganciato un callback alla pipeline per salvare il latent ad ogni singolo step, decodificarlo col VAE, e creare una GIF animata del processo.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/terminale-denoising.png" alt="Terminale: script Python che genera un'immagine con Stable Diffusion salvando ogni step intermedio di denoising" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">generate.py: 20 step di denoising su CPU. Ogni step viene decodificato dal VAE e salvato. 64.7 secondi dal rumore puro alla nave pirata.</figcaption>
+</figure>
+
+<p>
+  64.7 secondi. Ecco il viaggio:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/denoising.gif" alt="Animazione GIF del processo di denoising: 20 frame dal rumore puro all'immagine finale" style="max-width: 512px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">20 passi di denoising. Ogni frame &egrave; il latent decodificato dal VAE. Il rumore diventa struttura, la struttura diventa dettaglio.</figcaption>
+</figure>
+
+<p>
+  Muovi lo slider per esplorare ogni step:
+</p>
+
+<div class="step-slider-container fade-in">
+  <img id="step-preview" src="../immagini/sd/step_00.png" alt="Step di denoising">
+  <br>
+  <input type="range" id="step-slider" min="0" max="20" value="0" step="1">
+  <div class="step-slider-label" id="step-label">Step 0 / 20 (rumore puro)</div>
+</div>
+
+<p>
+  Guardate cosa succede:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Step 0-3:</strong> masse di colore emergono dal rumore. Niente dettagli, solo una divisione grossolana tra cielo e acqua.</li>
+  <li><strong>Step 4-8:</strong> la composizione si stabilizza. La forma della nave appare, l'orizzonte si definisce.</li>
+  <li><strong>Step 9-14:</strong> i dettagli iniziano. Alberi, vele, onde. La texture "olio su tela" emerge.</li>
+  <li><strong>Step 15-20:</strong> rifinitura. Dettagli nitidi, colori saturi, ombre definite.</li>
+</ul>
+
+<p>
+  &Egrave; un processo gerarchico: prima la struttura globale, poi i dettagli medi, infine i dettagli fini. Ai timestep alti il rumore &egrave; forte e la U-Net vede solo basse frequenze. Ai timestep bassi il rumore &egrave; sottile e la U-Net si concentra sulle alte frequenze. &Egrave; lo stesso motivo per cui, nell'LLM, i primi layer del transformer estraggono pattern grossolani e gli ultimi raffinano. Architetture diverse, stesso principio: dal generale al particolare.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> bastano 20 passi perch&eacute; si usa un noise scheduler ottimizzato (PNDM o DDIM) che salta timestep in modo intelligente. Il DDPM originale ne richiedeva 1000. Saltare step senza perdere qualit&agrave; &egrave; un problema matematico non banale, e i paper su DDIM e DPM-Solver hanno reso possibile la generazione in tempo quasi reale.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — LA MATEMATICA                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Matematica Completa</h2>
+<span class="section-number">Sezione 10. Le equazioni che governano tutto</span>
+
+<p>
+  Mettiamo insieme tutti i pezzi. Ecco il flusso matematico completo. Se vi siete mangiati le formule dell'articolo sugli LLM (softmax, attention, cross-entropy), queste sono pi&ugrave; facili.
+</p>
+
+<p>
+  <strong>1. Noise schedule.</strong> La sequenza \(\beta_1, \ldots, \beta_T\) definisce quanto rumore aggiungere ad ogni passo:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\beta_t = \beta_{\min} + \frac{t-1}{T-1}(\beta_{\max} - \beta_{\min}) \qquad \beta_{\min} = 0.00085,\; \beta_{\max} = 0.012$$</div>
+  <p class="formula-label">Schedule lineare. Da quasi niente a un po' di rumore per passo.</p>
+</div>
+
+<p>
+  <strong>2. Prodotti cumulativi.</strong> Per saltare direttamente a un timestep:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\alpha_t = 1 - \beta_t \qquad \bar{\alpha}_t = \prod_{s=1}^{t}\alpha_s$$</div>
+  <p class="formula-label">&alpha;&#772;<sub>t</sub> parte da ~1 e scende verso ~0: quanto segnale resta al passo t</p>
+</div>
+
+<p>
+  <strong>3. Forward process (closed-form).</strong>
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\;\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\;\boldsymbol{\epsilon} \qquad \boldsymbol{\epsilon} \sim \mathcal{N}(0, \mathbf{I})$$</div>
+  <p class="formula-label">Miscela pesata: segnale &times; &radic;&alpha;&#772; + rumore &times; &radic;(1-&alpha;&#772;)</p>
+</div>
+
+<p>
+  <strong>4. Reverse process (denoising).</strong>
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{x}_{t-1} = \frac{1}{\sqrt{\alpha_t}}\left(\mathbf{x}_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t}}\;\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, \mathbf{c})\right) + \sigma_t\,\mathbf{z}$$</div>
+  <p class="formula-label">Denoising condizionato: &epsilon;<sub>&theta;</sub> &egrave; la U-Net, c &egrave; il conditioning CLIP, z ~ N(0,I)</p>
+</div>
+
+<p>
+  <strong>5. Classifier-Free Guidance (CFG).</strong> Per rendere l'immagine pi&ugrave; aderente al prompt. Invece di usare solo la predizione condizionata, interpola tra quella senza testo e quella con testo:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\hat{\boldsymbol{\epsilon}}_\theta = \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, \varnothing) + w\left(\boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, \mathbf{c}) - \boldsymbol{\epsilon}_\theta(\mathbf{x}_t, t, \varnothing)\right)$$</div>
+  <p class="formula-label">CFG: w = guidance scale (tipicamente 7.5). Amplifica l'effetto del testo.</p>
+</div>
+
+<p>
+  Con \(w = 1\) ottieni la predizione standard. Con \(w = 7.5\) l'effetto del testo viene amplificato. Per ogni passo di denoising, la U-Net viene invocata <strong>due volte</strong>: una senza testo e una con testo. Il CFG raddoppia il costo computazionale. Come la temperatura nell'LLM controllava la "creativit&agrave;" del dado, qui la guidance scale controlla l'aderenza al prompt. Pi&ugrave; &egrave; alta, pi&ugrave; il modello segue il testo. Pi&ugrave; &egrave; bassa, pi&ugrave; si prende libert&agrave;.
+</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Parametro</th>
+        <th>Valore tipico</th>
+        <th>Effetto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>num_inference_steps</code></td>
+        <td>20-50</td>
+        <td>Quanti passi di denoising. Pi&ugrave; passi = pi&ugrave; dettaglio, pi&ugrave; tempo.</td>
+      </tr>
+      <tr>
+        <td><code>guidance_scale</code></td>
+        <td>7.5</td>
+        <td>Aderenza al prompt. Alto = fedele. Basso = libero.</td>
+      </tr>
+      <tr>
+        <td><code>seed</code></td>
+        <td>Qualsiasi intero</td>
+        <td>Rumore iniziale. Stesso seed = stessa composizione base.</td>
+      </tr>
+      <tr>
+        <td><code>&beta;<sub>min</sub></code>, <code>&beta;<sub>max</sub></code></td>
+        <td>0.00085, 0.012</td>
+        <td>Range del noise schedule.</td>
+      </tr>
+      <tr>
+        <td><code>Latent dim</code></td>
+        <td>64&times;64&times;4</td>
+        <td>Dimensione dello spazio latente (fissata dal VAE).</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 — STESSO SEED                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Stesso Dado, Mano Diversa</h2>
+<span class="section-number">Sezione 11. Stesso seed, prompt diversi</span>
+
+<p>
+  Il seed controlla il rumore iniziale. Stesso seed, stesso rumore, stessa composizione di base. Ma il prompt guida la direzione del denoising. Cosa succede se tieni fisso il seed e cambi solo il prompt?
+</p>
+
+<p>
+  Ho preso il seed 42 e ho generato tre immagini. Stesso template di prompt, soggetto diverso. Ho scelto i soggetti che conosce meglio la iena: un'arnia (le api sono il suo mondo), una gallina (la Nera non fa un uovo da ottobre), e una iena (lei).
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/sd/terminale-seed.png" alt="Terminale: script Python che genera immagini con lo stesso seed 42 ma prompt diversi" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">gen_same_seed3.py: seed 42, stesso rumore iniziale, soggetti diversi.</figcaption>
+</figure>
+
+<div class="img-grid cols-3 fade-in">
+  <figure>
+    <img src="../immagini/sd/same_seed_0.png" alt="Seed 42: a beehive on a windowsill, watercolor">
+    <figcaption>"a beehive on a windowsill, watercolor"</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/same_seed_1.png" alt="Seed 42: a chicken sitting on a windowsill, watercolor">
+    <figcaption>"a chicken sitting on a windowsill, watercolor"</figcaption>
+  </figure>
+  <figure>
+    <img src="../immagini/sd/same_seed_2.png" alt="Seed 42: a hyena sitting on a windowsill, watercolor">
+    <figcaption>"a hyena sitting on a windowsill, watercolor"</figcaption>
+  </figure>
+</div>
+
+<p>
+  Stessa composizione di base: il soggetto sulla finestra, stessa illuminazione, stessa palette di colori. Ma soggetti completamente diversi. Il rumore iniziale definisce la struttura spaziale (dove finiscono le masse, come si distribuisce la luce). Il prompt definisce il "cosa": quale soggetto, quale stile.
+</p>
+
+<p>
+  &Egrave; come dare lo stesso blocco di marmo a tre scultori con idee diverse. Il materiale &egrave; lo stesso. Il risultato dipende dalla mano che scolpisce. Qui la "mano" &egrave; il conditioning CLIP: ad ogni passo di denoising, la cross-attention tira l'immagine verso il significato del prompt, partendo dalla stessa configurazione di rumore. La iena sarebbe contenta di sapere che il modello non sa cosa sia un'arnia o una gallina. Sa che "beehive" finisce in una certa regione dello spazio vettoriale e che l&igrave; vicino ci sono le immagini di arnie che ha visto durante l'addestramento. Pattern statistici. Non conoscenza.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Insight chiave:</strong> il seed non &egrave; un dettaglio tecnico. &Egrave; la struttura latente dell'immagine. Se trovi un seed che produce una composizione che ti piace, puoi variare il prompt mantenendo quella struttura. I professionisti che usano SD per lavoro testano decine di seed prima di trovare quello giusto, e poi lo fissano per esplorare variazioni.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 — CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Dado e lo Scalpello</h2>
+<span class="section-number">Sezione 12. Conclusione</span>
+
+<p>
+  Ricapitoliamo. Il percorso dal rumore puro alla nave pirata:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li>Un rumore gaussiano \(\mathbf{z}_T \sim \mathcal{N}(0, \mathbf{I})\) nel <strong>latent space</strong> (64&times;64&times;4)</li>
+  <li>Il prompt codificato da <strong>CLIP</strong> in una matrice 77&times;768</li>
+  <li>20 iterazioni della <strong>U-Net</strong> (860M parametri) che predice il rumore</li>
+  <li>Ad ogni passo, il rumore viene sottratto con la formula del reverse process</li>
+  <li>Il <strong>CFG</strong> amplifica l'effetto del testo ad ogni step</li>
+  <li>Il <strong>VAE decoder</strong> espande il latent in un'immagine 512&times;512</li>
+</ol>
+
+<p>
+  Nell'articolo sugli LLM ho scritto: "Non pensa. Lancia dadi pesati molto bene." Qui &egrave; la stessa storia, in un medium diverso. Il modello non disegna. Non immagina. Non ha concetto di bellezza, composizione, o stile. Ha 860 milioni di parametri calibrati per predire rumore gaussiano condizionato a embedding testuali. Punto. E come l'LLM produce testo fluente e apparentemente intelligente lanciando dadi pesati, qui il modello produce immagini apparentemente artistiche togliendo rumore pesato.
+</p>
+
+<p>
+  Grok si inventa di avere quattro cervelli. L'LLM si inventa che la regina delle api esce a fondare colonie. Stable Diffusion genera navi pirata da rumore puro. Tre manifestazioni dello stesso principio: pattern statistici estratti da dati, applicati iterativamente, senza nessuna comprensione di quello che stanno producendo. E funzionano. Non perch&eacute; sono intelligenti, ma perch&eacute; la statistica, con abbastanza dati e abbastanza parametri, simula cose che sembrano intelligenza.
+</p>
+
+<p>
+  La iena continuerebbe a non essere impressionata. Lei sa cos'&egrave; un'arnia perch&eacute; le ha costruite con le mani. Sa cos'&egrave; una gallina perch&eacute; la Nera le ruba i pomodori dall'orto. Sa cosa sono le api perch&eacute; una volta l'ha punta una regina e le &egrave; rimasta la mano gonfia per tre giorni. Questo &egrave; conoscenza grounded. Il modello ha visto foto di arnie su internet. Toglie rumore nella loro direzione. Non &egrave; la stessa cosa.
+</p>
+
+<p>
+  Ma Michelangelo diceva che scolpire consiste nel togliere dal marmo tutto quello che non &egrave; la statua. Stable Diffusion fa esattamente questo, col rumore. Parte da un blocco di rumore e toglie, passo dopo passo, tutto quello che non &egrave; l'immagine che il testo descrive. Non aggiunge niente. Sottrae. 20 volte. E quello che resta &egrave; una nave pirata in una tempesta, olio su tela, che non &egrave; mai esistita e non esister&agrave; mai fuori dai numeri che la definiscono.
+</p>
+
+<p>
+  E adesso che sai come funziona, sai anche come controllarlo. Quando chiedi a un LLM di generare un'immagine, l'LLM chiama un tool Python. Quel tool accetta parametri. Puoi passargli un JSON e decidere tutto tu:
+</p>
+
+<div class="code-block" data-lang="json">
+{
+  <span class="key">"prompt"</span>: <span class="st">"a pirate ship sailing through a storm, oil painting"</span>,
+  <span class="key">"seed"</span>: <span class="nb">42</span>,
+  <span class="key">"num_inference_steps"</span>: <span class="nb">30</span>,
+  <span class="key">"guidance_scale"</span>: <span class="nb">9.0</span>,
+  <span class="key">"width"</span>: <span class="nb">512</span>,
+  <span class="key">"height"</span>: <span class="nb">512</span>,
+  <span class="key">"negative_prompt"</span>: <span class="st">"blurry, low quality, text"</span>
+}
+</div>
+
+<p>
+  <code>seed</code> fissa il rumore iniziale: stesso seed, stessa composizione (come abbiamo visto con l'arnia, la gallina e la iena). <code>guidance_scale</code> controlla quanto il modello segue il testo: alzala e il prompt pesa di pi&ugrave;, abbassala e il modello si prende libert&agrave;. <code>num_inference_steps</code> decide quanti passi di denoising: di pi&ugrave; significa pi&ugrave; dettaglio, ma pi&ugrave; tempo. <code>negative_prompt</code> &egrave; quello che <em>non</em> vuoi: il modello allontana il denoising da quei concetti.
+</p>
+
+<p>
+  Non stai pi&ugrave; chiedendo "disegnami qualcosa" a una scatola nera. Stai passando parametri a un modello di cui conosci l'architettura, il noise schedule, il latent space, il CLIP, la U-Net. Sai cosa fa ogni numero. Sai perch&eacute; seed 42 d&agrave; una composizione diversa da seed 43. Sai perch&eacute; guidance_scale 3 d&agrave; immagini sfocate e 15 d&agrave; artefatti. Non &egrave; magia. &Egrave; un miliardo di parametri che tolgono rumore. E adesso sai come dirgli <em>quanto</em> rumore togliere, <em>in che direzione</em>, e <em>partendo da dove</em>.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Non disegna. Toglie rumore. 20 volte."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    860 milioni di parametri. 16.384 valori nello spazio latente. 20 passi di denoising. 64.7 secondi su CPU.
+    Un modello che non sa cosa sia una nave, una tempesta, o la pittura ad olio.
+    Sa solo quanto rumore c'&egrave; in un tensore 64&times;64&times;4.
+    Il dado pesato che scrive testo adesso toglie rumore.
+    La iena continua a non essere impressionata.
+    E probabilmente ha ragione.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+
+    // Step slider
+    var slider = document.getElementById('step-slider');
+    var preview = document.getElementById('step-preview');
+    var label = document.getElementById('step-label');
+    if (slider && preview && label) {
+      slider.addEventListener('input', function() {
+        var step = parseInt(this.value);
+        if (step === 20) {
+          preview.src = '../immagini/sd/final.png';
+        } else {
+          preview.src = '../immagini/sd/step_' + String(step).padStart(2, '0') + '.png';
+        }
+        var desc = '';
+        if (step === 0) desc = ' (rumore puro)';
+        else if (step <= 3) desc = ' (struttura grossolana)';
+        else if (step <= 8) desc = ' (composizione)';
+        else if (step <= 14) desc = ' (dettagli)';
+        else if (step < 20) desc = ' (rifinitura)';
+        else desc = ' (immagine finale)';
+        label.textContent = 'Step ' + step + ' / 20' + desc;
+      });
+    }
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/sd-charts.js"></script>
+
+</body>
+</html>
