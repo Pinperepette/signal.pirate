@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Caso Non Esiste | Signal Pirate</title>
+  <meta name="description" content="Il Mersenne Twister smontato pezzo per pezzo. 624 osservazioni bastano per predire ogni output futuro. Il random del computer non esiste.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-19 | Pinperepette</p>
+  <h1 class="article-page-title">Il Caso <span class="accent">Non Esiste</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Il Mersenne Twister smontato pezzo per pezzo. 624 osservazioni, stato completo, ogni numero futuro predetto. Il random del computer non esiste.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Mersenne Twister</span>
+    <span class="tag tag-highlight">PRNG</span>
+    <span class="tag tag-reaction">Cracking</span>
+    <span class="tag tag-amplification">GF(2)</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — IL DADO TRUCCATO (HOOK)                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Dado Truccato</h2>
+<span class="section-number">Sezione 01. Per capire le cose le rompiamo</span>
+
+<p>
+  La iena dorme. Come sempre. Come quando <a href="come-pensa-la-macchina.html">ho smontato l'LLM</a> pezzo per pezzo e ho scoperto che non pensa, lancia dadi pesati. Come quando <a href="il-rumore-diventa-arte.html">ho smontato Stable Diffusion</a> e ho scoperto che non disegna, toglie rumore. In entrambi i casi lavoravo di notte, su CPU, perch&eacute; se accendo la GPU partono i ventilatori e la iena si sveglia. E la iena svegliata &egrave; peggio di un kernel panic.
+</p>
+
+<p>
+  Per&ograve; questa volta c'&egrave; una differenza. Questa volta il rumore non me lo porto pi&ugrave; come ingrediente. Questa volta lo smonto. Perch&eacute; il "rumore" di Stable Diffusion, quello che partiva da seed 42 e produceva una nave pirata in 64 secondi, non era rumore. Il "caso" dei dadi pesati dell'LLM, quelli che campionavano il prossimo token da 128.256 possibilit&agrave;, non era caso. Erano entrambi la stessa cosa: un algoritmo del 1997 chiamato <strong>Mersenne Twister</strong>.
+</p>
+
+<p>
+  Lo stesso algoritmo dietro <code>random.random()</code> di Python, <code>rand()</code> di Ruby, <code>mt_rand()</code> di PHP, <code>RAND()</code> di Excel. Ogni volta che il computer dice "random", quasi sempre mente. Sta eseguendo una funzione deterministica che prende 624 interi a 32 bit e produce una sequenza lunghissima di numeri che <em>sembrano</em> casuali. Ma non lo sono. Sono prevedibili. Tutti. E stanotte lo dimostro.
+</p>
+
+<p>
+  Per capire le cose le rompiamo. Oggi ho rotto il random di Python. La iena si &egrave; rotta solo le scatole, ma quello &egrave; il suo stato naturale.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="624" data-suffix="">0</div>
+    <div class="stat-label">Osservazioni per crackarlo</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="19937" data-suffix="">0</div>
+    <div class="stat-label">Periodo 2^n - 1</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="2496" data-suffix=" B">0 B</div>
+    <div class="stat-label">Stato interno</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="0" data-suffix="">0</div>
+    <div class="stat-label">Entropia vera</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — VERO CASO VS FINTO CASO                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Vero Caso vs Finto Caso</h2>
+<span class="section-number">Sezione 02. True random vs pseudorandom</span>
+
+<p>
+  Ok, prima di rompere tutto, una cosa va capita. Il "casuale" nel computer ha due facce.
+</p>
+
+<p>
+  Il <strong>vero caso</strong> (True Random Number Generator, TRNG) viene dalla fisica. Atomi che decadono. Elettroni che vibrano. Roba quantistica. Roba che neanche l'universo sa come andr&agrave; a finire. Nessun algoritmo, nessun supercomputer, nessuna osservazione pu&ograve; predire il prossimo valore. Come la iena: non puoi prevederla. Le chiedi se vuole la pasta e ti risponde con una lista di cose da fare. Le dici "hai ragione" e ti dice "non usare quel tono". Le chiedi "che tono?" e ti dice "appunto". Le dici che fa freddo e apre la finestra. Le dici che hai sistemato il rubinetto e ti chiede perch&eacute; non l'hai fatto prima. Le dici che l'hai fatto prima e ti chiede perch&eacute; perde ancora. Zero correlazione con l'input. Entropia pura.
+</p>
+
+<p>
+  Il <strong>finto caso</strong> (Pseudorandom Number Generator, PRNG) viene da un algoritmo. Punto. Gli dai un numero iniziale (il seed), lui fa i suoi conti, e sforna una sequenza di numeri che <em>sembra</em> casuale. Supera i test. Distribuzione perfetta. Ma &egrave; deterministica: \(f(\text{stato}) \to \text{output}\). Se conosci lo stato, conosci ogni output futuro. Ogni singolo numero. Per sempre.
+</p>
+
+<p>
+  La cosa assurda: un buon PRNG frega tutti. <em>Nessun test statistico</em> lo distingue dal vero caso. Passa tutto: Diehard, TestU01, NIST. Ma sotto, &egrave; un orologio. Deterministico. Prevedibile. Basta sapere dove guardare.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Analogia:</strong> immagina un mazzo di carte mescolato cos&igrave; bene che nessuno riesce a indovinare la prossima carta. Ma c'&egrave; un trucco: il mazziere ha mescolato seguendo una regola precisa. Se scopri la regola, sai l'ordine di tutte le carte. Il Mersenne Twister &egrave; quel mazziere. E la regola ha 624 pezzi.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — DENTRO IL MERSENNE TWISTER                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Dentro il Mersenne Twister</h2>
+<span class="section-number">Sezione 03. Matsumoto e Nishimura, 1997</span>
+
+<p>
+  Lo tirano fuori nel 1997 due ricercatori giapponesi, Matsumoto e Nishimura. Il nome? Viene dal periodo: \(2^{19937} - 1\), che &egrave; un <strong>primo di Mersenne</strong> (un numero primo della forma \(2^p - 1\)). Per capire: &egrave; un numero con 6.002 cifre. Seimila cifre. Se generassi un miliardo di numeri al secondo, ci vorrebbe pi&ugrave; tempo dell'et&agrave; dell'universo per finire un ciclo. Sembra inattaccabile. Non lo &egrave;.
+</p>
+
+<p>
+  Lo stato interno &egrave; un vettore di <strong>624 interi a 32 bit</strong>. Totale: 2.496 byte. 2.5 KB. Tutto il "caso" del tuo computer sta in meno spazio di un vocale della iena che dice "compra il latte". Tutto il "rumore" di Stable Diffusion, tutti i "dadi pesati" dell'LLM, tutte le playlist "random" di Spotify: 2.5 KB di stato e una funzione. Da questo stato, il MT genera un output alla volta tramite due operazioni: il <strong>twist</strong> (che aggiorna lo stato) e il <strong>tempering</strong> (che trasforma lo stato in output).
+</p>
+
+<p>
+  Chi lo usa? Tutti. Ma proprio tutti:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li>Python (<code>random</code> module)</li>
+  <li>Ruby (<code>rand</code>)</li>
+  <li>PHP (<code>mt_rand</code>)</li>
+  <li>R (default RNG)</li>
+  <li>NumPy (legacy, prima della versione 1.17)</li>
+  <li>Excel (<code>RAND()</code>)</li>
+  <li>Unity e Unreal Engine</li>
+  <li>MATLAB e GNU Octave</li>
+  <li>PostgreSQL (<code>random()</code>)</li>
+</ul>
+
+<p>
+  La iena dorme. Apro il terminale. Come con l'<a href="come-pensa-la-macchina.html">LLM e il file GGUF</a>, come con il <a href="il-rumore-diventa-arte.html">VAE di Stable Diffusion</a>, il primo passo &egrave; sempre lo stesso: apri, guarda dentro, conta i pezzi. Ho scritto <code>smonta_mt.py</code>. Apre lo stato interno, esegue il twist a mano, mostra il tempering, genera i primi 10 output:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/prng/terminale-smonta.png" alt="Terminale: script Python che smonta il Mersenne Twister, mostra stato interno, twist, tempering e output" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">smonta_mt.py: stato interno di 624 interi, twist manuale, tempering, primi 10 output. 2.496 byte di "caso".</figcaption>
+</figure>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Seed</div>
+    <div class="step-detail">Inizializza 624 interi</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Stato</div>
+    <div class="step-detail">624 &times; 32 bit = 2.5 KB</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Twist</div>
+    <div class="step-detail">Ricorrenza su GF(2)</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Tempering</div>
+    <div class="step-detail">4 op bitwise</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Output</div>
+    <div class="step-detail">Intero a 32 bit</div>
+  </div>
+</div>
+
+<p>
+  I numeri confermano: 624 interi a 32 bit, 2.496 byte di memoria, periodo \(2^{19937} - 1\). 100.000 numeri generati con seed 42 (lo stesso seed della nave pirata), media 0.5001. Distribuzione perfettamente uniforme. Nessun test statistico troverebbe un difetto. Ma &egrave; tutto deterministico. Cambi il seed, cambi la sequenza. Stesso seed, stessa sequenza. Sempre. Su qualsiasi macchina, qualsiasi sistema operativo, qualsiasi versione di Python. Per questo seed 42 produceva sempre la stessa nave pirata.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Distribuzione di 100.000 numeri MT: uniforme perfetta</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="distribution-chart"></canvas>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — LA MATEMATICA: GF(2)                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Matematica: GF(2)</h2>
+<span class="section-number">Sezione 04. Aritmetica binaria e la ricorrenza</span>
+
+<p>
+  Qui la matematica fa paura solo a guardarla, ma fidatevi, &egrave; pi&ugrave; semplice di quanto sembra. Il MT lavora in \(\text{GF}(2)\), il campo di Galois. Un mondo dove esistono solo due cose: 0 e 1. L'aritmetica:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Addizione</strong> = XOR. 0+0=0, 0+1=1, 1+0=1, 1+1=0.</li>
+  <li><strong>Moltiplicazione</strong> = AND. 0&times;0=0, 0&times;1=0, 1&times;0=0, 1&times;1=1.</li>
+</ul>
+
+<p>
+  Due soli risultati. Nessuna sfumatura. La iena funziona allo stesso modo: o hai ragione o hai torto. Spoiler: hai torto. Le dici "ma anche tu avevi detto che..." e ti risponde "quello era diverso". In GF(2) almeno le regole sono coerenti.
+</p>
+
+<p>
+  In pratica, ogni intero a 32 bit diventa una fila di 32 zeri e uni. Lo XOR &egrave; la somma. E la ricorrenza che genera il prossimo stato combina tre pezzi dello stato attuale:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{x}_{k+n} = \mathbf{x}_{k+m} \oplus \left(\text{upper}(\mathbf{x}_k) \,\|\, \text{lower}(\mathbf{x}_{k+1})\right) \cdot \mathbf{A}$$</div>
+  <p class="formula-label">La ricorrenza MT19937. n=624, m=397. Tutto su GF(2).</p>
+</div>
+
+<p>
+  Dove:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li>\(\mathbf{x}_k\) &egrave; il k-esimo intero dello stato (32 bit)</li>
+  <li>\(\text{upper}(\mathbf{x}_k)\) = bit 31 di \(\mathbf{x}_k\) (la parte alta)</li>
+  <li>\(\text{lower}(\mathbf{x}_{k+1})\) = bit 0-30 di \(\mathbf{x}_{k+1}\) (la parte bassa)</li>
+  <li>\(\|\) = concatenazione dei bit</li>
+  <li>\(\mathbf{A}\) = matrice di compagnia con coefficiente \(\texttt{0x9908B0DF}\)</li>
+  <li>\(\oplus\) = XOR</li>
+</ul>
+
+<p>
+  La moltiplicazione per \(\mathbf{A}\) si implementa come: shift a destra di 1 bit, e se il bit meno significativo era 1, XOR con \(\texttt{0x9908B0DF}\). Due righe di codice. Come l'<a href="come-pensa-la-macchina.html">attention dell'LLM</a> che sembrava complicata e poi era un prodotto scalare con softmax, anche qui la formula fa pi&ugrave; paura di quello che fa davvero:
+</p>
+
+<div class="code-block" data-lang="python">
+<span class="cm"># Il twist: una riga alla volta</span>
+<span class="kw">for</span> k <span class="kw">in</span> <span class="nb">range</span>(<span class="nb">624</span>):
+    y = (mt[k] & <span class="nb">0x80000000</span>) | (mt[(k+<span class="nb">1</span>) % <span class="nb">624</span>] & <span class="nb">0x7FFFFFFF</span>)
+    mt[k] = mt[(k + <span class="nb">397</span>) % <span class="nb">624</span>] ^ (y >> <span class="nb">1</span>)
+    <span class="kw">if</span> y % <span class="nb">2</span> != <span class="nb">0</span>:
+        mt[k] ^= <span class="nb">0x9908B0DF</span>
+</div>
+
+<p>
+  I numeri 624 e 397 non sono a caso. Sono stati scelti perch&eacute; fanno funzionare tutto al massimo: periodo lungo, distribuzione bella. Il polinomio della matrice &egrave; primitivo su GF(2), che in pratica vuol dire: periodo garantito al massimo possibile, \(2^{19937} - 1\).
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{Periodo} = 2^{nw - r} - 1 = 2^{624 \times 32 - 31} - 1 = 2^{19937} - 1$$</div>
+  <p class="formula-label">n=624, w=32, r=31. Un numero con 6.002 cifre decimali.</p>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>Occhio:</strong> il periodo &egrave; astronomico, ma la sicurezza &egrave; zero. Il periodo ti dice solo "quanto ci mette a ripetersi". Non ti dice niente sulla predicibilit&agrave;. Un orologio ha periodo 12 ore, ma se sai che ora &egrave; adesso, sai che ora sar&agrave; tra un'ora. Lo stato del MT ha 19.937 bit. Te ne servono 19.968 di osservazione per ricostruirlo. Cio&egrave; 624 numeri.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — IL TEMPERING                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Tempering (e Come Invertirlo)</h2>
+<span class="section-number">Sezione 05. Sembra irreversibile. Non lo &egrave;.</span>
+
+<p>
+  Dopo il twist, il MT fa un'altra cosa: il <strong>tempering</strong>. Quattro operazioni sui bit che trasformano lo stato in output. Servono a rendere i numeri pi&ugrave; "belli" statisticamente. Eccole:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\begin{aligned}
+y &\leftarrow y \oplus (y \gg 11) \\
+y &\leftarrow y \oplus ((y \ll 7) \,\&\, \texttt{0x9D2C5680}) \\
+y &\leftarrow y \oplus ((y \ll 15) \,\&\, \texttt{0xEFC60000}) \\
+y &\leftarrow y \oplus (y \gg 18)
+\end{aligned}$$</div>
+  <p class="formula-label">Le 4 operazioni di tempering. XOR, shift, AND con maschere costanti.</p>
+</div>
+
+<p>
+  A prima vista sembra una funzione a senso unico: i bit si mescolano, si sovrappongono, le maschere tagliano via pezzi. Irreversibile? No. Ogni operazione si pu&ograve; invertire, perch&eacute; lo XOR con un valore che viene da s&eacute; stesso non distrugge niente. I bit "nuovi" dipendono da bit che gi&agrave; conosci.
+</p>
+
+<p>
+  Prendiamo la quarta operazione: <code>y ^= (y >> 18)</code>. Con parole a 32 bit e shift di 18, i primi 18 bit rimangono invariati (lo shift li porta oltre il bordo). Quindi conosco gi&agrave; i top 18 bit. Con quelli, ricostruisco i bottom 14. Un solo passo.
+</p>
+
+<p>
+  La seconda operazione (<code>y ^= (y << 7) & mask</code>) &egrave; pi&ugrave; insidiosa: i bottom 7 bit sono invariati, poi ricostruisco 7 bit alla volta, dal basso verso l'alto. Servono 4 iterazioni. Ma funziona sempre. Come sbucciare una cipolla: sembra complicata, ma ogni strato rivela il successivo. La iena dice che sbuccio le cipolle troppo lentamente. Dice anche che cucino troppo lentamente. E che mangio troppo velocemente. L'inversione del tempering almeno &egrave; consistente.
+</p>
+
+<div class="code-block" data-lang="python">
+<span class="kw">def</span> <span class="fn">untemper</span>(y):
+    <span class="cm"># Inverti op 4: y ^= (y >> 18)</span>
+    y ^= (y >> <span class="nb">18</span>)
+    <span class="cm"># Inverti op 3: y ^= (y << 15) & 0xEFC60000</span>
+    y ^= (y << <span class="nb">15</span>) & <span class="nb">0xEFC60000</span>
+    <span class="cm"># Inverti op 2: y ^= (y << 7) & 0x9D2C5680</span>
+    tmp = y
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="nb">range</span>(<span class="nb">4</span>):
+        tmp = y ^ ((tmp << <span class="nb">7</span>) & <span class="nb">0x9D2C5680</span>)
+    y = tmp & <span class="nb">0xFFFFFFFF</span>
+    <span class="cm"># Inverti op 1: y ^= (y >> 11)</span>
+    tmp = y
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="nb">range</span>(<span class="nb">2</span>):
+        tmp = y ^ (tmp >> <span class="nb">11</span>)
+    y = tmp & <span class="nb">0xFFFFFFFF</span>
+    <span class="kw">return</span> y
+</div>
+
+<p>
+  15 righe. Ecco la funzione che rompe il random. Funziona? Prendo tutti i 624 valori dello stato interno, li tempero, li untempero, e verifico il round-trip:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/prng/terminale-untemper.png" alt="Terminale: script Python che inverte il tempering del Mersenne Twister, round-trip perfetto su 624 valori" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">untemper.py: inversione del tempering. 624 valori testati, 0 errori. Round-trip perfetto.</figcaption>
+</figure>
+
+<p>
+  624 su 624. Zero errori. Il tempering si inverte tutto. Da qualsiasi output del MT, recuperi lo stato interno esatto. Ecco dove si rompe.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il punto:</strong> il tempering non &egrave; mai stato pensato per la sicurezza. Matsumoto e Nishimura volevano distribuzione migliore, non cifratura. &Egrave; una trasformazione lineare su GF(2), e quelle si invertono sempre. Tutta quella roba di bit che si mescolano sembra complicata, ma &egrave; fumo. 15 righe di Python la smontano.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — L'ATTACCO                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Attacco: 624 Numeri</h2>
+<span class="section-number">Sezione 06. Osserva, inverti, clona, predici</span>
+
+<p>
+  Adesso mettiamo tutto insieme. L'attacco &egrave; di una semplicit&agrave; imbarazzante:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Osserva</strong> 624 output consecutivi a 32 bit dal generatore vittima.</li>
+  <li><strong>Inverti</strong> il tempering su ciascuno (la funzione <code>untemper</code>).</li>
+  <li><strong>Clona</strong> il generatore impostando lo stato recuperato.</li>
+  <li><strong>Predici</strong> ogni output futuro. Per sempre.</li>
+</ol>
+
+<p>
+  Non ti serve il seed. Non ti serve forza bruta. Non ti serve nessun supercomputer. Non ti servono neanche i ventilatori. Solo 624 osservazioni e la funzione di inversione. La iena pu&ograve; continuare a dormire.
+</p>
+
+<div class="code-block" data-lang="python">
+<span class="cm"># L'intero attacco</span>
+observed = [<span class="fn">victim</span>.<span class="fn">getrandbits</span>(<span class="nb">32</span>) <span class="kw">for</span> _ <span class="kw">in</span> <span class="nb">range</span>(<span class="nb">624</span>)]
+state = [<span class="fn">untemper</span>(x) <span class="kw">for</span> x <span class="kw">in</span> observed]
+
+cloned = random.Random()
+cloned.<span class="fn">setstate</span>((<span class="nb">3</span>, <span class="nb">tuple</span>(state) + (<span class="nb">624</span>,), <span class="kw">None</span>))
+
+<span class="cm"># Da qui in poi, cloned produce gli stessi numeri di victim</span>
+<span class="fn">print</span>(<span class="fn">victim</span>.<span class="fn">random</span>())   <span class="cm"># 0.9713048923733888</span>
+<span class="fn">print</span>(<span class="fn">cloned</span>.<span class="fn">random</span>())   <span class="cm"># 0.9713048923733888  &lt;- identico</span>
+</div>
+
+<p>
+  Risultato:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/prng/terminale-crack.png" alt="Terminale: script Python che cracka il Mersenne Twister, 624 output osservati, 1000 predetti, 100% match" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">crack_mt.py: 624 osservazioni, 1000 predizioni. Match: 100.0%. Anche random.random() (float a 64 bit): 100%.</figcaption>
+</figure>
+
+<p>
+  1000 su 1000. Match perfetto. Non solo sugli interi a 32 bit, anche sui float a 64 bit di <code>random.random()</code>. Il clone &egrave; una copia esatta del generatore vittima. Produce gli stessi numeri, nello stesso ordine, per sempre.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Predizione vs Realt&agrave;: primi 100 output dopo il crack</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="prediction-chart"></canvas>
+  </div>
+</div>
+
+<p>
+  Guardate il grafico: i punti verdi (vittima) e le croci rosse (clone) sono perfettamente sovrapposti. Non "quasi". Non "approssimativamente". Identici. Bit per bit. Come <a href="il-rumore-diventa-arte.html">Stable Diffusion con lo stesso seed</a> produceva la stessa nave pirata, qui il clone produce gli stessi numeri. La differenza &egrave; che l&agrave; serviva conoscere il seed. Qui no. Basta osservare.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Perch&eacute; proprio 624?</strong> Perch&eacute; lo stato ha 624 interi. Ogni osservazione ti rivela un intero (dopo l'untemper). Con 623 non hai abbastanza informazione. Con 624 hai tutto. Fine. Lo stato &egrave; tuo.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — DEMO: ROMPERE PYTHON                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Demo: Rompere Python</h2>
+<span class="section-number">Sezione 07. shuffle, choice, randint: tutto predicibile</span>
+
+<p>
+  Ok, predire <code>getrandbits(32)</code> &egrave; impressionante. Ma nella pratica chi usa <code>getrandbits</code> direttamente? Tutti usano <code>random.shuffle()</code>, <code>random.choice()</code>, <code>random.randint()</code>. Queste funzioni sono costruite sopra lo stesso generatore. Se hai clonato il generatore, le predici tutte. &Egrave; come nell'articolo sull'LLM: una volta che sai che <a href="come-pensa-la-macchina.html#dado-pesato">il prossimo token &egrave; un dado pesato</a>, sai che ogni funzione costruita sopra (chat, traduzione, riassunto) &egrave; lo stesso dado con una maschera diversa. Qui &egrave; uguale: shuffle, choice, randint sono tutti maschere sopra lo stesso MT.
+</p>
+
+<p>
+  Ho scritto <code>crack_shuffle.py</code>. Dopo il crack, predico: lo shuffle di un mazzo da 10 carte, lo shuffle di un mazzo da 52 carte, 10 <code>random.choice()</code> da una lista di colori, 10 <code>random.randint(1, 100)</code>.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/prng/terminale-shuffle.png" alt="Terminale: script Python che predice random.shuffle, random.choice e random.randint dopo aver crackato il MT" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">crack_shuffle.py: dopo il crack, predico shuffle, choice, randint. Match: PERFETTO su tutto.</figcaption>
+</figure>
+
+<p>
+  Tutto perfetto. Il mazzo di 52 carte mescolato dalla vittima? Lo conosco prima che finisca di mescolare. Il colore scelto a "caso"? Lo so prima che lo scelga. Il numero tra 1 e 100? Lo so prima che lo generi.
+</p>
+
+<p>
+  La iena conosce questa sensazione. Sa cosa sto per dire prima che apra bocca. "Non hai comprato il pane." "Hai lasciato la luce accesa." "Stai pensando a quella cosa del computer." Non le servono 624 osservazioni. Le bastano le prime tre lettere della frase e quindici anni di dati di addestramento.
+</p>
+
+<p>
+  Le implicazioni:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Lotterie online</strong> che usano MT: se osservi 624 estrazioni, predici tutte le future.</li>
+  <li><strong>Poker online</strong> con MT: conosci le carte di tutti prima che vengano distribuite.</li>
+  <li><strong>Shuffle playlist</strong>: sai quale canzone verr&agrave; dopo.</li>
+  <li><strong>Giochi Unity/Unreal</strong>: predici spawn, loot, eventi casuali.</li>
+  <li><strong>Token di sessione</strong> generati con MT: li puoi predire e rubare sessioni.</li>
+  <li><strong>Captcha e password temporanee</strong> con MT: aggirabili.</li>
+</ul>
+
+<div class="insight-box fade-in">
+  <p><strong>Non &egrave; teoria.</strong> &Egrave; successo davvero. Nel 2012 hanno bucato giochi online che usavano MT per le carte. Nel 2010 hanno sfruttato <code>mt_rand()</code> di PHP per predire token di sessione. Non &egrave; roba da paper accademico. &Egrave; cronaca.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — DEMO: IL RUMORE DI STABLE DIFFUSION           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Demo: Il "Rumore" di Stable Diffusion</h2>
+<span class="section-number">Sezione 08. Il rumore non &egrave; rumore</span>
+
+<p>
+  Torniamo all'<a href="il-rumore-diventa-arte.html">articolo su Stable Diffusion</a>. La iena dormiva, io facevo girare SD su CPU per non fare rumore. "Rumore." &Egrave; la parola che abbiamo usato per tutto l'articolo. Il rumore gaussiano, il rumore che la U-Net toglie, il rumore da cui emerge la nave pirata. L'abbiamo usata cos&igrave; tante volte che &egrave; diventata normale. Ma quella parola era una bugia.
+</p>
+
+<p>
+  Quando scrivi <code>torch.Generator().manual_seed(42)</code>, PyTorch inizializza un Mersenne Twister con seed 42. Il tensore di "rumore" iniziale (4 &times; 64 &times; 64 = 16.384 valori) viene generato da quel MT. Il "rumore gaussiano" che abbiamo visto non era affatto casuale. Era una sequenza deterministica di 16.384 numeri prodotta dall'algoritmo che abbiamo appena crackato.
+</p>
+
+<p>
+  16.384 valori sono <strong>molto pi&ugrave; dei 624</strong> necessari per il crack. Il "rumore" di Stable Diffusion contiene, dentro di s&eacute;, l'intero stato del generatore. Anzi, di pi&ugrave;: ogni valore gaussiano viene prodotto da una coppia di output MT uniformi (trasformazione di Box-Muller), quindi il tensore consuma oltre 32.000 output dal generatore. Pi&ugrave; di 50 volte i 624 necessari. L'intero tensore era gi&agrave; scritto prima ancora di generarlo. Non era rumore. Era una sequenza.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{seed} \xrightarrow{\text{MT19937}} \mathbf{z}_T \in \mathbb{R}^{4 \times 64 \times 64} \xrightarrow{\text{denoise}} \text{immagine}$$</div>
+  <p class="formula-label">Dal seed al tensore al quadro. Tutto deterministico. Zero casualit&agrave;.</p>
+</div>
+
+<p>
+  Facevo girare SD su CPU "per non fare rumore". Non c'era nessun rumore da fare. Non c'era nessun rumore nello script. Non c'era nessun rumore nel tensore. C'era un algoritmo deterministico del 1997, uno stato di 2.5 KB, e una funzione. Il rumore era solo un nome. L'unico rumore vero in quella stanza erano i miei tasti e il russare della iena.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il cerchio si chiude:</strong> nell'articolo su Stable Diffusion abbiamo visto che <a href="il-rumore-diventa-arte.html">"stesso seed = stessa composizione"</a>. Adesso sappiamo <em>perch&eacute;</em>: il seed fissa lo stato del MT, lo stato fissa la sequenza, la sequenza fissa il tensore, il tensore fissa l'immagine. Una catena deterministica dal primo all'ultimo bit. Il "caso" non c'entra niente. L'arnia, la gallina, la iena dello stesso seed erano gi&agrave; scritte prima che premessi invio.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — CSPRNG                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Quando Serve il Vero Caso</h2>
+<span class="section-number">Sezione 09. CSPRNG: quelli che non si crackano</span>
+
+<p>
+  Ok, ma se il Mersenne Twister &egrave; cos&igrave; fragile, perch&eacute; lo usano ancora tutti? Perch&eacute; per la maggior parte delle cose va benissimo. Simulazioni. Test statistici. Giochi single-player. Generazione procedurale. Per queste robe, velocit&agrave; e distribuzione uniforme contano pi&ugrave; della sicurezza. Per Stable Diffusion va benissimo: il seed lo scegli tu, non &egrave; un segreto, e la riproducibilit&agrave; &egrave; un <em>feature</em>, non un bug.
+</p>
+
+<p>
+  Ma quando serve sicurezza vera (crittografia, token, password, chiavi), si usano i <strong>CSPRNG</strong> (Cryptographically Secure Pseudorandom Number Generator). In Python:
+</p>
+
+<div class="code-block" data-lang="python">
+<span class="kw">import</span> secrets
+<span class="kw">import</span> os
+
+<span class="cm"># CSPRNG: non crackabile</span>
+token = secrets.<span class="fn">token_hex</span>(<span class="nb">32</span>)      <span class="cm"># 256 bit di entropia</span>
+raw = os.<span class="fn">urandom</span>(<span class="nb">32</span>)                <span class="cm"># 32 byte da /dev/urandom</span>
+n = secrets.<span class="fn">randbelow</span>(<span class="nb">1000</span>)          <span class="cm"># intero sicuro</span>
+
+<span class="cm"># MAI usare per sicurezza:</span>
+<span class="cm"># random.random()      &lt;- Mersenne Twister, crackabile</span>
+<span class="cm"># random.randint()     &lt;- Mersenne Twister, crackabile</span>
+<span class="cm"># random.choice()      &lt;- Mersenne Twister, crackabile</span>
+</div>
+
+<p>
+  La differenza: un CSPRNG non ti fa ricostruire lo stato dagli output. Puoi osservare miliardi di numeri, lo stato resta sconosciuto. Perch&eacute;? Perch&eacute; sotto usano roba crittografica seria (AES-CTR, ChaCha20) che non si inverte. Il tempering del MT lo inverti con 15 righe di Python. AES senza la chiave non lo inverti neanche con tutta la determinazione del mondo. Come la differenza tra il PIN del mio telefono (che la iena conosce da anni, non le ho mai detto come) e un caveau della banca (che non apro neanche volendo). La iena ha crackato il mio stato interno molto prima che io cracassi il Mersenne Twister.
+</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Propriet&agrave;</th>
+        <th>MT19937</th>
+        <th>CSPRNG</th>
+        <th>True Random</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Deterministico</td>
+        <td>S&igrave;</td>
+        <td>S&igrave;</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Predicibile</td>
+        <td><strong style="color:#ff6b6b">S&igrave; (624 output)</strong></td>
+        <td>No</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Velocit&agrave;</td>
+        <td>Molto alta</td>
+        <td>Alta</td>
+        <td>Bassa</td>
+      </tr>
+      <tr>
+        <td>Distribuzione</td>
+        <td>Uniforme perfetta</td>
+        <td>Uniforme</td>
+        <td>Dipende dalla fonte</td>
+      </tr>
+      <tr>
+        <td>Uso corretto</td>
+        <td>Simulazioni, giochi</td>
+        <td>Crittografia, token</td>
+        <td>Chiavi master, seed CSPRNG</td>
+      </tr>
+      <tr>
+        <td>Esempio Python</td>
+        <td><code>random.random()</code></td>
+        <td><code>secrets.token_hex()</code></td>
+        <td><code>os.urandom()</code>*</td>
+      </tr>
+      <tr>
+        <td>Stato interno</td>
+        <td>2.5 KB, ricostruibile</td>
+        <td>256 bit, non ricostruibile</td>
+        <td>N/A</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p style="font-size: 0.8rem; color: var(--text-secondary);">
+  * <code>os.urandom()</code> su Linux/macOS legge da <code>/dev/urandom</code>, che mescola entropia hardware (interrupt timing, input devices) con un CSPRNG. Non &egrave; true random puro, ma &egrave; crittograficamente sicuro.
+</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">MT vs CSPRNG: confronto propriet&agrave;</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="comparison-chart"></canvas>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Caso Non Esiste</h2>
+<span class="section-number">Sezione 10. Conclusione</span>
+
+<p>
+  Ok, ricapitoliamo. Tre articoli, tre cose rotte:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li><a href="come-pensa-la-macchina.html">L'LLM</a>: non pensa, <strong>lancia dadi pesati</strong>. 8 miliardi di parametri, 128.256 facce sul dado, un token alla volta.</li>
+  <li><a href="il-rumore-diventa-arte.html">Stable Diffusion</a>: non disegna, <strong>toglie rumore</strong>. 860 milioni di parametri, 20 passi, da seed 42 alla nave pirata.</li>
+  <li>Il Mersenne Twister: non genera caso, <strong>esegue una funzione</strong>. 624 interi, 2.5 KB di stato, completamente predicibile.</li>
+</ol>
+
+<p>
+  E adesso il cerchio si chiude. I dadi pesati dell'LLM? Mersenne Twister. Il rumore di Stable Diffusion? Mersenne Twister. Abbiamo seguito il filo da "il modello sembra intelligente" a "lancia dadi" a "i dadi sono prevedibili". Non c'&egrave; caso da nessuna parte. C'&egrave; un algoritmo del 1997, 2.5 KB di stato, e la parola "random" usata come marketing.
+</p>
+
+<p>
+  624 numeri. 15 righe di untemper. Stato completo. Futuro predetto. Non serve conoscere il seed, non serve forza bruta, non serve un supercomputer. Serve solo osservare.
+</p>
+
+<p>
+  La iena si &egrave; svegliata mentre scrivevo. "Ancora al computer?" S&igrave;. "Che fai?" Ho rotto il caso. "Quale caso?" Il caso. Il random. Il computer non sa fare i numeri a caso. "Neanche io so fare i numeri a caso. Se mi chiedi un numero a caso dico sempre 7."
+</p>
+
+<p>
+  E questa &egrave; la differenza. La iena dice sempre 7, ma non sai <em>quando</em> dir&agrave; 7. Non sai se la prossima volta ti risponder&agrave; con un numero, con una lamentela sulla Nera, o con un discorso sulle api che dura quaranta minuti. La iena &egrave; imprevedibile non perch&eacute; genera caso, ma perch&eacute; il suo stato interno ha pi&ugrave; di 624 interi. Il Mersenne Twister no. Il Mersenne Twister ha esattamente 624 interi, e dopo averli visti, &egrave; finita. Lo conosci tutto. Per sempre.
+</p>
+
+<p>
+  La iena non puoi prevederla. Il random del computer s&igrave;.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Il caso non esiste. Esistono sequenze che non hai ancora osservato abbastanza."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    624 osservazioni. 15 righe di inversione. Stato completo. Futuro predetto.
+    Il "caso" del computer &egrave; 2.5 KB di stato deterministico.
+    Il dado pesato che lancia l'LLM, il rumore che toglie Stable Diffusion: tutto parte da qui.
+    Da un algoritmo del 1997 che finge di essere casuale.
+    E che abbiamo appena smontato.
+    La iena dice sempre 7. Ma non sai quando.
+    Questo la rende pi&ugrave; casuale del Mersenne Twister.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/prng-charts.js"></script>
+
+</body>
+</html>
