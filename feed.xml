@@ -8,6 +8,22 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Caso Non Esiste</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-caso-non-esiste.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-caso-non-esiste.html</guid>
+    <pubDate>Thu, 19 Feb 2026 00:00:00 +0100</pubDate>
+    <description>Il Mersenne Twister smontato pezzo per pezzo. 624 osservazioni, inversione del tempering, stato completo. Predico ogni output futuro: shuffle, choice, randint. Il random del computer non esiste.</description>
+  </item>
+
+  <item>
+    <title>Il Rumore Diventa Arte</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-rumore-diventa-arte.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-rumore-diventa-arte.html</guid>
+    <pubDate>Wed, 19 Feb 2026 00:00:00 +0100</pubDate>
+    <description>Come Stable Diffusion trasforma rumore gaussiano in immagini. Forward process, U-Net, VAE, CLIP, denoising step by step. Tutto in locale su CPU, 64 secondi dal nulla a una nave pirata.</description>
+  </item>
+
+  <item>
     <title>Il Processore Mente</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-processore-mente.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-processore-mente.html</guid>
