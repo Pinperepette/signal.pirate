@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>La Posizione Deriva</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-gps-ha-bisogno-di-einstein.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-gps-ha-bisogno-di-einstein.html</guid>
+    <pubDate>Thu, 26 Feb 2026 00:00:00 +0100</pubDate>
+    <description>Mi sono rotto un braccio, la iena guida e chiede come funziona il GPS. 3,881 punti reali dall'iPhone, due script Python scritti con una mano sola, e la scoperta che senza Einstein il navigatore sbaglia di 11.5 km al giorno. Trilaterazione, pseudorange, dilatazione temporale. Smontato pezzo per pezzo.</description>
+  </item>
+
+  <item>
     <title>Il Caso Non Esiste</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-caso-non-esiste.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-caso-non-esiste.html</guid>

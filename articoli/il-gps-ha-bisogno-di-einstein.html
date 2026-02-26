@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Posizione Deriva | Signal Pirate</title>
+  <meta name="description" content="Senza correzioni relativistiche, il GPS deriva di 11.5 km al giorno. Trilaterazione, dilatazione temporale, pseudorange. Smontato pezzo per pezzo con dati reali dall'iPhone.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-weight: 700;
+      margin: 0.5rem 0 0.3rem;
+      font-size: 0.9rem;
+    }
+    .step-detail {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.8rem 1rem;
+      text-align: left;
+    }
+    .strategy-table td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.05), rgba(124,77,255,0.05));
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 3rem 0 2rem;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.6;
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== NAV ========== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ========== HEADER ========== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-26 | Pinperepette</p>
+  <h1 class="article-page-title">La Posizione <span class="accent">Deriva</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    11.5 km al giorno. Senza che te ne accorga. Smontato pezzo per pezzo.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">GPS</span>
+    <span class="tag tag-highlight">Relativita'</span>
+    <span class="tag tag-reaction">Trilaterazione</span>
+    <span class="tag tag-amplification">iPhone</span>
+  </div>
+</header>
+
+<!-- ========== ARTICLE ========== -->
+<article class="article-content">
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - APERTURA                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Iena Vuole Sapere</h2>
+<span class="section-number">Sezione 00. L'antefatto</span>
+
+<p>Mi sono rotto un braccio. Non in modo eroico, non scalando, non facendo parkour. Sono scivolato. Dettagli irrilevanti. Quello che conta e' che non posso guidare, e la iena ha preso il comando della macchina.</p>
+
+<p>Dovevamo andare a Verona. Lei guida, il suo iPhone agganciato al CarPlay con Google Maps. Io sono seduto di fianco col gesso e il mio telefono in mano, a scrollare Twitter. Maps dice "tra 200 metri svolta a destra". Lei svolta a sinistra. "Era la prossima," dice. Il navigatore ricalcola. Io non posso neanche stringere il sedile.</p>
+
+<p>"Ma come fa a sapere dove siamo?" chiede, mentre ignora un altro suggerimento.</p>
+
+<p>"Satelliti."</p>
+
+<p>"Si' ma come. Spiegamelo. Tanto stai li' a scrollare Twitter, almeno renditi utile."</p>
+
+<p>Ha ragione. E poi lo so che le piace quando le spiego le cose. Finge che non le importi, ma poi sta zitta e ascolta, e alla fine fa una battuta che dimostra che ha capito tutto. Cosi' ho iniziato a spiegarle il GPS. Dall'inizio.</p>
+
+<p>"Lo sai che ti piace sembrare Einstein," dice senza togliere gli occhi dalla strada.</p>
+
+<p>"Non c'entra sembrare. Einstein c'e' dentro, letteralmente. Nel firmware dei satelliti."</p>
+
+<p>"Dai, non esagerare."</p>
+
+<p>"Senza le sue equazioni il navigatore sbaglierebbe di 11 chilometri al giorno. Ti manderebbe in mezzo a un campo di barbabietole."</p>
+
+<p>Silenzio. Poi: "Ok, racconta."</p>
+
+<p>E intanto ho fatto un'altra cosa da nerd: ho messo Twitter in background, ho aperto Open GPX Tracker sul mio iPhone e ho registrato l'intero viaggio. 101 minuti. 3,881 punti GPS. Ogni secondo una coordinata, un'altitudine, un timestamp. Lei col suo telefono sul CarPlay a seguire Maps, io col mio in mano a registrare dati GPS. Due iPhone, due scopi completamente diversi. Poi ci ho montato sopra due script Python e sei chart. Perche' se mi rompo un braccio, almeno ci scrivo un articolo.</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="3881" data-suffix=" punti">0</div>
+    <div class="stat-label">Traccia GPS reale</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="38" data-suffix=" us/g">0</div>
+    <div class="stat-label">Drift temporale</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="11" data-suffix=" km/g">0</div>
+    <div class="stat-label">Deriva senza correzione</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="67" data-suffix=" ms">0</div>
+    <div class="stat-label">Tempo di volo segnale</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - COME FUNZIONA IL GPS                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come Funziona il GPS</h2>
+<span class="section-number">Sezione 01. Trilaterazione e 4 satelliti</span>
+
+<p>"Allora, prima cosa: il GPS non sa dove sei. Calcola dove sei."</p>
+
+<p>"Che differenza c'e'?"</p>
+
+<p>"Che non c'e' nessun satellite che ti punta e dice eccola li'. E' il tuo telefono che fa i conti."</p>
+
+<p>Ogni satellite trasmette due cose: il suo ID e che ora e' sul suo orologio atomico. Il telefono riceve questi segnali, misura quanto ci hanno messo ad arrivare, e siccome sa che viaggiano alla velocita' della luce, calcola la distanza. Roba da terza media: distanza = velocita' &times; tempo. Solo che qui la velocita' e' 299,792,458 m/s e il tempo si misura in miliardesimi di secondo.</p>
+
+<p>"Tipo il fulmine? Che conti i secondi dopo il lampo per sapere quanto e' lontano?"</p>
+
+<p>"Esatto. Solo che invece del tuono usi la luce, e invece di uno ne hai quattro."</p>
+
+<p>Con un satellite sai che sei da qualche parte su una sfera. Con due, su un cerchio. Con tre, in uno di due punti. Con quattro risolvi anche l'errore dell'orologio del telefono, che non e' atomico e sbaglia di qualche nanosecondo.</p>
+
+<p>Si chiama <strong>trilaterazione</strong>. Non triangolazione (quella usa angoli). Il GPS usa solo distanze. Tipo: "sono a 20,200 km da questo satellite, a 21,300 km da quest'altro..." e cosi' via.</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Ricezione</div>
+    <div class="step-detail">Il chip riceve segnali da 4+ satelliti</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Tempo</div>
+    <div class="step-detail">Misura il ritardo di ogni segnale</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Pseudorange</div>
+    <div class="step-detail">Calcola la distanza: rho = c * dt</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Posizione</div>
+    <div class="step-detail">Risolve il sistema: x, y, z, dt_orologio</div>
+  </div>
+</div>
+
+<p>"E funziona bene?"</p>
+
+<p>"Benissimo. Ma ha un problema grosso: dipende <em>tutto</em> dal tempo. Un errore di 1 nanosecondo, un miliardesimo di secondo, corrisponde a 30 centimetri di errore sulla posizione. Perche' la luce percorre 30 cm in un nanosecondo."</p>
+
+<p>"Trenta centimetri per un miliardesimo di secondo?"</p>
+
+<p>"Benvenuta nel GPS."</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">
+    $$\rho = c \cdot \Delta t \quad \Rightarrow \quad \delta\rho = c \cdot \delta t = 299\,792\,458 \;\text{m/s} \times 1\;\text{ns} = 0.30\;\text{m}$$
+  </div>
+  <p class="formula-label">Un nanosecondo di errore = 30 cm di posizione</p>
+</div>
+
+<p>"E quindi come fanno a essere cosi' precisi?"</p>
+
+<p>"Orologi atomici. Per forza. E per questo serve Einstein. Ma ci arriviamo."</p>
+
+<p>"Eccolo. Lo sapevo che ci infilavi Einstein."</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - IL SEGNALE IN VIAGGIO                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Segnale in Viaggio</h2>
+<span class="section-number">Sezione 02. 67 millisecondi a 299,792,458 m/s</span>
+
+<p>"Quei satelliti quanto sono lontani?"</p>
+
+<p>"20,200 km."</p>
+
+<p>"E si muovono?"</p>
+
+<p>"Piu' di un proiettile da fucile. Quattro volte piu' veloci. Non come te che vai a 80 in terza corsia e speli i cerchioni nelle piazzole."</p>
+
+<p>"I cerchioni li ho spelati UNA volta."</p>
+
+<p>"Due. Comunque, quei satelliti completano un giro della Terra in 11 ore e 58 minuti, non 12, e non e' un caso. E' calcolato perche' da qualsiasi punto del pianeta ne vedi sempre almeno 4."</p>
+
+<p>Il segnale radio parte dal satellite e viaggia alla velocita' della luce. Da 20,200 km di altitudine, ci mette circa <strong>67 millisecondi</strong> ad arrivare al telefono. Sembra poco. Ma in quel tempo il segnale attraversa il vuoto dello spazio, la ionosfera (piena di elettroni liberi che lo rallentano), la troposfera (piena di vapore acqueo che lo distorce), e alla fine colpisce un'antenna da pochi millimetri nel tuo telefono. Che nel frattempo sta facendo altre mille cose. Multitasking.</p>
+
+<p>"E il telefono come fa a misurare una roba cosi' piccola?"</p>
+
+<p>"Non misura direttamente il tempo di volo. Confronta il codice ricevuto dal satellite con una copia locale che genera internamente. Lo sfasamento tra i due e' il ritardo. Da quello ricava la <strong>pseudorange</strong>: la distanza approssimata."</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">
+    $$\rho_i = c \cdot (t_{\text{ricevitore}} - t_{\text{satellite},i}) + c \cdot \delta t_{\text{clock}} + \epsilon_{\text{atm}}$$
+  </div>
+  <p class="formula-label">Pseudorange: distanza stimata dal satellite i, con errore di clock e atmosferico</p>
+</div>
+
+<p>"Perche' pseudo?"</p>
+
+<p>"Perche' include l'errore dell'orologio del telefono, che non e' atomico e fa un po' schifo, in termini di precisione. Risolvendo il sistema con 4 satelliti quell'errore si elimina. Ma c'e' un errore che il sistema non puo' eliminare con l'algebra: l'errore sugli <em>orologi dei satelliti stessi</em>."</p>
+
+<p>Se gli orologi atomici dei satelliti derivano, ogni pseudorange e' sbagliata. Garbage in, garbage out. E nessuna algebra puo' compensare un input sbagliato.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Tempo di volo del segnale per satellite (distanza/c)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="signal-travel-chart"></canvas>
+  </div>
+</div>
+
+<p>Il satellite piu' vicino (alto in cielo, sopra la tua testa) e' a circa 20,200 km. Quelli bassi sull'orizzonte arrivano a 25,000+ km: il segnale percorre un arco piu' lungo attraverso l'atmosfera, piu' distorto, piu' rumoroso. Come parlare a qualcuno attraverso una parete di vetro vs attraverso un muro di mattoni.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - IL TEMPO RALLENTA                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Tempo Rallenta</h2>
+<span class="section-number">Sezione 03. Relativita' speciale</span>
+
+<p>"Ok, e Einstein dove entra?"</p>
+
+<p>"Adesso. Primo problema: i satelliti si muovono veloce."</p>
+
+<p>"E quanto veloce e' veloce?"</p>
+
+<p>"3,874 metri al secondo. Quasi 14,000 km/h, come ti dicevo prima. Sembra tanto, ma e' un diecimillesimo della velocita' della luce. Pero' la relativita' speciale (quella che Einstein pubblico' nel 1905, a 26 anni, mentre lavorava all'ufficio brevetti) dice una cosa precisa: qualsiasi oggetto in movimento sperimenta un tempo piu' lento rispetto a un osservatore fermo."</p>
+
+<p>"Tipo che il tempo rallenta se vai veloce?"</p>
+
+<p>"Esatto. Non e' un'illusione. Non e' un effetto percettivo. Non e' filosofia. Gli orologi atomici sui satelliti <strong>ticchettano effettivamente piu' lentamente</strong> rispetto a quelli a terra. Lo sappiamo perche' li misuriamo. Ogni giorno."</p>
+
+<p>La quantita' e' data dal fattore di Lorentz:</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">
+    $$\gamma = \frac{1}{\sqrt{1 - \frac{v^2}{c^2}}} = \frac{1}{\sqrt{1 - \left(\frac{3874}{299792458}\right)^2}} = 1.000000000083$$
+  </div>
+  <p class="formula-label">Fattore di Lorentz per un satellite GPS a 3,874 m/s</p>
+</div>
+
+<p>"E quindi? Quanto cambia?"</p>
+
+<p>"Eh, guardalo bene. 1 seguito da nove zeri e poi 83. Sembra una roba da ignorare. Il tipo di numero che butteresti via in un <code>float</code> senza pensarci. Ma moltiplicalo per 86,400 secondi, cioe' un giorno, e la differenza diventa:"</p>
+
+<p style="text-align: center; font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent-amplification);">
+  <strong>-7.2 microsecondi al giorno</strong>
+</p>
+
+<p>"7 microsecondi? E chi se ne frega."</p>
+
+<p>"Tu. Tu te ne freghi. Perche' 1 microsecondo = 299.8 metri di errore. Quindi 7.2 microsecondi = circa <strong>2.2 km di errore al giorno</strong>. Solo dalla relativita' speciale. E non abbiamo neanche iniziato con quella generale."</p>
+
+<p>"C'e' anche un'altra?"</p>
+
+<p>"Tieni gli occhi sulla strada."</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Punto chiave:</strong> la dilatazione temporale non e' un'approssimazione. E' stata misurata direttamente con orologi atomici sugli aerei (esperimento di Hafele-Keating, 1971). Hanno messo degli orologi su aerei di linea, li hanno fatti volare, li hanno confrontati con orologi a terra. Differenza misurata: esattamente quella prevista da Einstein. La relativita' non e' opinabile.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - LA GRAVITA' ACCELERA IL TEMPO                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Gravita' Accelera il Tempo</h2>
+<span class="section-number">Sezione 04. Relativita' generale</span>
+
+<p>"Secondo problema: i satelliti sono lontani dalla Terra."</p>
+
+<p>"Quello lo avevo capito, 20,000 e rotti km."</p>
+
+<p>"Si', ma il punto non e' la distanza. E' la gravita'. La relativita' generale (quella del 1915, la piu' bella teoria della fisica) dice che il tempo scorre piu' lentamente dove la gravita' e' piu' forte. Quaggiu' la gravita' e' forte. Lassu' e' molto piu' debole. Quindi gli orologi sui satelliti <strong>ticchettano piu' velocemente</strong> rispetto ai nostri."</p>
+
+<p>"Aspetta aspetta. Prima hai detto che vanno piu' lenti. Adesso piu' veloci?"</p>
+
+<p>"Esatto. Due effetti opposti. E il secondo e' sei volte piu' grande del primo."</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">
+    $$\frac{\Delta f}{f} = \frac{\Phi_{\text{GPS}} - \Phi_{\text{Terra}}}{c^2} = \frac{-\frac{GM}{R_{\text{GPS}}} + \frac{GM}{R_{\text{Terra}}}}{c^2}$$
+  </div>
+  <p class="formula-label">Dilatazione gravitazionale: differenza di potenziale diviso c^2</p>
+</div>
+
+<p>Con i numeri reali:</p>
+
+<p style="text-align: center; font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent-highlight);">
+  <strong>+45.7 microsecondi al giorno</strong>
+</p>
+
+<p>"Cioe' il tempo lassu' va piu' veloce? Tipo nei film?"</p>
+
+<p>"Tecnicamente si'. Di 45.7 microsecondi al giorno. La gravita' pesa sul tempo. Meno gravita', tempo piu' veloce. I satelliti vivono in un tempo leggermente accelerato. Come se il tempo fosse un fluido e la gravita' lo rendesse piu' viscoso."</p>
+
+<p>"Ok adesso la smetti di parlare come un libro."</p>
+
+<p>"No."</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-reaction);">
+  <p><strong>Nota storica:</strong> Einstein predisse questo effetto nel 1915. Fu verificato nel 1959 da Pound e Rebka, che misurarono lo spostamento di frequenza dei raggi gamma tra la cima e la base di una torre di 22 metri a Harvard. Ventidue metri. La gravita' cambia il tempo misurabilmente su 22 metri. Pazzesco.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - IL BILANCIO                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Bilancio</h2>
+<span class="section-number">Sezione 05. 38 microsecondi e 11.5 km</span>
+
+<p>"Ok, allora. Uno lo rallenta e l'altro lo accelera. Si cancellano?"</p>
+
+<p>"No. Vince la gravita'. Per distacco."</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Dilatazione temporale: Speciale vs Generale vs Netto</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="time-dilation-chart"></canvas>
+  </div>
+</div>
+
+<p>"Relativita' speciale: <strong>-7.2 us/giorno</strong>. Rallenta. Relativita' generale: <strong>+45.7 us/giorno</strong>. Accelera. Il netto e' +38.5 microsecondi al giorno. L'orologio del satellite guadagna 38.5 microsecondi ogni giorno rispetto al tuo."</p>
+
+<p>"38 microsecondi. Non e' un niente?"</p>
+
+<p>"Moltiplicalo per la velocita' della luce."</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">
+    $$\Delta d = c \cdot \Delta t = 299\,792\,458\;\text{m/s} \times 38.5 \times 10^{-6}\;\text{s} \approx 11\,541\;\text{m}$$
+  </div>
+  <p class="formula-label">11.5 km di deriva al giorno senza correzioni relativistiche</p>
+</div>
+
+<p>"<strong>11.5 km al giorno.</strong> Dopo un giorno il GPS pensa che sei a 11 km da dove sei. Dopo due giorni, 23 km. In una settimana, 80 km. Maps ti direbbe 'sei arrivato' e saresti in un campo di barbabietole."</p>
+
+<p>"Vabe' dai."</p>
+
+<p>"Sul serio. Guarda il grafico."</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Deriva posizionale: 24h senza vs con correzione relativistica</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="drift-24h-chart"></canvas>
+  </div>
+</div>
+
+<p>"La linea rossa e' il GPS senza Einstein. La verde e' il GPS reale, corretto. La differenza e' tra 'sei al bar' e 'sei in mezzo all'Adige'."</p>
+
+<p>"E come lo risolvono?"</p>
+
+<p>"Col trucco piu' bello di tutta l'ingegneria spaziale. Prima di lanciare il satellite, rallentano l'orologio atomico. Da 10.23 MHz a 10.22999999543 MHz. Quella differenza di 0.00457 Hz e' Einstein codificato in hardware."</p>
+
+<p>"Cioe' modificano l'orologio <em>prima</em> di lanciarlo?"</p>
+
+<p>"Si'. Si fidano di un'equazione scritta nel 1915 per tarare un orologio che vola a 14,000 km/h a 20,000 km di altitudine. E funziona. Ogni giorno. Da trent'anni."</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-attention);">
+  <p><strong>Il fix hardware:</strong> i satelliti GPS non trasmettono il loro "tempo reale". Gli orologi atomici vengono <em>rallentati</em> prima del lancio: da 10.23 MHz a 10.22999999543 MHz. Quella manciata di decimali compensa esattamente i 38.5 us/giorno di drift relativistico. Einstein codificato in quarzo.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - IL TUO IPHONE                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Metodologia (aka Il Nerd Col Gesso)</h2>
+<span class="section-number">Sezione 06. Dati GPS reali</span>
+
+<p>"Bella la teoria. Ma tu ce l'hai la prova?"</p>
+
+<p>"Indovina cos'ho fatto per tutto il viaggio col braccio buono."</p>
+
+<p>"Hai registrato."</p>
+
+<p>"Ho registrato."</p>
+
+<p>Open GPX Tracker sul mio iPhone. App gratis, App Store, fa una cosa sola e la fa bene. Una coordinata GPS al secondo: latitudine, longitudine, altitudine, timestamp. L'ho avviato prima di partire, fermato all'arrivo. Il suo iPhone era agganciato al CarPlay con Google Maps. Il mio lo tenevo in mano col braccio buono.</p>
+
+<p>A4 direzione Verona. 110 km in linea d'aria, 101 minuti. Lei guidava seguendo Maps sul CarPlay. Io scrollavo tra GPX Tracker e Twitter, e intanto le spiegavo Einstein. Multitasking.</p>
+
+<p>Poi a casa ci ho montato due script Python. Il primo (<code>01_parse_gpx.py</code>) parsa il file GPX, calcola statistiche, esporta JSON. Il secondo (<code>02_relativity_calc.py</code>) fa i calcoli relativistici step-by-step. Tutto verificabile, tutto riproducibile.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">I due script in nvim. Una mano sola, zero scuse.</div>
+  <img src="../immagini/gpx.png" alt="01_parse_gpx.py e 02_relativity_calc.py aperti in nvim" style="width: 100%; border-radius: 8px;">
+</div>
+
+<p>"E quanto ci hai messo a scrivere gli script?"</p>
+
+<p>"Meno di quanto ci hai messo tu a parcheggiare. E li ho scritti con una mano sola. Immagina le bestemmie a fare Ctrl+C con il mignolo."</p>
+
+<p>Risultato: 3,881 punti GPS reali. Niente simulazioni. Niente dati finti. Questa e' la traccia vera del mio iPhone mentre la iena ignorava il navigatore sulla A4:</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Traccia GPS reale: viaggio verso Verona (3,881 punti)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="position-scatter-chart"></canvas>
+  </div>
+</div>
+
+<p>"E questa e' la stessa traccia buttata su mappa stradale. Guarda:"</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Mappa del percorso reale: dati GPS iPhone sovrapposti</div>
+  <div id="gps-map" style="height: 450px; border-radius: 8px; z-index: 0;"></div>
+</div>
+
+<p>"Cerchio verde: partenza. Cerchio rosso: Verona. Se zoomi vedi che la traccia segue le corsie dell'autostrada. Precisione di pochi metri. E tutto questo funziona perche' le correzioni relativistiche sono gia' applicate dal firmware del satellite."</p>
+
+<p>"Cioe' Einstein e' gia' dentro?"</p>
+
+<p>"Da sempre. Gratis. Trasparente. Senza quelle correzioni, in 101 minuti di viaggio il GPS avrebbe accumulato circa <strong>800 metri di errore</strong> in piu'. Abbastanza per metterti sulla corsia sbagliata. O in un fosso."</p>
+
+<p>"Grazie per l'immagine."</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - LA PRECISIONE                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Precisione</h2>
+<span class="section-number">Sezione 07. DOP, satelliti e fonti di errore</span>
+
+<p>"Ok ma se e' cosi' preciso, perche' il navigatore ogni tanto mi dice che sono sulla strada di fianco?"</p>
+
+<p>"Perche' la precisione del GPS non e' un numero fisso. Cambia ogni secondo, in base a quanti satelliti vedi, dove sono, e cosa c'e' tra te e loro."</p>
+
+<p>"Guarda i dati del nostro viaggio. Velocita': picchi di 121 km/h, che per i tuoi standard e' da record."</p>
+
+<p>"Andavo in discesa."</p>
+
+<p>"Certo. Poi cali a zero nelle soste perche' volevi il caffe'. Altitudine: da 43 a 185 metri, il profilo della pianura padana fino alle colline moreniche."</p>
+
+<div class="charts-row fade-in">
+  <div class="chart-container">
+    <div class="chart-title">Velocita' e altitudine reali (iPhone, A4 → Verona)</div>
+    <div>
+      <canvas id="dop-satellites-chart"></canvas>
+    </div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Come il DOP moltiplica l'errore</div>
+    <div>
+      <canvas id="dop-error-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<p>"Vedi il grafico a destra? Quello e' il <strong>DOP</strong>: Dilution of Precision. Pensalo come il moltiplicatore del danno in un videogioco. Prende l'errore base e lo amplifica."</p>
+
+<p>"Tipo critico?"</p>
+
+<p>"Tipo critico. DOP 1 = satelliti distribuiti bene nel cielo, errore minimo. DOP 5 = raggruppati in un angolo, errore quintuplicato. DOP 8+ = non fidarti di niente."</p>
+
+<p>"E quanto sbaglia?"</p>
+
+<p>"Dipende. L'errore di posizione e' <strong>DOP &times; URE</strong>. URE e' l'errore base, circa 3 metri. Con DOP 1 hai 3 m. Con DOP 5 hai 15 m. Con DOP 8 hai 24 m. Tipo leverage finanziario ma per la tua posizione."</p>
+
+<p>"E basta quello a far sbagliare?"</p>
+
+<p>"Magari. Guarda qui:"</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Fonte</th>
+        <th>Errore tipico</th>
+        <th>Causa</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Ionosfera</strong></td>
+        <td>2-5 m</td>
+        <td>Elettroni liberi rallentano il segnale in modo variabile</td>
+      </tr>
+      <tr>
+        <td><strong>Troposfera</strong></td>
+        <td>0.5-1 m</td>
+        <td>Vapore acqueo e pressione alterano la velocita'</td>
+      </tr>
+      <tr>
+        <td><strong>Multipath</strong></td>
+        <td>1-5 m</td>
+        <td>Segnali che rimbalzano su edifici, terreno, guard rail</td>
+      </tr>
+      <tr>
+        <td><strong>Orologio ricevitore</strong></td>
+        <td>1-3 m</td>
+        <td>L'orologio del tuo telefono non e' atomico (ovviamente)</td>
+      </tr>
+      <tr>
+        <td><strong>Effemeridi</strong></td>
+        <td>1-2 m</td>
+        <td>Errore nella posizione orbitale trasmessa dal satellite</td>
+      </tr>
+      <tr>
+        <td><strong>Relativita' (se non corretta)</strong></td>
+        <td>11,500 m/giorno</td>
+        <td>Dilatazione temporale SR + GR non compensata</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>"Vedi l'ultima riga?"</p>
+
+<p>"11,500 metri?!"</p>
+
+<p>"Tutti gli altri errori sono nell'ordine dei metri. L'errore relativistico, se non corretto, e' nell'ordine dei <strong>chilometri</strong>. E' come avere un bug che corrompe il database di 1 record al secondo, e un altro che lo cancella tutto. Einstein non e' un optional. E' il <code>fix</code> piu' importante del sistema."</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - DIFESE E CORREZIONI                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Difese e Correzioni</h2>
+<span class="section-number">Sezione 08. Lo stack di correzioni</span>
+
+<p>"Ma se ci sono tutti questi errori, come fa a funzionare?"</p>
+
+<p>"Perche' non si fida di un segnale grezzo. Tipo: non ti fidi dell'input dell'utente, giusto? Il GPS fa la stessa cosa. Applica strati di correzioni. Tipo middleware in un server Express. Ogni layer sistema qualcosa."</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Correzione</th>
+        <th>Come funziona</th>
+        <th>Miglioramento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Correzione relativistica</strong></td>
+        <td>Frequenza dell'orologio ridotta prima del lancio (-0.00457 Hz su 10.23 MHz)</td>
+        <td>Elimina i 38.5 us/giorno di drift</td>
+      </tr>
+      <tr>
+        <td><strong>Modello ionosferico</strong></td>
+        <td>Parametri broadcast (modello Klobuchar) stimano il ritardo ionosferico</td>
+        <td>Corregge ~50% dell'errore ionosferico</td>
+      </tr>
+      <tr>
+        <td><strong>Doppia frequenza (L1/L5)</strong></td>
+        <td>Ionosfera dispersiva: confrontando L1 e L5 si calcola il ritardo esatto</td>
+        <td>Rimuove quasi tutto l'errore ionosferico</td>
+      </tr>
+      <tr>
+        <td><strong>EGNOS / WAAS / SBAS</strong></td>
+        <td>Satelliti geostazionari inviano correzioni differenziali in tempo reale</td>
+        <td>Precisione sub-metrica</td>
+      </tr>
+      <tr>
+        <td><strong>A-GPS</strong></td>
+        <td>Il telefono scarica effemeridi e almanacco via rete cellulare</td>
+        <td>Fix piu' veloce (secondi invece di minuti)</td>
+      </tr>
+      <tr>
+        <td><strong>Fusione sensori</strong></td>
+        <td>Accelerometro, giroscopio, barometro integrati con il GPS</td>
+        <td>Posizione stabile in tunnel, indoor, multipath</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>"Entrambi i nostri iPhone usano quasi tutte queste robe. Il chip GPS, un Broadcom BCM47765, riceve su due frequenze L1 e L5, applica la correzione relativistica, scarica i dati A-GPS dalla rete Apple, e fonde tutto con accelerometro e giroscopio a 6 assi."</p>
+
+<p>"E il risultato?"</p>
+
+<p>"2-5 metri di precisione in campo aperto. In pochi secondi. Abbastanza per dirti che sei in corsia di sorpasso e non in corsia d'emergenza."</p>
+
+<p>"E tutto quanto per quei microsecondi di prima?"</p>
+
+<p>"Tutto parte da li'. 10.22999999543 MHz invece di 10.23000000000 MHz. Quella manciata di decimali e' Einstein, hardcoded nel quarzo dell'orologio atomico. Prima ancora che il satellite lasci la Terra."</p>
+
+<p>"Cioe' lanciano un satellite nello spazio con un orologio apposta sballato."</p>
+
+<p>"Sballato in modo che diventi giusto quando arriva in orbita. Si'."</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - CONCLUSIONE                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Una Dipendenza Runtime</h2>
+<span class="section-number">Sezione 09. Conclusione</span>
+
+<p>"Ok, riepilogo per me che sono lenta."</p>
+
+<p>"Non sei lenta, fai finta."</p>
+
+<p>"Riepilogo."</p>
+
+<ol style="line-height: 2;">
+  <li>Il GPS misura il tempo di arrivo di segnali da 4+ satelliti a 20,200 km</li>
+  <li>Calcola la distanza con la velocita' della luce: 1 ns = 30 cm di errore</li>
+  <li>Deve compensare la relativita' speciale: -7.2 us/giorno (satellite piu' lento)</li>
+  <li>Deve compensare la relativita' generale: +45.7 us/giorno (meno gravita')</li>
+  <li>Il netto e' +38.5 us/giorno = 11.5 km/giorno di deriva</li>
+  <li>Si corregge con una modifica hardware sull'orologio: -0.00457 Hz</li>
+</ol>
+
+<p>"Senza Einstein, il navigatore ti porterebbe in mezzo a un campo dopo un giorno. In una settimana, in un'altra citta'. La relativita' non e' una curiosita' accademica. E' una specifica tecnica. E' nel firmware. E' nelle equazioni che il chip del telefono risolve 10 volte al secondo, anche adesso che il tuo sta li' sul CarPlay a dirti di svoltare a destra."</p>
+
+<p>"E io svolto a sinistra."</p>
+
+<p>"Lo so. Per quello servono 11.5 km di margine."</p>
+
+<p>Siamo arrivati a Verona. La iena ha parcheggiato al terzo tentativo, col navigatore che diceva "hai raggiunto la destinazione" mentre eravamo ancora in mezzo alla strada.</p>
+
+<p>"Ancora con Einstein?" Ha guardato il mio schermo pieno di formule e grafici.</p>
+
+<p>"Sai che senza di lui il navigatore non funziona?"</p>
+
+<p>"Non funziona neanche con lui. Mi ha detto di svoltare a destra e c'era un senso unico."</p>
+
+<p>"Quello e' un problema di mappe, non di relativita'."</p>
+
+<p>"Per me e' un problema di chi progetta le rotonde. Tutte uguali. Come le fai a distinguere?"</p>
+
+<p>Difficile darle torto. Ma almeno adesso sai che quando la pallina blu di Google Maps ti segue fedelmente, non e' magia. E' un satellite a 20,200 km con un orologio atomico rallentato di 0.00457 Hz, che risolve un'equazione di un tizio che nel 1915 non aveva neanche il telefono.</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Einstein e' una dipendenza runtime del tuo telefono."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Ogni volta che apri Maps, il tuo iPhone risolve equazioni della relativita' scritte nel 1915.
+    38 microsecondi al giorno separano la navigazione dalla deriva.
+    Il GPS non e' solo ingegneria. E' fisica fondamentale, codificata in silicio,
+    lanciata in orbita, e usata per trovare il kebabbaro piu' vicino.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+
+</article>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ========== SCRIPTS ========== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/gps-charts.js"></script>
+
+</body>
+</html>
