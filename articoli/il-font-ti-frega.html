@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Font Ti Frega | Signal Pirate</title>
+  <meta name="description" content="CVE-2026-2441: un font CSS crasha Chrome e ti esegue codice. Use-after-free nel rendering engine, smontato dal commit al proof-of-concept.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Memory Map === */
+    .memory-map {
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .cache-line {
+      display: flex;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 0.3rem;
+    }
+    .mem-cell {
+      padding: 0.7rem 0.8rem;
+      border-right: 1px dashed var(--border-subtle);
+      text-align: center;
+      line-height: 1.4;
+    }
+    .mem-cell:last-child { border-right: none; }
+    .mem-cell.flush { background: rgba(255,136,0,0.18); color: #ff8800; }
+    .mem-cell.hot { background: rgba(0,255,136,0.15); color: #00ff88; }
+    .mem-cell.dead { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+    .mem-cell.empty { background: rgba(120,120,160,0.12); color: #8888aa; }
+    .cl-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.65rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-weight: 700;
+      margin: 0.5rem 0 0.3rem;
+      font-size: 0.9rem;
+    }
+    .step-detail {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.8rem 1rem;
+      text-align: left;
+    }
+    .strategy-table td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.05), rgba(124,77,255,0.05));
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 3rem 0 2rem;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.6;
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d0d14;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: #c0c0d0;
+    }
+    .code-block .keyword { color: #ff6b6b; }
+    .code-block .type { color: #4ecdc4; }
+    .code-block .string { color: #00ff88; }
+    .code-block .comment { color: #555577; }
+    .code-block .func { color: #f5c518; }
+    .code-block .number { color: #ff8800; }
+    .code-block .ptr { color: #7c4dff; }
+
+    /* === Attack Timeline === */
+    .attack-timeline {
+      position: relative;
+      padding-left: 2rem;
+      margin: 1.5rem 0;
+    }
+    .attack-timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.5rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #00ff88, #ff6b6b);
+    }
+    .timeline-step {
+      position: relative;
+      margin-bottom: 1.5rem;
+      padding-left: 1rem;
+    }
+    .timeline-step::before {
+      content: '';
+      position: absolute;
+      left: -1.65rem;
+      top: 0.5rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-attention);
+      border: 2px solid var(--bg-primary);
+    }
+    .timeline-step.danger::before {
+      background: var(--accent-reaction);
+    }
+    .timeline-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-attention);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .timeline-step.danger .timeline-label {
+      color: var(--accent-reaction);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== NAV ========== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ========== HEADER ========== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-27 | Pinperepette</p>
+  <h1 class="article-page-title">Il Font Ti <span class="accent">Frega</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    CVE-2026-2441: un font CSS crasha Chrome e ti esegue codice. Lo zero-day smontato dal commit al PoC.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-reaction">CVE-2026-2441</span>
+    <span class="tag tag-attention">Use-After-Free</span>
+    <span class="tag tag-highlight">Chrome</span>
+    <span class="tag tag-amplification">Zero-Day</span>
+  </div>
+</header>
+
+<!-- ========== ARTICLE ========== -->
+<article class="article-content">
+
+<!-- ======================================================= -->
+<!-- PREMESSA                                                  -->
+<!-- ======================================================= -->
+<div class="insight-box fade-in" style="border-left-color: var(--accent-highlight);">
+  <p>Se sei arrivato fin qui probabilmente hai letto anche gli altri articoli e hai capito il senso e la direzione di questo progetto. Se non lo hai fatto, te lo spiego al volo.</p>
+  <p style="margin-top: 0.8rem;">Questo e' un blog personale. Volutamente scritto in italiano, perche' mi piace la mia lingua e mi rilassa scriverla. Lo scopo e' divulgativo: smontare cose complesse e spiegarle in modo familiare, senza fuffa, con un occhio alla matematica che e' fondamentale e che adoro. Passeremo anche a temi piu' complessi, ma un passo alla volta. Cosi' quando ci si arriva, tutti capiscono perfettamente almeno il concetto.</p>
+</div>
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - APERTURA                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Apri Una Pagina, Perdi Tutto</h2>
+<span class="section-number">Sezione 00. L'antefatto</span>
+
+<p>La iena mi urla dall'altra stanza. "Il computer si e' rotto." Le dico di chiudere la tab. "L'ho fatto. Si e' chiuso tutto." Pausa. "Anche le altre tab. Anche la musica."</p>
+
+<p>Arrivo zoppicando col braccio nel gesso. Schermo nero. Il renderer e' morto. Le chiedo che sito aveva aperto. "Un blog di ricette. Biscotti al miele." Classico. Mi siedo, apro il terminale con una mano sola, guardo i crash log. Il processo di rendering e' andato in segfault. In un parser CSS. Per un font. Un font. Come dire che ti sei rotto una gamba inciampando in un granello di polvere.</p>
+
+<p>Controllo la versione di Chrome. 144.0.qualcosa. Non aggiornato. "Ma quando e' l'ultima volta che hai aggiornato Chrome?" La iena mi guarda come quando Panna sente un rumore e inclina la testa. "Aggiornato cosa?" Ecco. Siamo messi cosi'.</p>
+
+<p>Il punto e' che un blog di ricette non crasha Chrome. Ma i blog di ricette sono pieni zeppi di banner pubblicitari. E i banner caricano codice da network pubblicitari di terze parti. E dentro quel codice qualcuno puo' infilare un CSS costruito ad arte. La iena cercava i biscotti al miele. Col miele delle sue api, ovviamente. I biscotti al miele le hanno crashato il browser. E su un Chrome non aggiornato, un crash e' solo l'antipasto.</p>
+
+<p>La patch esisteva gia'. Google l'aveva rilasciata due settimane prima. <a href="https://nvd.nist.gov/vuln/detail/cve-2026-2441" target="_blank" rel="noopener">CVE-2026-2441</a>. CVSS 8.8. Use-after-free nel rendering CSS. Exploitata in the wild. Il primo zero-day di Chrome del 2026. Tutto per colpa di un font. Ma la iena non aggiorna niente. Mai. Per lei "aggiornamento" e' quando le galline cambiano il piumaggio.</p>
+
+<p>Nell'articolo su <a href="il-processore-mente.html">Spectre</a> il processore mentiva. Qui e' il browser che si fa fregare. La' il canale era la cache, qui e' la memoria heap. Ma il concetto e' lo stesso: una cosa che sembra innocua (un'istruzione, un font CSS) si trasforma in un'arma.</p>
+
+<p>Chromium e' open source. Il <a href="https://chromium.googlesource.com/chromium/src/+/63f3cb4864c64c677cd60c76c8cb49d37d08319c" target="_blank" rel="noopener">commit del fix</a> e' pubblico. Il <a href="https://github.com/huseyinstif/CVE-2026-2441-PoC" target="_blank" rel="noopener">proof-of-concept</a> gira su GitHub. E io ho una mano sola e troppo tempo libero. Combinazione pericolosa.</p>
+
+<p>Smontiamolo.</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number red" data-count="88" data-suffix="/100">0</div>
+    <div class="stat-label">CVSS score</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number green" data-count="1" data-suffix=" riga">0</div>
+    <div class="stat-label">Il fix</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="3" data-suffix=" trigger">0</div>
+    <div class="stat-label">Nel PoC</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="0" data-suffix=" click">0</div>
+    <div class="stat-label">Per fregarti</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - CSS FONT FEATURE VALUES                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il CSS Che Nessuno Usa</h2>
+<span class="section-number">Sezione 01. @font-feature-values</span>
+
+<p>Ok, partiamo dal pezzo di CSS che ha causato tutto 'sto casino. Nella specifica CSS Fonts Level 4 c'e' una regola che il 99.9% degli sviluppatori web non ha mai visto e non vedra' mai: <code>@font-feature-values</code>. Serve a dare nomi leggibili alle feature OpenType dei font. Se non sai cosa vuol dire, tranquillo, non lo sa neanche chi ha scritto il bug.</p>
+
+<div class="code-block fade-in">
+<span class="keyword">@font-feature-values</span> MyFont {<br>
+&nbsp;&nbsp;<span class="keyword">@styleset</span> {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">fancy-ligatures</span>: <span class="number">1</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">old-style-nums</span>: <span class="number">3</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">swash-caps</span>: <span class="number">7</span>;<br>
+&nbsp;&nbsp;}<br>
+}
+</div>
+
+<p>Sembra innocuo, no? Un mapping nome → numero. Chrome lo parsa, crea un oggetto CSSOM chiamato <code>CSSFontFeatureValuesRule</code>, e dentro ci mette una <code>CSSFontFeatureValuesMap</code>. Che e' un wrapper attorno a una <code>HashMap</code> in C++. La struttura dati piu' comune del mondo. Tipo, la prima cosa che studi al secondo anno di informatica.</p>
+
+<p>E il bug e' proprio li'. Nella roba che danno per scontata.</p>
+
+<p>Perche' JavaScript puo' accedere a questa mappa tramite il DOM: <code>rule.styleset</code>. Puo' iterarla con <code>entries()</code>, <code>for...of</code>, o <code>forEach</code>. Puo' modificarla con <code>set()</code> e <code>delete()</code>.</p>
+
+<p>E puo' fare le due cose <strong>contemporaneamente</strong>. Si'. Hai capito bene.</p>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-reaction);">
+  <p><strong>Regola aurea della programmazione:</strong> non modificare mai una collezione mentre ci stai iterando sopra. E' la prima cosa che insegnano nei corsi di informatica. E' l'ultima cosa che Chrome controllava in questo codice. L'ironia scrive da sola.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - LA HASHMAP                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Dentro la HashMap</h2>
+<span class="section-number">Sezione 02. Come funziona una tabella hash in C++</span>
+
+<p>Per capire il bug devi capire la struttura dati. Prometto che e' veloce. Una <code>HashMap</code> (in Chromium si chiama <code>WTF::HashMap</code>, e si', WTF sta per "Web Template Framework", non per quello che stai pensando) e' un array di bucket. Ogni chiave viene hashata, l'hash determina in quale bucket finisce la coppia chiave-valore.</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Hash</div>
+    <div class="step-detail">chiave → indice nel bucket array</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Store</div>
+    <div class="step-detail">coppia (key, value) nel bucket</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Grow</div>
+    <div class="step-detail">troppi elementi → rehash</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="color: var(--accent-reaction);">04</div>
+    <div class="step-name">Rehash</div>
+    <div class="step-detail">nuovo array, vecchio liberato</div>
+  </div>
+</div>
+
+<p>Il punto critico e' il <strong>rehash</strong>. Quando la mappa supera un certo rapporto di carico (circa il 75% dei bucket occupati), alloca un nuovo array piu' grande, ricopia tutti gli elementi, e <strong>libera il vecchio array</strong>.</p>
+
+<p>Fin qui tutto normale. Tutte le HashMap lo fanno. Il casino succede quando qualcun altro ha ancora un puntatore al vecchio array. Tipo, l'iteratore che JavaScript sta usando per leggere la mappa.</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">
+    $$\text{load\_factor} = \frac{n_{\text{elementi}}}{n_{\text{bucket}}} > 0.75 \implies \text{rehash}() \implies \texttt{free}(\text{old\_storage})$$
+  </div>
+  <p class="formula-label">Quando il load factor supera la soglia, il vecchio storage viene deallocato</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - IL BUG                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Puntatore Morto</h2>
+<span class="section-number">Sezione 03. Il cuore della vulnerabilita'</span>
+
+<p>Ok, qui entriamo nel vivo. Questo e' il <a href="https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/css/css_font_feature_values_map.cc" target="_blank" rel="noopener">codice reale di Chromium</a>, la versione vulnerabile prima della patch. Le righe evidenziate sono quelle che contano:</p>
+
+<div class="fade-in" style="margin: 1.5rem 0; text-align: center;">
+  <img src="../immagini/vuln-iterationsource.png" alt="Codice vulnerabile: css_font_feature_values_map.cc pre-patch, con puntatore raw FontFeatureAliases* aliases_" style="max-width: 100%; border-radius: 8px;">
+</div>
+
+<p>Vedi il problema? Riga 17: <code>const FontFeatureAliases* aliases</code>. Riga 42: <code>const FontFeatureAliases* aliases_</code>. Puntatore raw allo storage interno della HashMap. Non una copia. Non un riferimento contato. Un puntatore nudo. Tipo camminare sul tetto senza parapetto. Di notte. Col ghiaccio.</p>
+
+<p>Quando JavaScript chiama <code>map.entries()</code>, Blink crea questa <code>IterationSource</code> e salva il puntatore allo storage attuale. Fin qui tutto bene. Il puntatore funziona, tutti contenti.</p>
+
+<p>Ma se tra un <code>.next()</code> e l'altro JavaScript chiama <code>map.set()</code> o <code>map.delete()</code>... beh.</p>
+
+<div class="attack-timeline fade-in">
+  <div class="timeline-step">
+    <div class="timeline-label">Passo 1. Crea iteratore</div>
+    <p><code>const iter = map.entries()</code><br>
+    Blink salva <code>aliases_ = &storage</code>. Il puntatore e' valido.</p>
+  </div>
+  <div class="timeline-step">
+    <div class="timeline-label">Passo 2. Primo .next()</div>
+    <p><code>iter.next()</code> → legge <code>aliases_->begin()</code>. Funziona. Il puntatore e' ancora vivo.</p>
+  </div>
+  <div class="timeline-step danger">
+    <div class="timeline-label">Passo 3. Mutazione</div>
+    <p><code>map.delete(key); map.set("x", [1,2,3])</code><br>
+    La HashMap si rialloca. <strong><code>free(old_storage)</code></strong>. Il puntatore <code>aliases_</code> ora punta a memoria liberata.</p>
+  </div>
+  <div class="timeline-step danger">
+    <div class="timeline-label">Passo 4. Secondo .next()</div>
+    <p><code>iter.next()</code> → legge <code>aliases_->...</code> → <strong>USE-AFTER-FREE</strong>.<br>
+    Il puntatore e' morto. La memoria sotto potrebbe contenere qualsiasi cosa.</p>
+  </div>
+</div>
+
+<p>Quattro passi. Dal CSS al crash. E dal crash, potenzialmente, a code execution. La iena cercava ricette di biscotti. Qualcun altro poteva prenderle il computer.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - USE-AFTER-FREE                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Anatomia di un Use-After-Free</h2>
+<span class="section-number">Sezione 04. Cosa succede quando leggi memoria morta</span>
+
+<p>La iena a questo punto ha chiesto "ma non puo' semplicemente crashare e basta?". Bella domanda. No. E il motivo e' una delle cose piu' insidiose della gestione della memoria in C++.</p>
+
+<p>Quando liberi un blocco di memoria con <code>free()</code>, quel blocco non scompare. Resta li'. L'allocatore lo segna come "disponibile" e lo rimette nel suo pool. Il contenuto non viene azzerato. Costerebbe troppo farlo ogni volta.</p>
+
+<p>Quindi il tuo puntatore punta ancora allo stesso indirizzo. Ma ora quell'indirizzo puo' essere stato riassegnato a qualcun altro. E quando leggi attraverso il puntatore morto, stai leggendo <strong>i dati di qualcun altro</strong>. E' come tornare a casa tua dopo uno sfratto. La porta si apre, ma dentro ci abita qualcun altro.</p>
+
+<div class="memory-map fade-in">
+  <div style="color: var(--accent-attention); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;">PRIMA DEL REHASH (puntatore valido):</div>
+  <div class="cache-line">
+    <div class="mem-cell hot" style="flex: 2;">aliases_ →<br><small>storage HashMap</small></div>
+    <div class="mem-cell hot" style="flex: 2;">entry_a: 1<br><small>bucket 0</small></div>
+    <div class="mem-cell hot" style="flex: 2;">entry_b: 2<br><small>bucket 1</small></div>
+    <div class="mem-cell hot" style="flex: 2;">entry_c: 3<br><small>bucket 2</small></div>
+  </div>
+  <div class="cl-label">Storage originale. Il puntatore punta qui, tutto valido</div>
+</div>
+
+<div class="memory-map fade-in">
+  <div style="color: var(--accent-reaction); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;">DOPO IL REHASH (puntatore dangling):</div>
+  <div class="cache-line">
+    <div class="mem-cell dead" style="flex: 2;">aliases_ →<br><small>FREED</small></div>
+    <div class="mem-cell dead" style="flex: 2;">???<br><small>freed</small></div>
+    <div class="mem-cell dead" style="flex: 2;">???<br><small>freed</small></div>
+    <div class="mem-cell dead" style="flex: 2;">???<br><small>freed</small></div>
+  </div>
+  <div class="cl-label">Vecchio storage liberato. Il puntatore punta ancora qui, ma la memoria e' morta</div>
+</div>
+
+<div class="memory-map fade-in">
+  <div style="color: var(--accent-rejection); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;">DOPO LA RIALLOCAZIONE (memoria riusata):</div>
+  <div class="cache-line">
+    <div class="mem-cell flush" style="flex: 2;">aliases_ →<br><small>DATI ATTACCANTE</small></div>
+    <div class="mem-cell flush" style="flex: 2;">payload<br><small>controllato</small></div>
+    <div class="mem-cell flush" style="flex: 2;">fake_ptr<br><small>controllato</small></div>
+    <div class="mem-cell flush" style="flex: 2;">shellcode<br><small>controllato</small></div>
+  </div>
+  <div class="cl-label">Stessa zona di memoria, ora occupata dall'attaccante. aliases_ legge i SUOI dati</div>
+</div>
+
+<p>Questo e' il cuore dell'exploit. L'attaccante non scrive in memoria direttamente. Sarebbe troppo facile da bloccare. Invece libera la memoria <em>per conto di Chrome</em> (forzando il rehash), poi la rioccupa con i suoi dati (creando oggetti della stessa dimensione). Quando Chrome rilegge attraverso il puntatore morto, legge i dati dell'attaccante. Pensando siano i suoi.</p>
+
+<div class="insight-box fade-in">
+  <p><strong>La differenza con Spectre:</strong> nell'articolo su <a href="il-processore-mente.html">Spectre</a> il processore leggeva memoria che non doveva toccare e lasciava tracce nella cache. Qui il browser legge la sua stessa memoria, ma il contenuto e' stato sostituito da un attaccante. La' era un bug di architettura hardware, qui e' un bug di gestione della memoria software. Ma il risultato e' lo stesso: dati controllati dall'attaccante finiscono dove non dovrebbero.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - IL POC                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Proof of Concept</h2>
+<span class="section-number">Sezione 05. HTML + CSS + JS = crash</span>
+
+<p>Basta teoria. Vediamo il <a href="https://github.com/huseyinstif/CVE-2026-2441-PoC/blob/main/poc.html" target="_blank" rel="noopener">PoC pubblicato su GitHub</a>. La vulnerabilita' l'ha scoperta <a href="https://thehackernews.com/2026/02/new-chrome-zero-day-cve-2026-2441-under.html" target="_blank" rel="noopener">Shaheen Fazim</a>, il PoC l'ha scritto un ricercatore che si firma huseyinstif. Usa tre strategie diverse per triggerare il bug. Le smontiamo una per una.</p>
+
+<p><strong>Strategia 1: entries() + mutazione</strong></p>
+
+<p>La piu' diretta e la piu' brutale. Crei un iteratore con <code>map.entries()</code>, poi tra un <code>.next()</code> e l'altro cancelli chiavi e ne aggiungi di nuove. Ogni <code>set()</code> con abbastanza elementi forza il rehash. Tre iterazioni e Chrome va giu'.</p>
+
+<div class="code-block fade-in">
+<span class="comment">// 1. Ottieni la mappa CSS</span><br>
+<span class="keyword">const</span> rule = sheet.cssRules[<span class="number">0</span>];<br>
+<span class="keyword">const</span> map = rule.styleset;<br>
+<br>
+<span class="comment">// 2. Crea iteratore. Blink salva il puntatore raw</span><br>
+<span class="keyword">const</span> iterator = map.<span class="func">entries</span>();<br>
+<br>
+<span class="comment">// 3. Itera e muta contemporaneamente</span><br>
+<span class="keyword">while</span> (<span class="number">true</span>) {<br>
+&nbsp;&nbsp;<span class="keyword">const</span> result = iterator.<span class="func">next</span>();&nbsp;&nbsp;<span class="comment">// &larr; legge tramite puntatore</span><br>
+&nbsp;&nbsp;<span class="keyword">if</span> (result.done) <span class="keyword">break</span>;<br>
+<br>
+&nbsp;&nbsp;map.<span class="func">delete</span>(result.value[<span class="number">0</span>]);&nbsp;&nbsp;&nbsp;<span class="comment">// &larr; muta la HashMap</span><br>
+<br>
+&nbsp;&nbsp;<span class="comment">// Forza rehash: 512 inserimenti superano il load factor</span><br>
+&nbsp;&nbsp;<span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < <span class="number">512</span>; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;map.<span class="func">set</span>(<span class="string">"spray_"</span> + i, [i]);&nbsp;&nbsp;<span class="comment">// &larr; rehash → free(old) → UAF</span><br>
+&nbsp;&nbsp;}<br>
+}
+</div>
+
+<p><strong>Strategia 2: for...of</strong></p>
+
+<p>Stessa logica, path diverso dentro Blink. Alcune versioni di Chromium usano un codice leggermente diverso per <code>for...of</code> rispetto a <code>entries()</code>, ma il puntatore raw e' lo stesso. Cinque iterazioni questa volta. Un po' piu' lento, stesso risultato.</p>
+
+<p><strong>Strategia 3: requestAnimationFrame</strong></p>
+
+<p>Questa e' la piu' cattiva. L'iteratore viene avanzato dentro un ciclo <code>requestAnimationFrame</code>, forzando il layout recalc tra un frame e l'altro con <code>document.body.offsetWidth</code>. Questo obbliga il CSS engine a rielaborare le regole, amplificando le possibilita' di corruzione. Piu' lenta (circa 10 iterazioni), ma molto piu' difficile da rilevare perche' sembra una normale operazione di rendering.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Le tre strategie di trigger: entries() vs for...of vs rAF</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="trigger-strategies-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in" style="border-left-color: var(--accent-reaction);">
+  <p><strong>Heap grooming:</strong> il PoC non si limita a triggerare il crash. E' piu' furbo di cosi'. Crea 50 regole <code>@font-feature-values</code> aggiuntive <em>prima</em> dell'attacco. Servono a riempire l'heap con oggetti della stessa dimensione, cosi' quando lo storage originale viene liberato, la memoria viene riusata da un oggetto controllato. In pratica, l'attaccante prepara il terreno prima di sparare. Questo trasforma un crash casuale in una corruzione di memoria prevedibile. La differenza tra un fulmine e un cecchino.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - DA CRASH A CODE EXECUTION                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Da Crash a Code Execution</h2>
+<span class="section-number">Sezione 06. L'escalation</span>
+
+<p>"Ok, crasha. E allora?" La iena ha ragione per una volta. Un crash non e' un exploit. Un crash e' fastidioso, chiudi e riapri. Un exploit e' pericoloso, qualcuno ti entra nel computer. La distanza tra i due e' la differenza tra un ubriaco che sbatte contro un muro e un ladro che trova la porta aperta.</p>
+
+<p>Ecco come un attaccante percorre quella distanza:</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">UAF</div>
+    <div class="step-detail">Il puntatore legge memoria freed</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Heap Spray</div>
+    <div class="step-detail">Riempi la memoria freed con dati controllati</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Type Confusion</div>
+    <div class="step-detail">Chrome interpreta i tuoi dati come un oggetto interno</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num" style="color: var(--accent-reaction);">04</div>
+    <div class="step-name">RCE</div>
+    <div class="step-detail">Esecuzione codice nella sandbox</div>
+  </div>
+</div>
+
+<p><strong>Passo 1: Trigger.</strong> L'iteratore legge attraverso il puntatore morto. Chrome non crasha immediatamente (non sempre, almeno). Dipende da cosa trova a quell'indirizzo.</p>
+
+<p><strong>Passo 2: Heap spray.</strong> L'attaccante crea centinaia di oggetti JavaScript della stessa dimensione del vecchio storage HashMap. L'allocatore riusa la memoria freed. Ora il puntatore morto punta a dati controllati dall'attaccante. E Chrome non ha idea che e' successo.</p>
+
+<p><strong>Passo 3: Type confusion.</strong> Chrome legge quei dati pensando siano una HashMap entry (chiave, valore, hash). Ma sono dati costruiti dall'attaccante. Se il "valore" e' un puntatore falso, Chrome lo seguira'. Se la "chiave" e' un indirizzo calcolato, Chrome lo dereferenziera'. Tipo dare in mano a qualcuno una mappa dove "casa" punta al covo dei ladri.</p>
+
+<p><strong>Passo 4: Code execution.</strong> Con un indirizzo controllato, l'attaccante puo' redirigere l'esecuzione verso il suo codice. Dentro la sandbox di Chrome, per ora. Ma la sandbox ha i suoi bug. E chi fa questo di mestiere li conosce.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Anatomia di un exploit UAF: dalla vulnerabilita' all'esecuzione</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="exploit-chain-chart"></canvas>
+  </div>
+</div>
+
+<div class="insight-box fade-in">
+  <p><strong>La sandbox come ultima difesa:</strong> anche con code execution, l'attaccante e' dentro la sandbox di Chrome. Per uscire serve un secondo bug (una sandbox escape, tipo la <a href="https://chromium.googlesource.com/chromium/src/+/main/docs/design/sandbox.md" target="_blank" rel="noopener">Mojo IPC</a> o un bug kernel). Ma la storia insegna che le sandbox escape si trovano. NSO Group le concatenava cosi': un bug nel renderer + un bug nella sandbox + un bug nel kernel = compromissione totale da un link WhatsApp. Un link. Ti viene da ridere, se non fosse terrificante.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - IL FIX                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Fix: Una Riga</h2>
+<span class="section-number">Sezione 07. Commit 63f3cb48</span>
+
+<p>E ora la parte che mi fa sempre ridere (e piangere). Il fix. Il <a href="https://chromium.googlesource.com/chromium/src/+/63f3cb4864c64c677cd60c76c8cb49d37d08319c" target="_blank" rel="noopener">commit <code>63f3cb48</code></a>. Ecco il diff reale:</p>
+
+<div class="fade-in" style="margin: 1.5rem 0; text-align: center;">
+  <img src="../immagini/fix-diff.png" alt="git diff del commit 63f3cb48: da FontFeatureAliases* (puntatore) a FontFeatureAliases (copia)" style="max-width: 100%; border-radius: 8px;">
+</div>
+
+<p>Vedi le righe rosse e verdi? <code>const FontFeatureAliases* aliases</code> diventa <code>const FontFeatureAliases aliases</code>. Un asterisco. Hanno tolto un <code>*</code>. Da puntatore a copia. L'ho fatto vedere alla iena. "Tutto 'sto casino per un asterisco?" Si'. Benvenuta nella sicurezza informatica.</p>
+
+<p>E guarda il commento che i dev di Chromium hanno lasciato nel codice fixato:</p>
+
+<div class="fade-in" style="margin: 1.5rem 0; text-align: center;">
+  <img src="../immagini/fixed-iterationsource.png" alt="Codice fixato: css_font_feature_values_map.cc post-patch, con deep copy FontFeatureAliases aliases_" style="max-width: 100%; border-radius: 8px;">
+</div>
+
+<p>Righe 40-45: "Create a copy to keep the iterator from becoming invalid if there are modifications to the aliases HashMap while iterating." E poi un TODO: "Implement live/stable iteration... avoiding taking a copy here." Tradotto: sappiamo che la deep copy e' un cerotto, ma per ora funziona.</p>
+
+<p>Con la deep copy, l'iteratore lavora sulla sua copia personale della mappa. Se JavaScript muta l'originale, il rehash avviene sull'originale. La copia dell'iteratore resta intatta. Nessun puntatore morto. Nessun UAF. Fine del problema.</p>
+
+<div class="memory-map fade-in">
+  <div style="color: var(--accent-attention); font-size: 0.8rem; font-weight: 700; margin-bottom: 0.5rem;">DOPO IL FIX (deep copy):</div>
+  <div class="cache-line">
+    <div class="mem-cell hot" style="flex: 3;">aliases_ (copia)<br><small>snapshot della mappa</small></div>
+    <div class="mem-cell empty" style="flex: 1;">|</div>
+    <div class="mem-cell flush" style="flex: 3;">originale (rehash)<br><small>puo' riallocarsi liberamente</small></div>
+  </div>
+  <div class="cl-label">L'iteratore lavora sulla sua copia. Il rehash dell'originale non lo tocca</div>
+</div>
+
+<p>Pero' la deep copy ha un costo: memoria e tempo. Ogni volta che JavaScript crea un iteratore, Chrome clona l'intera mappa. Per una mappa con 8 entry e' niente. Per una con migliaia, e' un overhead reale. Il commento nel bug tracker dice che c'e' "remaining work". Probabilmente un refactor piu' elegante con <code>WeakPtr</code> o una generazione di versione per invalidare l'iteratore senza copiare.</p>
+
+<p>Ma quando il tuo zero-day e' attivamente exploitato in the wild, non ti metti a fare il refactor elegante. Copi e patchi. Domani pensi al bello.</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Aspetto</th>
+        <th>Prima (vulnerabile)</th>
+        <th>Dopo (fix)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Tipo</strong></td>
+        <td><code>const FontFeatureAliases*</code></td>
+        <td><code>const FontFeatureAliases</code></td>
+      </tr>
+      <tr>
+        <td><strong>Semantica</strong></td>
+        <td>Puntatore raw → storage condiviso</td>
+        <td>Deep copy → storage privato</td>
+      </tr>
+      <tr>
+        <td><strong>Rehash</strong></td>
+        <td>Invalida il puntatore → dangling</td>
+        <td>Non tocca la copia → safe</td>
+      </tr>
+      <tr>
+        <td><strong>Costo</strong></td>
+        <td>Zero (nessuna copia)</td>
+        <td>O(n) per entry nella mappa</td>
+      </tr>
+      <tr>
+        <td><strong>Sicurezza</strong></td>
+        <td>Use-After-Free</td>
+        <td>Safe</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - TIMELINE                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Cronologia</h2>
+<span class="section-number">Sezione 08. Dal report alla patch</span>
+
+<p>Due giorni. Da segnalazione a fix rilasciato. Dico, due giorni. Google quando vuole non scherza.</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Evento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>11 Feb 2026</strong></td>
+        <td><a href="https://thehackernews.com/2026/02/new-chrome-zero-day-cve-2026-2441-under.html" target="_blank" rel="noopener">Shaheen Fazim</a> segnala la vulnerabilita' a Google</td>
+      </tr>
+      <tr>
+        <td><strong>13 Feb 2026</strong></td>
+        <td><a href="https://www.bleepingcomputer.com/news/security/google-patches-first-chrome-zero-day-exploited-in-attacks-this-year/" target="_blank" rel="noopener">Chrome 145.0.7632.75</a> rilasciato con il fix. Patch out-of-band.</td>
+      </tr>
+      <tr>
+        <td><strong>17 Feb 2026</strong></td>
+        <td>CISA aggiunge CVE-2026-2441 al <a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener">catalogo KEV</a> (Known Exploited Vulnerabilities)</td>
+      </tr>
+      <tr>
+        <td><strong>20 Feb 2026</strong></td>
+        <td><a href="https://github.com/huseyinstif/CVE-2026-2441-PoC" target="_blank" rel="noopener">PoC pubblicato su GitHub</a></td>
+      </tr>
+      <tr>
+        <td><strong>27 Feb 2026</strong></td>
+        <td>Questo articolo. Un pirata con un braccio rotto lo smonta.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Google ha confermato che l'exploit era "in the wild" prima della patch. Qualcuno la usava gia'. Chi? Non si sa. Non lo dicono mai. Ma il pattern e' quello classico: zero-day nel renderer, CSS/font come vettore, nessuna interazione utente. Tipico di operazioni di sorveglianza mirata. NSO Group, Intellexa, e compagnia bella costruiscono catene di exploit esattamente cosi'. Roba da milioni di dollari, per spiare giornalisti e dissidenti. Con un font CSS.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - PERCHE' SUCCEDE                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Perche' Succede Sempre</h2>
+<span class="section-number">Sezione 09. Il problema strutturale</span>
+
+<p>A questo punto ti starai chiedendo: ma e' un caso sfortunato? No. CVE-2026-2441 non e' un caso isolato. E' un pattern. Chrome ha avuto <strong>dozzine</strong> di UAF negli ultimi anni. Guarda il grafico qui sotto e capisci perche'. Blink e' scritto in C++. E il C++ non ha garbage collector.</p>
+
+<div class="chart-container fade-in">
+  <div class="chart-title">Chrome zero-day per tipo di vulnerabilita' (2021-2026)</div>
+  <div class="chart-wrapper-wide">
+    <canvas id="vuln-types-chart"></canvas>
+  </div>
+</div>
+
+<p>In un linguaggio con garbage collector (Java, Go, Python), la memoria viene liberata solo quando nessuno la referenzia piu'. Nessun dangling pointer. Nessun UAF. Il costo e' performance. Il GC deve tracciare tutte le referenze. Ma almeno non ti spari nei piedi.</p>
+
+<p>In C++, il programmatore decide quando liberare. E' piu' veloce, ma ogni <code>free()</code> e' una promessa: "giuro che nessun altro ha un puntatore a questa memoria". Se sbagli, hai un UAF. E in un codebase di milioni di righe, qualcuno sbaglia sempre.</p>
+
+<p>Google lo sa. Ha investito in <a href="https://security.googleblog.com/2022/09/use-after-freedom-miracleptr.html" target="_blank" rel="noopener">MiraclePtr</a> (puntatori che controllano se la memoria e' stata liberata), in <a href="https://chromium.googlesource.com/chromium/src/+/HEAD/third_party/blink/renderer/platform/heap/BlinkGCAPIReference.md" target="_blank" rel="noopener">Oilpan</a> (garbage collector per il DOM), nella migrazione a Rust per i componenti nuovi. Ma Blink ha milioni di righe di C++ legacy. La migrazione e' lenta. E nel frattempo, un asterisco di troppo in un parser CSS per font diventa uno zero-day. La vita.</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il paradosso:</strong> la feature CSS piu' inutile del mondo (<code>@font-feature-values</code>, che quasi nessuno usa) ha prodotto lo zero-day piu' pericoloso del 2026 (finora). Piu' codice c'e', piu' superficie di attacco c'e'. E Chrome ha molto, molto codice. Tipo, piu' righe di codice del Signore degli Anelli ha parole. Di parecchio.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 - DIFESE                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come Difendersi</h2>
+<span class="section-number">Sezione 10. La pratica</span>
+
+<p>La risposta breve, quella che ho dato alla iena: <strong>aggiorna Chrome</strong>. La versione 145.0.7632.75 o successiva contiene il fix. Fine. Vai. Fallo adesso. Ti aspetto.</p>
+
+<p>La risposta lunga, per chi non si accontenta e vuole capire i layer di protezione:</p>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Protezione</th>
+        <th>Cosa ferma</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Aggiornamento</strong></td>
+        <td>Chrome auto-update</td>
+        <td>Il bug stesso (deep copy)</td>
+      </tr>
+      <tr>
+        <td><strong>Sandbox</strong></td>
+        <td>Processo renderer isolato</td>
+        <td>Code execution resta confinata</td>
+      </tr>
+      <tr>
+        <td><strong>Site Isolation</strong></td>
+        <td>Ogni sito in un processo separato</td>
+        <td>Un sito malevolo non legge i dati di un altro</td>
+      </tr>
+      <tr>
+        <td><strong>ASLR</strong></td>
+        <td>Indirizzi di memoria randomizzati</td>
+        <td>L'attaccante non sa dove puntare</td>
+      </tr>
+      <tr>
+        <td><strong>MiraclePtr</strong></td>
+        <td>Smart pointer che rileva UAF</td>
+        <td>Crash controllato invece di exploitation</td>
+      </tr>
+      <tr>
+        <td><strong>V8 Sandbox</strong></td>
+        <td>Isolamento del motore JavaScript</td>
+        <td>Limita la primitiva di heap spray</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Il punto: nessun layer e' perfetto da solo. La sicurezza moderna funziona per accumulo, tipo le cipolle di Shrek. Ogni layer alza il costo dell'exploit. Un UAF nel CSS da solo costa poco. Un UAF + sandbox escape + kernel exploit costa milioni. E quei milioni sono il budget di NSO Group, non del ragazzino nel seminterrato. Se non sei un dissidente politico o un giornalista investigativo, probabilmente non ti cercano con catene da tre bug. Ma aggiorna Chrome lo stesso. Dai.</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 - CONCLUSIONE                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Font Non E' Innocuo</h2>
+<span class="section-number">Sezione 11. Epilogo</span>
+
+<p>Ricapitoliamo il viaggio, perche' e' stato un bel giro. Una regola CSS che nessuno usa (<code>@font-feature-values</code>) crea una mappa interna. La mappa usa una HashMap. La HashMap ha un iteratore con un puntatore raw. JavaScript puo' mutare la mappa durante l'iterazione. La HashMap si rialloca. Il puntatore diventa dangling. Chrome legge memoria liberata. Un attaccante riempie quella memoria con i suoi dati. Chrome li esegue.</p>
+
+<p>Tutto questo succede quando apri una pagina web. Zero click. Nessun download. Nessun popup. Nessun avviso. Un font.</p>
+
+<p>La mattina dopo le ho aggiornato Chrome io. 145.0.qualcosa. "Fatto, sei a posto." La iena ha annuito, con la stessa convinzione con cui annuisce quando le spiego la differenza tra HTTP e HTTPS. Cioe' zero. Poi e' tornata a scrollare TikTok.</p>
+
+<p>Panna mi ha guardato dal divano. Ho la netta impressione che Panna capisca i dangling pointer meglio di quanto lasci credere. Ha quell'aria. Quella di chi sa che il puntatore e' morto ma non te lo dice perche' vuole vedere come va a finire.</p>
+
+<p>Dopo un po' ha alzato gli occhi dal telefono. "Ma tu guadagni qualcosa a smontare 'ste cose?" Pausa. "Perche' le mie galline almeno le uova le fanno. Tu stai li' a smontare cose che la gente normale non sa neanche che esistono."</p>
+
+<p>"Appunto. Per quello qualcuno le deve smontare."</p>
+
+<p>"Si' va bene. Pero' i biscotti al miele li cerco da un altro sito."</p>
+
+<p>Almeno quello l'ha capito.</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Un asterisco. Un puntatore. Un font che nessuno usa.<br>E il browser esegue il codice di qualcun altro."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    CVE-2026-2441 ci ricorda che la superficie di attacco di un browser moderno non e' dove pensi.
+    Non e' nel JavaScript. Non e' nell'HTML. E' in una funzione CSS per tipografi,
+    in un puntatore nudo in un file che nessuno legge, in un rehash che nessuno ha previsto.
+    Il codice piu' pericoloso e' quello che sembra innocuo.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+
+</article>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ========== SCRIPTS ========== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+<script src="../js/charts/font-charts.js"></script>
+
+</body>
+</html>

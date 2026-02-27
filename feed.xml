@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Font Ti Frega</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-font-ti-frega.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-font-ti-frega.html</guid>
+    <pubDate>Thu, 27 Feb 2026 00:00:00 +0100</pubDate>
+    <description>CVE-2026-2441: un font CSS crasha Chrome e ti esegue codice. Use-after-free nel rendering engine, puntatore dangling, heap spray. Lo zero-day smontato dal commit Chromium al proof-of-concept.</description>
+  </item>
+
+  <item>
     <title>La Posizione Deriva</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-gps-ha-bisogno-di-einstein.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-gps-ha-bisogno-di-einstein.html</guid>
