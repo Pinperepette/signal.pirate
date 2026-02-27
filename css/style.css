@@ -848,7 +848,7 @@ img { max-width: 100%; }
 /* ---- Counter Animation ---- */
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin: 2rem 0;
 }
@@ -857,7 +857,7 @@ img { max-width: 100%; }
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  padding: 2rem;
+  padding: 1.5rem 1rem;
   text-align: center;
   opacity: 0;
   transform: translateY(20px);

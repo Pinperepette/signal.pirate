@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Crittografia Non Basta | Signal Pirate</title>
+  <meta name="description" content="Signal Protocol smontato pezzo per pezzo. Double Ratchet, X3DH, curve25519. Poi la Svezia vuole una backdoor, in UK ordinano ad Apple di aprire iCloud, e gli AI agent rendono tutto irrilevante.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    .formula-text {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .formula-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin: 0.5rem 0 0;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Timeline === */
+    .timeline {
+      position: relative;
+      margin: 2rem 0;
+      padding-left: 2rem;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent-attention), var(--accent-reaction));
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+      padding-left: 1rem;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2.35rem;
+      top: 0.4rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-attention);
+      border: 2px solid var(--bg-primary);
+    }
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-attention);
+      font-weight: 600;
+    }
+    .timeline-text {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      line-height: 1.5;
+    }
+
+    /* === Ratchet Diagram === */
+    .ratchet-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+    }
+    .ratchet-key {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 0.5rem 0.7rem;
+      text-align: center;
+      min-width: 60px;
+    }
+    .ratchet-key .key-label {
+      color: var(--text-secondary);
+      font-size: 0.6rem;
+    }
+    .ratchet-key .key-value {
+      color: var(--accent-attention);
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+    }
+    .ratchet-arrow {
+      color: var(--accent-highlight);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .ratchet-key.compromised {
+      border-color: var(--accent-reaction);
+      background: rgba(255,107,107,0.1);
+    }
+    .ratchet-key.compromised .key-value {
+      color: var(--accent-reaction);
+    }
+    .ratchet-key.safe {
+      border-color: var(--accent-attention);
+      background: rgba(0,255,136,0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-02-27 | Pinperepette</p>
+    <h1 class="article-page-title">La Crittografia <span class="accent">Non Basta</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Signal, backdoor di stato e agenti AI: quando il lucchetto c'e' ma la porta e' aperta
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Signal Protocol</span>
+      <span class="tag tag-highlight">Backdoor</span>
+      <span class="tag tag-reaction">Svezia</span>
+      <span class="tag tag-amplification">AI Agent</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00  - L'antefatto
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Iena Legge le Notizie</h2>
+    <span class="section-number">Sezione 00. L'antefatto</span>
+
+    <p>Nota: ho hackerato il gesso per riuscire a scrivere alla tastiera. Alla visita mi hanno beccato, mi hanno fatto la ramanzina e settimana prossima me lo rifanno da capo. Loro volevano smontarmelo seduta stante &#128517;</p>
+
+    <p>La iena sta scrollando il telefono. Io sto debuggando un segfault che mi sta facendo perdere la volonta' di vivere.</p>
+
+    <p>"Ehi Andre', la Svezia vuole obbligare Signal a mettere una backdoor. Dice che devono conservare tutti i messaggi e darli alla polizia."</p>
+
+    <p>Alzo gli occhi dallo schermo. "Quando entra in vigore?"</p>
+
+    <p>"1 marzo 2026."</p>
+
+    <p>Dopodomani. Bene.</p>
+
+    <p>"E Signal cosa dice?"</p>
+
+    <p>"Che se ne vanno dalla Svezia piuttosto che farlo."</p>
+
+    <p>"Bella mossa." Chiudo il terminale. Il segfault puo' aspettare, tanto lui non se ne va da nessuna parte. Questa mi interessa. Smontiamola.</p>
+
+    <!-- Stat Cards -->
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green" data-count="200" data-suffix="+ esperti">0</div>
+        <div class="stat-label">Firmano contro la legge svedese</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="1" data-suffix=" marzo">0</div>
+        <div class="stat-label">Deadline legge Svezia</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red" data-count="0" data-suffix=" backdoor">0</div>
+        <div class="stat-label">Accettabili in crittografia</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="3" data-suffix=" stati">0</div>
+        <div class="stat-label">Attaccano la crittografia ora</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01  - Come funziona Signal Protocol
+         ============================================================ -->
+    <h2><span class="accent">//</span> Come Funziona Signal Protocol</h2>
+    <span class="section-number">Sezione 01. Double Ratchet, X3DH e curve25519</span>
+
+    <p>"Ok, ma Signal non e' tipo WhatsApp? Messaggi crittografati, fine," dice la iena.</p>
+
+    <p>Ni. Signal e' il protocollo <em>sotto</em> WhatsApp. Lo ha scritto Moxie Marlinspike nel 2013 e adesso lo usa mezzo mondo: WhatsApp, Facebook Messenger, Google Messages (RCS). WhatsApp lo usa ma ci mette sopra la pubblicita'. Come prendere una Ferrari e parcheggiarla in doppia fila.</p>
+
+    <p>Il cuore si chiama <strong>Double Ratchet</strong>. In pratica genera una chiave crittografica nuova per ogni singolo messaggio. Non per sessione, non per giornata. Ogni messaggio, chiave diversa.</p>
+
+    <p>Funziona cosi':</p>
+
+    <!-- Pipeline: Double Ratchet -->
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">X3DH</div>
+        <div class="step-detail">Handshake iniziale. Scambio Diffie-Hellman esteso con 3 coppie di chiavi</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Root Chain</div>
+        <div class="step-detail">Chiave root derivata dall'handshake. Mai usata direttamente</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Sending Chain</div>
+        <div class="step-detail">KDF genera una message key per ogni messaggio inviato</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">DH Ratchet</div>
+        <div class="step-detail">Ogni risposta genera un nuovo scambio DH. Chiavi precedenti distrutte</div>
+      </div>
+    </div>
+
+    <p>Sotto il cofano c'e' <strong>Curve25519</strong>, la curva ellittica di Daniel Bernstein. Il Diffie-Hellman ci gira sopra cosi':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\text{Alice: } a \leftarrow \mathbb{Z}_q, \quad A = aG$$</div>
+      <p class="formula-label">Alice genera una chiave privata casuale a, calcola la pubblica A moltiplicando per il punto generatore G sulla curva</p>
+    </div>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\text{Bob: } b \leftarrow \mathbb{Z}_q, \quad B = bG$$</div>
+      <p class="formula-label">Bob fa lo stesso. Nessuno dei due conosce la chiave privata dell'altro</p>
+    </div>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\text{Shared Secret: } S = aB = bA = abG$$</div>
+      <p class="formula-label">Il segreto condiviso e' lo stesso punto sulla curva. Chi intercetta vede solo A e B, ma senza a o b non puo' calcolare S</p>
+    </div>
+
+    <p>"E fin qui e' Diffie-Hellman classico," dico alla iena. "Il Double Ratchet fa un passo in piu': dopo ogni risposta genera una <em>nuova</em> coppia di chiavi effimere e fa un nuovo scambio DH."</p>
+
+    <p>"E se qualcuno ti frega una chiave?"</p>
+
+    <p>"Legge solo quel messaggio. Quelli prima e quelli dopo sono cifrati con chiavi diverse. Si chiama <strong>forward secrecy</strong>. Tipo cambiare la serratura di casa dopo ogni volta che apri la porta. Paranoico? Si'. Funziona? Anche."</p>
+
+    <!-- Ratchet Diagram -->
+    <div class="chart-container fade-in">
+      <div class="chart-title">Double Ratchet: ogni messaggio ha la sua chiave</div>
+      <div class="ratchet-diagram">
+        <div class="ratchet-key">
+          <div class="key-label">MSG 1</div>
+          <div class="key-value">K<sub>1</sub></div>
+        </div>
+        <div class="ratchet-arrow">&rarr;</div>
+        <div class="ratchet-key">
+          <div class="key-label">MSG 2</div>
+          <div class="key-value">K<sub>2</sub></div>
+        </div>
+        <div class="ratchet-arrow">&rarr;</div>
+        <div class="ratchet-key compromised">
+          <div class="key-label">MSG 3</div>
+          <div class="key-value">K<sub>3</sub></div>
+        </div>
+        <div class="ratchet-arrow">&rarr;</div>
+        <div class="ratchet-key">
+          <div class="key-label">DH Ratchet</div>
+          <div class="key-value">NEW</div>
+        </div>
+        <div class="ratchet-arrow">&rarr;</div>
+        <div class="ratchet-key safe">
+          <div class="key-label">MSG 4</div>
+          <div class="key-value">K<sub>4</sub></div>
+        </div>
+        <div class="ratchet-arrow">&rarr;</div>
+        <div class="ratchet-key safe">
+          <div class="key-label">MSG 5</div>
+          <div class="key-value">K<sub>5</sub></div>
+        </div>
+      </div>
+      <p style="text-align: center; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.8rem;">
+        Anche se K<sub style="color: var(--accent-reaction);">3</sub> viene compromessa, il DH Ratchet rigenera tutto. K<sub style="color: var(--accent-attention);">4</sub> e successive sono sicure.
+      </p>
+    </div>
+
+    <p>Il KDF che fa girare il ratchet e' HKDF su HMAC-SHA256:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$CK_{n+1}, MK_n = \text{HKDF}(CK_n)$$</div>
+      <p class="formula-label">Ogni chain key genera la message key per cifrare e la prossima chain key. Operazione irreversibile: da MK non puoi risalire a CK</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il bello:</strong> il Double Ratchet ti da' due cose insieme: <strong>forward secrecy</strong> (ti fregano una chiave oggi e i messaggi vecchi restano al sicuro) e <strong>break-in recovery</strong> (anche se un attaccante entra, al prossimo ratchet step viene sbattuto fuori). Prima del Double Ratchet nessun protocollo le aveva entrambe.</p>
+    </div>
+
+    <!-- Chart: Signal vs alternative -->
+    <div class="chart-container fade-in">
+      <div class="chart-title">Sicurezza a confronto: Signal Protocol vs alternative</div>
+      <div class="chart-wrapper-wide">
+        <canvas id="security-radar-chart"></canvas>
+      </div>
+    </div>
+
+    <p>"Bello, ma me lo fai vedere per davvero?"</p>
+
+    <p>Ho scritto un Double Ratchet semplificato in Python. Stesse primitive di Signal: Curve25519, HMAC-SHA256 con 0x01/0x02 per il ratchet, AES-256-CBC + HMAC-SHA256 per cifrare. Signal usa <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">libsignal</code> in Rust, noi usiamo <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">cryptography</code> in Python (binding OpenSSL). Stessa matematica, implementazione diversa.</p>
+
+    <div class="chart-container fade-in">
+      <div class="chart-title">01_double_ratchet.py  - Curve25519 + HMAC ratchet + AES-256-CBC + HMAC-SHA256</div>
+      <img src="../immagini/crypto/ratchet-output.png" alt="Double Ratchet: scambio chiavi X25519, symmetric ratchet con 5 messaggi, forward secrecy dimostrata" style="width: 100%; border-radius: 8px;">
+    </div>
+
+    <p>Cinque messaggi, cinque chiavi diverse. Rubi quella del MSG 3? Decifri solo quello. Gli altri quattro? Muro. L'attaccante si porta a casa un messaggio su cinque e un bel mal di testa.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Vuoi provare?</strong> <code style="background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">python3 scripts/crittografia-non-basta/01_double_ratchet.py</code> - X25519, HMAC(CK, 0x01/0x02), HKDF con info <em>WhisperMessageKeys</em>, AES-256-CBC + HMAC-SHA256. Stesse primitive di Signal.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02  - La Svezia vuole le chiavi
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Svezia Vuole le Chiavi</h2>
+    <span class="section-number">Sezione 02. Datalagring - conserva e consegna</span>
+
+    <p>"Ok il protocollo e' solido. E allora cosa vuole la Svezia, che gli mandino i messaggi con un piccione?" chiede la iena.</p>
+
+    <p>Quasi. Vogliono due cose:</p>
+
+    <p><strong>1. Conservazione</strong>: i provider devono <em>conservare</em> i messaggi degli utenti sul territorio svedese.</p>
+    <p><strong>2. Accesso</strong>: su ordine di un tribunale, polizia e servizi segreti (SAPO) possono <em>richiedere e ottenere</em> lo storico dei messaggi.</p>
+
+    <p>"Ma se i messaggi sono end-to-end, come li conservi in chiaro?"</p>
+
+    <p>Appunto. Non puoi. A meno che non rompi il protocollo. E' come chiedere di fare una porta blindata con la chiave sotto lo zerbino.</p>
+
+    <!-- Pipeline: cosa chiede la legge -->
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">Messaggio</div>
+        <div class="step-detail">Alice scrive a Bob su Signal</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Storage</div>
+        <div class="step-detail">La legge chiede: salva una copia leggibile</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Richiesta</div>
+        <div class="step-detail">La polizia ottiene un ordine del tribunale</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Consegna</div>
+        <div class="step-detail">Il provider consegna i messaggi in chiaro</div>
+      </div>
+    </div>
+
+    <p>Lo step 02 e' il casino. Per conservare una copia leggibile, Signal dovrebbe fare una di queste:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Opzione</th>
+            <th>Come funzionerebbe</th>
+            <th>Cosa rompe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Ghost user</strong></td>
+            <td>Aggiungere un partecipante invisibile (il server) a ogni conversazione</td>
+            <td>Il protocollo crittografico. L'utente vedrebbe una chiave in piu' nella verifica</td>
+          </tr>
+          <tr>
+            <td><strong>Key escrow</strong></td>
+            <td>Conservare una copia della chiave privata sul server</td>
+            <td>Forward secrecy. Se il server viene bucato, tutti i messaggi passati sono esposti</td>
+          </tr>
+          <tr>
+            <td><strong>Client-side scan</strong></td>
+            <td>Il client invia una copia del messaggio al server prima di cifrarlo</td>
+            <td>La fiducia. L'app diventa uno spyware con extra steps</td>
+          </tr>
+          <tr>
+            <td><strong>Backdoor nel ratchet</strong></td>
+            <td>Inserire una master key che decifra tutto</td>
+            <td>L'intero modello di minaccia. Chi ha la master key ha tutto</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Meredith Whittaker, presidente di Signal Foundation: <em>"Chiedere a noi di conservare dati significherebbe demolire la nostra intera architettura. Non lo faremo mai. Piuttosto lasciamo il mercato svedese."</em></p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il bello:</strong> le forze armate svedesi usano Signal per le comunicazioni operative. Lo stesso esercito si e' opposto alla legge del proprio governo, dicendo che una backdoor creerebbe <em>"vulnerabilita' sistemiche sfruttabili da attori stranieri"</em>. Cioe' l'esercito chiede al parlamento di non rompere lo strumento che usano per difendersi. Pazzesco.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03  - In UK ci hanno gia' provato
+         ============================================================ -->
+    <h2><span class="accent">//</span> In UK Ci Hanno Gia' Provato</h2>
+    <span class="section-number">Sezione 03. Apple, iCloud e la technical capability notice</span>
+
+    <p>"Ma e' solo la Svezia o sono tutti impazziti?" chiede la iena.</p>
+
+    <p>Sono tutti impazziti. Il Regno Unito ci ha provato prima, e piu' pesante. Gennaio 2025: il governo britannico manda ad Apple una <strong>Technical Capability Notice</strong> (TCN) segreta. In pratica un ordine che obbliga Apple a dare accesso ai dati iCloud crittografati. Non solo utenti UK, <em>tutti</em> gli utenti del mondo.</p>
+
+    <p>Apple ha risposto togliendo completamente <strong>Advanced Data Protection</strong> (ADP) dal Regno Unito. Se sei un utente UK, da quel giorno niente piu' crittografia end-to-end sui backup iCloud.</p>
+
+    <p>"Cioe' hanno tolto la sicurezza piuttosto che metterci una porta di servizio?"</p>
+
+    <p>Si'. La mossa piu' Apple di sempre: non ti piace la mia regola? Ti tolgo il giocattolo. <em>"Non costruiremo mai una backdoor. Ma se non possiamo offrire la crittografia legalmente qui, la togliamo."</em> Risultato: gli utenti UK ora sono meno protetti di prima. Complimenti al legislatore.</p>
+
+    <p>Due giorni fa i parlamentari americani Jim Jordan e Brian Mast hanno chiesto al governo britannico un briefing sulla TCN, dicendo che una backdoor potrebbe esporre i dati degli americani ad <em>"attori autoritari e cybercriminali"</em>.</p>
+
+    <!-- Timeline -->
+    <div class="chart-container fade-in">
+      <div class="chart-title">Timeline: la guerra alla crittografia</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">Gen 2025</div>
+          <div class="timeline-text">UK invia Technical Capability Notice ad Apple: "apri iCloud, per tutti"</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Feb 2025</div>
+          <div class="timeline-text">Apple rimuove Advanced Data Protection per gli utenti UK</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Mar 2025</div>
+          <div class="timeline-text">Signalgate: ufficiali USA condividono piani militari su Signal. Un giornalista viene aggiunto per errore</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Set 2025</div>
+          <div class="timeline-text">UK emette nuova TCN: stessa richiesta, ma limitata ai cittadini britannici</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Gen 2026</div>
+          <div class="timeline-text">Whittaker a Davos: gli AI agent rendono la crittografia irrilevante</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Feb 2026</div>
+          <div class="timeline-text">Svezia: legge anti-crittografia prevista per il 1 marzo. Signal minaccia uscita. L'esercito svedese si oppone</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Feb 2026</div>
+          <div class="timeline-text">EU: negoziati CSAR ("Chat Control") in corso. Scansione obbligatoria tolta, resta verifica eta'</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">25 Feb 2026</div>
+          <div class="timeline-text">Parlamentari USA chiedono briefing al UK sulla backdoor iCloud</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabella legislazioni -->
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Paese</th>
+            <th>Cosa chiede</th>
+            <th>Target</th>
+            <th>Stato</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Svezia</strong></td>
+            <td>Conservazione messaggi + accesso polizia</td>
+            <td>Signal, WhatsApp, tutti</td>
+            <td style="color: var(--accent-reaction);">Legge prevista 1 mar 2026</td>
+          </tr>
+          <tr>
+            <td><strong>UK</strong></td>
+            <td>Technical Capability Notice (TCN)</td>
+            <td>Apple iCloud (ADP)</td>
+            <td style="color: var(--accent-rejection);">Attiva. Apple ha rimosso ADP</td>
+          </tr>
+          <tr>
+            <td><strong>EU</strong></td>
+            <td>CSAR "Chat Control"  - scansione volontaria + verifica eta'</td>
+            <td>Tutte le piattaforme</td>
+            <td style="color: #f5c518;">Trilogo in corso, finale giu 2026</td>
+          </tr>
+          <tr>
+            <td><strong>Australia</strong></td>
+            <td>Assistance and Access Act (2018)</td>
+            <td>Tutti i provider</td>
+            <td style="color: var(--accent-reaction);">Attiva dal 2018</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04  - Il vero problema: gli AI Agent
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Vero Problema: gli AI Agent</h2>
+    <span class="section-number">Sezione 04. L'attacco che non rompe la crittografia</span>
+
+    <p>"Ok, il protocollo tiene. I governi non riescono a romperlo. Posso tornare a scrollare TikTok?"</p>
+
+    <p>No. E qua viene il bello.</p>
+
+    <p>Gennaio 2026, Davos. La Whittaker se ne esce con: <em>"Gli agenti AI stanno rendendo la crittografia irrilevante."</em> Mezzo settore si e' strozzato col caffe'.</p>
+
+    <p>Il punto e' semplice. Un agente AI per funzionare ha bisogno di accesso a:</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">Messaggi</div>
+        <div class="step-detail">Legge le tue chat per "aiutarti" a rispondere</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">File</div>
+        <div class="step-detail">Accede ai documenti locali per contestualizzare</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Browser</div>
+        <div class="step-detail">Naviga per te, vede la tua cronologia</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Sistema</div>
+        <div class="step-detail">Si integra a livello OS per automazioni</div>
+      </div>
+    </div>
+
+    <p>Signal cifra il canale. Il Double Ratchet protegge i dati <em>in transito</em>. Ma una volta che il messaggio arriva sul telefono, viene decifrato. E se su quel telefono c'e' un agente AI con permessi di sistema, quell'agente vede tutto in chiaro. E' come avere una cassaforte perfetta ma lasciare un tizio con la telecamera dentro la stanza.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\text{Sicurezza}_{\text{reale}} = \min(\text{E2EE}_{\text{canale}}, \text{Sicurezza}_{\text{endpoint}})$$</div>
+      <p class="formula-label">La sicurezza complessiva e' forte quanto il suo anello piu' debole. Se l'endpoint e' compromesso, E2EE non serve</p>
+    </div>
+
+    <p>"Si' vabe', ma in pratica chi e' cosi' scemo?"</p>
+
+    <p>Parecchia gente, a quanto pare. Hanno trovato oltre mille deployment di <strong>Clawdbot</strong> (framework open-source per agenti AI) collegati direttamente a Signal. Un tizio aveva messo le credenziali di <strong>device-linking</strong> di Signal dentro un pannello web accessibile a chiunque. Bastava trovare l'URL, associare un nuovo dispositivo e leggere tutto in chiaro. Mille. Non uno, mille.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il caso Clawdbot:</strong> credenziali Signal device-linking esposte su un pannello web pubblico. Niente exploit zero-day, niente mandato, niente crittanalisi. Un browser e l'URL giusto. Il protocollo era intatto. La porta era spalancata.</p>
+    </div>
+
+    <p>Ma il bello non e' neanche quello. Pensaci: un LLM con accesso al sistema che legge i messaggi Signal in arrivo e' un vettore di <strong>RCE via prompt injection</strong>. Ti mando un messaggio su Signal, il messaggio attraversa il Double Ratchet, arriva cifrato, viene decifrato dall'app, e poi l'agente AI lo processa. Se dentro quel messaggio c'e' un prompt injection fatto bene, l'agente esegue quello che gli dico io. Codice arbitrario, sul tuo sistema, con i tuoi permessi. Remote Code Execution attraverso un messaggio di chat. La crittografia ha funzionato perfettamente dall'inizio alla fine, e tu sei comunque fottuto.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\text{Messaggio} \xrightarrow{\text{E2EE}} \text{Decifrato} \xrightarrow{\text{LLM}} \text{Prompt Injection} \xrightarrow{\text{System}} \text{RCE}$$</div>
+      <p class="formula-label">Il messaggio attraversa la crittografia intatto. L'LLM lo interpreta come istruzione. Se ha permessi di sistema, e' game over</p>
+    </div>
+
+    <p>"Aspetta, quindi qualcuno ti puo' mandare un messaggio e prendere il controllo del tuo computer?"</p>
+
+    <p>Se hai un agente AI con permessi di sistema che legge i tuoi messaggi, si'. Non e' diverso da una macro di Word negli anni '90, solo che adesso la macro e' un LLM e il vettore e' Signal. La superficie d'attacco non e' il protocollo, e' il coglione che ci ha messo un LLM davanti con root access.</p>
+
+    <p>E poi ci sono i russi. Gruppo UNC5792, tracciato da Google Threat Intelligence. Stesso angolo: il <strong>device-linking QR code</strong> di Signal. Creano QR code malevoli camuffati da inviti a gruppi. L'utente li scansiona pensando di unirsi a una chat, e invece si linka il dispositivo dell'attaccante all'account. Da quel momento ogni messaggio arriva in tempo reale anche a loro. Zero exploit, zero crittanalisi. Solo social engineering fatto bene.</p>
+
+    <p>Target: militari ucraini. Gente che combatte una guerra vera e che si fa fregare da un QR code. Fa riflettere.</p>
+
+    <!-- Chart: Attack surface -->
+    <div class="chart-container fade-in">
+      <div class="chart-title">Superficie d'attacco: dove colpiscono (non sul protocollo)</div>
+      <div class="chart-wrapper-wide">
+        <canvas id="attack-surface-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Nota:</strong> il Signal Protocol e' stato rivoltato da crittografi accademici e nessuno ha trovato buchi nel protocollo. Tutti gli attacchi documentati colpiscono sopra o sotto: l'interfaccia utente (QR code), il sistema operativo (AI agent con permessi), la distribuzione (app modificate). Il lucchetto funziona. Ma se la porta e' aperta, il lucchetto non serve a niente.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05  - La matematica non si piega
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Matematica Non Si Piega</h2>
+    <span class="section-number">Sezione 05. Perche' una backdoor "solo per i buoni" non puo' esistere</span>
+
+    <p>"Ma non si puo' fare una backdoor che funziona solo per la polizia? Tipo, una chiave master che hanno solo loro?"</p>
+
+    <p>La iena fa la domanda da un milione di dollari. Quella che fanno tutti i politici convinti che la crittografia sia come un rubinetto che puoi aprire solo per le persone giuste. Spoiler: no.</p>
+
+    <p>Una backdoor e' un <strong>secondo canale di decifrazione</strong>. Se esiste un modo per decifrare senza la chiave del destinatario, quel modo funziona per chiunque lo trovi.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$H(M | C, K_{\text{backdoor}}) = 0$$</div>
+      <p class="formula-label">Se esiste una chiave backdoor che riduce l'entropia del messaggio a zero dato il ciphertext, chiunque possieda quella chiave puo' decifrare. La matematica non distingue tra "polizia" e "attaccante"</p>
+    </div>
+
+    <p>Ci hanno gia' provato. Anni '90, le famose Crypto Wars. Il governo americano tira fuori il <strong>Clipper Chip</strong>: chip crittografico con una chiave depositata presso il governo. Idea geniale, no? Matt Blaze della AT&T lo buca in meno di un anno. Meno tempo di quanto ci metto io a montare un mobile IKEA.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>1994:</strong> Blaze dimostro' che il Clipper Chip si aggirava con un brute-force sul checksum a 16 bit del campo LEAF (Law Enforcement Access Field). Un ricercatore con un computer ha reso inutile il sistema pensato per dare accesso "solo" al governo.</p>
+    </div>
+
+    <p>Il motivo e' semplice: in crittografia la sicurezza si basa sulla <strong>durezza computazionale</strong> di un problema (fattorizzazione, logaritmo discreto, curve ellittiche). Una backdoor non cambia la durezza, aggiunge un <em>secondo percorso</em> per aggirarlo. E quel percorso funziona per chiunque.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\text{Se } \exists \; K_{\text{master}} : D(C, K_{\text{master}}) = M \;\; \forall \; (M, K)$$</div>
+      <p class="formula-label">Se esiste una chiave master che decifra qualsiasi messaggio indipendentemente dalla chiave usata, allora la sicurezza del sistema dipende interamente dalla segretezza di K_master</p>
+    </div>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$P(\text{leak di } K_{\text{master}} \text{ in } t \text{ anni}) = 1 - (1-p)^t \xrightarrow{t \to \infty} 1$$</div>
+      <p class="formula-label">La probabilita' che una chiave master venga compromessa nel tempo tende a 1. Non e' se, e' quando</p>
+    </div>
+
+    <p>"Quindi qualsiasi backdoor prima o poi salta?"</p>
+
+    <p>Non e' teoria. Guarda i precedenti:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Backdoor</th>
+            <th>Anno</th>
+            <th>Cosa e' successo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Clipper Chip</strong></td>
+            <td>1993-1996</td>
+            <td>Matt Blaze buco' il checksum a 16 bit del LEAF. Progetto abbandonato</td>
+          </tr>
+          <tr>
+            <td><strong>Dual_EC_DRBG</strong></td>
+            <td>2006-2014</td>
+            <td>Generatore random NSA con costante sospetta. I documenti Snowden rivelarono la backdoor</td>
+          </tr>
+          <tr>
+            <td><strong>Juniper ScreenOS</strong></td>
+            <td>2015</td>
+            <td>Backdoor nel VPN di Juniper. Usava Dual_EC_DRBG. Un secondo attaccante (probabilmente cinese) la sfrutto'</td>
+          </tr>
+          <tr>
+            <td><strong>Crypto AG</strong></td>
+            <td>1970-2018</td>
+            <td>Azienda svizzera di cifratura posseduta segretamente da CIA e BND. Vendeva macchine deliberatamente indebolite a oltre 120 paesi</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Juniper e' il caso che spiega tutto: la NSA mette una backdoor in un prodotto commerciale. Poi qualcun altro (probabilmente la Cina) trova la backdoor della NSA e se la usa per i fatti suoi. E' come nascondere la chiave di riserva sotto il vaso: prima o poi qualcuno alza il vaso.</p>
+
+    <!-- Chart: timeline vulnerabilita' backdoor -->
+    <div class="chart-container fade-in">
+      <div class="chart-title">Ogni backdoor crittografica nella storia e' stata compromessa</div>
+      <div class="chart-wrapper-wide">
+        <canvas id="backdoor-history-chart"></canvas>
+      </div>
+    </div>
+
+    <p>"Ok ok, ho capito. Ma fammi vedere, basta teoria."</p>
+
+    <p>Due script. Il primo aggiunge una master key governativa a un canale con le stesse primitive di Signal e mostra che chiunque la trovi decifra tutto. Il secondo confronta chiave statica vs Double Ratchet quando ti bucano. Numeri veri, non chiacchiere.</p>
+
+    <div class="chart-container fade-in">
+      <div class="chart-title">02_backdoor_demo.py  - master key governativa, +100 byte overhead, leak inevitabile</div>
+      <img src="../immagini/crypto/backdoor-output.png" alt="Backdoor demo: canale normale vs key escrow, la master key decifra tutti i messaggi" style="width: 100%; border-radius: 8px;">
+    </div>
+
+    <div class="chart-container fade-in">
+      <div class="chart-title">03_ratchet_vs_static.py  - chiave statica 10/10 esposti, ratchet 1/10</div>
+      <img src="../immagini/crypto/confronto-output.png" alt="Confronto: chiave statica espone 10/10 messaggi, double ratchet espone 1/10" style="width: 100%; border-radius: 8px;">
+    </div>
+
+    <p>Dieci messaggi, ti bucano al quinto. Con la chiave statica (quella che una backdoor imporrebbe) l'attaccante legge tutto: passato, presente, futuro. Con il Double Ratchet? Uno su dieci.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Vuoi provare?</strong> <code style="background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">python3 scripts/crittografia-non-basta/02_backdoor_demo.py</code> e <code style="background: var(--bg-tertiary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">python3 scripts/crittografia-non-basta/03_ratchet_vs_static.py</code> - crittografia vera, risultati veri.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06  - Conclusione
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lucchetto e la Porta Aperta</h2>
+    <span class="section-number">Sezione 06. Conclusione</span>
+
+    <p>La iena mi guarda. "Quindi? Posso riprendere a scrollare o devo preoccuparmi?"</p>
+
+    <p>Entrambe le cose. Ricapitolando:</p>
+
+    <ol style="line-height: 2;">
+      <li>Il <strong>Signal Protocol</strong> funziona. Double Ratchet, X3DH, Curve25519, forward secrecy. Nessuno ha bucato il protocollo.</li>
+      <li>La <strong>Svezia</strong> vuole obbligare Signal a conservare i messaggi. Signal preferisce andarsene. Il loro stesso esercito si oppone alla legge.</li>
+      <li>In <strong>UK</strong> hanno imposto ad Apple una TCN. Apple ha tolto la crittografia avanzata piuttosto che mettere una backdoor. Risultato: utenti meno protetti.</li>
+      <li>L'<strong>EU</strong> negozia Chat Control: la scansione obbligatoria e' stata tolta ma i negoziati sono ancora aperti. Trilogo finale previsto giugno 2026.</li>
+      <li>Gli <strong>AI agent</strong> aggirano la crittografia senza romperla: leggono i messaggi dopo la decifrazione, a livello endpoint. Caso reale: Clawdbot con credenziali Signal esposte. Peggio: un LLM con accesso al sistema davanti a Signal e' un vettore di <strong>RCE via prompt injection</strong>.</li>
+      <li>I <strong>russi</strong> (UNC5792) usano QR code malevoli per linkare dispositivi e leggere messaggi in tempo reale. Target: militari ucraini.</li>
+      <li>Una backdoor <strong>"solo per i buoni"</strong> e' matematicamente impossibile. Tutte quelle della storia (Clipper, Dual_EC, Juniper, Crypto AG) sono saltate.</li>
+    </ol>
+
+    <p>"E noi che facciamo, ci mettiamo a piangere?"</p>
+
+    <p>No, pero' qualcosa si puo' fare. Controlla i dispositivi linkati su Signal ogni tanto. Aggiorna l'app. Non scansionare QR code a caso come se fossi a una caccia al tesoro. E se un agente AI ti chiede accesso ai messaggi, digli di no. O almeno pensaci, che gia' sarebbe un passo avanti.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il protocollo e' un lucchetto perfetto su una porta che nessuno difende."</div>
+      <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+        Signal Protocol resta il miglior sistema di crittografia per messaggistica che esiste.
+        Ma la guerra si e' spostata. Non attaccano piu' la matematica, attaccano il contesto.
+        L'endpoint, l'interfaccia, il legislatore, l'agente AI che vede tutto dopo la decifrazione.
+        Curve25519 non si piega. Il telefono su cui gira si'.
+      </p>
+      <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+        Signal Pirate
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+  <script src="../js/main.js"></script>
+  <script src="../js/charts/crypto-charts.js"></script>
+</body>
+</html>

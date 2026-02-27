@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>La Crittografia Non Basta</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-non-basta.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-non-basta.html</guid>
+    <pubDate>Fri, 27 Feb 2026 12:00:00 +0100</pubDate>
+    <description>Signal Protocol smontato pezzo per pezzo. Double Ratchet, X3DH, Curve25519. Poi la Svezia vuole una backdoor entro il 1 marzo, il UK ordina ad Apple di aprire iCloud, e gli AI agent rendono la crittografia irrilevante. Il lucchetto e' perfetto, ma la porta e' aperta.</description>
+  </item>
+
+  <item>
     <title>Il Font Ti Frega</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-font-ti-frega.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-font-ti-frega.html</guid>
