@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Volto è un Vettore</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-volto-e-un-vettore.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-volto-e-un-vettore.html</guid>
+    <pubDate>Sat, 28 Feb 2026 00:00:00 +0100</pubDate>
+    <description>Face ID smontato pezzo per pezzo. TrueDepth, infrarossi a 940 nm, depth map, mesh 3D, embedding 128D e distanza coseno. Un'app Swift da 50 righe, reverse engineering di BiometricKit.framework, e la scoperta che il Secure Enclave e' l'unica cosa che non si smonta. Zero budget, solo iPhone e Mac.</description>
+  </item>
+
+  <item>
     <title>La Crittografia Non Basta</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-non-basta.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-non-basta.html</guid>

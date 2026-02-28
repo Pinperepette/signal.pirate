@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Volto è un Vettore | Signal Pirate</title>
+  <meta name="description" content="Face ID smontato pezzo per pezzo. TrueDepth, infrarossi, depth map, 128 numeri e un'app da 50 righe di Swift. Zero budget, solo iPhone e Mac.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+    .chart-wrapper-wide {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-02-28 | Pinperepette</p>
+  <h1 class="article-page-title">Il Volto <span class="accent">è un Vettore</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Face ID smontato pezzo per pezzo. TrueDepth, infrarossi, depth map, 128 numeri e un'app da 50 righe di Swift. Zero budget, solo iPhone e Mac.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Face ID</span>
+    <span class="tag tag-highlight">TrueDepth</span>
+    <span class="tag tag-reaction">Embedding 128D</span>
+    <span class="tag tag-amplification">Reverse Engineering</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — IL BUIO                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Buio</h2>
+<span class="section-number">Sezione 01. L'antefatto</span>
+
+<p>
+  Le due e quarantasette di notte. La iena dorme. Russa leggermente, quel ronzio costante a bassa frequenza che dopo 26 anni è diventato il mio rumore bianco preferito. La camera è buia. Buia nel senso che non vedi la mano davanti alla faccia. Persiane chiuse, la porta del bagno chiusa perché il led dello spazzolino elettrico illumina come un faro di Capo Miseno.
+</p>
+
+<p>
+  Vibra il telefono sul comodino. Una notifica. Qualche idiota su Twitter che risponde a un thread delle undici di sera. Allungo la mano, prendo l'iPhone. Lo alzo davanti alla faccia. Buio pesto. Non vedo lo schermo. Non vedo niente.
+</p>
+
+<p>
+  Click. Face ID sblocca. Istantaneo. La schermata home appare e mi spara la luce blu direttamente nelle retine dilatate. Bestemmio mentalmente. Ma la domanda è già li, piantata nella corteccia prefrontale come un chiodo arrugginito:
+</p>
+
+<p style="font-size: 1.2rem; text-align: center; color: var(--accent-attention); font-family: var(--font-mono); margin: 2rem 0;">
+  Ma come cazzo fa? È buio pesto.
+</p>
+
+<p>
+  Rimetto giù il telefono. Riprovo. Buio totale. Alzo il telefono. Sblocca. Di nuovo. Senza un filo di luce. Resto lì, perplesso, a fissare lo schermo acceso nel buio. La iena si sveglia. Mi guarda. "Che c'è?" "Come cazzo fa a sbloccarsi al buio?" Lei ci pensa mezzo secondo. "È l'app torcia. L'ho letto su internet." "Vai a cagare nell'orto che concimi." Si gira dall'altra parte e si riaddormenta in tre secondi. Nessuna luce si accende. La camera resta buia. Il telefono si sblocca lo stesso. E una certezza: quel coso non usa la luce visibile. Scoprirò come fa.
+</p>
+
+<p>
+  Mi rigiro nel letto per mezz'ora. La iena russa. Il cervello macina. Mi addormento alle tre. Domani mattina smonto tutto.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="30000" data-suffix="">0</div>
+    <div class="stat-label">Punti IR proiettati</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="128" data-suffix="D">0D</div>
+    <div class="stat-label">Dimensioni embedding</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="1220" data-suffix="">0</div>
+    <div class="stat-label">Vertici mesh 3D</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="98" data-suffix=".4%">0.4%</div>
+    <div class="stat-label">Similarità coseno</div>
+  </div>
+</div>
+
+<p>
+  La risposta, scoprirò la mattina dopo, è <strong>infrarosso</strong>. Il modulo TrueDepth non ha bisogno della luce che vedi tu. Lavora a <strong>940 nm</strong>, ben oltre il visibile umano che si ferma a 700 nm. In pratica ti spara in faccia un proiettore IR invisibile, ci piazza sopra 30.000 punti strutturati, e la camera IR cattura tutto. Per quel modulo sono le due di pomeriggio anche alle tre di notte. Ha la sua luce. Non gliene fotte della tua.
+</p>
+
+<p>
+  Per la TrueDepth camera, è sempre giorno.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Tradotto:</strong> 940 nm è una frequenza furba — invisibile all'occhio, ma non assorbita dall'atmosfera. La camera IR ha un filtro che vede solo quella frequenza. Ignora tutto il resto. Nessuna torcia nascosta. Solo fisica.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — LA MACCHINA FOTOGRAFICA INVISIBILE            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Macchina Fotografica Invisibile</h2>
+<span class="section-number">Sezione 02. Come funziona la TrueDepth camera</span>
+
+<p>
+  Mattina dopo. Caffè. La iena è già in giro per casa, organizza cose, sposta cose, pulisce cose che non hanno bisogno di essere pulite. Io mi chiudo in ufficio. Apro la documentazione Apple. Apro i paper. Apro il terminale.
+</p>
+
+<p>
+  Dentro quel notch che tutti odiano ci sono tre pezzi di hardware che lavorano in sequenza. E fanno cose assurde.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">I tre componenti</h3>
+
+<p>
+  <strong>Flood Illuminator.</strong> Il primo che parte. Ti spara luce infrarossa uniforme in faccia. Serve per illuminare la scena e fare un check veloce: "c'è una faccia davanti a me?". Se no, il resto non parte nemmeno. Batteria ringrazia.
+</p>
+
+<p>
+  <strong>Dot Projector.</strong> Il pezzo forte. Spara <strong>30.000 punti infrarossi</strong> sul volto. Non a caso: è un pattern preciso, generato da un VCSEL (Vertical-Cavity Surface-Emitting Laser) attraverso un elemento ottico diffrattivo. Il trucco è che il pattern è fisso, ma quando colpisce la tua faccia i punti si deformano. Il naso li sposta da una parte, le orbite dall'altra. La deformazione dei punti È la tua faccia.
+</p>
+
+<p>
+  <strong>IR Camera.</strong> Fotografa il casino di punti deformati. Siccome sa dove dovrebbero stare su una faccia piatta, dalla differenza calcola quanto sporge o rientra ogni punto. Triangolazione a luce strutturata: sai dove sta il proiettore, sai dove sta la camera, sai il pattern originale, e dalla deformazione tiri fuori la geometria 3D.
+</p>
+
+<p>
+  Quello che esce è una <strong>depth map</strong>: un'immagine dove ogni pixel non è un colore ma una distanza. Il naso è il punto più vicino, le orecchie più lontane, le orbite incavate. La mappa 3D della tua faccia, fatta in millisecondi, al buio, senza che te ne accorgi.
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Flood IR</div>
+    <div class="step-detail">940 nm uniforme</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">30K Punti</div>
+    <div class="step-detail">VCSEL + DOE</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">IR Camera</div>
+    <div class="step-detail">Cattura pattern</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Depth Map</div>
+    <div class="step-detail">Triangolazione</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Mesh 3D</div>
+    <div class="step-detail">1220 vertici</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">06</div>
+    <div class="step-name">Neural Net</div>
+    <div class="step-detail">Secure Enclave</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">07</div>
+    <div class="step-name">128 Numeri</div>
+    <div class="step-detail">Embedding vector</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">08</div>
+    <div class="step-name">Match</div>
+    <div class="step-detail">Cosine distance</div>
+  </div>
+</div>
+
+<p>
+  Otto passaggi. Da un fascio di luce invisibile a "sei tu" o "vaffanculo". Meno di 100 millisecondi. Meno di un battito di palpebre. E io stanotte ci ho messo mezz'ora a capire che non serve la luce. Consolante.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$d(x, y) = \frac{f \cdot B}{x_L - x_R}$$</div>
+  <p class="formula-label">Triangolazione: profondità d dalla disparità tra posizione attesa e osservata del punto IR. f = focale, B = baseline proiettore-camera</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — LA APP DA 50 RIGHE                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La App da 50 Righe</h2>
+<span class="section-number">Sezione 03. FaceDepthDumper — estrarre la mesh 3D dal vivo</span>
+
+<p>
+  La teoria è bella. Ma io i dati li voglio vedere. Non mi fido di quello che dice Apple nei whitepaper. Mi fido di quello che il telefono mi sputa fuori quando lo interrogo direttamente. Quindi mi faccio un'app.
+</p>
+
+<p>
+  <strong>FaceDepthDumper.</strong> 50 righe di Swift utile, il resto è merda di SwiftUI. Attivo la <code>ARFaceTrackingConfiguration</code> di ARKit, catturo la depth map dalla TrueDepth, estraggo la mesh 3D del volto e salvo tutto. Zero librerie esterne, zero dipendenze, zero cloud. Solo il framework che Apple ti dà gratis e un iPhone con Face ID.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-xcode-swift.png" alt="FaceDepthDumper: il codice Swift in Xcode" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">FaceDepthDumper in Xcode. ARKit, TrueDepth camera, depth map, mesh 3D, blend shapes. 50 righe utili, il resto è boilerplate.</figcaption>
+</figure>
+
+<p>
+  Compilo. Installo sull'iPhone. Mi punto il telefono in faccia.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/app.PNG" alt="FaceDepthDumper in azione sull'iPhone — face tracking in tempo reale" style="max-width: 350px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">FaceDepthDumper in azione. 1220 vertici tracciati in tempo reale, posizione 3D, blend shapes (bocca, occhi). Dietro di me, un iPhone smontato in cornice. Coerenza.</figcaption>
+</figure>
+
+<p>
+  E quello che esce è questo:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-mesh-3d.png" alt="Mesh 3D del volto estratta con ARKit — frontale, laterale, dall'alto" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La mia faccia in 1220 vertici e 2304 triangoli. Tre viste: frontale, laterale, dall'alto. Renderizzata con matplotlib dal file OBJ esportato dall'app.</figcaption>
+</figure>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/mesh.png" alt="Mesh 3D del volto aperta in Xcode — 1220 vertici, vista prospettica" style="max-width: 600px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La stessa mesh aperta in Xcode. 1220 vertici, 2304 triangoli. La mia faccia pesa 78 KB — meno di un'icona del desktop.</figcaption>
+</figure>
+
+<p>
+  1220 vertici. 2304 triangoli. 78 KB. La mia faccia pesa meno di un'icona del desktop.
+</p>
+
+<p>
+  Il file OBJ che esce è testo puro. Ogni riga <code>v</code> è un vertice con coordinate x, y, z in metri. Ogni riga <code>f</code> è un triangolo che collega tre vertici. Un formato degli anni '80, inventato da Wavefront Technologies, che funziona ancora. Puoi aprirlo con Blender, con un editor di testo, con quello che ti pare. La mia faccia in formato leggibile da un umano.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-mesh-obj.png" alt="Il file face_mesh.obj — la faccia in testo puro" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">face_mesh.obj — la mia faccia in testo puro. Vertici (v) e triangoli (f). 1220 righe di coordinate, 2304 righe di facce. 78 KB.</figcaption>
+</figure>
+
+<p>
+  Attenzione però: la mesh di ARKit non è quella che usa Face ID per davvero. Questa è la versione per sviluppatori — 1220 vertici bastano per le Animoji e i filtri di Snapchat, non per l'autenticazione. Quella vera nel Secure Enclave ha una risoluzione molto più alta. Ma il concetto è lo stesso: una nuvola di punti 3D che descrive la tua faccia.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <div style="display: flex; gap: 1rem; justify-content: center; align-items: flex-start; flex-wrap: wrap;">
+    <img src="../immagini/face-selfie.jpg" alt="Selfie dell'autore — lo yeti che Face ID riconosce comunque" style="max-width: 240px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+    <img src="../immagini/face-depth-map.jpg" alt="Depth map catturata dalla TrueDepth camera" style="max-width: 240px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  </div>
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Sembro lo yeti. Sono giorni che dormo pochissimo e col braccio rotto non posso nemmeno tagliarmi la barba. Ma Face ID mi riconosce ugualmente. A destra, la depth map grezza che la TrueDepth camera vede al posto mio: ogni pixel è una distanza, il naso è il punto più vicino (chiaro), le orecchie il più lontano (scuro).</figcaption>
+</figure>
+
+<div class="insight-box fade-in">
+  <p><strong>Il punto:</strong> ARKit ti espone <code>capturedDepthData</code> e <code>ARFaceAnchor.geometry</code> come API pubbliche. Apple ti dà abbastanza corda per fare le Animoji, ma non per replicare Face ID. La mesh vera non esce mai dal Secure Enclave. Questa è il fratello minore. Ma per capire come funziona, basta e avanza.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — 128 NUMERI                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 128 Numeri</h2>
+<span class="section-number">Sezione 04. Dal volto a un punto nello spazio a 128 dimensioni</span>
+
+<p>
+  Ok, ho la mesh. Ho la depth map. Ho la faccia in 3D. Ma Face ID non confronta mesh. Non sovrappone nuvole di punti. Non fa matching pixel per pixel. Sarebbe troppo lento e troppo fragile — ti fai crescere la barba e sei fuori, metti gli occhiali e sei fuori, giri la testa di 5 gradi e sei fuori.
+</p>
+
+<p>
+  Quello che fa è più elegante: prende la rappresentazione 3D e la passa attraverso una <strong>rete neurale</strong> che la comprime in <strong>128 numeri</strong>. Un embedding. Un punto in uno spazio a 128 dimensioni. Tutta la tua faccia — proporzioni, distanza tra gli occhi, curvatura del naso, profondità delle orbite — ridotta a 128 float.
+</p>
+
+<p>
+  Ovviamente voglio vederli. Il chip di Apple non me lo fa toccare nessuno, ma posso usare <strong>FaceNet</strong> e la libreria <code>face_recognition</code> di Python. Stesso principio: foto del volto dentro, 128 numeri fuori.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-python-embedding.png" alt="Script Python per estrarre l'embedding 128D dal volto" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<p>
+  Ecco. La mia faccia è 128 numeri. Il primo, <code>-0.1530</code>, codifica qualcosa. Il quarto, <code>0.0649</code>, qualcos'altro. Non puoi dire "il numero 37 è la distanza tra gli occhi" — la rete non funziona così. Ogni dimensione cattura un mix non lineare di features che nessun umano può interpretare. Ma l'insieme dei 128 numeri è un punto unico nello spazio che rappresenta <em>te</em>.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-embedding-128d.png" alt="Embedding 128D del volto visualizzato come barchart" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La mia faccia in 128 numeri. Ogni barra è una dimensione dell'embedding. Verde = positivo, rosso = negativo. Questo è il vettore che ti identifica.</figcaption>
+</figure>
+
+<p>
+  Ogni persona è un punto diverso in questo spazio a 128 dimensioni. Punti vicini = stessa persona. Punti lontani = persone diverse. Non servono pixel, mesh, depth map. Bastano 128 numeri e una distanza.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Nota nerd:</strong> L'embedding di Apple probabilmente non è esattamente 128D — il whitepaper non lo dice. Ma il principio è quello di FaceNet (Google, 2015): una rete addestrata con <strong>triplet loss</strong> che impara a mettere vicini i volti della stessa persona e lontani quelli di persone diverse. 128 è lo sweet spot trovato da Schroff et al. — abbastanza per discriminare, non troppo da sprecare risorse.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — LA DISTANZA TRA DUE FACCE                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Distanza tra Due Facce</h2>
+<span class="section-number">Sezione 05. Cosine similarity — il cuore del matching</span>
+
+<p>
+  Ok, ho due foto. Come decide se è la stessa persona? Con un prodotto scalare e una divisione. Fine.
+</p>
+
+<p>
+  La <strong>similarità coseno</strong> misura l'angolo tra due vettori. Stessa direzione = 1. Ortogonali = 0. Opposti = -1. Non importa quanto sono lunghi, conta solo dove puntano.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{cosine similarity} = \frac{\mathbf{A} \cdot \mathbf{B}}{\|\mathbf{A}\| \; \|\mathbf{B}\|} = \frac{\sum_{i=1}^{128} A_i \cdot B_i}{\sqrt{\sum_{i=1}^{128} A_i^2} \; \sqrt{\sum_{i=1}^{128} B_i^2}}$$</div>
+  <p class="formula-label">Due volti sono la stessa persona se il coseno dell'angolo tra i loro vettori è vicino a 1</p>
+</div>
+
+<p>
+  Prendo due mie foto. Condizioni diverse: una in ufficio con luce artificiale, una fuori col sole. Estraggo entrambi gli embedding. Li confronto.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-python-confronto.png" alt="Script Python per confrontare embedding di volti diversi" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<p>
+  <strong>Stessa persona:</strong> distanza coseno 0.016, similarità 98.4%. Due foto in condizioni completamente diverse, ma i vettori puntano quasi nella stessa direzione. La rete se ne fotte dell'illuminazione, dell'angolo, dello sfondo. Ha estratto quello che resta invariante: la geometria del volto.
+</p>
+
+<p>
+  <strong>Persona diversa:</strong> distanza euclidea 0.89, ben sopra la soglia di 0.6. Io e lo sconosciuto siamo lontani nello spazio a 128 dimensioni. La soglia non è a caso: è il punto in cui il tasso di falsi positivi scende sotto \(10^{-6}\) — una possibilità su un milione. Apple dichiara quella come probabilità che un volto casuale sblocchi il tuo telefono. Quel numero è una soglia di distanza travestita da statistica.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-confronto.png" alt="Confronto embedding tra stessa persona e persona diversa" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Confronto di embedding. Sopra: foto 1. Centro: foto 2. Sotto: differenza tra i due vettori. La differenza è rumore a bassa ampiezza. I due embedding sono quasi identici.</figcaption>
+</figure>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$d_{\text{euclidea}}(\mathbf{A}, \mathbf{B}) = \sqrt{\sum_{i=1}^{128} (A_i - B_i)^2} \quad \begin{cases} < 0.6 & \Rightarrow \text{stessa persona} \\ \geq 0.6 & \Rightarrow \text{persona diversa} \end{cases}$$</div>
+  <p class="formula-label">Soglia di face_recognition (dlib). Face ID usa una soglia analoga nel Secure Enclave, calibrata per FAR = 10⁻⁶</p>
+</div>
+
+<p>
+  Tutto qui. La tua identità è una direzione in uno spazio a 128 dimensioni. Ogni sblocco è un prodotto scalare. Ogni acquisto su Apple Pay è una norma euclidea. Quel mezzo secondo in cui alzi il telefono e Face ID ti riconosce? 128 moltiplicazioni, 128 somme, una radice quadrata e un confronto con una soglia. Fine.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — SOTTO IL COFANO DI APPLE                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Sotto il Cofano di Apple</h2>
+<span class="section-number">Sezione 06. Reverse engineering di BiometricKit.framework</span>
+
+<p>
+  Fin qui ho usato roba pubblica: ARKit, face_recognition, scipy. Quello che fa chiunque. Ma a me non basta. Voglio vedere come Apple ha organizzato il codice che governa Face ID. Non il neural network — quello sta nel Secure Enclave e non esce — ma il framework che fa da interfaccia tra iOS e il chip biometrico.
+</p>
+
+<p>
+  <code>BiometricKit.framework</code>. Framework privato, vive in <code>/System/Library/PrivateFrameworks/</code>. Non documentato, non nelle API pubbliche, non dovresti nemmeno sapere che esiste. Ma con un bridge Python-ObjC tiro fuori le interfacce delle classi. Non il codice, non l'implementazione: solo i nomi dei metodi. È come leggere l'indice di un libro senza poterne leggere i capitoli. Ma l'indice dice già un sacco di cose.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-biometrickit.png" alt="Class dump di BiometricKit.framework nel terminale" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Il dump di BiometricKit nel terminale. 11 classi, centinaia di metodi. L'interfaccia tra iOS e il tuo volto.</figcaption>
+</figure>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/face-biometrickit-code.png" alt="Class dump di BiometricKit.framework estratto via Python objc bridge" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+</figure>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Cosa ci dicono i nomi dei metodi</h3>
+
+<p>
+  <strong><code>matchCount</code> che incrementa.</strong> Questo è il dettaglio figo. Ogni volta che Face ID ti riconosce, il contatore sale. E non è solo statistico: Apple usa i match riusciti per <strong>aggiornare il template</strong>. Il campo <code>updateCount</code> lo conferma. Face ID non è una foto statica della tua faccia: è un modello vivo. Ti fai crescere la barba piano? Il template si aggiorna ogni giorno. Metti gli occhiali nuovi? I primi sblocchi saranno col PIN, ma dopo qualche match riuscito il template incorpora anche la versione con gli occhiali. Il coso <em>impara</em> la tua faccia.
+</p>
+
+<p>
+  <strong><code>listAccessories_</code>.</strong> Aggiunto con iOS 14.5, quando Apple ha messo lo sblocco con mascherina. Il framework distingue tra faccia nuda, faccia con occhiali, faccia con mascherina. Ogni variante ha un sotto-template dedicato.
+</p>
+
+<p>
+  <strong><code>forceBioLockout</code>.</strong> Cinque tentativi falliti = bloccato. Non un timeout — un lockout che vuole il PIN. Protezione brute force banale ma funziona.
+</p>
+
+<p>
+  <strong><code>BiometricKitXPCClient</code>.</strong> Tutto passa via XPC, il meccanismo IPC di Apple. Il framework non tocca mai i dati biometrici. Manda messaggi a un demone (<code>biometrickd</code>), che parla col Secure Enclave. Tre livelli di isolamento tra la tua app e la tua faccia.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il punto:</strong> 11 classi, centinaia di metodi, ma nessuno contiene la logica di matching vera. È tutto interfaccia IPC: messaggi al Secure Enclave e risposte. La computazione biometrica vera gira su un processore separato con il suo OS (sepOS). BiometricKit è il citofono. Il portiere sta altrove.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — IL MURO DEL SECURE ENCLAVE                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Muro del Secure Enclave</h2>
+<span class="section-number">Sezione 07. Quello che non ho potuto smontare</span>
+
+<p>
+  E qui mi fermo. Non perché non so come andare avanti. Perché non si può.
+</p>
+
+<p>
+  Il <strong>Secure Enclave Processor</strong> (SEP) è un chip separato dentro il SoC Apple. Non una partizione software. Non un processo isolato. Un processore fisicamente distinto con il suo kernel, la sua memoria, la sua catena di boot. Nemmeno il processore principale — quello su cui gira iOS — ci può parlare direttamente. Comunicano via mailbox hardware con messaggi firmati.
+</p>
+
+<p>
+  Dentro il SEP vive tutto quello che conta:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li>La rete neurale che converte la depth map in embedding</li>
+  <li>Il template di enrollment (la tua faccia registrata)</li>
+  <li>I pesi del modello (non aggiornabili da remoto)</li>
+  <li>La chiave crittografica legata all'UID del dispositivo</li>
+  <li>La logica di matching e la soglia di decisione</li>
+</ol>
+
+<p>
+  Il whitepaper Apple lo dice chiaro: <em>"The mathematical representation of your face is encrypted with a key available only to the Secure Enclave. This data is further protected with a class key tangled with the device UID."</em> Tradotto: anche se dissaldi la NAND flash del telefono, senza l'UID di quel dispositivo specifico hai un blob di byte cifrati. Nessun altro dispositivo al mondo li decifra.
+</p>
+
+<p>
+  Niente API. Niente debug interface. Niente JTAG. Niente dump della memoria. Il SEP ha il suo boot ROM immutabile, la sua chain of trust, e si rifiuta di parlare con chiunque non sia autorizzato. Se rileva una manomissione, non si avvia. Game over.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{template}_{\text{encrypted}} = \text{AES-256}(\text{template}_{\text{raw}}, \; K_{\text{SEP}} \oplus \text{UID}_{\text{device}})$$</div>
+  <p class="formula-label">Il template è cifrato con una chiave derivata dal SEP e intrecciata con l'UID hardware univoco del dispositivo</p>
+</div>
+
+<p>
+  Ho cercato. Paper, talk al Black Hat, CCC, ogni exploit pubblico. Il SEP è stato bucato una volta nel 2020 — team cinese Pangu, vulnerabilità nel boot ROM del T2 dei Mac. Ma era un'altra ROM, un'altra generazione, e Apple ha patchato il silicio. Sui chip serie A (iPhone)? Zero exploit pubblici.
+</p>
+
+<p>
+  Il Secure Enclave è l'unica cosa che non ho smontato. Non perché non so come. Perché Apple ha fatto bene il suo lavoro.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il punto:</strong> la mailbox hardware accetta solo comandi predefiniti. Non puoi mandargli codice arbitrario. Non puoi chiedergli di esportare niente. Puoi solo dire "questo volto è il mio?" e ricevere sì o no. Come parlare con un giudice che risponde solo "colpevole" o "innocente" e non ti mostra mai le prove.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — GLI ATTACCHI                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Gli Attacchi</h2>
+<span class="section-number">Sezione 08. Cosa funziona, cosa no, e perché</span>
+
+<p>
+  Serena chiama su FaceTime. "Pa', che fai?" "Smonto Face ID." Silenzio. "Cioè il tuo?" "Sì." "Ma perché?" "Perché stanotte si è sbloccato al buio e voglio capire come fa." Altro silenzio. Poi quel sospiro che solo una figlia sa fare, quel misto di rassegnazione e vergogna che dice "mio padre è un caso umano". "Ok pa'. Ciao." Riattacca.
+</p>
+
+<p>
+  Mentre Serena è a casa sua probabilmente su TikTok, io testo gli attacchi. Quelli dei paper, quelli dei talk al Black Hat. Non ho un laboratorio con stampanti 3D industriali, ma le basi le posso provare.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Risultati</h3>
+
+<div style="overflow-x: auto;">
+  <table class="strategy-table fade-in">
+    <thead>
+      <tr>
+        <th>Attacco</th>
+        <th>Metodo</th>
+        <th>Risultato</th>
+        <th>Perché</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Foto A4</td>
+        <td>Stampa a colori del volto</td>
+        <td style="color: #00ff88;">RESPINTO</td>
+        <td>Nessuna profondità. I 30.000 punti IR rimbalzano su un piano. Zero curvatura.</td>
+      </tr>
+      <tr>
+        <td>Video su iPad</td>
+        <td>Video frontale su schermo piatto</td>
+        <td style="color: #00ff88;">RESPINTO</td>
+        <td>Superficie piatta. L'IR non penetra il vetro dell'iPad. Zero geometria 3D.</td>
+      </tr>
+      <tr>
+        <td>Nastro su occhiali</td>
+        <td>Nastro adesivo nero sulle lenti</td>
+        <td style="color: #ff6b6b;">BYPASS attention</td>
+        <td>Inganna il controllo "occhi aperti". Documentato (CVE). Richiede volto reale addormentato.</td>
+      </tr>
+      <tr>
+        <td>Maschera 3D</td>
+        <td>Stampa 3D ad alta risoluzione</td>
+        <td style="color: #ff8800;">POSSIBILE</td>
+        <td>Brekke & Halseth (2018), VNPT (2017). Funziona se la maschera ha dettaglio submillimetrico e texture IR corretta.</td>
+      </tr>
+      <tr>
+        <td>Gemelli</td>
+        <td>Gemello identico</td>
+        <td style="color: #ff8800;">~30% FAR</td>
+        <td>Apple stessa lo ammette: gemelli identici, fratelli molto somiglianti e bambini sotto 13 anni hanno FAR più alto.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  Foto e video falliscono sempre. Subito. Il dot projector vede un piano, non un volto. La profondità non c'è e non puoi fingerla con un LCD. Per questo Apple è passata dal Touch ID (che freghi con un dito in silicone) al Face ID: la tridimensionalità è un canale molto più difficile da falsificare.
+</p>
+
+<p>
+  Il <strong>nastro sugli occhiali</strong> è l'attacco più figo. Face ID controlla se i tuoi occhi sono aperti (attention check). Nastro nero opaco sulle lenti simula occhi aperti per la camera IR, perché il nastro assorbe l'IR come la pupilla. Non sblocca il telefono di un estraneo — serve la tua faccia vera — ma sblocca il telefono di uno che dorme. Documentato al Black Hat 2019.
+</p>
+
+<p>
+  La <strong>maschera 3D</strong> è l'attacco da laboratorio. Scansione 3D submillimetrica della vittima, stampa 3D con materiale che riflette l'IR come la pelle, texture degli occhi con la giusta risposta IR. I ricercatori di VNPT (Vietnam) ci sono riusciti nel 2017, una settimana dopo il lancio di iPhone X. Costo: 150 dollari e ore di lavoro specializzato. Per rubare un telefono al bar non vale la pena. Per un attacco mirato, è reale.
+</p>
+
+<p>
+  I <strong>gemelli identici</strong> sono la kryptonite. Apple stessa lo ammette: probabilità significativamente più alta di sblocco reciproco. ~30% di false acceptance rate da studi indipendenti. La ragione è geometrica: stessa struttura ossea, embedding quasi identici, distanza sotto soglia. Non c'è niente da fare.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il punto:</strong> Face ID non è perfetto. È un trade-off: l'attacco da bar è praticamente impossibile, l'attacco mirato è abbastanza costoso da non valere la pena nel 99.99% dei casi. Ma se qualcuno vuole davvero entrare nel tuo telefono e ha risorse illimitate, la tua faccia non è la barriera più forte. Il PIN a 6 cifre, paradossalmente, è più sicuro — non puoi fotocopiare un PIN.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 128 Numeri in un Chip che Non Parla</h2>
+<span class="section-number">Sezione 09. Conclusione</span>
+
+<p>
+  Ricapitolo. Quando alzi il telefono al buio alle tre di notte succede questo:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2; padding-left: 1.5rem;">
+  <li>Il flood illuminator inonda la tua faccia di luce IR a 940 nm</li>
+  <li>Il dot projector spara 30.000 punti infrarossi strutturati</li>
+  <li>La camera IR cattura il pattern deformato dalla geometria del volto</li>
+  <li>Un algoritmo di triangolazione a luce strutturata calcola la depth map</li>
+  <li>La depth map viene convertita in una mesh 3D di migliaia di vertici</li>
+  <li>Una rete neurale nel Secure Enclave comprime la mesh in 128 numeri</li>
+  <li>L'embedding viene confrontato con il template di enrollment</li>
+  <li>Se la distanza coseno è sotto soglia: sbloccato. Se no: locked.</li>
+</ol>
+
+<p>
+  Otto passaggi. 100 millisecondi. Tutto al buio. Tutto invisibile. Tutto su un chip che non parla con nessuno, in un processore che non puoi toccare, con dati cifrati con una chiave che esiste solo in quel telefono e morirà con lui.
+</p>
+
+<p>
+  La faccia che vedi nello specchio non è quella che vede Face ID. Lo specchio ti mostra luce visibile. Face ID vede infrarosso, profondità, geometria. Vede le tue ossa zigomatiche, non il colore delle guance. Vede la curvatura del naso, non se ti sei fatto la barba. Riduce tutto a un punto in uno spazio a 128 dimensioni. Ogni mattina, ogni notifica, ogni acquisto: un prodotto scalare e una soglia. Se la distanza è abbastanza piccola, sei tu. Se no, sei fuori.
+</p>
+
+<p>
+  La mattina dopo. Colazione. La iena è al tavolo con il caffè. Mi guarda.
+</p>
+
+<p>
+  "Cosa facevi stanotte col telefono?"
+</p>
+
+<p>
+  "Niente, mi sono sbloccato."
+</p>
+
+<p>
+  "E ci hai messo tutta la notte?"
+</p>
+
+<p>
+  Non le rispondo. Ho il telefono in mano. Sto già scrivendo il codice.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"La tua faccia è 128 numeri in un chip che non parla con nessuno."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    30.000 punti infrarossi. 1220 vertici. 128 dimensioni. Una soglia. Un prodotto scalare. Zero luce visibile.
+    La TrueDepth camera ha trasformato la tua faccia in un vettore e il tuo vettore in una chiave. Non in senso metaforico: in senso matematico. Un punto nello spazio, una distanza, un sì o un no. L'unica cosa tra te e il tuo telefono è un angolo in uno spazio che non puoi immaginare. E l'unica cosa che protegge quel vettore è un chip che si rifiuta di parlare con il mondo esterno. Se il tuo volto è un vettore, il Secure Enclave è la cassaforte. E io, alle tre di notte, nel buio della camera, con la iena che russa, ho scoperto che la cassaforte fa bene il suo lavoro.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+
+</body>
+</html>

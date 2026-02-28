@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Serve accesso alla TrueDepth camera per catturare la depth map del volto</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Per salvare le depth map e le foto IR nel rullino</string>
+</dict>
+</plist>

@@ -1,0 +1,193 @@
+// ===========================================================
+// REVERSE ENGINEERING — BiometricKit.framework
+// /System/Library/PrivateFrameworks/BiometricKit.framework
+// Estratto via Python objc bridge — solo metodi specifici
+// ===========================================================
+
+@interface BiometricKit
+  // --- Enrollment (registrazione volto) ---
+  - enroll_withOptions_
+  - enroll_forUser_withOptions_
+  - enrollFeedback_client_
+  - enrollResult_details_client_
+  - enrollUpdate_client_
+  - enrollProgressConfigRenderMode
+  - enrollProgressMessage_
+
+  // --- Matching (riconoscimento) ---
+  - match_
+  - match_withOptions_
+  - matchResult_details_client_
+  - createMatchInfo_withTopology_withMatchImage_
+
+  // --- Identity management ---
+  - identities_
+  - getIdentityFromUUID_
+  - removeIdentity_
+  - removeIdentity_withOptions_
+  - removeAllIdentitiesForUser_withOptions_
+  - updateIdentity_
+  - updateIdentity_withOptions_
+  - getFreeIdentityCount_forUser_
+  - getMaxIdentityCount_
+  - getIdentitiesDatabaseUUID
+  - getIdentitiesDatabaseHash
+
+  // --- Template (il "modello" del tuo volto) ---
+  - getTemplateInfo_
+  - _templateUpdate_withDictionary_
+  - templateUpdate_details_client_
+
+  // --- Sensor & Hardware ---
+  - getSensorInfo
+  - getSensorCalibrationStatus
+  - getCalibrationDataState
+  - getProvisioningState
+  - isTouchIDCapable
+  - isTouchIDAvailableWithInfo_
+  - isFingerOn
+  - detectFingerWithOptions_
+  - detectPresenceWithOptions_
+
+  // --- Capture & Debug ---
+  - pullCaptureBuffer
+  - pullDebugImage_rotated_
+  - pullDebugImageData_rotated_target_
+  - imageDictFromRawImageData_
+  - setDebugImages_
+
+  // --- Protected Configuration (Secure Enclave) ---
+  - getProtectedConfiguration
+  - getProtectedConfigurationForUser_
+  - getSystemProtectedConfiguration
+  - setProtectedConfiguration_withOptions_
+  - setProtectedConfiguration_forUser_withOptions_
+  - setSystemProtectedConfiguration_withOptions_
+
+  // --- Lockout & Security ---
+  - forceBioLockout
+  - forceBioLockoutForUser_
+  - getBioLockoutState
+  - getBioLockoutStateForUser_
+  - getMatchPolicyInfo
+  - dropUnlockToken
+
+  // --- Lifecycle ---
+  - cancel
+  - delegate
+  - setDelegate_
+  - connectionInterrupted
+@end
+
+@interface BiometricKitIdentity
+  // Un volto registrato = una identity
+  - uuid                    // identificativo unico
+  - userID                  // utente proprietario
+  - name                    // nome assegnato ("Il mio volto")
+  - type                    // Face ID o Touch ID
+  - creationTime            // quando registrato
+  - matchCount              // quante volte ha matchato
+  - matchCountContinuous    // match consecutivi
+  - updateCount             // aggiornamenti del template
+  - attribute               // attributi extra
+  - entity                  // entita associata
+  - flags                   // flag di stato
+  - accessory               // accessorio (occhiali, mascherina?)
+  - isEqualToIdentity_      // confronto tra identita
+@end
+
+@interface BiometricKitMatchInfo
+  // Risultato di un match
+  - topology                // mappa topologica del match
+  - details                 // dettagli del risultato
+@end
+
+@interface BiometricKitTemplateInfo
+  // Il "template" = rappresentazione matematica del volto
+  - topology                // struttura topologica
+  - details                 // informazioni sul template
+@end
+
+@interface BiometricKitXPCClient
+  // Il client che parla col demone biometrico via XPC
+  - initWithDeviceType_clientType_
+  - connect
+  - disconnect
+
+  // Enrollment
+  - enroll_forUser_withOptions_async_withReply_
+  - enrollContinue
+  - completeEnrollment
+  - suspendEnrollment_
+  - isPeriocularEnrollmentSupported_
+
+  // Matching
+  - match_withOptions_async_withReply_
+  - startNewMatchAttempt
+  - enableMatchAutoRetry_
+  - getLastMatchEvent_
+  - pullMatchPolicyInfoData
+  - pauseFaceDetectTimer_
+
+  // Identity
+  - identities_
+  - getIdentityFromUUID_
+  - removeIdentity_withOptions_async_withReply_
+  - removeAllIdentitiesForUser_withOptions_async_withReply_
+  - updateIdentity_withOptions_async_withReply_
+  - setTemplate_forIdentity_
+  - getNodeTopologyForIdentity_
+  - getFreeIdentityCount_forUser_
+  - getMaxIdentityCount_
+  - queryIdentityMigrationFailureForUser_failed_clear_
+
+  // Sensor
+  - getSensorInfo
+  - getSensorCalibrationStatus
+  - getDeviceState
+  - getDeviceHardwareState_
+  - getProvisioningState
+  - isFingerOn
+  - getBiometryAvailability_forUser_
+
+  // Security
+  - getBioLockoutState_forUser_
+  - forceBioLockoutForUser_withOptions_
+  - getProtectedConfigurationForUser_
+  - getSystemProtectedConfiguration
+  - getCountersignedStoreToken_
+  - isXARTAvailable
+  - dropUnlockToken
+  - registerStoreToken_
+
+  // Capture
+  - pullCaptureBuffer
+  - pullCalibrationData
+  - pullAlignmentData
+  - pullDebugImageData_rotated_imageWidth_imageHeight_
+
+  // Accessories (occhiali, mascherina)
+  - listAccessories_
+  - getPeriocularMatchState_state_
+  - removePeriocularTemplatesWithOptions_async_withReply_
+@end
+
+@interface BiometricKitEnrollProgressInfo
+  - progress                    // percentuale completamento
+  - captureImage                // immagine catturata
+  - renderedImage               // immagine renderizzata per UI
+  - currentPrimaryComponentID   // quale parte del volto sta scansionando
+  - message                     // messaggio per l'utente
+  - messageDetails              // dettagli messaggio
+@end
+
+@interface BiometricKitEnrollProgressCoordinates
+  - x       // coordinata X del punto di enrollment
+  - y       // coordinata Y
+  - angle   // angolo di rotazione della testa
+@end
+
+@interface BiometricKitEnrollProgressMergedComponent
+  - componentID                 // quale componente del volto
+  - transformationCoordinates   // trasformazione geometrica
+@end
