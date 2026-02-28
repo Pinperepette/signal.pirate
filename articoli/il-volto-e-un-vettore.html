@@ -304,7 +304,7 @@
 </p>
 
 <div class="insight-box fade-in">
-  <p><strong>Tradotto:</strong> 940 nm è una frequenza furba — invisibile all'occhio, ma non assorbita dall'atmosfera. La camera IR ha un filtro che vede solo quella frequenza. Ignora tutto il resto. Nessuna torcia nascosta. Solo fisica.</p>
+  <p><strong>Tradotto:</strong> 940 nm è una frequenza furba, invisibile all'occhio ma non assorbita dall'atmosfera. La camera IR ha un filtro che vede solo quella frequenza. Ignora tutto il resto. Nessuna torcia nascosta. Solo fisica.</p>
 </div>
 
 
@@ -397,7 +397,7 @@
 <!-- SEZ. 03 — LA APP DA 50 RIGHE                            -->
 <!-- ======================================================= -->
 <h2><span class="accent">//</span> La App da 50 Righe</h2>
-<span class="section-number">Sezione 03. FaceDepthDumper — estrarre la mesh 3D dal vivo</span>
+<span class="section-number">Sezione 03. FaceDepthDumper, estrarre la mesh 3D dal vivo</span>
 
 <p>
   La teoria è bella. Ma io i dati li voglio vedere. Non mi fido di quello che dice Apple nei whitepaper. Mi fido di quello che il telefono mi sputa fuori quando lo interrogo direttamente. Quindi mi faccio un'app.
@@ -418,7 +418,7 @@
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
   <img src="../immagini/app.PNG" alt="FaceDepthDumper in azione sull'iPhone — face tracking in tempo reale" style="max-width: 350px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
-  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">FaceDepthDumper in azione. 1220 vertici tracciati in tempo reale, posizione 3D, blend shapes (bocca, occhi). Dietro di me, un iPhone smontato in cornice. Coerenza.</figcaption>
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">FaceDepthDumper in azione. Face tracking in tempo reale, posizione 3D, blend shapes (bocca, occhi). Dietro di me, un iPhone smontato in cornice. Coerenza.</figcaption>
 </figure>
 
 <p>
@@ -432,7 +432,7 @@
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
   <img src="../immagini/mesh.png" alt="Mesh 3D del volto aperta in Xcode — 1220 vertici, vista prospettica" style="max-width: 600px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
-  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La stessa mesh aperta in Xcode. 1220 vertici, 2304 triangoli. La mia faccia pesa 78 KB — meno di un'icona del desktop.</figcaption>
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La stessa mesh aperta in Xcode, vista prospettica. Puoi ruotarla, zoomare, ispezionare ogni vertice.</figcaption>
 </figure>
 
 <p>
@@ -440,16 +440,16 @@
 </p>
 
 <p>
-  Il file OBJ che esce è testo puro. Ogni riga <code>v</code> è un vertice con coordinate x, y, z in metri. Ogni riga <code>f</code> è un triangolo che collega tre vertici. Un formato degli anni '80, inventato da Wavefront Technologies, che funziona ancora. Puoi aprirlo con Blender, con un editor di testo, con quello che ti pare. La mia faccia in formato leggibile da un umano.
+  Il file OBJ che esce è testo puro. Ogni riga <code>v</code> è un vertice con coordinate x, y, z in metri. Ogni riga <code>f</code> è un triangolo che collega tre vertici. Puoi aprirlo con Blender, con Xcode, con un editor di testo, con quello che ti pare. La mia faccia in formato leggibile da un umano.
 </p>
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
   <img src="../immagini/face-mesh-obj.png" alt="Il file face_mesh.obj — la faccia in testo puro" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
-  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">face_mesh.obj — la mia faccia in testo puro. Vertici (v) e triangoli (f). 1220 righe di coordinate, 2304 righe di facce. 78 KB.</figcaption>
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">face_mesh.obj ispezionato con uno script Python. Struttura, coordinate, bounding box e primi vertici. Un formato degli anni '80 che funziona ancora.</figcaption>
 </figure>
 
 <p>
-  Attenzione però: la mesh di ARKit non è quella che usa Face ID per davvero. Questa è la versione per sviluppatori — 1220 vertici bastano per le Animoji e i filtri di Snapchat, non per l'autenticazione. Quella vera nel Secure Enclave ha una risoluzione molto più alta. Ma il concetto è lo stesso: una nuvola di punti 3D che descrive la tua faccia.
+  Attenzione però: la mesh di ARKit non è quella che usa Face ID per davvero. Questa è la versione per sviluppatori, 1220 vertici bastano per le Animoji e i filtri di Snapchat, non per l'autenticazione. Quella vera nel Secure Enclave ha una risoluzione molto più alta. Ma il concetto è lo stesso: una nuvola di punti 3D che descrive la tua faccia.
 </p>
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
@@ -457,11 +457,11 @@
     <img src="../immagini/face-selfie.jpg" alt="Selfie dell'autore — lo yeti che Face ID riconosce comunque" style="max-width: 240px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
     <img src="../immagini/face-depth-map.jpg" alt="Depth map catturata dalla TrueDepth camera" style="max-width: 240px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
   </div>
-  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Sembro lo yeti. Sono giorni che dormo pochissimo e col braccio rotto non posso nemmeno tagliarmi la barba. Ma Face ID mi riconosce ugualmente. A destra, la depth map grezza che la TrueDepth camera vede al posto mio: ogni pixel è una distanza, il naso è il punto più vicino (chiaro), le orecchie il più lontano (scuro).</figcaption>
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Sembro lo yeti. Sono giorni che dormo pochissimo e col braccio rotto non posso nemmeno tagliarmi la barba. Ma Face ID mi riconosce ugualmente. A destra, la depth map grezza: quello che la TrueDepth camera vede al posto mio. Ogni pixel è una distanza, non un colore.</figcaption>
 </figure>
 
 <div class="insight-box fade-in">
-  <p><strong>Il punto:</strong> ARKit ti espone <code>capturedDepthData</code> e <code>ARFaceAnchor.geometry</code> come API pubbliche. Apple ti dà abbastanza corda per fare le Animoji, ma non per replicare Face ID. La mesh vera non esce mai dal Secure Enclave. Questa è il fratello minore. Ma per capire come funziona, basta e avanza.</p>
+  <p><strong>Il punto:</strong> ARKit ti espone <code>capturedDepthData</code> e <code>ARFaceAnchor.geometry</code> come API pubbliche. Abbastanza per giocarci, non abbastanza per replicare Face ID. La versione vera del template non esce mai dal SEP. Questa è il fratello minore. Ma per capire il meccanismo, basta e avanza.</p>
 </div>
 
 
@@ -472,11 +472,11 @@
 <span class="section-number">Sezione 04. Dal volto a un punto nello spazio a 128 dimensioni</span>
 
 <p>
-  Ok, ho la mesh. Ho la depth map. Ho la faccia in 3D. Ma Face ID non confronta mesh. Non sovrappone nuvole di punti. Non fa matching pixel per pixel. Sarebbe troppo lento e troppo fragile — ti fai crescere la barba e sei fuori, metti gli occhiali e sei fuori, giri la testa di 5 gradi e sei fuori.
+  Ok, ho la mesh. Ho la depth map. Ho la faccia in 3D. Ma Face ID non confronta mesh. Non sovrappone nuvole di punti. Non fa matching pixel per pixel. Sarebbe troppo lento e troppo fragile: ti fai crescere la barba e sei fuori, metti gli occhiali e sei fuori, giri la testa di 5 gradi e sei fuori.
 </p>
 
 <p>
-  Quello che fa è più elegante: prende la rappresentazione 3D e la passa attraverso una <strong>rete neurale</strong> che la comprime in <strong>128 numeri</strong>. Un embedding. Un punto in uno spazio a 128 dimensioni. Tutta la tua faccia — proporzioni, distanza tra gli occhi, curvatura del naso, profondità delle orbite — ridotta a 128 float.
+  Quello che fa è più elegante: prende la rappresentazione 3D e la passa attraverso una <strong>rete neurale</strong> che la comprime in <strong>128 numeri</strong>. Un embedding. Un punto in uno spazio a 128 dimensioni. Tutta la tua faccia, proporzioni, distanza tra gli occhi, curvatura del naso, profondità delle orbite, ridotta a 128 float.
 </p>
 
 <p>
@@ -488,12 +488,12 @@
 </figure>
 
 <p>
-  Ecco. La mia faccia è 128 numeri. Il primo, <code>-0.1530</code>, codifica qualcosa. Il quarto, <code>0.0649</code>, qualcos'altro. Non puoi dire "il numero 37 è la distanza tra gli occhi" — la rete non funziona così. Ogni dimensione cattura un mix non lineare di features che nessun umano può interpretare. Ma l'insieme dei 128 numeri è un punto unico nello spazio che rappresenta <em>te</em>.
+  Ecco. La mia faccia è 128 numeri. Il primo, <code>-0.1530</code>, codifica qualcosa. Il quarto, <code>0.0649</code>, qualcos'altro. Non puoi dire "il numero 37 è la distanza tra gli occhi" perché la rete non funziona così. Ogni dimensione cattura un mix non lineare di features che nessun umano può interpretare. Ma l'insieme dei 128 numeri è un punto unico nello spazio che rappresenta <em>te</em>.
 </p>
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
   <img src="../immagini/face-embedding-128d.png" alt="Embedding 128D del volto visualizzato come barchart" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
-  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La mia faccia in 128 numeri. Ogni barra è una dimensione dell'embedding. Verde = positivo, rosso = negativo. Questo è il vettore che ti identifica.</figcaption>
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">L'embedding visualizzato. Ogni barra è una dimensione. Verde = positivo, rosso = negativo. Questo è il vettore che ti identifica.</figcaption>
 </figure>
 
 <p>
@@ -501,7 +501,7 @@
 </p>
 
 <div class="insight-box fade-in">
-  <p><strong>Nota nerd:</strong> L'embedding di Apple probabilmente non è esattamente 128D — il whitepaper non lo dice. Ma il principio è quello di FaceNet (Google, 2015): una rete addestrata con <strong>triplet loss</strong> che impara a mettere vicini i volti della stessa persona e lontani quelli di persone diverse. 128 è lo sweet spot trovato da Schroff et al. — abbastanza per discriminare, non troppo da sprecare risorse.</p>
+  <p><strong>Nota nerd:</strong> L'embedding di Apple probabilmente non è esattamente 128D, il whitepaper non lo dice. Ma il principio è quello di FaceNet (Google, 2015): una rete addestrata con <strong>triplet loss</strong> che impara a mettere vicini i volti della stessa persona e lontani quelli di persone diverse. 128 è lo sweet spot trovato da Schroff et al., abbastanza per discriminare, non troppo da sprecare risorse.</p>
 </div>
 
 
@@ -509,7 +509,7 @@
 <!-- SEZ. 05 — LA DISTANZA TRA DUE FACCE                     -->
 <!-- ======================================================= -->
 <h2><span class="accent">//</span> La Distanza tra Due Facce</h2>
-<span class="section-number">Sezione 05. Cosine similarity — il cuore del matching</span>
+<span class="section-number">Sezione 05. Cosine similarity, il cuore del matching</span>
 
 <p>
   Ok, ho due foto. Come decide se è la stessa persona? Con un prodotto scalare e una divisione. Fine.
@@ -537,7 +537,7 @@
 </p>
 
 <p>
-  <strong>Persona diversa:</strong> distanza euclidea 0.89, ben sopra la soglia di 0.6. Io e lo sconosciuto siamo lontani nello spazio a 128 dimensioni. La soglia non è a caso: è il punto in cui il tasso di falsi positivi scende sotto \(10^{-6}\) — una possibilità su un milione. Apple dichiara quella come probabilità che un volto casuale sblocchi il tuo telefono. Quel numero è una soglia di distanza travestita da statistica.
+  <strong>Persona diversa:</strong> la libreria <code>face_recognition</code> usa anche la distanza euclidea come metrica. Con lo sconosciuto: 0.89, ben sopra la soglia di 0.6. Stessa idea, misura diversa. La soglia non è a caso: è il punto in cui il tasso di falsi positivi scende sotto \(10^{-6}\), una possibilità su un milione. Apple dichiara quella come probabilità che un volto casuale sblocchi il tuo telefono. Quel numero è una soglia di distanza travestita da statistica.
 </p>
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
@@ -562,7 +562,7 @@
 <span class="section-number">Sezione 06. Reverse engineering di BiometricKit.framework</span>
 
 <p>
-  Fin qui ho usato roba pubblica: ARKit, face_recognition, scipy. Quello che fa chiunque. Ma a me non basta. Voglio vedere come Apple ha organizzato il codice che governa Face ID. Non il neural network — quello sta nel Secure Enclave e non esce — ma il framework che fa da interfaccia tra iOS e il chip biometrico.
+  Fin qui ho usato roba pubblica: ARKit, face_recognition, scipy. Quello che fa chiunque. Ma a me non basta. Voglio vedere come Apple ha organizzato il codice che governa Face ID. Non il neural network, quello sta nel Secure Enclave e non esce, ma il framework che fa da interfaccia tra iOS e il chip biometrico.
 </p>
 
 <p>
@@ -571,7 +571,7 @@
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
   <img src="../immagini/face-biometrickit.png" alt="Class dump di BiometricKit.framework nel terminale" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
-  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Il dump di BiometricKit nel terminale. 11 classi, centinaia di metodi. L'interfaccia tra iOS e il tuo volto.</figcaption>
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Il dump di BiometricKit nel terminale. L'interfaccia tra iOS e il tuo volto, classe per classe.</figcaption>
 </figure>
 
 <figure class="fade-in" style="text-align: center; margin: 2rem 0;">
@@ -589,7 +589,7 @@
 </p>
 
 <p>
-  <strong><code>forceBioLockout</code>.</strong> Cinque tentativi falliti = bloccato. Non un timeout — un lockout che vuole il PIN. Protezione brute force banale ma funziona.
+  <strong><code>forceBioLockout</code>.</strong> Cinque tentativi falliti = bloccato. Non un timeout, un lockout che vuole il PIN. Protezione brute force banale ma funziona.
 </p>
 
 <p>
@@ -612,7 +612,7 @@
 </p>
 
 <p>
-  Il <strong>Secure Enclave Processor</strong> (SEP) è un chip separato dentro il SoC Apple. Non una partizione software. Non un processo isolato. Un processore fisicamente distinto con il suo kernel, la sua memoria, la sua catena di boot. Nemmeno il processore principale — quello su cui gira iOS — ci può parlare direttamente. Comunicano via mailbox hardware con messaggi firmati.
+  Il <strong>Secure Enclave Processor</strong> (SEP) è un chip separato dentro il SoC Apple. Non una partizione software. Non un processo isolato. Un processore fisicamente distinto con il suo kernel, la sua memoria, la sua catena di boot. Nemmeno il processore principale, quello su cui gira iOS, ci può parlare direttamente. Comunicano via mailbox hardware con messaggi firmati.
 </p>
 
 <p>
@@ -641,11 +641,11 @@
 </div>
 
 <p>
-  Ho cercato. Paper, talk al Black Hat, CCC, ogni exploit pubblico. Il SEP è stato bucato una volta nel 2020 — team cinese Pangu, vulnerabilità nel boot ROM del T2 dei Mac. Ma era un'altra ROM, un'altra generazione, e Apple ha patchato il silicio. Sui chip serie A (iPhone)? Zero exploit pubblici.
+  Ho cercato. Paper, talk al Black Hat, CCC, ogni exploit pubblico. Il SEP è stato bucato una volta nel 2020, team cinese Pangu, vulnerabilità nel boot ROM del T2 dei Mac. Ma era un'altra ROM, un'altra generazione, e Apple ha patchato il silicio. Sui chip serie A (iPhone)? Zero exploit pubblici.
 </p>
 
 <p>
-  Il Secure Enclave è l'unica cosa che non ho smontato. Non perché non so come. Perché Apple ha fatto bene il suo lavoro.
+  Il Secure Enclave è l'unica cosa che non ho smontato. Apple ha fatto bene il suo lavoro.
 </p>
 
 <div class="insight-box fade-in">
@@ -708,7 +708,7 @@
         <td>Gemelli</td>
         <td>Gemello identico</td>
         <td style="color: #ff8800;">~30% FAR</td>
-        <td>Apple stessa lo ammette: gemelli identici, fratelli molto somiglianti e bambini sotto 13 anni hanno FAR più alto.</td>
+        <td>Gemelli identici, fratelli molto somiglianti e bambini sotto 13 anni hanno FAR più alto.</td>
       </tr>
     </tbody>
   </table>
@@ -757,7 +757,7 @@
 </ol>
 
 <p>
-  Otto passaggi. 100 millisecondi. Tutto al buio. Tutto invisibile. Tutto su un chip che non parla con nessuno, in un processore che non puoi toccare, con dati cifrati con una chiave che esiste solo in quel telefono e morirà con lui.
+  Otto passaggi. 100 millisecondi. Tutto al buio. Tutto invisibile. Tutto su un processore che non puoi toccare, con dati cifrati con una chiave che esiste solo in quel telefono e morirà con lui.
 </p>
 
 <p>
