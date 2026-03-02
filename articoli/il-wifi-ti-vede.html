@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il WiFi Ti Vede | Signal Pirate</title>
+  <meta name="description" content="Un Raspberry Pi 3, tre router, 2000 metri quadri. CSI, BLE, mDNS, bettercap e nmap per sapere chi c'e' in casa senza telecamere. Zero budget, solo segnali.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .code-block td {
+      padding: 0;
+      vertical-align: top;
+      border: none;
+    }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code {
+      padding: 0.2em 0 0.2em 1em;
+      white-space: pre;
+    }
+    .code-block .code-wrap {
+      padding: 0.8rem 0;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-03-02 | Pinperepette</p>
+  <h1 class="article-page-title">Il WiFi <span class="accent">Ti Vede</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Un Raspberry Pi 3, tre router, 2000 mq. CSI, BLE, mDNS e bettercap per sapere chi c'e' in casa senza telecamere.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">WiFi CSI</span>
+    <span class="tag tag-highlight">Raspberry Pi</span>
+    <span class="tag tag-reaction">Bettercap</span>
+    <span class="tag tag-amplification">Network Recon</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - IL CASSETTO                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Cassetto</h2>
+<span class="section-number">Sezione 00. L'antefatto</span>
+
+<p>
+  Tre di notte. La iena si sveglia, va in bagno, torna. Si infila sotto le coperte e fa: "C'e' una luce nel capannone." Mezzo addormentato: "Sara' il sensore di movimento." "No. Si e' accesa e spenta. Come uno schermo."
+</p>
+
+<p>
+  Mi tiro su. Prendo il tablet dal comodino, apro l'app delle telecamere. Una griglia di quadratini grigi in visione notturna. Capannone esterno: niente. Capannone interno: niente. L'angolo dove dice lei non e' coperto. Telecamere ovunque e quell'angolo non lo vede nessuna.
+</p>
+
+<p>
+  Mi vesto, prendo la torcia, chiamo Panna super addormentata, facciamo il giro completo. Capannoni, uffici, magazzino, perimetro. Niente. Nessun segno, nessuna porta forzata. Torno a letto.
+</p>
+
+<p>
+  La mattina la iena alza le spalle: "Te l'ho detto, era una luce." Si'. Probabilmente un riflesso. Ma il tarlo e' piantato. Le telecamere hanno angoli, direzioni, coni d'ombra. Sai dove stanno, sai dove non guardano. Chi conosce il layout conosce i buchi.
+</p>
+
+<p>
+  Due giorni dopo, cercando un cavo HDMI nel cassetto dello studio, trovo un Raspberry Pi 3. Stava li sotto un groviglio di cavi USB, una scheda SD senza etichetta e un alimentatore che forse era suo, forse no. Uno di quei cassetti dove finiscono le cose che "prima o poi mi servono". Di solito mentono. Questa volta no.
+</p>
+
+<p>
+  Il contesto: casa e azienda sono nello stesso posto. Uffici, capannoni, zona abitativa. Piu' di duemila metri quadri su piu' livelli e piu' edifici, con tre router collegati in cascata perche' un solo access point non copre neanche un terzo. Tre router, una rete, un sacco di muri spessi.
+</p>
+
+<p>
+  La domanda e' arrivata da sola: <strong>si puo' fare con il WiFi?</strong>
+</p>
+
+<p>
+  Un sistema che non si vede, non si evita. Niente ottica, niente angoli di ripresa, niente LED rossi. Solo segnali radio che attraversano i muri, rimbalzano sui corpi e raggiungono ogni angolo della struttura. Il WiFi copre gia' tutto: uffici, capannoni, magazzino, casa. Se puoi usarlo come sensore, hai una copertura che nessun impianto di telecamere puo' dare.
+</p>
+
+<p>
+  Ho preso il Pi dal cassetto, gli ho messo una SD fresca, l'ho attaccato alla rete e ho iniziato a sperimentare.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="2000" data-suffix=" mq">0 mq</div>
+    <div class="stat-label">Superficie da coprire</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="3" data-suffix=" router">0</div>
+    <div class="stat-label">Access point in cascata</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="5" data-suffix=" sensori">0</div>
+    <div class="stat-label">Fonti dati integrate</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="0" data-suffix=" telecamere">0</div>
+    <div class="stat-label">Usate nel progetto</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - IL RADAR CHE NON FUNZIONA                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Radar che Non Funziona</h2>
+<span class="section-number">Sezione 01. WiFi CSI e i suoi limiti</span>
+
+<p>
+  La prima idea era la piu' ambiziosa: usare il WiFi come un radar. Si chiama <strong>Channel State Information</strong> e sulla carta e' una figata pazzesca. Ogni volta che un pacchetto WiFi viaggia dal router al dispositivo, attraversa l'aria. Se quell'aria e' vuota, il segnale arriva pulito. Se c'e' un corpo umano in mezzo, il segnale si distorce. Il corpo assorbe, riflette, diffrange. Ogni subcarrier OFDM cambia ampiezza e fase in modo leggermente diverso. Misuri la differenza e sai se qualcuno si e' mosso.
+</p>
+
+<p>
+  Il Pi 3 ha un chip WiFi Broadcom BCM43438. Esiste un firmware modificato, <strong>nexmon</strong>, che espone i dati CSI grezzi. Li catturi come pacchetti UDP sulla porta 5500: 274 byte ciascuno, header con magic number <code>0x1111</code>, poi coppie di interi a 16 bit per ogni subcarrier. Parte reale e immaginaria, da cui ricavi l'ampiezza.
+</p>
+
+<div class="code-block" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">def</span> <span class="fn">parse_csi_packet</span>(data):</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="dc">"""Parsa un pacchetto CSI da nexmon (UDP porta 5500)."""</span></td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="kw">if</span> len(data) &lt; <span class="nb">18</span>:</td></tr>
+<tr><td class="ln">4</td><td class="code">        <span class="kw">return</span> <span class="nb">None</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cm"># Header: magic number 0x1111</span></td></tr>
+<tr><td class="ln">7</td><td class="code">    magic = struct.unpack(<span class="st">"&gt;H"</span>, data[<span class="nb">0</span>:<span class="nb">2</span>])[<span class="nb">0</span>]</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="kw">if</span> magic != <span class="nb">0x1111</span>:</td></tr>
+<tr><td class="ln">9</td><td class="code">        <span class="kw">return</span> <span class="nb">None</span></td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="cm"># Payload: coppie int16 (reale, immaginario) per subcarrier</span></td></tr>
+<tr><td class="ln">12</td><td class="code">    csi_raw = data[<span class="nb">18</span>:]</td></tr>
+<tr><td class="ln">13</td><td class="code">    n_samples = len(csi_raw) // <span class="nb">4</span></td></tr>
+<tr><td class="ln">14</td><td class="code">    csi = np.zeros(n_samples, dtype=<span class="nb">complex</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code"></td></tr>
+<tr><td class="ln">16</td><td class="code">    <span class="kw">for</span> i <span class="kw">in</span> range(n_samples):</td></tr>
+<tr><td class="ln">17</td><td class="code">        off = i * <span class="nb">4</span></td></tr>
+<tr><td class="ln">18</td><td class="code">        real = struct.unpack(<span class="st">"&lt;h"</span>, csi_raw[off:off + <span class="nb">2</span>])[<span class="nb">0</span>]</td></tr>
+<tr><td class="ln">19</td><td class="code">        imag = struct.unpack(<span class="st">"&lt;h"</span>, csi_raw[off + <span class="nb">2</span>:off + <span class="nb">4</span>])[<span class="nb">0</span>]</td></tr>
+<tr><td class="ln">20</td><td class="code">        csi[i] = <span class="nb">complex</span>(real, imag)</td></tr>
+<tr><td class="ln">21</td><td class="code"></td></tr>
+<tr><td class="ln">22</td><td class="code">    <span class="kw">return</span> np.abs(csi)  <span class="cm"># ampiezza per subcarrier</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Calibri con la stanza vuota: raccogli 200 pacchetti, calcoli la varianza media delle ampiezze, quella diventa la baseline. Poi quando qualcuno entra, la varianza sale. Il rapporto varianza attuale su baseline ti da' un numero: sotto 3, stanza vuota. Sopra 3, qualcuno si muove.
+</p>
+
+<p>
+  Ho fatto una serie di test nell'arco della prima settimana. Stanza vuota, una persona che cammina, una persona seduta. La iena e' entrata per portarmi il caffe' e ho misurato anche quello.
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr><th>Condizione</th><th>Varianza</th><th>var_ratio</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Stanza vuota</td><td>8.817</td><td>1.0</td></tr>
+    <tr><td>Una persona, si muove</td><td>232.127</td><td>26.3</td></tr>
+    <tr><td>Una persona, ferma</td><td>52.000</td><td>5.9</td></tr>
+    <tr><td>Due persone, ferme</td><td>71.000</td><td>8.0</td></tr>
+    <tr><td>Due persone, si muovono</td><td>362.000</td><td>41.0</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Il movimento lo vede. Var ratio a 26 quando cammini: inequivocabile. Ma il limite e' li: <strong>CSI vede il movimento, non le persone</strong>. Mi sono seduto sul divano col telefono. Fermo. Il var ratio e' sceso a 5, poi a 4, poi sotto la soglia. "Stanza vuota" ha detto il sistema. Ero li seduto. Per il CSI ero aria. Due persone ferme e una persona che cammina danno numeri simili.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il problema fondamentale:</strong> il WiFi CSI misura la perturbazione del canale radio, non la presenza fisica. Un corpo fermo perturba pochissimo. Per contare persone statiche servirebbe un array di antenne e un modello ML addestrato su quella specifica stanza. Con un singolo Pi 3 e un chip WiFi consumer, non ci arrivi.</p>
+</div>
+
+<p>
+  CSI resta nel progetto come sensore di movimento. Ma per rispondere a "chi c'e' in casa" serve altro.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - IL PIVOT                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Pivot</h2>
+<span class="section-number">Sezione 02. Se non puoi vedere le persone, vedi i loro dispositivi</span>
+
+<p>
+  Cambio di strategia. Ho spiegato il problema alla iena. "Ma se ogni persona ha un telefono, basta cercare i telefoni." A volte la iena riassume in una frase quello che tu stai cercando di teorizzare da tre giorni. Se non posso sentire i corpi, posso sentire i loro dispositivi. L'iPhone, l'iPad, il Samsung. Se li identifico, so chi c'e'.
+</p>
+
+<p>
+  Il problema: i telefoni moderni sono bastardi. Da iOS 14 e Android 10, quando si connettono al WiFi usano un <strong>MAC address randomizzato</strong>. Il MAC nella tabella ARP non e' quello reale dell'hardware. E' un indirizzo locally administered generato per-network. Il bit 1 del primo byte e' settato a 1: questo lo distingue da un MAC reale. Ma l'OUI lookup e' morto: i primi 3 byte non identificano piu' il produttore.
+</p>
+
+<p>
+  Come distinguo un iPhone da un Android da un iPad se non posso fidarmi del MAC? Devo trovare altri segnali. E i segnali ci sono. Parecchi.
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">ARP</div>
+    <div class="step-detail">Chi e' sulla rete</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">mDNS</div>
+    <div class="step-detail">Nomi e servizi</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">nmap</div>
+    <div class="step-detail">Porte aperte</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">BLE</div>
+    <div class="step-detail">Bluetooth passivo</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Bettercap</div>
+    <div class="step-detail">Sniff mDNS deep</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - I CINQUE SENSI                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Cinque Sensi</h2>
+<span class="section-number">Sezione 03. ARP, mDNS, nmap, BLE, bettercap</span>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">ARP: la lista degli invitati</h3>
+
+<p>
+  Il punto di partenza e' <code>/proc/net/arp</code> sul Pi. La leggi e hai l'elenco di tutti i dispositivi che hanno comunicato sulla rete locale: IP e MAC. Aggiorno ogni 10 secondi. E' grezza ma e' la base su cui costruire tutto il resto.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">mDNS: chi si presenta con nome e cognome</h3>
+
+<p>
+  Multicast DNS. I dispositivi Apple ne vanno matti. Ogni Mac, iPhone, iPad, Apple TV annuncia i propri servizi sulla rete: AirPlay, SSH, stampanti, file sharing. Un <code>avahi-browse -tpar</code> sul Pi e ti arriva l'elenco: "Mac Pro offre ssh, sftp, airplay, raop". Nome del dispositivo, IP, tipo di servizio. Gratis, nessuna scansione attiva.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">nmap porta 62078: il timbro dell'iPhone</h3>
+
+<p>
+  La chicca. Ogni iPhone e iPad tiene aperta la porta TCP <strong>62078</strong>. E' il servizio <code>lockdownd</code>, quello che usa iTunes/Finder per sincronizzare. Sempre in ascolto, anche a telefono bloccato.
+</p>
+
+<div class="code-block" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># Scan della subnet per la porta lockdownd (iPhone/iPad)</span></td></tr>
+<tr><td class="ln">2</td><td class="code">sudo nmap -p <span class="nb">62078</span> -T4 --open <span class="nb">192.168.1.0/24</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm"># Output:</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cm"># 192.168.1.54  62078/tcp open  iphone-sync</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cm"># 192.168.1.59  62078/tcp open  iphone-sync</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Scan di 30 secondi e sai quanti dispositivi Apple sono sulla rete. Non ti dice di chi e', ma quanti sono e a quale IP stanno.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">BLE: l'orecchio passivo</h3>
+
+<p>
+  Bluetooth Low Energy. Il Pi 3 ha un'antenna BLE integrata. Con <code>hcitool lescan --duplicates</code> catturi tutti gli advertisement BLE nelle vicinanze: stampanti, cuffie, smartwatch, speaker. La stampante Epson ET-2850 si annuncia ogni pochi secondi. I dispositivi personali con BLE attivo appaiono e scompaiono.
+</p>
+
+<p>
+  Un caveat: il chip del Pi condivide WiFi e Bluetooth. Con il firmware nexmon attivo per CSI, BLE si blocca. La fix e' un <code>hciconfig hci0 reset</code> all'avvio del thread. Resetti l'adapter, riparte.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Bettercap: il quinto senso</h3>
+
+<p>
+  Bettercap gira sul Mac Pro, non sul Pi. Il Pi ha un quad-core ARM a 1.2 GHz del 2016 con 1 GB di RAM. Per sniffare una rete intera serve piu' muscolo. Bettercap espone una REST API sulla porta 8081, il Pi la interroga ogni 3 secondi e manda tutto in dashboard.
+</p>
+
+<p>
+  La vera potenza di bettercap non e' la lista degli host. E' il <strong>modulo net.sniff</strong>. Sniffa tutto il traffico mDNS della rete e accumula eventi. Ogni dispositivo che cerca un servizio via multicast lascia una traccia. Quella traccia e' un fingerprint.
+</p>
+
+<div class="code-block" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># Avvio bettercap sul Mac con REST API per il Pi</span></td></tr>
+<tr><td class="ln">2</td><td class="code">sudo bettercap -iface en0 -eval \</td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="st">"set api.rest.address 0.0.0.0;</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="st">   set api.rest.port 8081;</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="st">   set api.rest.username user;</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="st">   set api.rest.password pass;</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="st">   api.rest on;</span></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="st">   net.probe on;</span>   <span class="cm"># ARP probe per scoprire host</span></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="st">   net.recon on;</span>   <span class="cm"># Monitora la rete</span></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="st">   net.sniff on"</span>   <span class="cm"># Sniffa mDNS, DHCP, NBNS</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Qualche minuto e 1600 eventi mDNS catturati. Li analizzo per IP sorgente e ottengo i servizi che ogni dispositivo cerca sulla rete:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr><th>IP</th><th>Servizi mDNS cercati</th><th>Verdetto</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>.54</td><td>googlecast, atc, dns-sd</td><td><strong>iPhone</strong></td></tr>
+    <tr><td>.58</td><td>companion-link, rdlink, sleep-proxy</td><td><strong>iPhone/iPad</strong></td></tr>
+    <tr><td>.100</td><td>companion-link, rdlink, sleep-proxy</td><td><strong>iPhone/iPad</strong></td></tr>
+    <tr><td>.67</td><td>googlecast</td><td><strong>Android</strong></td></tr>
+    <tr><td>.66</td><td>airplay, ssh, sftp, apple-mobdev2</td><td>Mac Pro</td></tr>
+  </tbody>
+</table>
+
+<div class="insight-box fade-in">
+  <p><strong>Il trucco:</strong> un iPhone cerca <code>_googlecast</code> insieme a <code>_atc</code>, un servizio interno Apple. Un Android cerca solo <code>_googlecast</code>. Un iPhone/iPad cerca <code>_companion-link</code> e <code>_sleep-proxy</code>, servizi interni Apple che un Android non cercherebbe mai. Il traffico mDNS che il dispositivo <em>genera</em> e' il suo fingerprint. Non serve guardare il MAC.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - LA DASHBOARD                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Dashboard</h2>
+<span class="section-number">Sezione 04. Sette thread, un browser</span>
+
+<p>
+  Tutto converge in un unico script Python: <code>room_scanner.py</code>. Sette thread in parallelo, un server HTTP sulla porta 8080, Server-Sent Events per aggiornare il browser ogni 2 secondi.
+</p>
+
+<div class="code-block" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># room_scanner.py - sette thread, un web server</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code">threads = [</td></tr>
+<tr><td class="ln">4</td><td class="code">    (<span class="st">"BLE"</span>,         ble_thread),        <span class="cm"># hcitool lescan --duplicates</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    (<span class="st">"CSI"</span>,         csi_thread),        <span class="cm"># UDP 5500, varianza subcarrier</span></td></tr>
+<tr><td class="ln">6</td><td class="code">    (<span class="st">"mDNS"</span>,        mdns_thread),       <span class="cm"># avahi-browse -tpar ogni 15s</span></td></tr>
+<tr><td class="ln">7</td><td class="code">    (<span class="st">"ARP"</span>,         arp_thread),        <span class="cm"># /proc/net/arp ogni 10s</span></td></tr>
+<tr><td class="ln">8</td><td class="code">    (<span class="st">"Fingerprint"</span>, fingerprint_thread), <span class="cm"># nmap -p 62078 ogni 30s</span></td></tr>
+<tr><td class="ln">9</td><td class="code">    (<span class="st">"Bettercap"</span>,   bettercap_thread),  <span class="cm"># REST API Mac ogni 3s</span></td></tr>
+<tr><td class="ln">10</td><td class="code">    (<span class="st">"Cleanup"</span>,     cleanup_thread),    <span class="cm"># rimuovi device stale</span></td></tr>
+<tr><td class="ln">11</td><td class="code">]</td></tr>
+<tr><td class="ln">12</td><td class="code"></td></tr>
+<tr><td class="ln">13</td><td class="code"><span class="kw">for</span> name, func <span class="kw">in</span> threads:</td></tr>
+<tr><td class="ln">14</td><td class="code">    t = threading.Thread(target=func, daemon=<span class="nb">True</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code">    t.start()</td></tr>
+<tr><td class="ln">16</td><td class="code">    print(<span class="st">f"  {name} avviato"</span>)</td></tr>
+<tr><td class="ln">17</td><td class="code"></td></tr>
+<tr><td class="ln">18</td><td class="code"><span class="cm"># Web server HTTP + SSE su porta 8080</span></td></tr>
+<tr><td class="ln">19</td><td class="code">server = HTTPServer((<span class="st">"0.0.0.0"</span>, <span class="nb">8080</span>), Handler)</td></tr>
+<tr><td class="ln">20</td><td class="code">server.serve_forever()</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  La dashboard mostra tutto su una pagina: il grafico CSI a impulsi con Chart.js, il pannello Bluetooth con i device BLE nelle vicinanze, i servizi mDNS, la tabella ARP con hostname e vendor, e la mappa dei dispositivi identificati con il tipo dedotto dal fingerprint.
+</p>
+
+<p>
+  In cima, la sezione che conta: <strong>"Chi c'e' in casa"</strong>. Aggrega i dati di tutti e cinque i sensori. Se un dispositivo e' identificato come iPhone, iPad o Android, appare li con il suo IP. Sai quanti telefoni ci sono sulla rete. Sai quante persone ci sono in casa.
+</p>
+
+<div style="margin: 2rem 0; text-align: center;">
+  <img src="../immagini/gui.png" alt="Dashboard Room Scanner: chi c'e' in casa, grafico CSI, BLE, mDNS, ARP, bettercap, mappa dispositivi" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+  <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem; font-family: var(--font-mono);">
+    La dashboard live. 5 telefoni identificati, CSI a 24.6 (qualcuno si muove), 9 device BLE, 11 host sulla rete.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - COSA HO IMPARATO                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Cosa Ho Imparato</h2>
+<span class="section-number">Sezione 05. I limiti e le sorprese</span>
+
+<p>
+  <strong>CSI e' un sensore di movimento, non di presenza.</strong> Sulla carta sembra un radar. In pratica, con un Pi e un chip WiFi consumer, distingui "qualcuno cammina" da "tutto fermo". Per contare persone statiche servono antenne MIMO e modelli addestrati sulla stanza specifica.
+</p>
+
+<p>
+  <strong>I MAC randomizzati hanno cambiato tutto.</strong> Prima bastava la tabella ARP e l'OUI lookup. Ora vedi solo MAC locally administered che non dicono niente. Devi ragionare su segnali laterali: porte aperte, traffico mDNS, servizi annunciati.
+</p>
+
+<p>
+  <strong>Il traffico mDNS e' il fingerprint piu' ricco.</strong> Ogni dispositivo grida nella rete i servizi che cerca. Non per farsi scoprire. Per funzionare. Ma il risultato e' che un iPhone lascia una firma diversa da un Android, e un Mac diversa da entrambi. Basta ascoltare.
+</p>
+
+<p>
+  <strong>La porta 62078 e' il timbro Apple.</strong> Ogni iPhone e iPad la tiene aperta, sempre. Un singolo scan nmap e sai quanti dispositivi Apple sono in casa.
+</p>
+
+<p>
+  <strong>Tre router complicano poco.</strong> I device si spostano tra gli access point ma restano sulla stessa subnet. La tabella ARP li vede sempre, bettercap li traccia sempre. La dimensione della casa non conta: conta la rete.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- CONCLUSIONE                                             -->
+<!-- ======================================================= -->
+<div class="conclusion-box fade-in">
+  <div class="quote">"Non servono telecamere. Basta ascoltare i segnali che ci sono gia'."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Un Raspberry Pi 3 da cassetto, tre router, cinque sensori software. Zero hardware aggiuntivo, zero telecamere, zero microfoni. Solo segnali radio che attraversano i muri da sempre. WiFi, Bluetooth, traffico mDNS. Roba che c'e' gia', ovunque, sempre accesa. Bisogna solo sapere dove ascoltare.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="../js/main.js"></script>
+
+</body>
+</html>

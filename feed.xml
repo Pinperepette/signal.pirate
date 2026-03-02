@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il WiFi Ti Vede</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-wifi-ti-vede.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-wifi-ti-vede.html</guid>
+    <pubDate>Mon, 02 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Tre di notte, la iena vede una luce nel capannone. Le telecamere non coprono quell'angolo. Un Raspberry Pi 3 da cassetto, tre router, 2000 mq. CSI, BLE, mDNS, bettercap e nmap per sapere chi c'e' senza telecamere. Zero budget, solo segnali.</description>
+  </item>
+
+  <item>
     <title>Il Volto è un Vettore</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-volto-e-un-vettore.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-volto-e-un-vettore.html</guid>
