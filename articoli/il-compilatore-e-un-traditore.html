@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Compilatore E' un Traditore | Signal Pirate</title>
+  <meta name="description" content="Il compilatore ottimizza via il codice di sicurezza. memset cancellato, null check eliminati, overflow check rimossi. Codice C, disassembly Clang 16, zero warning.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .code-block td {
+      padding: 0;
+      vertical-align: top;
+      border: none;
+    }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code {
+      padding: 0.2em 0 0.2em 1em;
+      white-space: pre;
+    }
+    .code-block .code-wrap {
+      padding: 0.8rem 0;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-03-04 | Pinperepette</p>
+  <h1 class="article-page-title">Il Compilatore <span class="accent">E' un Traditore</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Scrivi memset per pulire la RAM. Compili con -O2. Guardi il disassembly. La chiamata non c'e'. Il compilatore l'ha eliminata. E non ti ha detto niente.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Compiler</span>
+    <span class="tag tag-highlight">Dead Store Elimination</span>
+    <span class="tag tag-reaction">Undefined Behavior</span>
+    <span class="tag tag-amplification">Reverse Engineering</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - IL TRADIMENTO                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Tradimento</h2>
+<span class="section-number">Sezione 00. L'antefatto</span>
+
+<p>
+  Sto riscrivendo un modulo di autenticazione. La password arriva in chiaro via TLS, la copio in un buffer locale, la valido, la confronto con l'hash nel database, poi faccio <code>memset(buf, 0, len)</code> per pulire la RAM. Roba standard. Il buffer e' azzerato, la password non resta in memoria. Vado a dormire tranquillo.
+</p>
+
+<p>
+  Poi un giorno mi viene la curiosita'. Compilo con <code>-O2</code> e apro il disassembly con <code>objdump</code>. Cerco la mia chiamata a <code>memset</code>. Non c'e'. Cerco meglio. Non c'e'. Sparita. Il binario fa il setup dello stack, chiama <code>authenticate</code>, e poi dritto al <code>ret</code>. La password resta in memoria finche' qualcos'altro la sovrascrive. Potrebbe essere un millisecondo, potrebbe essere un'ora.
+</p>
+
+<p>
+  La iena si affaccia: "Tutto bene? Hai la faccia di uno che ha visto un fantasma." "Quasi. Ho scoperto che il compilatore mi frega di nascosto."
+</p>
+
+<p>
+  E no, non e' un bug. Il compilatore ha applicato una regola perfettamente legittima: se una variabile non viene letta dopo una scrittura, quella scrittura e' inutile. Si chiama <strong>dead store elimination</strong>. Il tuo <code>memset</code> scrive su un buffer che nessuno leggera' piu'. Per il compilatore e' come passare lo straccio in una stanza che stai per demolire. Perche' perdere cicli?
+</p>
+
+<p>
+  E questo e' solo l'inizio. Il compilatore elimina anche null check, rimuove controlli di overflow e riordina le istruzioni. Tutto legale secondo lo standard. Tutto devastante per la sicurezza. E zero warning. Il codice compila, linka, gira. Solo che non fa quello che pensi.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="4" data-suffix=" casi">0</div>
+    <div class="stat-label">Eliminazioni nel binario</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="16" data-suffix="">0</div>
+    <div class="stat-label">Versione Clang</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan">-O2</div>
+    <div class="stat-label">Flag di ottimizzazione</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="0" data-suffix=" warning">0</div>
+    <div class="stat-label">Warning generati</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - LA PASSWORD FANTASMA                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Password Fantasma</h2>
+<span class="section-number">Sezione 01. Dead store elimination</span>
+
+<p>
+  Partiamo dal caso classico. Funzione che riceve una password, la usa, poi la cancella dalla RAM con <code>memset</code>. Lo fanno tutti, lo dicono tutti i manuali.
+</p>
+
+<div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">#include</span> <span class="st">&lt;string.h&gt;</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">void</span> <span class="fn">authenticate</span>(<span class="kw">const</span> <span class="kw">char</span> *pw);</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="kw">void</span> <span class="fn">process_password</span>(<span class="kw">const</span> <span class="kw">char</span> *input) {</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="kw">char</span> password[<span class="nb">64</span>];</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="fn">strncpy</span>(password, input, <span class="nb">63</span>);</td></tr>
+<tr><td class="ln">8</td><td class="code">    password[<span class="nb">63</span>] = <span class="st">'\0'</span>;</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="fn">authenticate</span>(password);</td></tr>
+<tr><td class="ln">11</td><td class="code"></td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="cm">// Pulisci la password dalla RAM</span></td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="fn">memset</span>(password, <span class="nb">0</span>, <span class="nb">64</span>);</td></tr>
+<tr><td class="ln">14</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Compili con <code>clang -O0</code>, guardi il disassembly, <code>memset</code> c'e'. Perfetto, il buffer viene azzerato. Tutto regolare.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/compilatore/memset-O0.png" alt="Disassembly di process_password compilata con -O0: la chiamata a memset e' presente" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">
+    clang -O0: la chiamata a memset c'e'. Il buffer viene azzerato come previsto.
+  </figcaption>
+</figure>
+
+<p>
+  Ora compili con <code>clang -O2</code>. Stessa funzione, stesso sorgente. Riapri il disassembly.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/compilatore/memset-O2.png" alt="Disassembly di process_password compilata con -O2: la chiamata a memset e' sparita" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">
+    clang -O2: memset e' sparito. La password resta in memoria.
+  </figcaption>
+</figure>
+
+<p>
+  Puf. <code>memset</code> non esiste piu'. Il compilatore l'ha segata. Il ragionamento e' freddo e logico: <code>password</code> e' un array locale sullo stack. Dopo <code>memset</code>, la funzione ritorna e lo stack frame viene distrutto. Nessuno leggera' mai quei 64 byte azzerati. Scrivere zero in un buffer che nessuno leggera'? Operazione inutile. Dead store. Via.
+</p>
+
+<p>
+  Il problema e' che la password resta li sullo stack. In chiaro. Finche' un'altra funzione non alloca quello stesso spazio e lo sovrascrive, quei byte sono li ad aspettare. Un attaccante con accesso alla memoria del processo (core dump, <code>/proc/&lt;pid&gt;/mem</code>, cold boot attack, un exploit di un altro bug qualsiasi) la trova intatta. Grazie compilatore.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Le soluzioni esistono.</strong> <code>memset_s</code> (C11 Annex K) e' garantito non eliminabile dallo standard. <code>explicit_bzero</code> (BSD/Linux) e' una funzione opaca che il compilatore non puo' ottimizzare via. Su Windows c'e' <code>SecureZeroMemory</code>. L'alternativa portable e' un barrier con <code>volatile</code>: scrivi tramite un puntatore volatile e il compilatore non puo' eliminare la scrittura. Ma la soluzione vera e' sapere che il problema esiste.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - IL NULL CHECK CHE NON ESISTE                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Null Check che Non Esiste</h2>
+<span class="section-number">Sezione 02. Undefined behavior e le sue conseguenze</span>
+
+<p>
+  Secondo caso, e qui il compilatore diventa proprio stronzo. Scrivi una funzione che legge un valore da un puntatore, poi controlla se il puntatore e' NULL. Sembra ragionevole. Lo trovi in mille codebase.
+</p>
+
+<div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">int</span> <span class="fn">read_value</span>(<span class="kw">int</span> *ptr) {</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="kw">int</span> val = *ptr;              <span class="cm">// dereferenzia ptr</span></td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="kw">if</span> (ptr == <span class="nb">NULL</span>)             <span class="cm">// controlla se e' NULL</span></td></tr>
+<tr><td class="ln">4</td><td class="code">        <span class="kw">return</span> -<span class="nb">1</span>;               <span class="cm">// gestione errore</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="kw">return</span> val + <span class="nb">1</span>;</td></tr>
+<tr><td class="ln">6</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Per un umano quel check e' una rete di sicurezza. Per il compilatore e' un puzzle logico. Riga 2: <code>*ptr</code> dereferenzia il puntatore. Se <code>ptr</code> fosse NULL, sarebbe <strong>undefined behavior</strong>. Lo standard C dice che il compilatore puo' assumere che l'UB non accada mai. Quindi se la riga 2 viene eseguita, <code>ptr</code> non puo' essere NULL. Quindi il check alla riga 3 e' sempre falso. Quindi il compilatore lo elimina. Sillogismo perfetto, conseguenza devastante.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/compilatore/null-check-O2.png" alt="Disassembly di read_value con -O2: il null check e' stato eliminato, restano solo 3 istruzioni" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">
+    clang -O2: il check su NULL e' sparito. Restano 3 istruzioni: leggi, incrementa, ritorna.
+  </figcaption>
+</figure>
+
+<p>
+  Tre istruzioni. Leggi, aggiungi 1, ritorna. Il null check non esiste nel binario. Il <code>return -1</code> non esiste nel binario. Chiami <code>read_value(NULL)</code> e il programma crasha. Proprio la cosa che il check doveva impedire.
+</p>
+
+<p>
+  "Ma io l'ho scritto il check!" Si', nel sorgente. Il binario pero' non e' il sorgente. Il binario e' quello che il compilatore decide di produrre. E le regole dicono: UB non accade, il check e' inutile, lo tolgo. Fine della discussione.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Cos'e' l'undefined behavior?</strong> E' il contratto tra te e il compilatore. Lo standard C dice: se fai certe cose (dereferenziare NULL, overflow di interi con segno, accedere fuori dai limiti di un array), il comportamento e' indefinito. Il compilatore puo' fare qualsiasi cosa: crashare, ignorare, formattarti il disco. In pratica usa l'UB come <em>informazione</em>: se un'operazione e' UB, il codice che la presuppone non puo' essere raggiunto. E lo elimina. Bello eh?</p>
+</div>
+
+<p>
+  La fix e' banale: controlla prima, dereferenzia dopo. <code>if (ptr == NULL) return -1; int val = *ptr;</code> In questo ordine il compilatore non ha scuse. Ma devi saperlo. E lui non te lo dice.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - L'OVERFLOW INVISIBILE                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Overflow Invisibile</h2>
+<span class="section-number">Sezione 03. Signed overflow e la trappola del check</span>
+
+<p>
+  Terzo caso, e ormai dovresti avere il sospetto che finira' male. Devi allocare un buffer con un margine di sicurezza. Controlli l'overflow prima di chiamare <code>malloc</code>.
+</p>
+
+<div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">#include</span> <span class="st">&lt;stdlib.h&gt;</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">void</span> *<span class="fn">safe_alloc</span>(<span class="kw">int</span> size) {</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="kw">if</span> (size + <span class="nb">100</span> &lt; size)       <span class="cm">// overflow?</span></td></tr>
+<tr><td class="ln">5</td><td class="code">        <span class="fn">abort</span>();                 <span class="cm">// errore: overflow</span></td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="kw">return</span> <span class="fn">malloc</span>(size + <span class="nb">100</span>);</td></tr>
+<tr><td class="ln">7</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  L'idea: se <code>size</code> e' vicino a <code>INT_MAX</code>, <code>size + 100</code> wrappa a un numero negativo, il check lo becca e chiama <code>abort()</code>. Sembra solido.
+</p>
+
+<p>
+  Peccato che <code>size</code> e' <code>int</code>, cioe' signed. In C, l'overflow di un intero con segno e' <strong>undefined behavior</strong>. Il compilatore assume che UB non accada mai. Quindi <code>size + 100</code> non puo' essere minore di <code>size</code>. Quindi il check e' sempre falso. Via il check, via <code>abort()</code>. In una riga ha disattivato la tua difesa.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/compilatore/overflow-O2.png" alt="Disassembly di safe_alloc con -O2: il check sull'overflow e la chiamata ad abort sono stati eliminati" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">
+    clang -O2: il check sull'overflow e abort() sono spariti. La funzione fa solo add e jmp malloc.
+  </figcaption>
+</figure>
+
+<p>
+  Il binario fa tre cose: <code>add 100</code>, estendi a 64 bit, <code>jmp malloc</code>. Basta. Se <code>size</code> vale <code>INT_MAX</code>, il risultato wrappa e <code>malloc</code> alloca un buffer minuscolo. Scrivi oltre i limiti. Buffer overflow. Il check difensivo non ha fermato un bel niente.
+</p>
+
+<p>
+  Ricapitoliamo. Quello che scrivi nel sorgente contro quello che trovi nel binario.
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr><th>Cosa scrivi</th><th>Cosa produce il compilatore</th><th>Perche'</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>memset(buf, 0, len)</code></td><td>Niente</td><td>Dead store elimination</td></tr>
+    <tr><td><code>if (ptr == NULL)</code></td><td>Niente</td><td>UB: ptr gia' dereferenziato</td></tr>
+    <tr><td><code>if (size + 100 &lt; size)</code></td><td>Niente</td><td>UB: signed overflow</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Tre protezioni scritte nel sorgente. Zero nel binario. Zero warning. Complimenti.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - IL RIORDINO                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Riordino</h2>
+<span class="section-number">Sezione 04. Instruction reordering e timing attacks</span>
+
+<p>
+  Il compilatore non si limita a cancellare roba. Riordina le istruzioni per sfruttare la pipeline della CPU. Due operazioni sequenziali nel sorgente possono invertirsi nel binario. Di solito non importa. Ma quando fai sicurezza, l'ordine conta eccome.
+</p>
+
+<p>
+  Caso concreto: server HTTPS, devi confrontare l'HMAC del client con quello del server. Se usi <code>memcmp</code>, hai un problema.
+</p>
+
+<div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm">// SBAGLIATO: memcmp esce al primo byte diverso</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">if</span> (<span class="fn">memcmp</span>(received_hmac, computed_hmac, <span class="nb">32</span>) == <span class="nb">0</span>) {</td></tr>
+<tr><td class="ln">3</td><td class="code">    accept_request();</td></tr>
+<tr><td class="ln">4</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  <code>memcmp</code> confronta byte per byte e ritorna appena trova una differenza. Primo byte sbagliato? Torna in 2 nanosecondi. Primi 31 giusti e solo l'ultimo sbagliato? Ci mette di piu'. Un attaccante misura il tempo e deduce quanti byte sono corretti. Prova tutti i valori del primo byte, trova quello che allunga la risposta. Ripete per il secondo. 256 &times; 32 = 8192 tentativi e ha l'intero HMAC. Si chiama <strong>timing attack</strong> e funziona da dio.
+</p>
+
+<p>
+  La soluzione standard e' un confronto constant-time: confronti tutti i byte, accumuli le differenze con OR, e ritorni solo alla fine. Nessun early exit, stesso tempo sia che sbagli tutto sia che indovini quasi tutto.
+</p>
+
+<div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm">// Confronto constant-time</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">int</span> <span class="fn">secure_compare</span>(<span class="kw">const</span> <span class="kw">unsigned</span> <span class="kw">char</span> *a,</td></tr>
+<tr><td class="ln">3</td><td class="code">                    <span class="kw">const</span> <span class="kw">unsigned</span> <span class="kw">char</span> *b,</td></tr>
+<tr><td class="ln">4</td><td class="code">                    <span class="nb">size_t</span> len) {</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="kw">unsigned</span> <span class="kw">int</span> result = <span class="nb">0</span>;</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="kw">for</span> (<span class="nb">size_t</span> i = <span class="nb">0</span>; i &lt; len; i++) {</td></tr>
+<tr><td class="ln">7</td><td class="code">        result |= a[i] ^ b[i];</td></tr>
+<tr><td class="ln">8</td><td class="code">    }</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="kw">return</span> result;</td></tr>
+<tr><td class="ln">10</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Indovina. Il compilatore con <code>-O2</code> puo' autovettorizzare questo loop con istruzioni SIMD, processando 16 o 32 byte alla volta. Su hardware moderno la versione vettorizzata e' <em>quasi</em> sempre constant-time. Ma "quasi" in crittografia non vale niente. Su certe microarchitetture le SIMD hanno timing variabile. Il compilatore non sa cos'e' un side channel. Lui ottimizza per la velocita', non per la tua paranoia.
+</p>
+
+<p>
+  Il riordino colpisce anche la pulizia dei segreti. Pulisci un buffer e poi lo liberi? Il compilatore puo' spostare il <code>free</code> prima del <code>memset</code> perche' non vede dipendenza. Oppure eliminare la pulizia del tutto, tanto la memoria sta per essere liberata. In entrambi i casi: il segreto resta in memoria.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Non e' solo colpa del compilatore.</strong> Anche la CPU riordina le istruzioni a runtime (out-of-order execution). In un sistema multi-thread, un thread puo' vedere le scritture di un altro in ordine diverso. Per questo esistono i memory barriers: <code>__asm__ __volatile__("" ::: "memory")</code> dice al compilatore "non spostare niente oltre questo punto" e alla CPU "completa tutte le scritture prima di andare avanti".</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - COME SOPRAVVIVERE                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come Sopravvivere</h2>
+<span class="section-number">Sezione 05. Le difese reali</span>
+
+<p>
+  Ok, il compilatore fa il suo lavoro. Non e' cattivo, e' che ragiona secondo lo standard e lo standard se ne frega della tua sicurezza. Il vero problema e' che scrivi C pensando che le istruzioni vengano eseguite come le hai scritte. Non funziona cosi'. Ma le difese ci sono.
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr><th>Problema</th><th>Soluzione</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>memset</code> eliminato</td>
+      <td><code>memset_s</code> (C11), <code>explicit_bzero</code> (BSD/Linux), <code>SecureZeroMemory</code> (Windows), barrier con <code>volatile</code></td>
+    </tr>
+    <tr>
+      <td>Null check eliminato</td>
+      <td>Controllare prima di dereferenziare. Mai <code>*ptr</code> prima di <code>if (ptr == NULL)</code></td>
+    </tr>
+    <tr>
+      <td>Overflow check eliminato</td>
+      <td><code>__builtin_add_overflow</code> (GCC/Clang), aritmetica <code>unsigned</code>, safe integer libraries</td>
+    </tr>
+    <tr>
+      <td>Riordino istruzioni</td>
+      <td><code>volatile</code>, memory barriers, <code>__asm__ __volatile__("" ::: "memory")</code></td>
+    </tr>
+    <tr>
+      <td>Timing attacks</td>
+      <td><code>CRYPTO_memcmp</code> (OpenSSL), <code>timingsafe_bcmp</code> (BSD), funzioni di libreria crittografica</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  E poi le difese generali. <code>-fno-strict-overflow</code> dice al compilatore di non sfruttare l'UB di signed overflow. <code>-fsanitize=undefined</code> aggiunge check runtime che trappolano l'UB quando accade. Ma la vera difesa e' una sola: <strong>leggere il disassembly</strong>. <code>objdump -d</code> e' il test finale. Se la tua protezione non c'e' nel binario, non esiste. Punto.
+</p>
+
+<div class="code-block" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># Compila con protezioni anti-UB</span></td></tr>
+<tr><td class="ln">2</td><td class="code">clang -O2 -fno-strict-overflow -fsanitize=undefined -o safe auth.c</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm"># Verifica che le protezioni siano nel binario</span></td></tr>
+<tr><td class="ln">5</td><td class="code">objdump -d safe | grep memset</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cm"># Con explicit_bzero, la pulizia non viene eliminata</span></td></tr>
+<tr><td class="ln">8</td><td class="code">objdump -d safe | grep explicit_bzero</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Regola d'oro: non fidarti del sorgente. Fidati del binario. Il sorgente e' quello che volevi fare. Il binario e' quello che succede davvero.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - I DANNI VERI                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Danni Veri</h2>
+<span class="section-number">Sezione 06. CVE reali, non esercizi accademici</span>
+
+<p>
+  "Si' ok, bel disassembly, ma nella pratica succede davvero?" Eccome. Memoria non azzerata che contiene segreti e' la causa di CVE con exploit pubblici e danni reali in produzione. Non nel 2011. Adesso.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">MongoBleed — <a href="https://nvd.nist.gov/vuln/detail/CVE-2025-14847" target="_blank" rel="noopener" style="color: var(--accent-attention);">CVE-2025-14847</a></h3>
+
+<p>
+  Dicembre 2025. Mandi un messaggio zlib malformato a MongoDB e il server ti restituisce pezzi di heap non inizializzata. Dentro: credenziali, token di sessione, PII dai documenti BSON. Il bug e' nella decompressione: riporta una dimensione sbagliata, il server copia piu' byte di quanti ne abbia scritti, e quei byte extra sono heap riciclata dalle operazioni precedenti.
+</p>
+
+<p>
+  PoC pubblico dal 26 dicembre. Exploitation in-the-wild dal 29. Censys conta 87.000 istanze MongoDB esposte su Internet. Heartbleed versione 2025: stessa meccanica, stesso impatto, dieci anni dopo. Non abbiamo imparato niente.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">rsync — <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-12085" target="_blank" rel="noopener" style="color: var(--accent-attention);">CVE-2024-12085</a> + <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-12084" target="_blank" rel="noopener" style="color: var(--accent-attention);">CVE-2024-12084</a></h3>
+
+<p>
+  Gennaio 2025. I ricercatori di Google scoprono che rsync leaka un byte alla volta di stack non inizializzato durante il confronto dei checksum. Il parametro <code>s2length</code> non viene validato: lo manipoli e forzi un confronto tra un checksum e memoria non inizializzata. Un byte per richiesta. Lento, ma deterministico.
+</p>
+
+<p>
+  Il leak da solo (CVE-2024-12085) sarebbe roba minore. Ma quelli di Google lo concatenano con un buffer overflow separato (CVE-2024-12084): usano i byte leakati per calcolare gli offset e triggerare l'overflow in modo affidabile. Risultato: <strong>RCE come guest anonimo su qualsiasi server rsync</strong>. E la cosa bella? L'intera catena si spezza compilando con un singolo flag: <code>-ftrivial-auto-var-init=zero</code>. Inizializza a zero tutte le variabili locali. Senza il flag, lo stack e' pieno di residui. Con il flag, il leak non produce niente di utile e la catena si rompe.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il parallelo con memset.</strong> <code>-ftrivial-auto-var-init=zero</code> risolve il problema al contrario: invece di cancellare la memoria dopo l'uso (memset, che il compilatore puo' eliminare), la inizializza prima dell'uso (che il compilatore non puo' eliminare perche' il valore zero potrebbe essere letto). Stessa difesa, approccio opposto, a prova di ottimizzazione.</p>
+</div>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">KeePass — <a href="https://nvd.nist.gov/vuln/detail/CVE-2023-32784" target="_blank" rel="noopener" style="color: var(--accent-attention);">CVE-2023-32784</a></h3>
+
+<p>
+  Maggio 2023. La master password di KeePass 2.x resta in chiaro nella memoria del processo. Il campo di input usa un text box custom (<code>SecureTextBoxEx</code>) che per ogni carattere digitato crea una stringa residua. Digiti "Password" e in RAM restano: <code>*a</code>, <code>**s</code>, <code>***s</code>, <code>****w</code>, <code>*****o</code>, <code>******r</code>, <code>*******d</code>. Ricostruire la password e' un esercizio per principianti.
+</p>
+
+<p>
+  Il motivo: .NET gestisce le stringhe come oggetti immutabili. Create, non puoi sovrascriverle. <code>memset</code> su una stringa .NET non ha senso: il garbage collector puo' spostarla e lasciare copie al vecchio indirizzo. La password e' recuperabile da un dump del processo, dal pagefile, dall'<code>hiberfil.sys</code>, o da un dump della RAM. Non servono nemmeno privilegi elevati: basta un malware che chiama <code>MiniDumpWriteDump</code> e hai la master password del password manager. Ironia livello Dio.
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr><th>CVE</th><th>Dove</th><th>Cosa leaka</th><th>Come</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><a href="https://www.varonis.com/blog/mongobleed-cve-2025-14847-memory-leak-vulnerability" target="_blank" rel="noopener" style="color: var(--accent-attention);">CVE-2025-14847</a></td><td>MongoDB</td><td>Credenziali, token, PII</td><td>Heap non inizializzata via zlib</td></tr>
+    <tr><td><a href="https://www.chainguard.dev/unchained/mitigating-a-rsync-vulnerability-a-lesson-in-compiler-hardening" target="_blank" rel="noopener" style="color: var(--accent-attention);">CVE-2024-12085</a></td><td>rsync</td><td>Stack residuo (1 byte/req)</td><td>Checksum length non validato</td></tr>
+    <tr><td><a href="https://www.bleepingcomputer.com/news/security/keepass-exploit-helps-retrieve-cleartext-master-password-fix-coming-soon/" target="_blank" rel="noopener" style="color: var(--accent-attention);">CVE-2023-32784</a></td><td>KeePass 2.x</td><td>Master password</td><td>Stringhe .NET immutabili in RAM</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Lo schema e' sempre quello. Un buffer contiene un segreto. Il codice prova a cancellarlo. Qualcosa impedisce la cancellazione: il compilatore che elimina memset, il runtime che non permette di sovrascrivere le stringhe, una variabile locale mai inizializzata. Poi arriva un altro bug (over-read, dump, leak) e quel buffer viene esposto. Il segreto esce. Ogni. Singola. Volta.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - LO SCANNER                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Lo Scanner</h2>
+<span class="section-number">Sezione 07. Rilevare le protezioni eliminate</span>
+
+<p>
+  Leggere il disassembly a mano va bene per un file. Ma su un progetto con centinaia di sorgenti non ti metti li' con <code>objdump</code> e una birra. Serve automazione. Questo script Python compila un sorgente con <code>-O0</code> e <code>-O2</code>, estrae le call da ogni funzione, e confronta. Se una call di sicurezza sparisce con <code>-O2</code>, te lo dice.
+</p>
+
+<div class="code-block" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="nb">SECURITY_CALLS</span> = {<span class="st">'memset'</span>, <span class="st">'explicit_bzero'</span>, <span class="st">'memset_s'</span>,</td></tr>
+<tr><td class="ln">2</td><td class="code">                   <span class="st">'abort'</span>, <span class="st">'exit'</span>, <span class="st">'__stack_chk_fail'</span>}</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="kw">def</span> <span class="fn">compile_and_disasm</span>(source, opt_level):</td></tr>
+<tr><td class="ln">5</td><td class="code">    obj = tempfile.mktemp(suffix=<span class="st">'.o'</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code">    subprocess.run([<span class="st">'clang'</span>, opt_level, <span class="st">'-c'</span>, <span class="st">'-o'</span>, obj, source])</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="kw">return</span> subprocess.check_output([<span class="st">'objdump'</span>, <span class="st">'-d'</span>, <span class="st">'-r'</span>, obj])</td></tr>
+<tr><td class="ln">8</td><td class="code"></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="kw">def</span> <span class="fn">extract_functions</span>(disasm):</td></tr>
+<tr><td class="ln">10</td><td class="code">    functions, current_fn, calls, saw_call = {}, <span class="nb">None</span>, [], <span class="nb">False</span></td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="kw">for</span> line <span class="kw">in</span> disasm.splitlines():</td></tr>
+<tr><td class="ln">12</td><td class="code">        fn = re.match(<span class="st">r'^[0-9a-f]+ &lt;_?(\w+)&gt;:'</span>, line)</td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="kw">if</span> fn:</td></tr>
+<tr><td class="ln">14</td><td class="code">            <span class="kw">if</span> current_fn: functions[current_fn] = calls</td></tr>
+<tr><td class="ln">15</td><td class="code">            current_fn, calls, saw_call = fn.group(<span class="nb">1</span>), [], <span class="nb">False</span></td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="kw">elif</span> saw_call:</td></tr>
+<tr><td class="ln">17</td><td class="code">            reloc = re.search(<span class="st">r'RELOC_BRANCH\s+_*(\w+)'</span>, line)</td></tr>
+<tr><td class="ln">18</td><td class="code">            <span class="kw">if</span> reloc:</td></tr>
+<tr><td class="ln">19</td><td class="code">                callee = re.sub(<span class="st">r'_chk$'</span>, <span class="st">''</span>, reloc.group(<span class="nb">1</span>))</td></tr>
+<tr><td class="ln">20</td><td class="code">                <span class="kw">if</span> callee <span class="kw">not in</span> calls: calls.append(callee)</td></tr>
+<tr><td class="ln">21</td><td class="code">            saw_call = <span class="nb">False</span></td></tr>
+<tr><td class="ln">22</td><td class="code">        <span class="kw">elif</span> re.search(<span class="st">r'\bcallq?\s+'</span>, line):</td></tr>
+<tr><td class="ln">23</td><td class="code">            saw_call = <span class="nb">True</span></td></tr>
+<tr><td class="ln">24</td><td class="code">    <span class="kw">return</span> functions</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Compila con entrambi i flag, fa <code>objdump -d -r</code> sui due object file (il <code>-r</code> serve per le relocation entries, cioe' i nomi veri delle funzioni chiamate), e per ogni funzione confronta le call. Se qualcosa del set <code>SECURITY_CALLS</code> c'e' con <code>-O0</code> ma non con <code>-O2</code>, lo segnala. Semplice e brutale.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/compilatore/scanner.png" alt="Output dello scanner: rileva memset eliminato dalla funzione process_password con -O2" style="max-width: 800px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">
+    Lo scanner rileva che memset e' stato eliminato da process_password con -O2.
+  </figcaption>
+</figure>
+
+<p>
+  L'output e' diretto: per ogni funzione, le call con <code>-O0</code>, le call con <code>-O2</code>, e cosa e' sparito. Zero disassembly da leggere a mano. Lo scanner fa il lavoro sporco al posto tuo.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Estendibile.</strong> <code>SECURITY_CALLS</code> e' un set. Ci butti dentro quello che vuoi: <code>OPENSSL_cleanse</code>, <code>sodium_memzero</code>, i tuoi wrapper custom. Lo scanner le traccia tutte. Mettilo nella CI e dormi piu' tranquillo.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- CONCLUSIONE                                             -->
+<!-- ======================================================= -->
+<div class="conclusion-box fade-in">
+  <div class="quote">"Il codice che scrivi non e' il codice che gira."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Il compilatore non e' cattivo. Fa il suo lavoro: produrre il binario piu' veloce possibile secondo lo standard. Il problema sei tu che pensi in operazioni sequenziali mentre lui pensa in regole formali. E le regole dicono che il tuo memset e' un dead store, il tuo null check e' ridondante, e il tuo overflow check e' impossibile. Tutto legale. Tutto silenzioso. Tutto nel tuo binario di produzione adesso.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="../js/main.js"></script>
+
+</body>
+</html>
