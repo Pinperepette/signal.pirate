@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I Server Parlano | Signal Pirate</title>
+  <meta name="description" content="22.313 domini della PA italiana analizzati con 6 script Python. Nessuna intrusione, solo dati pubblici. Cosa succede quando ascolti l'infrastruttura dello Stato.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9/dist/leaflet.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; text-align: left; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    .dns-record {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #c8c8d8;
+      overflow-x: auto;
+    }
+    .dns-record .label { color: #7c4dff; }
+    .dns-record .value { color: #00ff88; }
+    .dns-record .comment { color: #6a6a8a; }
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-container canvas { max-height: 350px; }
+    .chart-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .disclaimer-box {
+      background: rgba(124,77,255,0.06);
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .disclaimer-box p { margin: 0; line-height: 1.6; color: var(--text-secondary); }
+
+    /* Formula Box (KaTeX) */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Tabelle articolo */
+    article table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+    article table thead th {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      color: #00ff88;
+      font-weight: 600;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+      white-space: nowrap;
+    }
+    article table tbody td {
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.8);
+    }
+    article table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    article table tbody td:nth-child(2),
+    article table tbody td:nth-child(3),
+    article table thead th:nth-child(2),
+    article table thead th:nth-child(3) {
+      text-align: right;
+    }
+    article table tbody td em {
+      color: rgba(255, 255, 255, 0.4);
+    }
+    article table tbody td strong {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-03-05 | Pinperepette</p>
+  <h1 class="article-page-title">I Server <span class="accent">Parlano</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    22.313 domini della PA italiana. 6 script Python. Zero intrusioni. Cosa succede quando ascolti l'infrastruttura dello Stato.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">OSINT</span>
+    <span class="tag tag-highlight">PA Italiana</span>
+    <span class="tag tag-reaction">DNS</span>
+    <span class="tag tag-amplification">Security Headers</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - QUESTA NON E' UNA SCANSIONE                  -->
+<!-- ======================================================= -->
+<div class="stat-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:2rem 0;">
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#00ff88;">22.313</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">domini analizzati</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#ff6b6b;">18%</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">senza HTTPS</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#ff8800;">34%</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">zero security headers</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#f5c518;">90%</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">rivela il server</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#7c4dff;">90%</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">email spoofabili</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#4ecdc4;">1.3%</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">con DNSSEC</div>
+  </div>
+</div>
+
+<h2><span class="accent">//</span> Questa Non e' una Scansione</h2>
+<span class="section-number">Sezione 00. Premessa</span>
+
+<p>
+  Non ho inviato pacchetti malevoli. Non ho cercato vulnerabilita'. Non ho tentato accessi. Non ho usato exploit.
+</p>
+
+<p>
+  Ho fatto domande.
+</p>
+
+<p>
+  Le stesse domande che fa il tuo browser ogni volta che apri un sito. Le stesse che fa il tuo client email ogni volta che invia un messaggio. Le stesse che ogni server su Internet risponde migliaia di volte al giorno, a chiunque le faccia.
+</p>
+
+<p>
+  <strong>Query DNS.</strong> Ogni dominio ha record pubblici: chi gestisce la posta, chi firma i messaggi, che policy applica. Sono progettati per essere letti da chiunque. E' il modo in cui funziona Internet.
+</p>
+
+<p>
+  <strong>Richieste HTTP.</strong> Una HEAD request a un server web. La stessa cosa che fa Google quando indicizza una pagina. Il server risponde con i suoi header: che software usa, che protezioni ha, come gestisce la sicurezza.
+</p>
+
+<p>
+  <strong>Connessione TLS.</strong> Una connessione sulla porta 443 rivela la versione del protocollo, l'autorita' di certificazione, la scadenza e i nomi alternativi (SAN) registrati nel certificato.
+</p>
+
+<div class="disclaimer-box">
+  <p>
+    Ogni dato in questo articolo proviene da protocolli pubblici. Nessun sistema e' stato autenticato, stressato o interrogato oltre una normale richiesta HTTP o una query DNS pubblica. L'obiettivo non e' esporre vulnerabilita', ma mostrare quanta informazione l'infrastruttura pubblica rivela da sola.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- METODO                                                   -->
+<!-- ======================================================= -->
+<h3><span class="accent">//</span> Metodo</h3>
+
+<table>
+  <tbody>
+    <tr><td><strong>Dataset</strong></td><td><a href="https://indicepa.gov.it/ipa-dati/dataset/enti" target="_blank" rel="noopener">IndicePA</a> — open data AgID (22.313 domini unici)</td></tr>
+    <tr><td><strong>Periodo</strong></td><td>Febbraio 2026</td></tr>
+    <tr><td><strong>Metodologia</strong></td><td>
+      Query DNS pubbliche (SPF, DMARC, DKIM, DNSKEY, DS, NS)<br>
+      HTTP HEAD request (header, redirect, server fingerprint)<br>
+      Connessione TLS (versione, certificato, issuer, scadenza)<br>
+      Analisi SAN dai certificati TLS live<br>
+      Nessuna scansione attiva, nessun exploit, nessuna autenticazione
+    </td></tr>
+    <tr><td><strong>Strumenti</strong></td><td>Python 3.13, dnspython, ssl stdlib, urllib</td></tr>
+    <tr><td><strong>Script</strong></td><td>
+      <a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/stato-nudo/scan_headers.py" target="_blank" rel="noopener">scan_headers.py</a> &mdash; header HTTP e HTTPS<br>
+      <a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/stato-nudo/scan_email_auth.py" target="_blank" rel="noopener">scan_email_auth.py</a> &mdash; SPF, DMARC, DKIM<br>
+      <a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/stato-nudo/scan_tls.py" target="_blank" rel="noopener">scan_tls.py</a> &mdash; versione TLS e certificati<br>
+      <a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/stato-nudo/scan_dnssec.py" target="_blank" rel="noopener">scan_dnssec.py</a> &mdash; DNSSEC (DNSKEY, DS)<br>
+      <a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/stato-nudo/scan_dns_extra.py" target="_blank" rel="noopener">scan_dns_extra.py</a> &mdash; MX, CAA, wildcard DNS, SPF deep<br>
+      <a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/stato-nudo/scan_cert_san.py" target="_blank" rel="noopener">scan_cert_san.py</a> &mdash; SAN dai certificati TLS
+    </td></tr>
+    <tr><td><strong>Codice</strong></td><td><a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/stato-nudo" target="_blank" rel="noopener">github.com/Pinperepette/signal.pirate</a></td></tr>
+  </tbody>
+</table>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - LA LISTA                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Lista</h2>
+<span class="section-number">Sezione 01. 22.313 domini</span>
+
+<p>
+  Il punto di partenza e' <strong>IndicePA</strong>: il registro ufficiale degli enti pubblici italiani. Lo pubblica AgID, l'Agenzia per l'Italia Digitale. E' un dataset aperto, scaricabile, che contiene nome, indirizzo, contatti e dominio web di ogni ente della pubblica amministrazione.
+</p>
+
+<p>
+  Comuni. ASL. Regioni. Province. Universita'. Ministeri. Scuole. Agenzie. Ordini professionali. Consorzi. Aziende municipalizzate. Tutto.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="22313" data-suffix="">0</div>
+    <div class="stat-label">Domini unici</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="20" data-suffix=" regioni">0</div>
+    <div class="stat-label">Copertura geografica</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="1200" data-suffix=" righe">0</div>
+    <div class="stat-label">Codice Python</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="0" data-suffix=" exploit">0</div>
+    <div class="stat-label">Usati</div>
+  </div>
+</div>
+
+<p>
+  Da quel dataset ho estratto i domini. Li ho puliti: rimossi i duplicati, gli invalidi, quelli che iniziano con un punto. Restano 22.313 domini unici. E' la mappa dell'infrastruttura digitale della PA italiana.
+</p>
+
+<p>
+  Poi ho scritto sei script. Richieste HTTP, query DNS, connessioni TLS, record email. Nient'altro. 1.200 righe di Python in tutto, qualche ora di runtime.
+</p>
+
+<p>
+  E i server hanno iniziato a parlare.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - TRASPORTO                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Trasporto</h2>
+<span class="section-number">Sezione 02. HTTPS, redirect e chi non cifra</span>
+
+<p>
+  La prima domanda e' la piu' semplice: il sito usa HTTPS?
+</p>
+
+<p>
+  HTTPS non e' un optional. E' il minimo. Significa che la comunicazione tra il browser del cittadino e il server dell'ente e' cifrata. Senza HTTPS, chiunque sulla stessa rete puo' leggere tutto: dati inseriti nei form, pagine visitate, documenti scaricati.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="81" data-suffix="%">0</div>
+    <div class="stat-label">HTTPS funzionante</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="4109" data-suffix="">0</div>
+    <div class="stat-label">Senza HTTPS</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="5315" data-suffix="">0</div>
+    <div class="stat-label">Non redirigono HTTP</div>
+  </div>
+</div>
+
+<p>
+  <strong>Il 18,4% dei domini PA non ha HTTPS funzionante.</strong> Sono 4.109 siti. Nel 2026.
+</p>
+
+<p>
+  Ma il numero piu' insidioso e' un altro: <strong>5.315 domini non redirigono HTTP verso HTTPS.</strong> Significa che anche se il sito ha HTTPS, se un cittadino digita l'indirizzo senza "https://", la connessione resta in chiaro. Alcuni browser tentano l'upgrade automatico, ma il comportamento non e' garantito e dipende dal client. In molti casi il server non lo forza. Il traffico puo' viaggiare leggibile.
+</p>
+
+<div class="insight-box fade-in">
+  <p>
+    Un redirect HTTP verso HTTPS e' una riga di configurazione. Una. Non e' una scelta architetturale. Non richiede budget. E' un'istruzione che dice al server: "se qualcuno arriva in chiaro, mandalo sulla versione cifrata." Il 23,8% dei domini PA non la ha.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - TLS                                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> TLS: cosa succede dopo l'HTTPS</h2>
+<span class="section-number">Sezione 03. Chi cifra e come</span>
+
+<p>
+  HTTPS indica che una connessione e' cifrata. Ma non tutte le connessioni HTTPS sono uguali: la sicurezza reale dipende dalla versione del protocollo TLS e dal certificato utilizzato.
+</p>
+
+<p>
+  Ho negoziato una connessione TLS con ciascuno dei 22.313 domini.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Versione TLS</th><th>Domini</th><th>%</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>TLS 1.3</strong></td><td>16.929</td><td>75.9%</td></tr>
+    <tr><td>TLS 1.2</td><td>3.017</td><td>13.5%</td></tr>
+    <tr><td><em>Nessuna risposta TLS</em></td><td>2.367</td><td>10.6%</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Tre quarti dei domini che supportano HTTPS utilizzano <strong>TLS 1.3</strong>, la versione piu' recente del protocollo. Una quota piu' piccola utilizza ancora TLS 1.2 — che rimane comunque una versione sicura se configurata correttamente. Oltre il 10% dei domini non risponde affatto sulla porta 443.
+</p>
+
+<p>
+  Una nota: i 19.946 domini che negoziano TLS non coincidono con i 18.204 che nella sezione precedente risultano con "HTTPS funzionante". La differenza sono circa 1.700 domini che completano l'handshake TLS ma non restituiscono una risposta HTTP valida — certificati invalidi, configurazioni incomplete, server che accettano la connessione ma non servono contenuti. Il dato HTTPS misura l'esperienza utente; il dato TLS misura il protocollo.
+</p>
+
+<h3><span class="accent">//</span> Chi firma i certificati</h3>
+
+<p>
+  Piu' della meta' dei certificati utilizzati dalla PA italiana proviene da <strong>Let's Encrypt</strong>, la CA gratuita che ha reso l'HTTPS accessibile a chiunque.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Certificate Authority</th><th>Domini</th><th>%</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Let's Encrypt</strong></td><td>12.371</td><td>55.4%</td></tr>
+    <tr><td>Actalis S.p.A.</td><td>2.804</td><td>12.6%</td></tr>
+    <tr><td>Sectigo Limited</td><td>1.840</td><td>8.2%</td></tr>
+    <tr><td>Google Trust Services</td><td>979</td><td>4.4%</td></tr>
+    <tr><td>DigiCert Inc</td><td>453</td><td>2.0%</td></tr>
+    <tr><td>Amazon</td><td>148</td><td>0.7%</td></tr>
+    <tr><td>GoDaddy</td><td>141</td><td>0.6%</td></tr>
+    <tr><td>Altro</td><td>199</td><td>0.9%</td></tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>Actalis</strong>, l'autorita' di certificazione italiana, mantiene una presenza significativa nei domini pubblici. Sectigo arriva quasi sempre dall'hosting provider. Google Trust Services e' in crescita — segno di infrastruttura che migra verso il cloud.
+</p>
+
+<h3><span class="accent">//</span> Certificati problematici</h3>
+
+<p>
+  <strong>1.011 domini presentano certificati TLS non validi</strong>: certificati scaduti, auto-firmati o configurati per un hostname diverso. Il browser mostra un avviso di sicurezza. L'utente deve cliccare "Procedi comunque" per accedere al sito di un ente pubblico.
+</p>
+
+<p>
+  Alcuni certificati risultano prossimi alla scadenza: <strong>904 entro 30 giorni</strong> e <strong>38 entro una settimana</strong>. Con Let's Encrypt — che emette certificati validi 90 giorni — il rinnovo automatico e' essenziale. Quando si rompe, il sito sparisce.
+</p>
+
+<p>
+  17 domini supportano ancora configurazioni Diffie-Hellman con chiavi deboli, associate alla vulnerabilita' <strong>Logjam</strong> (CVE-2015-4000). 76 domini hanno l'SNI mal configurato: il server non riconosce il proprio hostname durante l'handshake TLS.
+</p>
+
+<div class="insight-box fade-in">
+  <p>
+    Nel complesso, l'adozione di TLS 1.3 e' ormai diffusa nella maggior parte dei domini della PA italiana. Tuttavia rimangono configurazioni incomplete o obsolete che indicano una gestione eterogenea dell'infrastruttura crittografica.
+  </p>
+</div>
+
+
+<h3><span class="accent">//</span> I certificati parlano</h3>
+
+<p>
+  Ogni certificato TLS contiene un campo chiamato <strong>Subject Alternative Name</strong> (SAN). E' la lista di tutti i domini per cui quel certificato e' valido.
+</p>
+
+<p>
+  Quando un browser apre una connessione HTTPS, il server invia il certificato durante l'handshake TLS. Quella lista diventa pubblica. Basta leggerla.
+</p>
+
+<p>
+  Ho estratto i SAN da tutti i certificati TLS raggiungibili nei 22.313 domini della PA.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="18938" data-suffix="">0</div>
+    <div class="stat-label">Certificati leggibili</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="45932" data-suffix="">0</div>
+    <div class="stat-label">Hostname unici dai SAN</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="341" data-suffix="">0</div>
+    <div class="stat-label">SAN massimo in un cert</div>
+  </div>
+</div>
+
+<p>
+  Da 22 mila domini emergono quasi 46 mila hostname. Un certificato TLS non rivela solo l'identita' di un dominio. Rivela l'ecosistema in cui vive.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Dato</th><th>Valore</th><th style="text-align:left;">Perche' conta</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Cert condivisi</strong></td><td>66,5%</td><td style="text-align:left;">un certificato rivela altri domini sulla stessa infrastruttura</td></tr>
+    <tr><td>Wildcard</td><td>19,1%</td><td style="text-align:left;"><code>*.dominio.it</code> copre qualsiasi sottodominio</td></tr>
+    <tr><td>Server mail nei SAN</td><td>2,6%</td><td style="text-align:left;">webmail, smtp, imap visibili</td></tr>
+    <tr><td>Pannelli admin</td><td>2,0%</td><td style="text-align:left;">cpanel, backoffice, cms</td></tr>
+    <tr><td>Nomi interni</td><td>1,1%</td><td style="text-align:left;">intranet, private, local</td></tr>
+    <tr><td>Test / staging</td><td>1,0%</td><td style="text-align:left;">ambienti non produzione</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Il dato piu' forte e' il primo: <strong>il 66,5% dei domini della PA condivide il certificato TLS con altri domini.</strong> Osservando il certificato di un singolo sito e' possibile scoprire decine di altri domini ospitati sulla stessa piattaforma.
+</p>
+
+<p>
+  Alcuni esempi: <strong>55 comuni</strong> condividono lo stesso certificato TLS. <strong>ACI</strong> compare in 97 certificati di altri domini. <code>intranet.regione.lombardia.it</code> appare nel SAN di un certificato pubblico. <code>comunestg.it</code> (staging) compare in 31 certificati. <code>demo.sviluppocalabria.info</code> in 29.
+</p>
+
+<p>
+  Non sono vulnerabilita'. Sono informazioni che i server pubblicano automaticamente quando stabiliscono una connessione HTTPS.
+</p>
+
+<div class="insight-box fade-in">
+  <p>
+    Un certificato TLS dovrebbe dire chi e' il server. Quando contiene decine o centinaia di SAN, finisce per dire anche chi vive sulla stessa infrastruttura. Una connessione rivela la piattaforma.
+  </p>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">SAN: cosa rivelano i certificati TLS</div>
+  <canvas id="chart-san"></canvas>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - GLI HEADER                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Configurazione</h2>
+<span class="section-number">Sezione 04. Security headers, o la loro assenza</span>
+
+<p>
+  Quando un browser chiede una pagina, il server risponde con degli <strong>header HTTP</strong>. Sono metadati invisibili all'utente ma fondamentali per la sicurezza. Dicono al browser come comportarsi: cosa puo' caricare, da dove, come gestire i frame, se forzare HTTPS.
+</p>
+
+<p>
+  Sono sei gli header di sicurezza standard:
+</p>
+
+<table class="strategy-table">
+  <tr>
+    <th>Header</th>
+    <th>Cosa fa</th>
+    <th>Presenti</th>
+  </tr>
+  <tr>
+    <td><code>HSTS</code></td>
+    <td>Forza HTTPS per tutte le visite future</td>
+    <td>46,7%</td>
+  </tr>
+  <tr>
+    <td><code>Content-Security-Policy</code></td>
+    <td>Blocca script e risorse non autorizzate (anti-XSS)</td>
+    <td>32,3%</td>
+  </tr>
+  <tr>
+    <td><code>X-Frame-Options</code></td>
+    <td>Impedisce che il sito venga incluso in un iframe (anti-clickjacking)</td>
+    <td>48,7%</td>
+  </tr>
+  <tr>
+    <td><code>X-Content-Type-Options</code></td>
+    <td>Impedisce al browser di indovinare il tipo di file</td>
+    <td>46,2%</td>
+  </tr>
+  <tr>
+    <td><code>Referrer-Policy</code></td>
+    <td>Controlla quali informazioni vengono inviate ai siti esterni</td>
+    <td>30,3%</td>
+  </tr>
+  <tr>
+    <td><code>Permissions-Policy</code></td>
+    <td>Limita l'accesso a webcam, microfono, geolocalizzazione</td>
+    <td>19,6%</td>
+  </tr>
+</table>
+
+<p>
+  <strong>6.273 siti PA non espongono nessuno dei sei header analizzati.</strong> Zero su sei. Il 34,5%. Piu' di un terzo dell'infrastruttura web della pubblica amministrazione italiana non dichiara alcun header di sicurezza standard.
+</p>
+
+<p>
+  Dall'altra parte, solo <strong>1.657 domini li hanno tutti e sei.</strong> Il 9,1%.
+</p>
+
+<div class="insight-box fade-in">
+  <p>
+    Per capire la scala: il 19,6% di Permissions-Policy significa che l'80,4% dei siti PA non dice al browser di bloccare l'accesso a webcam e microfono. Non significa che qualcuno possa attivarli. Significa che non c'e' un'istruzione esplicita che lo impedisca. In sicurezza, l'assenza di una regola e' una regola: in assenza di una policy esplicita, il browser applica i comportamenti di default.
+  </p>
+</div>
+
+<!-- Grafico HTTPS -->
+<div class="chart-container">
+  <div class="chart-title">HTTPS: stato dei 22.313 domini</div>
+  <canvas id="chart-https"></canvas>
+</div>
+
+
+<!-- Grafico headers -->
+<div class="chart-container">
+  <div class="chart-title">Security headers: presenza sui 18.204 domini con HTTPS</div>
+  <canvas id="chart-headers"></canvas>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - FINGERPRINTING                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Fingerprint</h2>
+<span class="section-number">Sezione 05. Quando il server si presenta</span>
+
+<p>
+  Oltre ai security header, i server HTTP rispondono con altri campi. Due sono particolarmente interessanti per chi osserva: <code>Server</code> e <code>X-Powered-By</code>.
+</p>
+
+<p>
+  Il primo dice che software web gira sulla macchina. Il secondo dice che linguaggio o framework c'e' dietro. Nessuno dei due e' necessario. Sono informazioni che il server regala, gratuitamente, a chiunque faccia una richiesta.
+</p>
+
+<table class="strategy-table">
+  <tr>
+    <th>Server</th>
+    <th>Domini</th>
+    <th>Quota</th>
+  </tr>
+  <tr><td>nginx</td><td>8.101</td><td>44,5%</td></tr>
+  <tr><td>Apache</td><td>4.073</td><td>22,4%</td></tr>
+  <tr><td>Aruba</td><td>1.949</td><td>10,7%</td></tr>
+  <tr><td>(non dichiarato)</td><td>1.822</td><td>10,0%</td></tr>
+  <tr><td>Microsoft IIS</td><td>1.090</td><td>6,0%</td></tr>
+  <tr><td>LiteSpeed</td><td>526</td><td>2,9%</td></tr>
+  <tr><td>Cloudflare</td><td>280</td><td>1,5%</td></tr>
+</table>
+
+<p>
+  Solo il 10% non dichiara nulla. Il restante 90% rivela il software web in uso — non sempre la versione, ma abbastanza per restringere il campo. Chi osserva il server non deve indovinare: basta leggere la risposta.
+</p>
+
+<p>
+  Ma il dato piu' preoccupante e' <code>X-Powered-By</code>. Il <strong>40,5% dei domini dichiara la tecnologia e spesso la versione esatta</strong>:
+</p>
+
+<div class="code-block" data-lang="HTTP Response">
+  <div class="code-wrap"><table>
+    <tr><td class="ln">1</td><td class="code"><span class="key">X-Powered-By:</span> <span class="st">PHP/7.4.33</span>    <span class="cm">// end of life dal 28 novembre 2022</span></td></tr>
+    <tr><td class="ln">2</td><td class="code"><span class="key">X-Powered-By:</span> <span class="st">PHP/5.6.40</span>    <span class="cm">// end of life dal 31 dicembre 2018</span></td></tr>
+    <tr><td class="ln">3</td><td class="code"><span class="key">X-Powered-By:</span> <span class="st">ASP.NET</span>         <span class="cm">// framework identificato</span></td></tr>
+    <tr><td class="ln">4</td><td class="code"><span class="key">X-Powered-By:</span> <span class="st">PleskLin</span>        <span class="cm">// pannello di controllo identificato</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  <strong>906 domini PA usano versioni di PHP fuori supporto.</strong> Niente patch di sicurezza, niente aggiornamenti. 255 sono ancora su PHP 5, una versione il cui supporto e' terminato nel 2018. Alcuni sono su PHP 5.2, rilasciato nel 2006.
+</p>
+
+<div class="insight-box fade-in">
+  <p>
+    Il punto non e' che queste informazioni siano segrete. Non lo sono. Il punto e' che sono gratuite. Rimuovere l'header <code>X-Powered-By</code> e' una riga di configurazione. Non farlo significa regalare a un potenziale attaccante la versione esatta del software, che puo' incrociare con i database di vulnerabilita' note (CVE) e sapere esattamente cosa cercare.
+  </p>
+</div>
+
+<!-- Placeholder per grafico -->
+<div class="chart-container">
+  <div class="chart-title">Distribuzione server e versioni PHP</div>
+  <canvas id="chart-servers"></canvas>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - L'IDENTITA' EMAIL                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Identita'</h2>
+<span class="section-number">Sezione 06. SPF, DMARC, DKIM e chi puo' mandare email a tuo nome</span>
+
+<p>
+  Questa e' la parte che fa piu' paura.
+</p>
+
+<p>
+  Funziona cosi': il protocollo email (SMTP) e' stato progettato negli anni '80. Non ha autenticazione nativa. Chiunque puo' inviare un'email con qualsiasi indirizzo mittente. Come spedire una lettera scrivendo l'indirizzo di qualcun altro sul retro della busta.
+</p>
+
+<p>
+  Per risolvere questo problema sono nati tre meccanismi, tutti basati su record DNS pubblici:
+</p>
+
+<p>
+  <strong>SPF</strong> (Sender Policy Framework) dice quali server sono autorizzati a inviare email per conto del dominio. Se ricevi un'email da @comune.esempio.it, il tuo server posta controlla il record SPF di comune.esempio.it per vedere se il server mittente e' nella lista.
+</p>
+
+<div class="code-block" data-lang="terminal">
+  <div class="code-wrap"><table>
+    <tr><td class="ln">$</td><td class="code"><span class="fn">dig</span> <span class="st">TXT</span> comune.esempio.it</td></tr>
+    <tr><td class="ln"></td><td class="code"></td></tr>
+    <tr><td class="ln"></td><td class="code"><span class="st">"v=spf1 include:spf.protection.outlook.com -all"</span></td></tr>
+    <tr><td class="ln"></td><td class="code"><span class="cm">// -all = solo i server elencati possono inviare. Tutti gli altri: rifiuta.</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  <strong>DMARC</strong> (Domain-based Message Authentication) dice cosa fare quando un'email fallisce i controlli. Tre opzioni: <code>none</code> (non fare niente, solo monitora), <code>quarantine</code> (metti in spam), <code>reject</code> (rifiuta).
+</p>
+
+<div class="code-block" data-lang="terminal">
+  <div class="code-wrap"><table>
+    <tr><td class="ln">$</td><td class="code"><span class="fn">dig</span> <span class="st">TXT</span> _dmarc.comune.esempio.it</td></tr>
+    <tr><td class="ln"></td><td class="code"></td></tr>
+    <tr><td class="ln"></td><td class="code"><span class="st">"v=DMARC1; p=reject"</span></td></tr>
+    <tr><td class="ln"></td><td class="code"><span class="cm">// p=reject = se non passa i controlli, rifiuta il messaggio.</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  <strong>DKIM</strong> (DomainKeys Identified Mail) aggiunge una firma crittografica a ogni email. La chiave pubblica sta nel DNS. Il ricevente la usa per verificare che il messaggio non sia stato alterato.
+</p>
+
+<p>
+  Ora, i numeri.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number red" data-count="89" data-suffix="%">0</div>
+    <div class="stat-label">Spoofabili (critico+alto)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="51" data-suffix="%">0</div>
+    <div class="stat-label">Senza DMARC</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="81" data-suffix="%">0</div>
+    <div class="stat-label">Senza DKIM</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number green" data-count="3" data-suffix="%">0</div>
+    <div class="stat-label">DMARC reject</div>
+  </div>
+</div>
+
+<p>
+  Leggiamoli.
+</p>
+
+<p>
+  <strong>Il 51,7% dei domini PA non ha DMARC.</strong> 11.529 domini. Nessuna istruzione su cosa fare con le email false. Il server ricevente decide da solo, e spesso decide di consegnarle.
+</p>
+
+<p>
+  Ma il dato piu' subdolo e' un altro: <strong>il 41,9% ha DMARC con policy <code>p=none</code>.</strong> 9.343 domini. DMARC viene spesso configurato inizialmente in modalita' di monitoraggio (<code>p=none</code>), per osservare il traffico prima di applicare restrizioni. Ma in molti casi questa fase non si conclude mai. E' come installare un antifurto e lasciarlo spento. Tecnicamente c'e'. Praticamente no.
+</p>
+
+<p>
+  Somma: <strong>il 93,6% dei domini PA non blocca le email falsificate.</strong> Tra chi non ha DMARC e chi ce l'ha ma non lo usa, solo il 3,1% ha <code>p=reject</code>. 683 domini su 22.313.
+</p>
+
+<p>
+  <strong>L'81% non ha DKIM.</strong> 18.067 domini senza firma crittografica sulle email. Nessun modo per il destinatario di verificare che il messaggio sia autentico e integro.
+</p>
+
+<p>
+  <strong>3.355 domini non hanno ne' SPF, ne' DMARC, ne' DKIM.</strong> Il 15% della PA italiana non ha alcun meccanismo di autenticazione email. Zero.
+</p>
+
+<div class="insight-box fade-in">
+  <p>
+    Tradotto: per il 90% degli enti pubblici italiani non esiste una policy DNS che impedisca a terzi di inviare email con il loro dominio come mittente. Non e' un bug. Non e' un exploit. E' il modo in cui funziona SMTP quando non lo configuri. I filtri antispam dei provider possono intercettare parte di questi messaggi, ma la protezione a livello DNS — l'unica sotto il controllo del dominio mittente — non c'e'.
+  </p>
+</div>
+
+<!-- Placeholder per grafico -->
+<div class="chart-container">
+  <div class="chart-title">Email authentication: SPF, DMARC, DKIM</div>
+  <canvas id="chart-email"></canvas>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - I FANTASMI                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Fantasmi</h2>
+<span class="section-number">Sezione 07. Domini che non esistono piu'</span>
+
+<p>
+  C'e' un dato che non riguarda la sicurezza ma racconta qualcosa di piu' profondo.
+</p>
+
+<p>
+  <strong>1.580 domini registrati su IndicePA non risolvono il DNS.</strong> Sono nel registro ufficiale della PA ma non esistono piu'. Il server e' spento, il dominio e' scaduto, l'ente e' stato accorpato. Ma la riga nel database c'e' ancora.
+</p>
+
+<p>
+  E poi ci sono i 813 che vanno in timeout. Il DNS risolve, punta a un indirizzo IP, ma nessuno risponde. Un server configurato, un IP assegnato, ma nessun servizio attivo.
+</p>
+
+<p>
+  Insieme fanno quasi 2.400 domini: il <strong>10,7% del registro ufficiale punta al vuoto.</strong>
+</p>
+
+<div class="insight-box fade-in">
+  <p>
+    Il registro ufficiale contiene centinaia di domini che non rispondono piu'. E' il segno di un ecosistema digitale che evolve piu' velocemente della sua catalogazione. Enti accorpati, siti migrati, domini abbandonati. Ma il registro non lo sa.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - DNSSEC                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Firma</h2>
+<span class="section-number">Sezione 08. DNSSEC e la maturita' infrastrutturale</span>
+
+<p>
+  Un ultimo dato. Semplice, elegante, devastante.
+</p>
+
+<p>
+  <strong>DNSSEC</strong> e' un'estensione del protocollo DNS che aggiunge una firma crittografica alle risposte. Serve a garantire che quando chiedi "dove si trova comune.esempio.it", la risposta che ricevi sia autentica e non sia stata manipolata. Senza DNSSEC, tecniche come il cache poisoning o il man-in-the-middle possono alterare le risposte DNS senza che il client possa verificarne l'autenticita'.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="295" data-suffix="">0</div>
+    <div class="stat-label">Domini con DNSSEC</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="98" data-suffix=",7%">0</div>
+    <div class="stat-label">Senza DNSSEC</div>
+  </div>
+</div>
+
+<p>
+  <strong>295 domini su 22.313 hanno DNSSEC.</strong> L'1,3%.
+</p>
+
+<p>
+  Non e' sorprendente. DNSSEC e' complesso da implementare e gestire. Ma e' una misura della maturita' infrastrutturale: quanti enti hanno investito nella sicurezza del livello piu' basso dello stack, quello su cui tutto il resto si appoggia.
+</p>
+
+<p>
+  La risposta e': quasi nessuno.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - LA MAPPA                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Mappa</h2>
+<span class="section-number">Sezione 09. PA Exposure Score per regione</span>
+
+<p>
+  Ho costruito un indice sintetico: il <strong>PA Exposure Score</strong>. Scala da 0 a 10, dove 10 significa massima esposizione. Pesa quattro fattori: trasporto (HTTPS), configurazione web (header), fingerprinting (server disclosure) e identita' email (SPF/DMARC).
+</p>
+
+<p>
+  La media nazionale e' <strong>5,51 su 10</strong>.
+</p>
+
+<!-- Mappa Leaflet Italia -->
+<div class="chart-container" style="position: relative;">
+  <div class="chart-title">PA Exposure Score per regione (piu' alto = piu' esposto)</div>
+  <div id="italy-map" style="height: 550px; border-radius: 8px; z-index: 1;"></div>
+  <div style="display:flex; justify-content:center; gap:1rem; margin-top:1rem; flex-wrap:wrap; font-family:var(--font-mono); font-size:0.7rem;">
+    <span><span style="display:inline-block;width:12px;height:12px;background:#00ff88;border-radius:2px;vertical-align:middle;"></span> &lt;5.0</span>
+    <span><span style="display:inline-block;width:12px;height:12px;background:#4ecdc4;border-radius:2px;vertical-align:middle;"></span> 5.0-5.3</span>
+    <span><span style="display:inline-block;width:12px;height:12px;background:#f5c518;border-radius:2px;vertical-align:middle;"></span> 5.3-5.6</span>
+    <span><span style="display:inline-block;width:12px;height:12px;background:#ff8800;border-radius:2px;vertical-align:middle;"></span> 5.6-5.8</span>
+    <span><span style="display:inline-block;width:12px;height:12px;background:#ff6b6b;border-radius:2px;vertical-align:middle;"></span> 5.8-6.0</span>
+    <span><span style="display:inline-block;width:12px;height:12px;background:#ff3333;border-radius:2px;vertical-align:middle;"></span> &gt;6.0</span>
+  </div>
+</div>
+
+<p>
+  <strong>Le piu' esposte:</strong> Molise (6,30), Campania (5,97), Calabria (5,96). <strong>Le piu' protette:</strong> Trentino-Alto Adige (4,19), Veneto (4,86), Valle d'Aosta (5,14).
+</p>
+
+<p>
+  Il divario nord-sud c'e', ma non e' l'unica storia. Il Piemonte (5,79) sta peggio della Sardegna (5,41). La Liguria (5,91) sta peggio della Sicilia (5,77). La dimensione dell'ente e la categoria contano piu' della latitudine.
+</p>
+
+<!-- Grafico regioni -->
+<div class="chart-container">
+  <div class="chart-title">PA Exposure Score per regione (ordinato dal migliore al peggiore)</div>
+  <canvas id="chart-regioni" style="max-height:500px;"></canvas>
+</div>
+
+<p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+  Ho messo anche il Molise, anche se molti di voi diranno che il Molise non esiste.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - I TIPI                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Tipi</h2>
+<span class="section-number">Sezione 10. Confronto per categoria di ente</span>
+
+<p>
+  Non tutti gli enti sono uguali. La postura di sicurezza cambia radicalmente in base alla categoria.
+</p>
+
+<table class="strategy-table">
+  <tr>
+    <th>Categoria</th>
+    <th>Enti</th>
+    <th>HTTPS</th>
+    <th>0 headers</th>
+    <th>Spoofabile</th>
+    <th>DMARC reject</th>
+  </tr>
+  <tr>
+    <td>Scuole</td>
+    <td>8.022</td>
+    <td>84,9%</td>
+    <td>28,2%</td>
+    <td style="color:var(--accent-red);">97,6%</td>
+    <td>0,6%</td>
+  </tr>
+  <tr>
+    <td>Comuni</td>
+    <td>7.944</td>
+    <td>80,4%</td>
+    <td>16,7%</td>
+    <td>86,6%</td>
+    <td>4,3%</td>
+  </tr>
+  <tr>
+    <td>Universita'</td>
+    <td>443</td>
+    <td>64,1%</td>
+    <td>28,4%</td>
+    <td>91,6%</td>
+    <td>2,7%</td>
+  </tr>
+  <tr>
+    <td>ASL</td>
+    <td>114</td>
+    <td>57,9%</td>
+    <td>21,1%</td>
+    <td>64,9%</td>
+    <td style="color:var(--accent-attention);">13,2%</td>
+  </tr>
+  <tr>
+    <td>Ordini professionali</td>
+    <td>1.719</td>
+    <td>86,4%</td>
+    <td style="color:var(--accent-red);">53,2%</td>
+    <td>90,6%</td>
+    <td>3,0%</td>
+  </tr>
+  <tr>
+    <td>Camere di commercio</td>
+    <td>152</td>
+    <td>90,1%</td>
+    <td style="color:var(--accent-red);">64,5%</td>
+    <td>88,8%</td>
+    <td>3,9%</td>
+  </tr>
+</table>
+
+<p>
+  Due numeri saltano fuori.
+</p>
+
+<p>
+  <strong>Le scuole sono spoofabili al 97,6%.</strong> 8.022 domini, quasi tutti con email falsificabile. Solo lo 0,6% ha DMARC reject. E' la categoria piu' esposta in assoluto: chiunque puo' mandare un'email che sembra provenire da una scuola pubblica italiana.
+</p>
+
+<p>
+  <strong>Le ASL hanno il peggior HTTPS (57,9%) ma il miglior DMARC reject (13,2%).</strong> Paradosso: l'ente che gestisce i dati sanitari dei cittadini e' quello che meno protegge il trasporto web, ma quello che piu' protegge l'identita' email. Probabilmente perche' la sanita' e' stata bersaglio di attacchi phishing mirati e ha reagito.
+</p>
+
+<!-- Grafico enti -->
+<div class="chart-container">
+  <div class="chart-title">Email spoofabile per tipo di ente (%)</div>
+  <canvas id="chart-enti"></canvas>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Radar: postura di sicurezza per tipo di ente</div>
+  <canvas id="chart-radar-enti"></canvas>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 - DOVE VIVONO                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Dove Vivono Questi Domini</h2>
+<span class="section-number">Sezione 11. L'infrastruttura sotto</span>
+
+<p>
+  Ogni dominio ha un nameserver. Chi risponde alle query DNS, chi traduce il nome in indirizzo IP. Una riga nel record NS che racconta dove vive un sito prima ancora di aprirlo.
+</p>
+
+<p>
+  Ho estratto i nameserver di tutti i 22.313 domini. Il risultato e' una mappa di concentrazione.
+</p>
+
+<div class="stat-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:2rem 0;">
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#ff8800;">29.5%</div>
+    <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);">su Aruba</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#ff6b6b;">54.8%</div>
+    <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);">top 5 provider</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#4ecdc4;">61.4%</div>
+    <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);">provider italiani</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#7c4dff;">846</div>
+    <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);">provider distinti</div>
+  </div>
+</div>
+
+<p>
+  Quasi un terzo della pubblica amministrazione italiana vive su <strong>Aruba</strong>. Un singolo provider. Se un provider DNS ha un problema operativo, migliaia di domini possono essere impattati contemporaneamente. Non e' un'ipotesi: <a href="https://www.tomshw.it/internet/problemi-aruba-down/" target="_blank" rel="noopener">e' gia' successo</a>.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Provider DNS</th><th>Domini</th><th>%</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Aruba</strong></td><td>6.587</td><td>29.5%</td></tr>
+    <tr><td>Argo / Nettuno (PA hosting)</td><td>1.833</td><td>8.2%</td></tr>
+    <tr><td><em>Nessun NS (domini fantasma)</em></td><td>1.344</td><td>6.0%</td></tr>
+    <tr><td>AB DNS</td><td>1.236</td><td>5.5%</td></tr>
+    <tr><td>Register.it</td><td>1.229</td><td>5.5%</td></tr>
+    <tr><td>DNS Italia</td><td>760</td><td>3.4%</td></tr>
+    <tr><td>DNS High</td><td>449</td><td>2.0%</td></tr>
+    <tr><td>Si-Tek</td><td>403</td><td>1.8%</td></tr>
+    <tr><td>Cloudflare</td><td>370</td><td>1.7%</td></tr>
+    <tr><td>Sele.it</td><td>340</td><td>1.5%</td></tr>
+    <tr><td>Microsoft Azure</td><td>190</td><td>0.9%</td></tr>
+    <tr><td>DigitalOcean</td><td>151</td><td>0.7%</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Il <strong>61.4%</strong> dei domini usa provider italiani. Solo il <strong>4.4%</strong> usa provider internazionali (Cloudflare, AWS, Azure, Google Cloud). Il resto e' un arcipelago di 846 provider diversi — piccoli hosting locali, server autogestiti, infrastruttura regionale.
+</p>
+
+<div class="chart-container">
+  <div class="chart-title">Provider DNS: distribuzione dei 22.313 domini</div>
+  <canvas id="chart-dns-providers" style="max-height:400px;"></canvas>
+</div>
+
+<h3><span class="accent">//</span> Stessi nameserver, stessa sorte</h3>
+
+<p>
+  Non e' solo lo stesso provider. Sono gli <strong>stessi identici nameserver</strong>.
+</p>
+
+<p>
+  Ho confrontato le combinazioni NS esatte di tutti i 20.969 domini che hanno un record NS. Il risultato: <strong>2.358 combinazioni uniche</strong>. Ma la distribuzione e' estrema.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Combinazione NS</th><th>Domini</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>dns.technorail.com + dns2 + dns3.arubadns.net + dns4.arubadns.cz</code></td><td><strong>6.587</strong></td></tr>
+    <tr><td><code>master.nsargo.com + slave.nsargo.com</code></td><td>1.833</td></tr>
+    <tr><td><code>ns.abdns.biz + ns.abdns.eu + ns.abdns.info</code></td><td>1.234</td></tr>
+    <tr><td><code>ns1.register.it + ns2.register.it</code></td><td>1.229</td></tr>
+    <tr><td><code>ns1-4.dnsitalia.net</code></td><td>760</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Cinque combinazioni NS coprono il 55% dei domini. Il <strong>71.6%</strong> dei domini con NS e' in cluster da 100 o piu' — stessa configurazione, stessa infrastruttura, stesso destino in caso di problemi.
+</p>
+
+<p>
+  Quei nameserver sono ridondati e distribuiti — non e' un single point of failure in senso tecnico. Ma e' una <strong>monocultura infrastrutturale</strong>. 6.587 domini condividono la stessa piattaforma, le stesse policy di routing, lo stesso software, gli stessi aggiornamenti. Un bug nella gestione DNS di Aruba, un errore di propagazione, un attacco mirato al loro AS — e migliaia di enti si muovono insieme, nella stessa direzione, nello stesso momento.
+</p>
+
+<p>
+  Alcuni cluster regionali sono ancora piu' stretti:
+</p>
+
+<ul>
+  <li><strong>Friuli Venezia Giulia</strong> — 223 domini su <code>dns.insiel.net + dns.regione.fvg.it</code>. Due NS, un'unica infrastruttura regionale.</li>
+  <li><strong>Trentino</strong> — 158 domini su <code>dns1-7.infotn.it</code>. Tutta la PA provinciale su un operatore.</li>
+  <li><strong>Basilicata</strong> — 114 domini su <code>ns.basilicatanet.it + ns.regione.basilicata.it</code>. L'intera regione.</li>
+  <li><strong>Emilia-Romagna</strong> — 148 domini su <code>dns1-2.lepida.it</code>. La rete regionale.</li>
+  <li><strong>Valle d'Aosta</strong> — 114 domini su <code>ns1-2.invallee.it</code>. Tutti.</li>
+</ul>
+
+<div class="insight-box" style="border-left:3px solid #ff8800;padding:1rem 1.2rem;margin:1.5rem 0;background:rgba(255,136,0,0.05);">
+  <strong>La diversita' e' resilienza.</strong> Non si tratta di giudicare un provider. Aruba, Insiel, Lepida fanno il loro lavoro. Il punto e' che la concentrazione riduce la superficie di errore a pochi nodi. In biologia si chiama monocultura. In ingegneria, rischio sistemico. Nella PA italiana, si chiama normalita'.
+</div>
+
+<h3><span class="accent">//</span> La geografia dei nameserver</h3>
+
+<p>
+  Analizzando la geografia dei nameserver emerge un altro dato interessante. <strong>10.550 domini</strong> della PA italiana utilizzano nameserver distribuiti in paesi diversi. Circa la meta' del totale.
+</p>
+
+<p>
+  Questa distribuzione geografica non e' necessariamente un problema: molti provider DNS utilizzano infrastrutture globali e tecniche come anycast per migliorare resilienza e prestazioni.
+</p>
+
+<p>
+  Il caso piu' diffuso e' quello dei domini ospitati sull'infrastruttura Aruba/Technorail, dove i nameserver includono nodi globali (<code>technorail.com</code>) insieme a server nel dominio <code>arubadns.cz</code>, localizzati in Repubblica Ceca. Un altro gruppo significativo e' rappresentato dai domini gestiti tramite Amazon Route 53, con nameserver distribuiti tra Stati Uniti e Regno Unito (<code>awsdns-xx.co.uk</code>).
+</p>
+
+<p>
+  Anche quando il dominio appartiene a un ente locale italiano, la sua infrastruttura DNS puo' essere distribuita su server situati in diversi paesi. Questo riflette la natura globale delle infrastrutture Internet: anche i servizi digitali della pubblica amministrazione si appoggiano spesso a piattaforme DNS distribuite a livello internazionale.
+</p>
+
+<p>
+  La gestione dei nomi su Internet raramente coincide con i confini amministrativi degli enti che li utilizzano.
+</p>
+
+
+<h3><span class="accent">//</span> I domini fantasma</h3>
+
+<p>
+  E poi ci sono i <strong>1.344 domini senza nameserver</strong>. Nessun record NS. Non sono offline: sono <em>senza delega DNS valida</em>. Enti che risultano nell'indice della PA con un dominio che il DNS non sa risolvere — delega rotta, dominio scaduto o mai configurato.
+</p>
+
+<p>
+  Chi sono? Soprattutto scuole e ordini professionali.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Categoria</th><th>Domini fantasma</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Scuole</td><td>597</td></tr>
+    <tr><td>Ordini professionali</td><td>174</td></tr>
+    <tr><td>Comuni</td><td>104</td></tr>
+    <tr><td>Collegi professionali</td><td>97</td></tr>
+    <tr><td>Universita' / enti ricerca</td><td>74</td></tr>
+    <tr><td>Enti regionali</td><td>62</td></tr>
+    <tr><td>Altro</td><td>236</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Le regioni con piu' domini fantasma: <strong>Sicilia</strong> (182), <strong>Campania</strong> (177), <strong>Lazio</strong> (114). C'e' un Commissario Straordinario il cui dominio punta nel vuoto. Ci sono istituti alberghieri con il <code>.edu.it</code> che non risolve. Ordini professionali con domini <code>.wordpress.com</code> che non esistono piu'.
+</p>
+
+<p>
+  Non e' un problema tecnico. E' un problema di governance. Questi enti sono nell'indice ufficiale della PA italiana con un indirizzo web che non porta da nessuna parte. E nessuno se ne accorge.
+</p>
+
+
+<h3><span class="accent">//</span> Il TTL: il tempo di reazione dell'infrastruttura</h3>
+
+<p>
+  Ogni record DNS ha un parametro chiamato <strong>TTL</strong> (Time To Live). Indica per quanto tempo una risposta DNS puo' essere memorizzata nella cache prima di essere richiesta di nuovo.
+</p>
+
+<p>
+  In pratica, il TTL misura quanto velocemente un cambio di indirizzo diventa visibile ai resolver.
+</p>
+
+<p>
+  Ho interrogato il record A di tutti i 22.313 domini. 20.753 hanno restituito un record A valido (il numero e' superiore ai domini con HTTP funzionante perche' un dominio puo' avere un record DNS valido anche se il server web non risponde o non serve contenuti HTTP). La mediana e' <strong>3.600 secondi</strong> — un'ora esatta. E' il valore di default della maggior parte degli hosting. Il 37.1% dei domini usa esattamente questo valore.
+</p>
+
+<table>
+  <thead>
+    <tr><th>TTL</th><th>Significato</th><th>Domini</th><th>%</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>0 – 60s</strong></td><td>Infrastruttura dinamica (CDN, failover)</td><td>1.269</td><td>6.1%</td></tr>
+    <tr><td><strong>61 – 300s</strong></td><td>Cloud / load balancer</td><td>2.231</td><td>10.8%</td></tr>
+    <tr><td><strong>5 min – 1 ora</strong></td><td>Configurazione standard</td><td>13.192</td><td>63.6%</td></tr>
+    <tr><td><strong>1 – 4 ore</strong></td><td>Hosting tradizionale</td><td>1.951</td><td>9.4%</td></tr>
+    <tr><td><strong>4 ore – 1 giorno</strong></td><td>Infrastruttura statica</td><td>2.031</td><td>9.8%</td></tr>
+    <tr><td><strong>&gt; 1 giorno</strong></td><td>Configurazione molto conservativa</td><td>79</td><td>0.4%</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Agli estremi si trovano le storie piu' interessanti.
+</p>
+
+<p>
+  <strong>680 domini hanno un TTL di 10 secondi.</strong> Infrastruttura dinamica, pronta a cambiare destinazione quasi in tempo reale. Tipico di servizi dietro CDN o load balancer distribuiti.
+</p>
+
+<p>
+  <strong>Sogei — l'infrastruttura tecnologica del Ministero dell'Economia — usa un TTL di 2 secondi.</strong> Con un TTL cosi' basso, un eventuale cambio di destinazione diventa visibile ai resolver in pochi secondi. E' un'infrastruttura critica configurata per reagire.
+</p>
+
+<p>
+  All'estremo opposto, <strong>tutti i domini dei comuni del Trentino condividono un TTL di sette giorni</strong>. Significa che una volta risolto l'indirizzo IP, i resolver possono mantenerlo in cache per un'intera settimana prima di chiedere di nuovo. E' una configurazione pensata per stabilita', piu' che per cambiamenti rapidi.
+</p>
+
+<p>
+  Il TTL non e' un parametro di sicurezza, ma racconta qualcosa di molto concreto: <strong>quanto velocemente un'infrastruttura puo' reagire</strong>.
+</p>
+
+<div class="chart-container">
+  <div class="chart-title">Distribuzione TTL: tempo di cache DNS (scala logaritmica)</div>
+  <canvas id="chart-ttl" style="max-height:350px;"></canvas>
+</div>
+
+
+<h3><span class="accent">//</span> DNS avanzato: email e certificati</h3>
+
+<p>
+  I record MX indicano quali server gestiscono la posta di un dominio. Anche qui i dati raccontano come e' distribuita l'infrastruttura.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Provider email</th><th>Domini</th><th>%</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Self-hosted / altro</td><td>11.467</td><td>51.4%</td></tr>
+    <tr><td><strong>Google Workspace</strong></td><td>5.881</td><td>26.4%</td></tr>
+    <tr><td><strong>Microsoft 365</strong></td><td>2.292</td><td>10.3%</td></tr>
+    <tr><td>Register.it</td><td>661</td><td>3.0%</td></tr>
+    <tr><td><em>Senza MX</em></td><td>1.899</td><td>8.5%</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Oltre la meta' dei domini della PA gestisce la posta su server propri, mentre circa un terzo utilizza piattaforme cloud come Google Workspace o Microsoft 365. L'8.5% dei domini non ha alcun record MX configurato, segno che quei domini non gestiscono posta elettronica o utilizzano indirizzi esterni.
+</p>
+
+<div class="chart-container">
+  <div class="chart-title">Provider email (MX): chi gestisce la posta della PA</div>
+  <canvas id="chart-mx"></canvas>
+</div>
+
+<p>
+  I record SPF rivelano la stessa distribuzione vista dai MX. Le infrastrutture piu' presenti negli <code>include:</code> SPF sono Google (3.155 domini), Aruba (3.066 + 1.542) e Microsoft (2.734). <strong>13 domini utilizzano la direttiva <code>+all</code></strong>, che autorizza qualsiasi server a inviare email per conto del dominio. 31 usano il meccanismo <code>ptr</code>, deprecato da RFC 7208. La maggior parte dei domini utilizza <code>~all</code> (soft fail), che segnala server non autorizzati ma lascia al destinatario la decisione finale.
+</p>
+
+<p>
+  Il <strong>record CAA</strong> permette a un dominio di specificare quali autorita' di certificazione sono autorizzate a emettere certificati TLS. Il <strong>99% dei domini non definisce restrizioni esplicite</strong> su quali CA possano emettere certificati. Tra i 223 che lo fanno, Let's Encrypt e' l'autorita' piu' frequentemente autorizzata (191), seguita da Comodo (104) e DigiCert (95).
+</p>
+
+<p>
+  Infine, i <strong>record wildcard</strong>: 1.300 domini (5.8%) hanno un record <code>*.dominio.it</code> che fa si' che qualsiasi sottodominio non definito esplicitamente venga risolto automaticamente. In alcuni casi un singolo record wildcard serve numerosi sottodomini, configurazione tipica dell'hosting condiviso.
+</p>
+
+<div class="insight-box" style="border-left:3px solid #4ecdc4;padding:1rem 1.2rem;margin:1.5rem 0;background:rgba(78,205,196,0.05);">
+  <p>
+    Anche i record DNS meno visibili raccontano qualcosa sull'infrastruttura: come viene gestita la posta, quali certificati sono autorizzati e quanto controllo esiste sui sottodomini. L'infrastruttura della PA appare centralizzata a livello DNS, ma frammentata a livello di posta elettronica e gestione dei domini.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 - MISURARE LA SUPERFICIE                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Misurare la Superficie</h2>
+<span class="section-number">Sezione 12. La matematica dell'esposizione</span>
+
+<p>
+  Fin qui abbiamo contato. Ora misuriamo.
+</p>
+
+<h3><span class="accent">//</span> Concentrazione: l'indice HHI</h3>
+
+<p>
+  La concentrazione di un mercato si misura con l'<strong>indice di Herfindahl-Hirschman</strong>: la somma dei quadrati delle quote di mercato.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">$$\text{HHI} = \sum_{i} s_i^2$$</div>
+  <p class="formula-label">dove s_i e' la quota di ciascun provider DNS</p>
+</div>
+
+<p>
+  Un HHI sotto 1.500 indica un mercato competitivo; sopra 2.500, altamente concentrato. Per i provider DNS della PA italiana:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">$$\text{HHI} = 29{,}5^2 + 8{,}2^2 + 5{,}5^2 + 5{,}5^2 + 3{,}4^2 + \cdots = \mathbf{1.175}$$</div>
+  <p class="formula-label">Fascia competitiva — ma solo grazie alla coda lunga di 846 piccoli provider</p>
+</div>
+
+<p>
+  Il valore si colloca nella fascia competitiva. Ma il numero puro nasconde la realta': la distribuzione e' fortemente asimmetrica. Per misurarla serve un altro strumento.
+</p>
+
+<h3><span class="accent">//</span> Diversita': l'entropia di Shannon</h3>
+
+<p>
+  L'entropia di Shannon misura la diversita' reale di un sistema:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">$$H = -\sum_{i} p_i \, \log_2(p_i)$$</div>
+  <p class="formula-label">dove p_i e' la probabilita' di ciascun provider</p>
+</div>
+
+<p>
+  Se tutti i provider fossero uguali, l'entropia sarebbe massima: \(\log_2(846) = 9{,}72\) bit. Il valore misurato e':
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">$$H = \mathbf{5{,}28} \text{ bit} \qquad \left(\frac{H}{H_{\max}} = 54\%\right)$$</div>
+  <p class="formula-label">Solo il 54% dell'entropia massima teorica</p>
+</div>
+
+<p>
+  Convertendo in <strong>numero effettivo di provider</strong> — una misura usata in ecologia per la biodiversita' e in economia per la concentrazione:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">$$N_{\text{eff}} = 2^{H} = 2^{5{,}28} = \mathbf{39}$$</div>
+  <p class="formula-label">846 provider nel dataset, diversita' reale equivalente a 39</p>
+</div>
+
+<div class="stat-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:2rem 0;">
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#00ff88;">846</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">provider nel dataset</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#ff8800;">39</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">diversita' reale (N<sub>eff</sub>)</div>
+  </div>
+  <div class="stat-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:1.2rem;text-align:center;">
+    <div style="font-size:2rem;font-weight:700;color:#ff6b6b;">54%</div>
+    <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">entropia utilizzata</div>
+  </div>
+</div>
+
+<p>
+  L'infrastruttura della PA usa 846 provider, ma la sua diversita' reale equivale a 39. In altre parole: molti provider esistono, ma pochi contano davvero.
+</p>
+
+<h3><span class="accent">//</span> Information leakage: i bit esposti</h3>
+
+<p>
+  Ogni risposta di un server pubblico rivela informazione. Quanta? Si puo' misurare in bit — la stessa unita' con cui si misura l'entropia.
+</p>
+
+<table>
+  <thead>
+    <tr><th>Dimensione</th><th>Entropia</th><th>Valori osservati</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>DNS provider</td><td><strong>5,29 bit</strong></td><td>846 provider</td></tr>
+    <tr><td>Security headers</td><td>3,61 bit</td><td>54 combinazioni</td></tr>
+    <tr><td>Server header</td><td>3,07 bit</td><td>227 valori</td></tr>
+    <tr><td>X-Powered-By</td><td>2,24 bit</td><td>199 valori</td></tr>
+    <tr><td>Certificate Authority</td><td>2,05 bit</td><td>24 CA</td></tr>
+    <tr><td>SPF policy</td><td>1,75 bit</td><td>6 classi</td></tr>
+    <tr><td>DMARC policy</td><td>1,34 bit</td><td>5 classi</td></tr>
+    <tr><td>TLS version</td><td>1,04 bit</td><td>3 versioni</td></tr>
+  </tbody>
+</table>
+
+<div class="formula-box fade-in">
+  <div class="formula-text">$$\sum H_i \approx \mathbf{20 \text{ bit di fingerprinting passivo}}$$</div>
+  <p class="formula-label">Una richiesta HTTP + una query DNS = 2^20 = 1.048.576 configurazioni distinguibili</p>
+</div>
+
+<p>
+  Una singola richiesta HTTP e una query DNS rivelano circa 20 bit di informazione sull'infrastruttura di un server della PA. Abbastanza per distinguere un dominio tra un milione di configurazioni possibili.
+</p>
+
+<div class="chart-container">
+  <div class="chart-title">Information leakage: bit di entropia per dimensione</div>
+  <canvas id="chart-polar-bits"></canvas>
+</div>
+
+
+<div class="insight-box" style="border-left:3px solid #7c4dff;padding:1rem 1.2rem;margin:1.5rem 0;background:rgba(124,77,255,0.05);">
+  <p>
+    L'infrastruttura della PA italiana non e' solo osservabile. E' <strong>misurabile</strong>.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 13 - COSA SIGNIFICA                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Cosa Significa</h2>
+<span class="section-number">Sezione 13. La superficie</span>
+
+<p>
+  Non ho scansionato nulla. Ho solo ascoltato.
+</p>
+
+<p>
+  DNS, header HTTP, record email. Protocolli pubblici, risposte automatiche, dati che ogni server offre a chiunque li chieda. Un portatile, sei script Python, 1.200 righe di codice.
+</p>
+
+<p>
+  E quello che emerge e' una fotografia:
+</p>
+
+<table class="strategy-table">
+  <tr>
+    <th>Pilastro</th>
+    <th>Risultato</th>
+  </tr>
+  <tr>
+    <td>Trasporto (HTTPS)</td>
+    <td>18,4% senza cifratura. 23,8% non forza il redirect.</td>
+  </tr>
+  <tr>
+    <td>Configurazione web (headers)</td>
+    <td>34,5% senza alcun security header. Solo il 9,1% li ha tutti.</td>
+  </tr>
+  <tr>
+    <td>Fingerprinting (server/tech)</td>
+    <td>90% dichiara il server. 40,5% dichiara la tecnologia. 906 su software EOL.</td>
+  </tr>
+  <tr>
+    <td>Identita' email (SPF/DMARC/DKIM)</td>
+    <td>89,9% spoofabile. 3,1% blocca davvero lo spoofing.</td>
+  </tr>
+  <tr>
+    <td>DNS (DNSSEC)</td>
+    <td>1,3% firma le risposte DNS.</td>
+  </tr>
+</table>
+
+<p>
+  Internet e' progettata per essere osservabile.
+</p>
+
+<p>
+  Il problema non e' la vulnerabilita' singola. Il problema e' la superficie. Ventiduemila domini che rispondono a chiunque, la maggior parte senza protezioni di base, molti con software obsoleto, quasi tutti con un'identita' email falsificabile.
+</p>
+
+<p>
+  Senza effettuare alcuna scansione attiva, l'analisi di dati pubblici rivela una superficie digitale vasta e spesso poco protetta: configurazioni web minime, infrastrutture facilmente identificabili e un sistema email che nella maggior parte dei casi puo' essere falsificato.
+</p>
+
+<p>
+  E tutto questo e' visibile a chiunque sappia dove guardare. O meglio: a chiunque sappia ascoltare.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- CONCLUSIONE                                             -->
+<!-- ======================================================= -->
+<div class="conclusion-box fade-in">
+  <div class="quote">"Non ho scansionato nulla. Ho solo ascoltato quello che Internet dice da solo."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    22.313 domini. Sette script Python. 1.200 righe di codice. La radiografia e' gia' li', in chiaro, per chiunque faccia le domande giuste. L'infrastruttura digitale della PA italiana si descrive da sola. Basta ascoltare.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://unpkg.com/leaflet@1.9/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+<script src="../js/charts/server-parlano-charts.js"></script>
+<script src="../js/main.js"></script>
+
+<script>
+(function() {
+    var mapEl = document.getElementById('italy-map');
+    if (!mapEl) return;
+
+    var scores = {
+        'Piemonte': 5.79,
+        "Valle d'Aosta/Vall\u00e9e d'Aoste": 5.14,
+        'Lombardia': 5.19,
+        'Trentino-Alto Adige/S\u00fcdtirol': 4.19,
+        'Veneto': 4.86,
+        'Friuli-Venezia Giulia': 5.50,
+        'Liguria': 5.91,
+        'Emilia-Romagna': 5.29,
+        'Toscana': 5.54,
+        'Umbria': 5.73,
+        'Marche': 5.34,
+        'Lazio': 5.73,
+        'Abruzzo': 5.64,
+        'Molise': 6.30,
+        'Campania': 5.97,
+        'Puglia': 5.66,
+        'Basilicata': 5.87,
+        'Calabria': 5.96,
+        'Sicilia': 5.77,
+        'Sardegna': 5.41
+    };
+
+    var details = {
+        'Piemonte': { enti: 2233, https: '84.5%', spoof: '88.7%' },
+        "Valle d'Aosta/Vall\u00e9e d'Aoste": { enti: 164, https: '79.9%', spoof: '41.5%' },
+        'Lombardia': { enti: 3300, https: '81.8%', spoof: '86.5%' },
+        'Trentino-Alto Adige/S\u00fcdtirol': { enti: 780, https: '89.6%', spoof: '90.6%' },
+        'Veneto': { enti: 1639, https: '85.1%', spoof: '85.4%' },
+        'Friuli-Venezia Giulia': { enti: 566, https: '89.2%', spoof: '94.0%' },
+        'Liguria': { enti: 575, https: '73.0%', spoof: '91.5%' },
+        'Emilia-Romagna': { enti: 1279, https: '81.6%', spoof: '85.7%' },
+        'Toscana': { enti: 1148, https: '83.7%', spoof: '89.4%' },
+        'Umbria': { enti: 342, https: '73.4%', spoof: '88.6%' },
+        'Marche': { enti: 672, https: '85.3%', spoof: '90.2%' },
+        'Lazio': { enti: 1762, https: '80.0%', spoof: '88.4%' },
+        'Abruzzo': { enti: 698, https: '77.2%', spoof: '93.1%' },
+        'Molise': { enti: 269, https: '65.8%', spoof: '87.4%' },
+        'Campania': { enti: 1879, https: '77.3%', spoof: '93.0%' },
+        'Puglia': { enti: 1168, https: '80.9%', spoof: '93.7%' },
+        'Basilicata': { enti: 339, https: '77.6%', spoof: '95.6%' },
+        'Calabria': { enti: 904, https: '77.3%', spoof: '96.1%' },
+        'Sicilia': { enti: 1708, https: '79.6%', spoof: '95.1%' },
+        'Sardegna': { enti: 684, https: '90.4%', spoof: '96.5%' }
+    };
+
+    function scoreToColor(s) {
+        if (s < 5.0) return '#00ff88';
+        if (s < 5.3) return '#4ecdc4';
+        if (s < 5.6) return '#f5c518';
+        if (s < 5.8) return '#ff8800';
+        if (s < 6.0) return '#ff6b6b';
+        return '#ff3333';
+    }
+
+    var map = L.map('italy-map', {
+        zoomControl: true,
+        scrollWheelZoom: false,
+        attributionControl: true
+    }).setView([42.0, 12.5], 5);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 8,
+        minZoom: 4
+    }).addTo(map);
+
+    var geoData = {"type":"FeatureCollection","bbox":[6.626621368537682,35.493691935511414,18.520381599098922,47.09178374646217],"features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[7.14,45.28],[7.16,45.37],[7.1,45.47],[7.16,45.49],[7.34,45.52],[7.52,45.58],[7.72,45.56],[7.87,45.6],[7.93,45.65],[7.88,45.77],[7.86,45.91],[8.0,46.01],[8.09,46.11],[8.16,46.18],[8.16,46.3],[8.25,46.35],[8.31,46.38],[8.44,46.46],[8.46,46.33],[8.47,46.24],[8.6,46.16],[8.71,46.07],[8.6,45.84],[8.65,45.72],[8.68,45.67],[8.66,45.63],[8.7,45.59],[8.72,45.5],[8.81,45.43],[8.72,45.37],[8.66,45.3],[8.53,45.32],[8.53,45.27],[8.55,45.24],[8.55,45.21],[8.55,45.16],[8.64,45.07],[8.67,45.02],[8.75,45.02],[8.79,45.02],[8.87,45.05],[8.97,44.97],[9.05,44.85],[9.16,44.81],[9.2,44.67],[9.15,44.57],[9.04,44.63],[8.97,44.67],[8.91,44.58],[8.83,44.55],[8.77,44.51],[8.7,44.58],[8.61,44.55],[8.5,44.51],[8.39,44.48],[8.24,44.52],[8.17,44.39],[8.08,44.31],[8.06,44.25],[8.07,44.15],[8.01,44.12],[7.88,44.1],[7.72,44.11],[7.69,44.11],[7.58,44.15],[7.43,44.13],[7.29,44.14],[7.15,44.2],[7.0,44.24],[6.9,44.36],[6.93,44.44],[6.91,44.56],[6.95,44.65],[7.08,44.69],[7.01,44.83],[6.84,44.86],[6.75,44.94],[6.72,45.02],[6.63,45.1],[6.84,45.13],[6.95,45.19],[7.13,45.25],[7.14,45.28]],[[8.05,45.11],[8.04,45.12],[8.05,45.12],[8.05,45.13],[8.04,45.13],[8.03,45.13],[8.02,45.13],[8.02,45.12],[8.01,45.12],[8.01,45.13],[7.99,45.13],[7.98,45.12],[7.99,45.12],[7.99,45.11],[8.01,45.1],[8.02,45.11],[8.03,45.11],[8.04,45.11],[8.05,45.11]],[[8.82,45.02],[8.81,45.02],[8.82,45.02]],[[8.7,45.02],[8.71,45.01],[8.71,45.02],[8.7,45.02]]]},"properties":{"name":"Piemonte"}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[7.74,45.92],[7.8,45.92],[7.81,45.92],[7.86,45.92],[7.87,45.87],[7.87,45.85],[7.87,45.84],[7.86,45.79],[7.88,45.77],[7.93,45.73],[7.91,45.69],[7.92,45.67],[7.93,45.65],[7.91,45.63],[7.9,45.6],[7.89,45.59],[7.88,45.6],[7.84,45.6],[7.8,45.59],[7.77,45.57],[7.73,45.55],[7.66,45.56],[7.61,45.57],[7.57,45.59],[7.53,45.58],[7.49,45.58],[7.44,45.55],[7.38,45.52],[7.36,45.52],[7.32,45.51],[7.27,45.5],[7.25,45.49],[7.21,45.48],[7.15,45.48],[7.14,45.49],[7.13,45.51],[7.11,45.48],[7.1,45.47],[7.04,45.48],[7.05,45.49],[7.03,45.5],[7.0,45.52],[6.99,45.56],[6.98,45.58],[6.99,45.61],[7.0,45.63],[6.97,45.65],[6.96,45.66],[6.91,45.66],[6.89,45.68],[6.82,45.72],[6.82,45.74],[6.81,45.76],[6.81,45.79],[6.82,45.84],[6.86,45.83],[6.87,45.84],[6.88,45.85],[6.9,45.84],[6.97,45.87],[7.0,45.87],[7.02,45.92],[7.06,45.91],[7.09,45.87],[7.13,45.87],[7.17,45.88],[7.19,45.86],[7.2,45.88],[7.25,45.89],[7.27,45.9],[7.29,45.92],[7.32,45.91],[7.37,45.9],[7.4,45.91],[7.44,45.93],[7.47,45.94],[7.48,45.95],[7.54,45.97],[7.57,45.99],[7.58,45.98],[7.62,45.97],[7.66,45.98],[7.69,45.95],[7.71,45.94],[7.74,45.92]]]},"properties":{"name":"Valle d'Aosta/Vall\u00e9e d'Aoste"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[8.58,45.75],[8.73,46.03],[8.81,46.1],[8.88,45.96],[8.94,45.86],[9.03,45.83],[9.07,45.91],[9.01,46.02],[9.16,46.17],[9.29,46.31],[9.25,46.45],[9.41,46.47],[9.46,46.41],[9.65,46.29],[9.83,46.36],[9.99,46.31],[10.15,46.23],[10.14,46.39],[10.04,46.44],[10.08,46.58],[10.24,46.63],[10.39,46.55],[10.55,46.49],[10.61,46.38],[10.56,46.32],[10.57,46.23],[10.5,46.07],[10.45,45.98],[10.5,45.86],[10.53,45.8],[10.7,45.84],[10.8,45.84],[10.64,45.44],[10.69,45.35],[10.82,45.28],[11.0,45.18],[11.05,45.11],[11.18,45.09],[11.27,45.05],[11.43,44.96],[11.23,44.95],[10.99,44.95],[10.79,44.94],[10.71,44.98],[10.66,44.97],[10.47,44.93],[10.34,44.97],[10.19,45.03],[10.04,45.06],[9.96,45.12],[9.88,45.12],[9.86,45.09],[9.79,45.08],[9.68,45.07],[9.62,45.13],[9.54,45.11],[9.45,45.09],[9.35,45.0],[9.29,44.91],[9.35,44.84],[9.32,44.7],[9.22,44.68],[9.16,44.81],[9.06,44.88],[8.9,45.01],[8.81,45.04],[8.77,45.01],[8.7,45.03],[8.65,45.06],[8.55,45.16],[8.54,45.21],[8.55,45.24],[8.53,45.28],[8.56,45.35],[8.72,45.34],[8.81,45.39],[8.77,45.49],[8.69,45.58],[8.66,45.62],[8.68,45.67],[8.64,45.72],[8.58,45.75]],[[8.7,45.84],[8.68,45.84],[8.67,45.84],[8.66,45.83],[8.66,45.82],[8.67,45.82],[8.67,45.81],[8.68,45.81],[8.69,45.81],[8.7,45.82],[8.71,45.83],[8.72,45.83],[8.71,45.83],[8.7,45.84]],[[9.29,44.7],[9.3,44.7],[9.29,44.7]],[[9.3,44.69],[9.3,44.7],[9.3,44.69]]],[[[8.97,45.98],[8.98,45.98],[8.98,45.97],[8.98,45.96],[8.97,45.96],[8.96,45.97],[8.96,45.98],[8.97,45.98]]]]},"properties":{"name":"Lombardia"}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[12.01,46.55],[11.91,46.53],[11.88,46.47],[11.84,46.41],[11.81,46.37],[11.78,46.36],[11.84,46.27],[11.88,46.26],[11.93,46.22],[11.95,46.17],[11.88,46.12],[11.77,46.11],[11.69,46.07],[11.67,46.03],[11.69,45.99],[11.57,46.01],[11.37,45.98],[11.35,45.92],[11.27,45.92],[11.23,45.88],[11.19,45.81],[11.18,45.75],[11.12,45.69],[11.06,45.72],[11.0,45.7],[10.94,45.67],[10.87,45.77],[10.86,45.83],[10.76,45.83],[10.69,45.84],[10.58,45.79],[10.53,45.81],[10.5,45.84],[10.51,45.9],[10.45,45.98],[10.48,46.02],[10.55,46.12],[10.55,46.2],[10.58,46.27],[10.56,46.32],[10.54,46.35],[10.62,46.42],[10.58,46.47],[10.47,46.5],[10.47,46.56],[10.49,46.62],[10.4,46.65],[10.4,46.74],[10.43,46.78],[10.48,46.86],[10.6,46.86],[10.69,46.85],[10.74,46.8],[10.83,46.77],[10.87,46.77],[10.94,46.77],[11.08,46.82],[11.09,46.88],[11.12,46.93],[11.2,46.97],[11.32,46.99],[11.44,46.98],[11.48,47.01],[11.58,47.0],[11.77,46.98],[11.93,47.04],[12.03,47.05],[12.14,47.08],[12.23,47.08],[12.2,47.03],[12.16,46.95],[12.21,46.88],[12.24,46.89],[12.3,46.84],[12.29,46.78],[12.36,46.76],[12.48,46.68],[12.37,46.62],[12.27,46.63],[12.18,46.62],[12.11,46.66],[12.06,46.62],[12.01,46.55]]]},"properties":{"name":"Trentino-Alto Adige/S\u00fcdtirol"}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[10.63,45.53],[10.88,45.81],[10.84,45.73],[10.97,45.7],[11.03,45.7],[11.12,45.69],[11.18,45.77],[11.22,45.84],[11.25,45.9],[11.35,45.91],[11.38,45.98],[11.59,45.97],[11.67,46.02],[11.71,46.05],[11.76,46.1],[11.89,46.12],[11.95,46.18],[11.92,46.25],[11.87,46.27],[11.78,46.36],[11.82,46.38],[11.86,46.43],[11.81,46.5],[12.0,46.53],[12.07,46.64],[12.14,46.63],[12.21,46.61],[12.35,46.62],[12.48,46.68],[12.6,46.66],[12.72,46.64],[12.64,46.58],[12.61,46.47],[12.49,46.41],[12.38,46.33],[12.36,46.23],[12.44,46.2],[12.49,46.12],[12.4,46.04],[12.44,45.95],[12.52,45.9],[12.56,45.83],[12.6,45.84],[12.68,45.8],[12.77,45.85],[12.88,45.85],[12.97,45.83],[12.97,45.81],[13.01,45.76],[13.03,45.74],[13.04,45.69],[13.07,45.66],[12.98,45.62],[12.84,45.58],[12.58,45.48],[12.4,45.43],[12.32,45.31],[12.31,45.19],[12.35,45.08],[12.52,44.99],[12.43,44.83],[12.34,44.85],[12.28,44.94],[12.18,44.93],[12.06,44.97],[11.91,44.98],[11.76,44.96],[11.71,44.92],[11.59,44.9],[11.5,44.94],[11.42,44.97],[11.27,45.03],[11.18,45.06],[11.16,45.12],[11.05,45.11],[11.01,45.15],[10.94,45.21],[10.75,45.29],[10.7,45.34],[10.71,45.42],[10.64,45.51],[10.63,45.53]]]},"properties":{"name":"Veneto"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[13.52,46.38],[13.44,46.35],[13.39,46.29],[13.45,46.21],[13.5,46.22],[13.58,46.19],[13.66,46.17],[13.6,46.1],[13.5,46.06],[13.48,46.0],[13.55,45.97],[13.64,45.99],[13.61,45.91],[13.58,45.86],[13.66,45.8],[13.73,45.76],[13.83,45.72],[13.86,45.66],[13.87,45.6],[13.73,45.6],[13.8,45.61],[13.77,45.62],[13.75,45.64],[13.76,45.65],[13.76,45.67],[13.71,45.7],[13.68,45.74],[13.61,45.77],[13.58,45.77],[13.54,45.8],[13.53,45.79],[13.54,45.78],[13.52,45.74],[13.55,45.72],[13.46,45.71],[13.36,45.68],[13.35,45.68],[13.26,45.71],[13.15,45.69],[13.09,45.66],[13.06,45.66],[13.05,45.68],[13.04,45.69],[13.02,45.72],[13.0,45.75],[12.99,45.8],[12.99,45.81],[12.97,45.83],[12.92,45.83],[12.82,45.83],[12.77,45.85],[12.71,45.82],[12.66,45.8],[12.59,45.83],[12.57,45.83],[12.54,45.86],[12.52,45.9],[12.48,45.93],[12.43,45.99],[12.4,46.04],[12.47,46.1],[12.5,46.14],[12.45,46.21],[12.38,46.22],[12.32,46.25],[12.38,46.33],[12.46,46.39],[12.52,46.45],[12.62,46.47],[12.62,46.53],[12.7,46.6],[12.76,46.65],[12.85,46.61],[12.99,46.6],[13.12,46.59],[13.25,46.56],[13.38,46.58],[13.54,46.55],[13.66,46.53],[13.71,46.48],[13.58,46.41],[13.52,46.38]]],[[[13.54,45.78]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.77,45.61]]],[[[13.78,45.61]]],[[[13.77,45.61]]],[[[13.78,45.61]]],[[[13.77,45.61]]],[[[13.77,45.61]]],[[[13.77,45.61]]],[[[13.77,45.61]]],[[[13.77,45.61]]],[[[13.77,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.77,45.61]]],[[[13.77,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.78,45.61]]],[[[13.74,45.62],[13.73,45.63],[13.74,45.63],[13.74,45.62]]],[[[13.74,45.63],[13.74,45.64],[13.74,45.63]]],[[[13.74,45.64]]],[[[13.76,45.65]]],[[[13.76,45.65]]],[[[13.76,45.66]]],[[[13.72,45.7]]],[[[13.72,45.7]]],[[[13.71,45.71]]],[[[13.67,45.74]]]]},"properties":{"name":"Friuli-Venezia Giulia"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[7.55,43.89],[7.64,43.97],[7.7,44.05],[7.75,44.09],[7.74,44.13],[7.92,44.11],[8.01,44.1],[7.98,44.13],[8.07,44.15],[8.06,44.22],[8.09,44.27],[8.1,44.3],[8.15,44.36],[8.2,44.46],[8.25,44.53],[8.36,44.47],[8.44,44.5],[8.54,44.51],[8.6,44.54],[8.62,44.58],[8.71,44.58],[8.77,44.53],[8.8,44.5],[8.82,44.56],[8.92,44.56],[8.88,44.64],[8.99,44.66],[9.03,44.65],[9.1,44.6],[9.17,44.59],[9.26,44.61],[9.3,44.61],[9.37,44.58],[9.43,44.58],[9.49,44.5],[9.46,44.44],[9.48,44.42],[9.6,44.44],[9.69,44.37],[9.81,44.28],[9.86,44.23],[9.91,44.21],[9.94,44.17],[9.99,44.12],[10.05,44.11],[9.99,44.05],[9.91,44.07],[9.85,44.11],[9.83,44.08],[9.74,44.09],[9.63,44.14],[9.51,44.22],[9.47,44.23],[9.38,44.29],[9.3,44.32],[9.23,44.34],[9.18,44.31],[9.13,44.36],[8.99,44.39],[8.91,44.41],[8.85,44.42],[8.76,44.43],[8.64,44.39],[8.57,44.35],[8.48,44.31],[8.44,44.28],[8.42,44.22],[8.41,44.19],[8.29,44.15],[8.22,44.04],[8.16,43.98],[8.15,43.95],[8.08,43.9],[7.97,43.86],[7.89,43.84],[7.83,43.82],[7.78,43.82],[7.71,43.8],[7.66,43.78],[7.53,43.79],[7.5,43.84],[7.55,43.89]]],[[[8.23,44.02],[8.22,44.02],[8.22,44.03],[8.23,44.03],[8.23,44.02]]],[[[8.45,44.23],[8.44,44.23],[8.45,44.23]]],[[[8.88,44.4],[8.92,44.4],[8.91,44.4],[8.9,44.4],[8.89,44.4],[8.88,44.4]]],[[[8.87,44.4],[8.86,44.4],[8.82,44.41],[8.87,44.4]]],[[[8.83,44.42]]],[[[8.83,44.42]]],[[[8.8,44.42],[8.79,44.41],[8.77,44.42],[8.77,44.41],[8.79,44.41],[8.8,44.41],[8.8,44.42],[8.81,44.42],[8.8,44.42]]],[[[9.77,44.08]]],[[[9.83,44.1]]],[[[9.85,44.11]]],[[[9.85,44.11]]],[[[9.85,44.11]]],[[[9.85,44.11]]],[[[9.85,44.02]]],[[[9.85,44.03],[9.85,44.02],[9.85,44.03]]],[[[9.85,44.03],[9.84,44.04],[9.83,44.05],[9.84,44.05],[9.85,44.05],[9.86,44.05],[9.85,44.05],[9.85,44.04],[9.85,44.03]]]]},"properties":{"name":"Liguria"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[9.33,44.73],[9.33,44.87],[9.29,44.93],[9.36,45.0],[9.44,45.09],[9.54,45.09],[9.61,45.11],[9.63,45.09],[9.75,45.08],[9.82,45.05],[9.88,45.08],[9.88,45.13],[9.96,45.12],[10.03,45.07],[10.17,45.04],[10.31,44.99],[10.41,44.98],[10.59,44.91],[10.69,44.97],[10.73,44.99],[10.85,44.93],[11.0,44.95],[11.23,44.95],[11.41,44.95],[11.57,44.92],[11.69,44.92],[11.76,44.96],[11.93,44.98],[12.13,44.94],[12.23,44.93],[12.33,44.85],[12.32,44.79],[12.37,44.8],[12.24,44.73],[12.28,44.56],[12.32,44.41],[12.4,44.21],[12.57,44.08],[12.69,43.98],[12.7,43.98],[12.71,43.98],[12.74,43.94],[12.7,43.86],[12.61,43.84],[12.57,43.88],[12.5,43.88],[12.5,43.99],[12.41,43.93],[12.4,43.87],[12.29,43.77],[12.23,43.76],[12.12,43.75],[12.0,43.76],[11.84,43.81],[11.7,43.93],[11.66,44.02],[11.75,44.12],[11.59,44.12],[11.54,44.16],[11.39,44.21],[11.3,44.17],[11.24,44.1],[11.13,44.11],[11.01,44.12],[10.92,44.06],[10.81,44.12],[10.66,44.15],[10.51,44.19],[10.32,44.28],[10.17,44.33],[10.04,44.38],[9.97,44.46],[9.79,44.43],[9.66,44.4],[9.54,44.43],[9.46,44.46],[9.49,44.56],[9.37,44.59],[9.28,44.6],[9.2,44.67],[9.26,44.68],[9.33,44.73]],[[12.18,43.81],[12.17,43.81],[12.17,43.8],[12.18,43.79],[12.18,43.78],[12.19,43.78],[12.19,43.77],[12.2,43.77],[12.21,43.78],[12.23,43.79],[12.24,43.79],[12.24,43.8],[12.23,43.81],[12.22,43.81],[12.22,43.8],[12.21,43.8],[12.2,43.81],[12.19,43.81],[12.19,43.8],[12.19,43.81],[12.18,43.81]]],[[[9.3,44.69],[9.3,44.7],[9.3,44.69]]],[[[9.29,44.7],[9.3,44.7],[9.29,44.7]]],[[[10.48,44.19]]]]},"properties":{"name":"Emilia-Romagna"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[9.9,44.16],[9.87,44.22],[9.82,44.28],[9.72,44.38],[9.82,44.45],[9.98,44.45],[10.05,44.37],[10.16,44.34],[10.25,44.27],[10.48,44.22],[10.62,44.12],[10.76,44.15],[10.86,44.1],[10.95,44.08],[11.0,44.11],[11.14,44.11],[11.24,44.1],[11.27,44.16],[11.38,44.2],[11.51,44.16],[11.61,44.16],[11.68,44.12],[11.73,44.09],[11.65,43.99],[11.71,43.9],[11.84,43.81],[11.97,43.77],[12.08,43.74],[12.2,43.75],[12.25,43.76],[12.37,43.71],[12.33,43.68],[12.3,43.72],[12.2,43.65],[12.16,43.55],[12.14,43.48],[12.04,43.42],[12.08,43.37],[12.13,43.31],[12.18,43.27],[12.08,43.24],[12.0,43.18],[11.93,43.09],[11.96,43.07],[11.97,43.02],[11.96,42.89],[11.88,42.84],[11.77,42.82],[11.81,42.75],[11.79,42.67],[11.76,42.64],[11.68,42.59],[11.59,42.57],[11.62,42.49],[11.54,42.44],[11.45,42.39],[11.29,42.41],[11.21,42.4],[11.18,42.37],[11.09,42.43],[11.15,42.43],[11.18,42.45],[11.14,42.56],[11.09,42.62],[10.98,42.72],[10.79,42.78],[10.77,42.86],[10.63,42.95],[10.52,42.92],[10.48,42.97],[10.51,42.99],[10.53,43.05],[10.5,43.29],[10.43,43.4],[10.33,43.48],[10.3,43.57],[10.28,43.69],[10.23,43.89],[10.09,44.02],[10.0,44.11],[9.96,44.17],[9.9,44.16]],[[10.48,44.19]]],[[[10.11,42.58],[10.11,42.59],[10.11,42.58]]],[[[10.1,42.59],[10.1,42.58],[10.09,42.57],[10.08,42.57],[10.07,42.57],[10.06,42.57],[10.05,42.57],[10.05,42.58],[10.05,42.59],[10.06,42.59],[10.07,42.59],[10.08,42.6],[10.08,42.61],[10.08,42.62],[10.09,42.62],[10.09,42.61],[10.09,42.6],[10.09,42.59],[10.1,42.59]]],[[[10.08,42.62]]],[[[10.27,42.74],[10.24,42.75],[10.24,42.74],[10.24,42.73],[10.19,42.74],[10.12,42.75],[10.11,42.76],[10.11,42.8],[10.14,42.81],[10.17,42.81],[10.18,42.81],[10.2,42.81],[10.21,42.81],[10.21,42.8],[10.24,42.79],[10.25,42.79],[10.25,42.8],[10.26,42.8],[10.27,42.8],[10.27,42.83],[10.27,42.82],[10.26,42.83],[10.32,42.82],[10.33,42.81],[10.32,42.8],[10.35,42.8],[10.36,42.8],[10.36,42.81],[10.36,42.82],[10.37,42.82],[10.39,42.85],[10.41,42.87],[10.43,42.86],[10.44,42.85],[10.43,42.83],[10.43,42.8],[10.43,42.78],[10.42,42.77],[10.4,42.76],[10.39,42.76],[10.41,42.75],[10.42,42.74],[10.44,42.72],[10.43,42.71],[10.41,42.71],[10.41,42.72],[10.4,42.71],[10.38,42.73],[10.36,42.75],[10.36,42.76],[10.34,42.76],[10.32,42.76],[10.33,42.74],[10.32,42.74],[10.31,42.75],[10.31,42.76],[10.3,42.76],[10.29,42.75],[10.29,42.74],[10.27,42.74]]],[[[10.41,42.71]]],[[[10.36,42.71]]],[[[10.36,42.71]]],[[[10.41,42.71]]],[[[10.37,42.72]]],[[[10.37,42.72]]],[[[10.38,42.72],[10.37,42.72],[10.38,42.72]]],[[[10.32,42.73]]],[[[9.8,43.03]]],[[[9.84,43.05],[9.85,43.05],[9.84,43.03],[9.83,43.02],[9.82,43.02],[9.82,43.01],[9.81,43.0],[9.8,43.01],[9.79,43.02],[9.79,43.03],[9.8,43.03],[9.8,43.05],[9.81,43.06],[9.82,43.07],[9.83,43.07],[9.84,43.06],[9.83,43.06],[9.84,43.05]]],[[[9.9,43.44],[9.91,43.44],[9.91,43.43],[9.91,43.42],[9.9,43.42],[9.89,43.42],[9.89,43.43],[9.89,43.44],[9.9,43.44]]],[[[10.22,43.55]]],[[[10.33,42.32],[10.31,42.31],[10.3,42.32],[10.29,42.32],[10.29,42.33],[10.29,42.34],[10.3,42.35],[10.31,42.35],[10.32,42.35],[10.32,42.34],[10.33,42.34],[10.33,42.33],[10.33,42.32]]],[[[10.06,42.36]]],[[[10.33,42.83]]],[[[10.55,42.86]]],[[[10.47,42.86],[10.47,42.87],[10.48,42.87],[10.47,42.86]]],[[[10.48,42.87],[10.47,42.87],[10.48,42.87]]],[[[10.42,42.87]]],[[[12.2,43.77],[12.19,43.77],[12.19,43.78],[12.18,43.78],[12.18,43.79],[12.17,43.8],[12.17,43.81],[12.18,43.81],[12.19,43.81],[12.19,43.8],[12.19,43.81],[12.2,43.81],[12.21,43.8],[12.22,43.8],[12.22,43.81],[12.23,43.81],[12.24,43.8],[12.24,43.79],[12.23,43.79],[12.21,43.78],[12.2,43.77]]],[[[10.71,42.8]]],[[[10.9,42.56]]],[[[10.89,42.56]]],[[[10.88,42.58]]],[[[11.12,42.26],[11.12,42.25],[11.11,42.25],[11.11,42.26],[11.11,42.25],[11.1,42.25],[11.11,42.25],[11.11,42.24],[11.1,42.24],[11.09,42.25],[11.09,42.26],[11.1,42.26],[11.11,42.26],[11.12,42.26]]],[[[10.88,42.35]]],[[[10.93,42.36]]],[[[10.89,42.39],[10.9,42.38],[10.91,42.38],[10.91,42.37],[10.92,42.37],[10.93,42.35],[10.92,42.35],[10.92,42.34],[10.93,42.34],[10.93,42.33],[10.92,42.32],[10.91,42.33],[10.9,42.33],[10.89,42.34],[10.88,42.35],[10.87,42.35],[10.86,42.36],[10.87,42.36],[10.87,42.37],[10.88,42.37],[10.88,42.38],[10.88,42.39],[10.89,42.39]]],[[[11.13,42.38]]],[[[11.21,42.38]]],[[[11.08,42.42]]]]},"properties":{"name":"Toscana"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[13.16,42.65],[13.1,42.64],[13.03,42.63],[12.96,42.62],[12.88,42.6],[12.8,42.54],[12.74,42.51],[12.69,42.45],[12.62,42.47],[12.61,42.41],[12.51,42.39],[12.47,42.4],[12.46,42.43],[12.42,42.43],[12.42,42.46],[12.42,42.48],[12.35,42.48],[12.29,42.49],[12.28,42.51],[12.27,42.54],[12.24,42.59],[12.23,42.64],[12.14,42.66],[12.11,42.66],[12.03,42.65],[11.94,42.7],[11.98,42.75],[11.91,42.81],[11.93,42.87],[11.94,42.91],[11.96,43.01],[11.98,43.05],[11.95,43.07],[11.93,43.07],[11.92,43.14],[12.0,43.18],[12.05,43.25],[12.09,43.24],[12.18,43.27],[12.2,43.31],[12.13,43.32],[12.1,43.37],[12.08,43.4],[12.05,43.43],[12.1,43.45],[12.1,43.5],[12.15,43.53],[12.2,43.6],[12.27,43.59],[12.31,43.6],[12.36,43.6],[12.32,43.55],[12.39,43.52],[12.42,43.54],[12.52,43.5],[12.61,43.44],[12.71,43.42],[12.77,43.45],[12.75,43.4],[12.77,43.36],[12.8,43.31],[12.82,43.27],[12.86,43.21],[12.83,43.15],[12.84,43.12],[12.88,43.11],[12.89,43.05],[12.91,42.99],[12.92,42.95],[12.97,42.93],[12.97,42.88],[13.0,42.9],[13.04,42.91],[13.07,42.9],[13.16,42.83],[13.23,42.86],[13.26,42.82],[13.24,42.77],[13.2,42.75],[13.19,42.72],[13.17,42.69],[13.16,42.65]]],[[[12.41,43.6],[12.41,43.61],[12.42,43.61],[12.43,43.61],[12.43,43.6],[12.44,43.6],[12.43,43.59],[12.42,43.59],[12.42,43.6],[12.41,43.6]]]]},"properties":{"name":"Umbria"}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[12.5,43.52],[12.41,43.53],[12.39,43.52],[12.32,43.55],[12.36,43.6],[12.31,43.6],[12.29,43.59],[12.22,43.59],[12.21,43.65],[12.27,43.68],[12.3,43.73],[12.32,43.69],[12.33,43.7],[12.37,43.71],[12.3,43.76],[12.28,43.79],[12.39,43.82],[12.42,43.87],[12.49,43.88],[12.53,43.87],[12.57,43.88],[12.6,43.86],[12.61,43.83],[12.67,43.82],[12.72,43.86],[12.73,43.9],[12.76,43.96],[12.91,43.92],[13.08,43.81],[13.18,43.74],[13.37,43.64],[13.43,43.62],[13.5,43.62],[13.53,43.62],[13.57,43.58],[13.63,43.54],[13.62,43.51],[13.66,43.44],[13.73,43.31],[13.8,43.19],[13.81,43.16],[13.85,43.09],[13.87,42.99],[13.91,42.9],[13.88,42.89],[13.8,42.87],[13.71,42.85],[13.66,42.81],[13.61,42.81],[13.53,42.81],[13.46,42.73],[13.44,42.7],[13.36,42.69],[13.3,42.73],[13.26,42.73],[13.19,42.74],[13.22,42.77],[13.25,42.77],[13.26,42.82],[13.23,42.85],[13.15,42.84],[13.07,42.91],[13.01,42.9],[13.0,42.89],[12.97,42.88],[12.97,42.93],[12.93,42.95],[12.9,42.98],[12.9,43.03],[12.89,43.09],[12.88,43.12],[12.84,43.13],[12.85,43.15],[12.83,43.23],[12.79,43.28],[12.79,43.34],[12.76,43.36],[12.76,43.4],[12.77,43.45],[12.71,43.42],[12.62,43.43],[12.52,43.5],[12.5,43.52]],[[12.41,43.6],[12.42,43.6],[12.42,43.59],[12.43,43.59],[12.44,43.6],[12.43,43.6],[12.43,43.61],[12.42,43.61],[12.41,43.61],[12.41,43.6]]]},"properties":{"name":"Marche"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[11.81,42.81],[11.91,42.82],[11.97,42.74],[11.95,42.68],[12.11,42.66],[12.16,42.68],[12.25,42.6],[12.27,42.53],[12.3,42.49],[12.35,42.48],[12.41,42.47],[12.42,42.44],[12.47,42.42],[12.52,42.4],[12.61,42.41],[12.64,42.45],[12.72,42.5],[12.85,42.55],[12.93,42.6],[13.03,42.63],[13.13,42.66],[13.18,42.69],[13.25,42.72],[13.3,42.73],[13.38,42.65],[13.34,42.58],[13.23,42.58],[13.18,42.51],[13.16,42.35],[13.23,42.29],[13.33,42.21],[13.34,42.17],[13.24,42.13],[13.1,42.18],[13.04,42.04],[13.14,42.02],[13.32,41.95],[13.36,41.87],[13.42,41.83],[13.53,41.77],[13.63,41.78],[13.72,41.8],[13.79,41.74],[13.92,41.72],[13.99,41.65],[14.01,41.57],[14.01,41.52],[13.97,41.49],[13.86,41.41],[13.87,41.34],[13.81,41.24],[13.69,41.25],[13.58,41.24],[13.59,41.21],[13.55,41.21],[13.4,41.27],[13.27,41.3],[13.13,41.26],[12.98,41.34],[12.81,41.41],[12.74,41.43],[12.62,41.45],[12.39,41.67],[12.23,41.74],[12.22,41.77],[12.11,41.93],[12.0,41.99],[11.83,42.03],[11.81,42.06],[11.76,42.12],[11.7,42.23],[11.59,42.32],[11.45,42.39],[11.53,42.44],[11.62,42.48],[11.57,42.51],[11.64,42.56],[11.73,42.61],[11.79,42.64],[11.78,42.7],[11.81,42.75],[11.77,42.82],[11.81,42.81]],[[12.66,41.73],[12.65,41.74],[12.65,41.75],[12.65,41.74],[12.65,41.73],[12.66,41.73]],[[12.46,41.91],[12.45,41.91],[12.45,41.9],[12.46,41.9],[12.46,41.91]]],[[[13.1,40.84]]],[[[12.97,40.88],[12.96,40.88],[12.97,40.88]]],[[[12.85,40.92]]],[[[12.85,40.92]]],[[[12.85,40.92]]],[[[12.85,40.92]]],[[[12.97,40.92],[12.96,40.92],[12.96,40.91],[12.96,40.9],[12.96,40.89],[12.97,40.89],[12.96,40.88],[12.95,40.88],[12.95,40.89],[12.96,40.89],[12.95,40.9],[12.94,40.9],[12.95,40.91],[12.95,40.92],[12.96,40.92],[12.97,40.92],[12.97,40.93],[12.98,40.93],[12.98,40.94],[12.99,40.94],[12.99,40.93],[13.0,40.93],[12.99,40.93],[12.98,40.93],[12.97,40.92]]],[[[13.0,40.93],[13.0,40.94],[13.0,40.93]]],[[[12.85,40.94]]],[[[12.85,40.94]]],[[[12.86,40.93],[12.85,40.92],[12.85,40.93],[12.86,40.93],[12.86,40.94],[12.85,40.95],[12.86,40.95],[12.86,40.94],[12.86,40.93]]],[[[13.06,40.97],[13.05,40.97],[13.06,40.97],[13.06,40.98],[13.06,40.97]]],[[[13.46,40.79],[13.45,40.79],[13.46,40.79]]],[[[13.43,40.79],[13.42,40.79],[13.41,40.78],[13.41,40.79],[13.42,40.79],[13.43,40.8],[13.44,40.8],[13.43,40.79]]]]},"properties":{"name":"Lazio"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[13.94,41.69],[13.9,41.72],[13.81,41.75],[13.74,41.78],[13.71,41.8],[13.64,41.8],[13.59,41.77],[13.53,41.77],[13.47,41.81],[13.39,41.82],[13.37,41.86],[13.36,41.93],[13.29,41.95],[13.16,42.0],[13.1,42.01],[13.02,42.08],[13.09,42.16],[13.17,42.15],[13.25,42.13],[13.32,42.15],[13.36,42.18],[13.34,42.22],[13.27,42.25],[13.22,42.32],[13.16,42.35],[13.14,42.46],[13.16,42.54],[13.23,42.58],[13.3,42.57],[13.38,42.59],[13.41,42.64],[13.36,42.69],[13.44,42.7],[13.47,42.73],[13.53,42.81],[13.6,42.81],[13.65,42.8],[13.71,42.84],[13.78,42.86],[13.85,42.88],[13.9,42.89],[13.96,42.78],[13.98,42.73],[14.06,42.62],[14.14,42.53],[14.22,42.47],[14.23,42.47],[14.3,42.41],[14.41,42.35],[14.5,42.27],[14.52,42.24],[14.65,42.19],[14.72,42.15],[14.72,42.11],[14.77,42.06],[14.78,42.03],[14.74,42.01],[14.69,41.97],[14.67,41.94],[14.64,41.9],[14.6,41.86],[14.59,41.85],[14.55,41.82],[14.53,41.79],[14.49,41.77],[14.45,41.76],[14.44,41.84],[14.37,41.88],[14.35,41.86],[14.3,41.89],[14.27,41.9],[14.23,41.88],[14.19,41.84],[14.17,41.79],[14.2,41.76],[14.18,41.75],[14.16,41.76],[14.12,41.73],[14.11,41.71],[14.05,41.7],[14.01,41.69],[13.95,41.69],[13.94,41.69]]]]},"properties":{"name":"Abruzzo"}},{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[14.42,41.44],[14.35,41.45],[14.29,41.47],[14.25,41.48],[14.18,41.5],[14.12,41.5],[14.1,41.42],[14.09,41.39],[14.03,41.41],[14.0,41.43],[13.98,41.47],[13.97,41.5],[14.0,41.51],[14.03,41.52],[14.03,41.56],[14.0,41.57],[13.99,41.65],[13.95,41.68],[13.96,41.7],[14.02,41.68],[14.05,41.71],[14.1,41.73],[14.12,41.73],[14.16,41.75],[14.17,41.77],[14.18,41.75],[14.2,41.76],[14.17,41.78],[14.17,41.84],[14.21,41.85],[14.25,41.89],[14.28,41.91],[14.3,41.89],[14.34,41.86],[14.36,41.87],[14.39,41.87],[14.45,41.81],[14.46,41.76],[14.49,41.77],[14.52,41.78],[14.54,41.8],[14.56,41.82],[14.6,41.85],[14.6,41.87],[14.63,41.9],[14.67,41.93],[14.67,41.95],[14.7,41.97],[14.75,42.01],[14.78,42.03],[14.77,42.06],[14.82,42.05],[14.9,42.02],[15.02,41.98],[15.1,41.94],[15.14,41.91],[15.12,41.86],[15.1,41.83],[15.11,41.81],[15.11,41.75],[15.1,41.74],[15.13,41.7],[15.1,41.68],[15.09,41.68],[15.05,41.66],[15.02,41.63],[14.98,41.64],[14.95,41.63],[14.95,41.6],[14.94,41.54],[14.99,41.5],[14.96,41.46],[14.88,41.45],[14.87,41.43],[14.79,41.45],[14.77,41.44],[14.76,41.41],[14.67,41.4],[14.63,41.38],[14.59,41.37],[14.55,41.38],[14.5,41.39],[14.48,41.42],[14.42,41.44]]]},"properties":{"name":"Molise"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[14.12,41.51],[14.25,41.48],[14.33,41.45],[14.45,41.43],[14.5,41.39],[14.59,41.38],[14.63,41.39],[14.76,41.41],[14.79,41.45],[14.87,41.43],[14.96,41.46],[15.04,41.45],[15.1,41.42],[15.06,41.36],[15.1,41.33],[15.15,41.28],[15.21,41.28],[15.27,41.26],[15.26,41.2],[15.26,41.11],[15.35,41.09],[15.46,41.08],[15.56,41.03],[15.57,40.98],[15.54,40.92],[15.47,40.89],[15.41,40.88],[15.35,40.88],[15.35,40.84],[15.37,40.8],[15.38,40.73],[15.49,40.66],[15.46,40.63],[15.52,40.58],[15.55,40.51],[15.59,40.45],[15.7,40.36],[15.8,40.28],[15.79,40.22],[15.7,40.16],[15.66,40.08],[15.67,40.05],[15.62,40.07],[15.49,40.05],[15.38,40.0],[15.31,40.03],[15.28,40.03],[15.2,40.12],[15.09,40.17],[15.01,40.2],[14.96,40.23],[14.93,40.27],[14.96,40.34],[15.0,40.36],[14.94,40.48],[14.82,40.64],[14.74,40.67],[14.62,40.65],[14.54,40.61],[14.45,40.62],[14.33,40.57],[14.35,40.63],[14.44,40.67],[14.48,40.7],[14.39,40.76],[14.32,40.82],[14.22,40.83],[14.21,40.8],[14.16,40.8],[14.16,40.81],[14.08,40.83],[14.08,40.79],[14.0,40.95],[13.88,41.11],[13.77,41.24],[13.88,41.29],[13.87,41.38],[13.91,41.43],[14.0,41.43],[14.09,41.4],[14.09,41.46],[14.12,41.51]]],[[[14.23,40.54],[14.21,40.54],[14.2,40.54],[14.2,40.55],[14.2,40.56],[14.21,40.56],[14.22,40.56],[14.23,40.56],[14.24,40.56],[14.25,40.56],[14.26,40.56],[14.27,40.56],[14.27,40.55],[14.26,40.55],[14.25,40.54],[14.25,40.55],[14.24,40.55],[14.23,40.55],[14.23,40.54]]],[[[13.95,40.71],[13.96,40.71],[13.96,40.7],[13.95,40.7],[13.94,40.71],[13.93,40.7],[13.92,40.7],[13.91,40.7],[13.9,40.7],[13.89,40.7],[13.88,40.7],[13.87,40.7],[13.86,40.71],[13.85,40.71],[13.86,40.72],[13.86,40.73],[13.86,40.74],[13.87,40.74],[13.87,40.75],[13.86,40.76],[13.87,40.76],[13.88,40.76],[13.89,40.75],[13.9,40.75],[13.91,40.75],[13.92,40.75],[13.93,40.75],[13.94,40.74],[13.95,40.74],[13.96,40.74],[13.96,40.73],[13.96,40.72],[13.96,40.71],[13.95,40.71]]],[[[14.25,40.54]]],[[[14.25,40.54]]],[[[14.26,40.54]]],[[[14.38,40.59]]],[[[14.19,40.79]]],[[[14.16,40.81]]],[[[14.22,40.83]]],[[[14.22,40.83]]],[[[14.22,40.83]]],[[[14.3,40.83]]],[[[14.02,40.77],[14.02,40.76],[14.01,40.75],[14.01,40.74],[14.02,40.74],[14.01,40.74],[14.01,40.75],[14.0,40.75],[14.01,40.75],[14.0,40.74],[14.0,40.75],[13.99,40.75],[13.99,40.74],[14.0,40.74],[13.99,40.74],[13.99,40.75],[14.0,40.75],[14.01,40.75],[14.01,40.76],[14.01,40.77],[14.02,40.77]]],[[[14.46,40.73]]],[[[14.9,40.25]]],[[[15.29,40.02]]],[[[14.43,40.58]]],[[[14.43,40.58]]],[[[14.44,40.58],[14.43,40.58],[14.44,40.58]]]]},"properties":{"name":"Campania"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[15.1,41.39],[15.06,41.44],[14.97,41.51],[14.93,41.62],[14.99,41.63],[15.07,41.66],[15.12,41.69],[15.12,41.75],[15.11,41.82],[15.13,41.91],[15.35,41.91],[15.66,41.92],[16.0,41.95],[16.07,41.94],[16.18,41.87],[16.15,41.75],[16.01,41.67],[15.9,41.55],[16.13,41.39],[16.38,41.29],[16.53,41.24],[16.63,41.2],[16.83,41.14],[16.87,41.14],[17.06,41.08],[17.26,40.98],[17.35,40.9],[17.55,40.8],[17.8,40.71],[17.94,40.68],[17.97,40.66],[17.97,40.65],[18.04,40.57],[18.18,40.48],[18.28,40.41],[18.41,40.3],[18.43,40.27],[18.46,40.22],[18.48,40.18],[18.51,40.14],[18.49,40.08],[18.43,40.0],[18.4,39.87],[18.35,39.79],[18.25,39.84],[18.07,39.92],[18.01,40.0],[17.98,40.06],[17.96,40.15],[17.91,40.24],[17.84,40.28],[17.74,40.3],[17.5,40.3],[17.39,40.34],[17.31,40.37],[17.2,40.41],[17.17,40.5],[17.03,40.51],[16.84,40.41],[16.74,40.47],[16.73,40.6],[16.67,40.74],[16.56,40.75],[16.48,40.74],[16.28,40.8],[16.22,40.9],[16.09,40.92],[16.02,40.99],[15.98,41.09],[15.87,41.13],[15.79,41.09],[15.68,41.09],[15.55,41.07],[15.44,41.08],[15.31,41.1],[15.23,41.19],[15.27,41.26],[15.2,41.28],[15.13,41.31],[15.07,41.35],[15.1,41.39]],[[16.63,40.76],[16.63,40.75],[16.64,40.75],[16.65,40.75],[16.65,40.76],[16.64,40.76],[16.63,40.76]]],[[[15.5,42.12]]],[[[15.48,42.1],[15.48,42.11],[15.48,42.12],[15.49,42.12],[15.49,42.13],[15.49,42.12],[15.5,42.12],[15.49,42.11],[15.48,42.1]]],[[[15.5,42.12],[15.51,42.13],[15.52,42.13],[15.51,42.12],[15.5,42.12]]],[[[15.51,42.13],[15.51,42.14],[15.52,42.14],[15.52,42.13],[15.51,42.13]]],[[[15.74,42.23],[15.75,42.23],[15.75,42.22],[15.74,42.23]]],[[[16.2,41.81],[16.2,41.82],[16.2,41.81]]],[[[16.19,41.84]]],[[[16.18,41.89],[16.19,41.89],[16.18,41.89]]],[[[16.11,41.93]]],[[[17.18,40.44],[17.17,40.44],[17.18,40.44],[17.17,40.44],[17.18,40.44]]],[[[17.16,40.45],[17.17,40.45],[17.16,40.45],[17.15,40.45],[17.14,40.45],[17.15,40.45],[17.16,40.45],[17.16,40.46],[17.16,40.45]]],[[[18.03,40.64]]],[[[18.0,40.65],[18.0,40.66],[18.0,40.65]]],[[[18.0,40.65],[18.0,40.66],[18.0,40.65]]],[[[17.99,40.66],[18.0,40.66],[17.99,40.66]]],[[[17.99,40.66]]],[[[17.99,40.66]]],[[[17.99,40.66]]],[[[17.82,40.7],[17.83,40.7],[17.82,40.7]]],[[[17.82,40.7]]],[[[17.81,40.71]]],[[[17.81,40.71],[17.8,40.71],[17.8,40.72],[17.81,40.71]]],[[[17.95,40.05],[17.96,40.05],[17.95,40.05]]],[[[17.97,40.05]]],[[[18.5,40.09]]],[[[18.12,39.88]]],[[[18.12,39.88]]],[[[18.1,39.9],[18.1,39.89],[18.1,39.9]]],[[[17.89,40.25]]],[[[17.89,40.26],[17.88,40.26],[17.89,40.26]]],[[[17.87,40.27],[17.86,40.27],[17.87,40.27]]]]},"properties":{"name":"Puglia"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[15.47,40.63],[15.5,40.67],[15.41,40.71],[15.38,40.75],[15.38,40.8],[15.35,40.82],[15.38,40.84],[15.35,40.87],[15.4,40.88],[15.45,40.87],[15.47,40.89],[15.53,40.92],[15.55,40.95],[15.57,40.99],[15.56,41.02],[15.54,41.06],[15.56,41.08],[15.62,41.1],[15.74,41.1],[15.79,41.09],[15.83,41.12],[15.87,41.13],[15.92,41.11],[15.99,41.07],[16.03,41.02],[16.0,40.97],[16.06,40.93],[16.14,40.91],[16.18,40.92],[16.24,40.84],[16.29,40.8],[16.4,40.71],[16.5,40.76],[16.54,40.75],[16.57,40.75],[16.65,40.74],[16.7,40.7],[16.73,40.6],[16.72,40.53],[16.75,40.47],[16.81,40.44],[16.85,40.41],[16.78,40.3],[16.69,40.15],[16.61,40.13],[16.54,40.12],[16.45,40.13],[16.41,40.12],[16.41,40.07],[16.39,40.0],[16.36,39.96],[16.35,39.95],[16.33,39.91],[16.28,39.93],[16.22,39.93],[16.21,39.9],[16.16,39.92],[16.08,39.9],[16.02,39.93],[16.03,39.98],[16.0,39.99],[15.92,40.0],[15.88,40.0],[15.82,39.99],[15.78,39.97],[15.77,39.93],[15.75,39.93],[15.66,40.04],[15.67,40.05],[15.65,40.08],[15.7,40.12],[15.71,40.16],[15.79,40.22],[15.8,40.26],[15.75,40.3],[15.71,40.34],[15.64,40.42],[15.56,40.48],[15.55,40.51],[15.53,40.57],[15.49,40.59],[15.47,40.63]]],[[[15.71,39.97],[15.72,39.97],[15.71,39.97]]],[[[16.63,40.76],[16.64,40.76],[16.65,40.76],[16.65,40.75],[16.64,40.75],[16.63,40.75],[16.63,40.76]]]]},"properties":{"name":"Basilicata"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[15.97,39.47],[15.88,39.54],[15.83,39.67],[15.79,39.8],[15.79,39.85],[15.76,39.92],[15.78,39.97],[15.84,40.0],[15.9,39.99],[16.01,39.99],[16.01,39.96],[16.05,39.9],[16.16,39.92],[16.22,39.92],[16.27,39.94],[16.35,39.9],[16.36,39.95],[16.38,39.99],[16.41,40.08],[16.42,40.14],[16.54,40.12],[16.64,40.12],[16.6,40.05],[16.61,40.0],[16.62,39.95],[16.5,39.83],[16.5,39.74],[16.53,39.66],[16.64,39.62],[16.74,39.62],[16.8,39.6],[16.86,39.54],[16.99,39.49],[17.05,39.44],[17.15,39.4],[17.11,39.32],[17.12,39.24],[17.13,39.18],[17.13,39.1],[17.17,39.03],[17.16,38.97],[17.1,38.9],[17.05,38.92],[16.99,38.94],[16.81,38.91],[16.62,38.83],[16.57,38.77],[16.54,38.72],[16.56,38.69],[16.57,38.57],[16.58,38.45],[16.46,38.34],[16.34,38.3],[16.3,38.27],[16.21,38.18],[16.16,38.13],[16.12,37.98],[15.96,37.92],[15.82,37.92],[15.75,37.92],[15.65,37.99],[15.66,38.04],[15.65,38.07],[15.65,38.15],[15.64,38.23],[15.81,38.29],[15.86,38.38],[15.89,38.43],[15.93,38.55],[15.86,38.6],[15.86,38.66],[15.93,38.69],[16.02,38.73],[16.13,38.72],[16.19,38.77],[16.22,38.92],[16.16,38.95],[16.1,39.03],[16.07,39.13],[16.05,39.3],[16.0,39.44],[15.97,39.47]]],[[[15.8,39.7]]],[[[15.78,39.87],[15.77,39.87],[15.77,39.88],[15.78,39.88],[15.78,39.87]]],[[[15.78,39.85]]],[[[15.79,39.86]]]]},"properties":{"name":"Calabria"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[12.91,38.02],[13.08,38.09],[13.09,38.16],[13.16,38.17],[13.25,38.2],[13.33,38.21],[13.37,38.13],[13.51,38.12],[13.59,38.03],[13.71,37.98],[13.9,38.01],[14.07,38.02],[14.2,38.02],[14.35,38.02],[14.44,38.04],[14.57,38.06],[14.67,38.09],[14.79,38.15],[14.95,38.17],[15.07,38.12],[15.18,38.15],[15.24,38.25],[15.24,38.23],[15.46,38.26],[15.63,38.27],[15.56,38.19],[15.49,38.07],[15.42,37.99],[15.31,37.88],[15.27,37.83],[15.21,37.72],[15.18,37.64],[15.12,37.53],[15.09,37.48],[15.16,37.29],[15.21,37.29],[15.25,37.24],[15.22,37.24],[15.2,37.24],[15.21,37.15],[15.23,37.15],[15.27,37.11],[15.28,37.07],[15.33,37.01],[15.27,37.0],[15.21,36.96],[15.14,36.9],[15.09,36.8],[15.12,36.73],[15.12,36.67],[15.05,36.68],[14.91,36.72],[14.82,36.72],[14.76,36.72],[14.68,36.74],[14.59,36.78],[14.46,36.82],[14.43,36.89],[14.24,37.07],[13.97,37.11],[13.83,37.14],[13.72,37.17],[13.58,37.27],[13.45,37.3],[13.35,37.36],[13.28,37.39],[13.19,37.47],[13.05,37.5],[12.98,37.55],[12.85,37.58],[12.62,37.62],[12.54,37.66],[12.47,37.74],[12.47,37.84],[12.48,37.93],[12.51,38.02],[12.65,38.08],[12.69,38.11],[12.73,38.19],[12.74,38.18],[12.8,38.1],[12.88,38.03],[12.91,38.02]]],[[[12.53,38.06]]],[[[12.3,37.91]]],[[[12.29,37.91]]],[[[12.3,37.92],[12.3,37.91],[12.3,37.92]]],[[[12.31,37.95],[12.32,37.94],[12.32,37.93],[12.33,37.93],[12.34,37.94],[12.35,37.94],[12.35,37.93],[12.36,37.93],[12.36,37.92],[12.37,37.92],[12.37,37.91],[12.35,37.91],[12.34,37.91],[12.34,37.92],[12.32,37.92],[12.31,37.92],[12.3,37.92],[12.29,37.92],[12.28,37.92],[12.28,37.93],[12.27,37.94],[12.28,37.94],[12.28,37.95],[12.29,37.95],[12.29,37.94],[12.3,37.95],[12.31,37.95],[12.31,37.96],[12.31,37.95]]],[[[12.06,37.99],[12.06,37.98],[12.07,37.98],[12.07,37.97],[12.08,37.96],[12.08,37.95],[12.09,37.95],[12.08,37.95],[12.07,37.95],[12.06,37.95],[12.05,37.95],[12.04,37.96],[12.04,37.97],[12.04,37.98],[12.03,37.99],[12.04,37.99],[12.05,37.99],[12.06,37.99]]],[[[12.33,37.99]]],[[[12.43,37.99],[12.42,37.99],[12.43,37.99]]],[[[12.42,37.99],[12.41,37.99],[12.42,37.99]]],[[[12.33,38.02],[12.34,38.02],[12.34,38.01],[12.35,38.0],[12.35,37.99],[12.34,37.99],[12.33,37.99],[12.32,37.99],[12.32,38.0],[12.32,38.01],[12.33,38.02]]],[[[12.46,37.86]]],[[[12.47,37.87],[12.47,37.86],[12.46,37.86],[12.46,37.87],[12.47,37.87]]],[[[12.46,37.88],[12.46,37.89],[12.46,37.88]]],[[[12.45,37.9],[12.45,37.89],[12.45,37.88],[12.45,37.87],[12.45,37.86],[12.45,37.85],[12.45,37.84],[12.44,37.85],[12.44,37.86],[12.44,37.87],[12.44,37.88],[12.43,37.89],[12.43,37.9],[12.44,37.9],[12.45,37.9],[12.46,37.91],[12.46,37.9],[12.45,37.9]]],[[[11.96,36.84],[11.97,36.84],[11.98,36.83],[11.99,36.82],[12.0,36.82],[12.01,36.83],[12.02,36.82],[12.03,36.81],[12.04,36.8],[12.05,36.8],[12.05,36.79],[12.05,36.78],[12.06,36.77],[12.05,36.76],[12.05,36.75],[12.04,36.75],[12.04,36.74],[12.03,36.74],[12.03,36.73],[12.01,36.73],[11.99,36.74],[11.98,36.74],[11.98,36.75],[11.97,36.76],[11.97,36.77],[11.96,36.77],[11.96,36.78],[11.95,36.78],[11.94,36.79],[11.93,36.8],[11.93,36.81],[11.93,36.82],[11.93,36.83],[11.94,36.83],[11.95,36.84],[11.96,36.84]]],[[[12.5,38.01],[12.49,38.01],[12.5,38.01]]],[[[12.49,38.01]]],[[[12.47,37.73]]],[[[13.23,38.21],[13.24,38.21],[13.23,38.21]]],[[[13.18,38.72],[13.19,38.72],[13.2,38.72],[13.2,38.71],[13.19,38.7],[13.17,38.69],[13.16,38.69],[13.15,38.69],[13.16,38.71],[13.17,38.72],[13.18,38.72]]],[[[14.85,38.54],[14.83,38.55],[14.81,38.55],[14.8,38.55],[14.8,38.56],[14.8,38.57],[14.81,38.58],[14.82,38.58],[14.84,38.58],[14.85,38.58],[14.86,38.58],[14.87,38.58],[14.87,38.57],[14.87,38.56],[14.87,38.55],[14.87,38.54],[14.86,38.53],[14.85,38.54]]],[[[14.94,38.4]]],[[[14.96,38.41],[14.98,38.41],[15.0,38.4],[15.0,38.39],[15.01,38.38],[15.0,38.37],[14.99,38.37],[14.98,38.37],[14.97,38.37],[14.96,38.38],[14.95,38.38],[14.94,38.4],[14.94,38.41],[14.95,38.42],[14.95,38.43],[14.96,38.43],[14.97,38.43],[14.97,38.42],[14.96,38.42],[14.96,38.41]]],[[[14.96,38.52],[14.96,38.51],[14.96,38.5],[14.96,38.49],[14.97,38.49],[14.97,38.48],[14.97,38.49],[14.98,38.49],[14.98,38.48],[14.97,38.48],[14.96,38.48],[14.96,38.47],[14.96,38.46],[14.96,38.45],[14.96,38.44],[14.95,38.44],[14.94,38.44],[14.94,38.45],[14.93,38.46],[14.92,38.46],[14.91,38.47],[14.9,38.48],[14.9,38.49],[14.9,38.5],[14.9,38.51],[14.91,38.51],[14.92,38.52],[14.93,38.52],[14.94,38.52],[14.95,38.52],[14.96,38.52]]],[[[14.35,38.53],[14.34,38.53],[14.34,38.54],[14.34,38.55],[14.35,38.55],[14.36,38.55],[14.37,38.55],[14.36,38.54],[14.36,38.53],[14.35,38.53]]],[[[14.59,38.56],[14.59,38.55],[14.58,38.55],[14.58,38.56],[14.57,38.56],[14.56,38.56],[14.55,38.56],[14.54,38.57],[14.54,38.58],[14.54,38.59],[14.55,38.59],[14.56,38.59],[14.57,38.58],[14.58,38.58],[14.58,38.57],[14.58,38.56],[14.59,38.56]]],[[[15.06,38.62]]],[[[15.11,38.63]]],[[[15.11,38.64]]],[[[15.1,38.64]]],[[[15.11,38.64],[15.12,38.64],[15.11,38.64]]],[[[15.06,38.65]]],[[[15.06,38.62],[15.06,38.63],[15.05,38.63],[15.06,38.64],[15.07,38.65],[15.08,38.64],[15.08,38.63],[15.07,38.63],[15.06,38.62]]],[[[15.11,38.66]]],[[[15.12,38.66],[15.11,38.66],[15.12,38.67],[15.12,38.66]]],[[[15.21,38.77],[15.2,38.78],[15.19,38.79],[15.19,38.8],[15.2,38.8],[15.21,38.8],[15.21,38.81],[15.22,38.81],[15.23,38.81],[15.24,38.8],[15.23,38.79],[15.23,38.78],[15.22,38.77],[15.21,38.77]]],[[[15.3,37.85]]],[[[12.56,35.51]]],[[[12.53,35.53]]],[[[12.53,35.53],[12.54,35.53],[12.55,35.53],[12.55,35.52],[12.57,35.52],[12.58,35.52],[12.59,35.52],[12.6,35.52],[12.6,35.53],[12.61,35.53],[12.62,35.52],[12.63,35.52],[12.62,35.51],[12.63,35.5],[12.63,35.49],[12.62,35.49],[12.61,35.49],[12.61,35.5],[12.6,35.5],[12.59,35.5],[12.57,35.51],[12.54,35.52],[12.53,35.52],[12.52,35.52],[12.53,35.53]]],[[[12.32,35.55]]],[[[12.88,35.88],[12.88,35.87],[12.88,35.86],[12.88,35.85],[12.88,35.86],[12.86,35.85],[12.86,35.86],[12.85,35.87],[12.86,35.88],[12.87,35.88],[12.87,35.87],[12.87,35.88],[12.88,35.88]]],[[[13.86,37.11]]],[[[15.17,37.56],[15.16,37.56],[15.17,37.56]]],[[[15.17,37.56]]],[[[14.93,36.69]]],[[[15.21,37.24],[15.2,37.23],[15.2,37.24],[15.21,37.24],[15.2,37.24],[15.21,37.24]]],[[[15.11,36.79],[15.1,36.79],[15.11,36.79]]],[[[15.12,36.74]]],[[[15.27,36.98],[15.26,36.98],[15.27,36.98]]],[[[15.14,36.68],[15.14,36.69],[15.15,36.69],[15.14,36.68]]]]},"properties":{"name":"Sicilia"}},{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[8.34,40.5]]],[[[8.3,40.57]]],[[[8.15,40.57]]],[[[8.14,40.6]]],[[[8.37,40.5],[8.25,40.58],[8.19,40.62],[8.14,40.62],[8.19,40.69],[8.16,40.8],[8.2,40.97],[8.29,40.86],[8.4,40.84],[8.63,40.88],[8.84,40.96],[9.05,41.14],[9.12,41.16],[9.15,41.23],[9.21,41.25],[9.28,41.19],[9.32,41.19],[9.33,41.19],[9.36,41.21],[9.41,41.16],[9.47,41.13],[9.53,41.14],[9.54,41.08],[9.53,41.02],[9.57,41.01],[9.65,41.0],[9.59,40.97],[9.53,40.93],[9.61,40.91],[9.64,40.88],[9.69,40.86],[9.69,40.81],[9.71,40.72],[9.74,40.65],[9.79,40.55],[9.79,40.44],[9.63,40.28],[9.64,40.17],[9.73,40.07],[9.71,39.94],[9.69,39.85],[9.67,39.72],[9.64,39.54],[9.63,39.43],[9.62,39.3],[9.56,39.2],[9.52,39.11],[9.5,39.13],[9.4,39.14],[9.34,39.19],[9.24,39.22],[9.16,39.2],[9.02,39.15],[9.04,39.06],[8.91,38.92],[8.78,38.92],[8.66,38.91],[8.65,38.89],[8.6,38.96],[8.57,39.02],[8.51,39.06],[8.44,38.97],[8.41,38.95],[8.37,39.02],[8.36,39.09],[8.46,39.08],[8.47,39.12],[8.39,39.2],[8.42,39.32],[8.41,39.43],[8.46,39.56],[8.45,39.67],[8.45,39.77],[8.52,39.75],[8.54,39.88],[8.43,39.86],[8.4,39.99],[8.4,40.04],[8.48,40.12],[8.48,40.26],[8.46,40.32],[8.39,40.45],[8.37,40.5]]],[[[8.71,40.92]]],[[[9.58,41.07],[9.59,41.07],[9.58,41.07]]],[[[9.58,41.06],[9.57,41.06],[9.57,41.07],[9.58,41.07],[9.58,41.06]]],[[[9.59,41.07],[9.58,41.07],[9.59,41.07]]],[[[9.59,41.07],[9.59,41.08],[9.59,41.07]]],[[[9.6,41.08]]],[[[9.61,41.08],[9.61,41.07],[9.6,41.07],[9.6,41.08],[9.61,41.08]]],[[[9.58,41.09]]],[[[9.58,41.09]]],[[[9.57,41.12]]],[[[9.57,41.12]]],[[[9.57,41.12],[9.56,41.12],[9.57,41.12]]],[[[9.57,41.13]]],[[[9.57,41.12],[9.56,41.12],[9.56,41.13],[9.57,41.13],[9.57,41.12]]],[[[9.57,41.13]]],[[[9.5,41.15]]],[[[9.52,41.16]]],[[[9.52,41.16],[9.52,41.17],[9.53,41.17],[9.53,41.16],[9.52,41.16]]],[[[9.46,41.17]]],[[[9.46,41.17],[9.46,41.18],[9.46,41.17]]],[[[9.49,41.18]]],[[[9.49,41.18],[9.48,41.18],[9.48,41.19],[9.49,41.18]]],[[[9.4,41.2]]],[[[9.44,41.2]]],[[[9.41,41.19],[9.4,41.19],[9.4,41.2],[9.41,41.2],[9.41,41.21],[9.42,41.21],[9.42,41.2],[9.42,41.19],[9.41,41.19]]],[[[9.45,41.21]]],[[[9.42,41.21],[9.41,41.21],[9.42,41.21],[9.42,41.22],[9.42,41.21]]],[[[9.52,41.22]]],[[[9.52,41.22]]],[[[9.52,41.22]]],[[[9.52,41.22]]],[[[9.45,41.22]]],[[[9.46,41.23],[9.45,41.23],[9.46,41.23]]],[[[9.34,41.23]]],[[[9.46,41.23]]],[[[9.36,41.24],[9.36,41.25],[9.36,41.24]]],[[[9.47,41.25],[9.47,41.24],[9.48,41.23],[9.49,41.22],[9.48,41.21],[9.47,41.2],[9.46,41.19],[9.46,41.18],[9.47,41.18],[9.47,41.19],[9.48,41.19],[9.48,41.18],[9.47,41.18],[9.46,41.19],[9.45,41.19],[9.44,41.19],[9.45,41.19],[9.44,41.18],[9.44,41.19],[9.43,41.19],[9.44,41.19],[9.44,41.2],[9.45,41.2],[9.46,41.2],[9.45,41.21],[9.45,41.22],[9.45,41.23],[9.46,41.22],[9.46,41.23],[9.46,41.24],[9.47,41.24],[9.47,41.25]]],[[[9.36,41.25]]],[[[9.4,41.25]]],[[[9.32,41.25]]],[[[9.34,41.25],[9.35,41.25],[9.36,41.25],[9.36,41.24],[9.35,41.23],[9.34,41.23],[9.33,41.24],[9.33,41.25],[9.34,41.25]]],[[[9.4,41.25]]],[[[9.43,41.26],[9.43,41.25],[9.44,41.25],[9.44,41.24],[9.44,41.23],[9.44,41.24],[9.45,41.23],[9.44,41.23],[9.44,41.22],[9.44,41.21],[9.42,41.21],[9.42,41.22],[9.41,41.21],[9.4,41.21],[9.39,41.21],[9.38,41.21],[9.38,41.22],[9.37,41.23],[9.38,41.23],[9.39,41.24],[9.4,41.24],[9.4,41.25],[9.4,41.26],[9.41,41.25],[9.41,41.26],[9.42,41.26],[9.41,41.26],[9.41,41.27],[9.42,41.27],[9.43,41.26]]],[[[9.4,41.28]]],[[[9.36,41.28]]],[[[9.37,41.28]]],[[[9.37,41.28],[9.36,41.28],[9.36,41.29],[9.37,41.29],[9.37,41.28]]],[[[9.4,41.28],[9.4,41.29],[9.4,41.28]]],[[[9.34,41.29]]],[[[9.37,41.29]]],[[[9.4,41.29]]],[[[9.4,41.29]]],[[[9.36,41.29]]],[[[9.36,41.28],[9.35,41.28],[9.34,41.28],[9.34,41.29],[9.35,41.29],[9.36,41.29],[9.36,41.28]]],[[[9.33,41.3],[9.33,41.29],[9.33,41.3]]],[[[9.34,41.3]]],[[[9.34,41.29],[9.34,41.3],[9.34,41.29]]],[[[9.34,41.29],[9.33,41.29],[9.33,41.3],[9.34,41.3],[9.34,41.29]]],[[[9.33,41.3]]],[[[9.41,41.29],[9.4,41.29],[9.4,41.3],[9.41,41.3],[9.41,41.29]]],[[[9.4,41.29],[9.4,41.3],[9.4,41.29]]],[[[9.4,41.3]]],[[[9.38,41.31],[9.38,41.3],[9.38,41.29],[9.37,41.29],[9.36,41.29],[9.36,41.3],[9.37,41.3],[9.38,41.31]]],[[[9.34,41.31],[9.35,41.3],[9.36,41.3],[9.36,41.29],[9.35,41.29],[9.35,41.3],[9.34,41.3],[9.33,41.3],[9.33,41.31],[9.34,41.31]]],[[[9.37,41.31]]],[[[9.38,41.31],[9.37,41.31],[9.38,41.31]]],[[[9.37,41.31]]],[[[9.71,40.88]]],[[[9.78,40.87],[9.78,40.88],[9.78,40.87]]],[[[9.73,40.88],[9.74,40.88],[9.74,40.87],[9.74,40.86],[9.73,40.86],[9.71,40.87],[9.71,40.88],[9.72,40.88],[9.73,40.88]]],[[[9.67,40.88]]],[[[9.64,40.89],[9.64,40.88],[9.64,40.89]]],[[[9.65,40.89]]],[[[9.67,40.89]]],[[[9.68,40.9],[9.67,40.9],[9.68,40.9]]],[[[9.58,40.91],[9.58,40.9],[9.58,40.91]]],[[[9.53,40.92]]],[[[9.51,40.92]]],[[[9.51,40.92]]],[[[9.65,40.92]]],[[[9.57,40.92]]],[[[9.64,40.92]]],[[[9.63,40.92]]],[[[9.64,40.92]]],[[[9.64,40.92]]],[[[9.51,40.92]]],[[[9.63,40.92]]],[[[9.63,40.92]]],[[[9.73,40.92],[9.74,40.92],[9.74,40.91],[9.73,40.91],[9.72,40.91],[9.71,40.9],[9.7,40.89],[9.69,40.89],[9.67,40.89],[9.69,40.9],[9.71,40.91],[9.72,40.91],[9.73,40.92],[9.74,40.93],[9.74,40.92],[9.73,40.92]]],[[[9.53,40.93]]],[[[9.53,41.04]]],[[[9.33,41.19],[9.34,41.19],[9.33,41.19]]],[[[8.22,40.97],[8.23,40.97],[8.22,40.97]]],[[[8.21,40.97]]],[[[8.21,40.98],[8.22,40.98],[8.23,40.98],[8.23,40.97],[8.22,40.97],[8.21,40.97],[8.21,40.98]]],[[[8.21,40.98],[8.21,40.99],[8.21,40.98]]],[[[8.21,40.99],[8.21,40.98],[8.21,40.99]]],[[[8.25,41.03]]],[[[8.32,41.11],[8.33,41.1],[8.34,41.1],[8.35,41.1],[8.35,41.09],[8.34,41.09],[8.34,41.07],[8.34,41.06],[8.33,41.05],[8.32,41.06],[8.29,41.06],[8.28,41.06],[8.27,41.06],[8.27,41.05],[8.26,41.05],[8.27,41.05],[8.25,41.03],[8.24,41.03],[8.23,41.02],[8.24,41.02],[8.24,41.03],[8.25,41.03],[8.25,41.02],[8.25,41.01],[8.26,41.0],[8.26,40.99],[8.25,40.98],[8.24,40.99],[8.23,40.99],[8.21,40.99],[8.21,41.01],[8.22,41.01],[8.23,41.02],[8.22,41.03],[8.22,41.04],[8.23,41.04],[8.24,41.05],[8.25,41.05],[8.26,41.06],[8.27,41.07],[8.28,41.08],[8.29,41.08],[8.28,41.08],[8.28,41.09],[8.27,41.09],[8.27,41.1],[8.28,41.1],[8.3,41.1],[8.31,41.11],[8.31,41.12],[8.32,41.12],[8.33,41.11],[8.32,41.11]]],[[[9.12,41.16]]],[[[9.12,41.16]]],[[[9.28,41.23]]],[[[9.19,41.25],[9.18,41.25],[9.19,41.25]]],[[[9.24,41.25],[9.24,41.26],[9.24,41.25]]],[[[9.24,41.26]]],[[[9.24,41.26]]],[[[8.86,41.01],[8.86,41.02],[8.86,41.01]]],[[[9.59,40.96]]],[[[9.64,40.98],[9.65,40.98],[9.64,40.98]]],[[[8.21,40.88]]],[[[8.17,40.94]]],[[[8.21,40.97]]],[[[9.77,40.68],[9.77,40.69],[9.77,40.68]]],[[[9.72,40.73],[9.71,40.73],[9.71,40.74],[9.72,40.74],[9.72,40.73]]],[[[9.71,40.83]]],[[[9.72,40.85]]],[[[9.72,40.84],[9.72,40.85],[9.72,40.84]]],[[[9.68,40.86],[9.68,40.87],[9.68,40.86]]],[[[9.71,39.97],[9.7,39.97],[9.7,39.98],[9.71,39.98],[9.71,39.97]]],[[[9.71,39.98]]],[[[9.71,39.98]]],[[[9.82,40.54]]],[[[9.02,38.98]]],[[[9.03,39.0],[9.03,39.01],[9.03,39.0]]],[[[8.28,39.88]]],[[[8.31,39.99],[8.3,39.99],[8.31,39.99],[8.31,40.0],[8.31,39.99]]],[[[8.49,40.09]]],[[[8.49,40.09]]],[[[8.49,40.09]]],[[[8.49,40.09]]],[[[8.46,40.21],[8.45,40.21],[8.46,40.21]]],[[[8.4,40.05]]],[[[8.38,40.36]]],[[[8.26,39.17],[8.26,39.18],[8.26,39.17]]],[[[8.32,39.19]]],[[[8.31,39.18],[8.31,39.17],[8.31,39.16],[8.31,39.15],[8.31,39.14],[8.31,39.13],[8.31,39.11],[8.31,39.1],[8.3,39.1],[8.29,39.1],[8.28,39.1],[8.27,39.1],[8.26,39.1],[8.25,39.11],[8.25,39.12],[8.25,39.13],[8.24,39.14],[8.23,39.14],[8.22,39.14],[8.22,39.15],[8.23,39.16],[8.25,39.17],[8.26,39.17],[8.27,39.17],[8.27,39.18],[8.29,39.18],[8.3,39.18],[8.3,39.19],[8.31,39.19],[8.31,39.18]]],[[[8.32,39.19],[8.32,39.2],[8.32,39.19]]],[[[8.87,38.88]]],[[[8.89,38.9]]],[[[8.4,39.33],[8.4,39.34],[8.4,39.33]]],[[[9.63,39.31]]],[[[8.36,39.23]]],[[[8.36,39.23]]],[[[8.41,38.86]]],[[[8.45,38.94],[8.45,38.93],[8.45,38.94]]],[[[8.45,38.94]]],[[[8.46,39.08]]],[[[8.44,39.1],[8.44,39.11],[8.44,39.1]]],[[[8.82,38.88],[8.83,38.88],[8.82,38.88]]],[[[8.83,38.88]]],[[[8.81,38.89]]],[[[8.77,38.91]]],[[[8.72,38.91],[8.71,38.91],[8.71,38.92],[8.72,38.92],[8.72,38.91]]],[[[9.66,39.52]]],[[[9.66,39.52]]],[[[9.54,39.08]]],[[[9.54,39.08]]],[[[9.54,39.08]]],[[[9.54,39.09],[9.54,39.08],[9.54,39.09]]],[[[9.54,39.09],[9.53,39.09],[9.54,39.08],[9.53,39.08],[9.53,39.09],[9.54,39.09]]],[[[9.61,39.15],[9.61,39.14],[9.61,39.13],[9.6,39.13],[9.6,39.14],[9.61,39.14],[9.61,39.15]]],[[[9.6,39.15],[9.61,39.15],[9.6,39.15]]],[[[9.61,39.15]]],[[[9.61,39.15],[9.6,39.15],[9.61,39.15]]]]},"properties":{"name":"Sardegna"}}]};
+
+            L.geoJSON(geoData, {
+                style: function(feature) {
+                    var name = feature.properties.name;
+                    var score = scores[name] || 5.5;
+                    return {
+                        fillColor: scoreToColor(score),
+                        fillOpacity: 0.7,
+                        weight: 1.5,
+                        color: 'rgba(255,255,255,0.4)'
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    var name = feature.properties.name;
+                    var score = scores[name] || '?';
+                    var d = details[name] || {};
+                    var shortName = name.split('/')[0];
+                    layer.bindTooltip(
+                        '<strong>' + shortName + '</strong><br>' +
+                        'Score: ' + (typeof score === 'number' ? score.toFixed(2) : score) + '/10<br>' +
+                        'Enti: ' + (d.enti || '?') + '<br>' +
+                        'HTTPS: ' + (d.https || '?') + '<br>' +
+                        'Spoofabile: ' + (d.spoof || '?'),
+                        {
+                            sticky: true,
+                            className: 'map-tip'
+                        }
+                    );
+                    layer.on('mouseover', function() {
+                        layer.setStyle({ fillOpacity: 0.95, weight: 2.5 });
+                    });
+                    layer.on('mouseout', function() {
+                        layer.setStyle({ fillOpacity: 0.7, weight: 1.5 });
+                    });
+                }
+            }).addTo(map);
+})();
+</script>
+
+<style>
+.map-tip {
+    background: var(--bg-primary, #0a0a1a) !important;
+    border: 1px solid #00ff88 !important;
+    border-radius: 6px !important;
+    color: #e0e0e0 !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.8rem !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+.map-tip strong { color: #00ff88; }
+.leaflet-container { background: var(--bg-secondary, #12122a) !important; }
+</style>
+
+</body>
+</html>

@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>I Server Parlano</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/i-server-parlano.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/i-server-parlano.html</guid>
+    <pubDate>Wed, 05 Mar 2026 00:00:00 +0100</pubDate>
+    <description>22.313 domini della PA italiana analizzati con 6 script Python. Nessuna intrusione, solo dati pubblici. DNS, HTTP, TLS: cosa succede quando ascolti l'infrastruttura dello Stato. 18% senza HTTPS, 90% email spoofabili, 1.3% con DNSSEC.</description>
+  </item>
+
+  <item>
     <title>Il Compilatore E' un Traditore</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-compilatore-e-un-traditore.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-compilatore-e-un-traditore.html</guid>
