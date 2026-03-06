@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Pixel Nasconde un Audio</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-pixel-nasconde-un-audio.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-pixel-nasconde-un-audio.html</guid>
+    <pubDate>Fri, 06 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Ho nascosto un audio morse dentro una foto e l'ho postata su X. 4 tecniche di steganografia, 3 distrutte dalla compressione JPEG. Una sopravvive. Spread spectrum differenziale su luminanza YCbCr, payload compresso da 50KB a 248 byte, SNR 150:1. Ecco perche' funziona.</description>
+  </item>
+
+  <item>
     <title>I Server Parlano</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/i-server-parlano.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/i-server-parlano.html</guid>

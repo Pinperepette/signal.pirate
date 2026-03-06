@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Pixel Nasconde un Audio | Signal Pirate</title>
+  <meta name="description" content="Ho nascosto un audio morse dentro una foto e l'ho postata su X. 4 tecniche di steganografia, 3 distrutte dalla compressione JPEG. Una sopravvive. Ecco perche'.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box Enhanced === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .code-block td {
+      padding: 0;
+      vertical-align: top;
+      border: none;
+    }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code {
+      padding: 0.2em 0 0.2em 1em;
+      white-space: pre;
+    }
+    .code-block .code-wrap {
+      padding: 0.8rem 0;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Verdict badges === */
+    .verdict-ok {
+      display: inline-block;
+      background: rgba(0,255,136,0.15);
+      color: #00ff88;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2em 0.6em;
+      border-radius: 4px;
+    }
+    .verdict-fail {
+      display: inline-block;
+      background: rgba(255,107,107,0.15);
+      color: #ff6b6b;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2em 0.6em;
+      border-radius: 4px;
+    }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-03-06 | Pinperepette</p>
+  <h1 class="article-page-title">Il Pixel <span class="accent">Nasconde un Audio</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Ho nascosto un audio dentro una foto e l'ho postata su X. 4 tecniche, 3 morte. Una sopravvive. Ecco perche'.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">steganografia</span>
+    <span class="tag tag-highlight">spread spectrum</span>
+    <span class="tag tag-reaction">JPEG</span>
+    <span class="tag">morse</span>
+    <span class="tag">python</span>
+  </div>
+</header>
+
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — IL QUIZ                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Quiz</h2>
+<span class="section-number">Sezione 01. L'esperimento</span>
+
+<p>
+  Ho postato una foto su X con questa didascalia:
+</p>
+
+<div class="insight-box fade-in">
+  <p><em>C'e' un messaggio nascosto in questa foto. Scarica l'immagine, trova il messaggio, scrivilo nei commenti. Questa sera la soluzione se non la trovate prima.</em></p>
+  <p style="margin-top: 0.8rem;"><a href="https://x.com/Pinperepette/status/2029835707707998257" target="_blank" rel="noopener" style="color: var(--accent-attention); font-family: var(--font-mono); font-size: 0.85rem;">Il post originale su X</a></p>
+</div>
+
+<p>
+  Nessuno l'ha trovato. Qualcuno ha provato con LSB. Qualcuno ha guardato i metadati EXIF. Qualcuno ha alzato il contrasto. Niente. Il messaggio era un audio. Un segnale morse. Due parole. Sepolte nei pixel con una tecnica che sopravvive alla compressione di X.
+</p>
+
+<p>
+  Questo articolo smonta tutto. Come ho nascosto l'audio, perche' 3 tecniche su 4 muoiono, e perche' una no. La matematica dietro. Il codice. E lo script per risolvere il quiz, se vuoi provare prima di leggere la risposta.
+</p>
+
+<div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">pip install numpy pillow</td></tr>
+<tr><td class="ln">2</td><td class="code">python reveal.py immagine.jpg</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm"># Output:</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cm">#   +-===============-+</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cm">#   |  </span><span class="st">SIGNAL PIRATE</span><span class="cm">  |</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cm">#   +-===============-+</span></td></tr>
+</tbody></table></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — IL MESSAGGIO                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Messaggio</h2>
+<span class="section-number">Sezione 02. Da testo a beep a byte</span>
+
+<p>
+  Il messaggio e' "SIGNAL PIRATE". Due parole. Per nasconderle in una foto potevo codificarle come testo. Troppo facile. Troppo noioso. Le ho trasformate in un audio morse.
+</p>
+
+<p>
+  <strong>Testo -> Morse -> Tono sinusoidale -> WAV.</strong> Ogni lettera diventa una sequenza di dot (brevi) e dash (lunghi). Ogni dot e' un beep a 700 Hz per 100ms. Ogni dash e' lo stesso beep per 300ms. Silenzio tra simboli, silenzio piu' lungo tra lettere, silenzio ancora piu' lungo tra parole.
+</p>
+
+<div class="code-block fade-in" data-lang="morse">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="key">S</span> = <span class="st">...</span>       <span class="cm">(3 dot)</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="key">I</span> = <span class="st">..</span>        <span class="cm">(2 dot)</span></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="key">G</span> = <span class="st">--.</span>       <span class="cm">(2 dash + 1 dot)</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="key">N</span> = <span class="st">-.</span>        <span class="cm">(1 dash + 1 dot)</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="key">A</span> = <span class="st">.-</span>        <span class="cm">(1 dot + 1 dash)</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="key">L</span> = <span class="st">.-..</span>      <span class="cm">(dot dash dot dot)</span></td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="key">P</span> = <span class="st">.--.</span>      <span class="cm">(dot dash dash dot)</span></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="key">I</span> = <span class="st">..</span>        <span class="cm">(2 dot)</span></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="key">R</span> = <span class="st">.-.</span>       <span class="cm">(dot dash dot)</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="key">A</span> = <span class="st">.-</span>        <span class="cm">(dot dash)</span></td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="key">T</span> = <span class="st">-</span>         <span class="cm">(1 dash)</span></td></tr>
+<tr><td class="ln">13</td><td class="code"><span class="key">E</span> = <span class="st">.</span>         <span class="cm">(1 dot)</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Il risultato e' un WAV di 6.4 secondi. 8000 Hz, mono, 8 bit. Grezzo come un segnale radio degli anni '40. Pesa 50.924 byte. Ma compresso con zlib diventa <strong>248 byte</strong>. Perche' il morse e' quasi tutto silenzio, e il silenzio si comprime bene.
+</p>
+
+<div style="margin: 1.5rem 0; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 10px;">
+  <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 0.8rem 0;">SIGNAL PIRATE in morse — l'audio nascosto nella foto</p>
+  <audio controls preload="metadata" style="width: 100%;">
+    <source src="../assets/audio/signal-pirate-morse.wav" type="audio/wav">
+  </audio>
+</div>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green">6.4s</div>
+    <div class="stat-label">Durata audio</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple">50,924</div>
+    <div class="stat-label">Byte WAV</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan">248</div>
+    <div class="stat-label">Byte compressi</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red">2,016</div>
+    <div class="stat-label">Bit da nascondere</div>
+  </div>
+</div>
+
+<p>
+  248 byte. 2.016 bit. In una foto da 2316x3088 pixel (7.153.088 pixel, 21.459.264 valori di canale). Nascondere 2.016 bit in 21 milioni di numeri e' come nascondere un granello di sabbia in una spiaggia. Il problema non e' lo spazio. Il problema e' che X prende la tua spiaggia e la passa al bulldozer.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — IL BULLDOZER                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Bulldozer</h2>
+<span class="section-number">Sezione 03. Cosa fa X alla tua foto</span>
+
+<p>
+  Posti una PNG. X la prende e fa quello che vuole. Il pipeline e' brutale:
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Upload</div>
+    <div class="step-detail">La tua PNG arriva</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Resize</div>
+    <div class="step-detail">Ridimensiona se troppo grande</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Recompress</div>
+    <div class="step-detail">Ricomprime in JPEG o WebP</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Strip</div>
+    <div class="step-detail">Rimuove metadati EXIF</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Serve</div>
+    <div class="step-detail">La serve via CDN</div>
+  </div>
+</div>
+
+<p>
+  Il passo 3 e' il killer. La <strong>compressione JPEG</strong> non e' un ridimensionamento. E' una trasformazione matematica distruttiva. Prende ogni blocco 8x8 pixel, lo trasforma nel dominio delle frequenze con la DCT (Discrete Cosine Transform), e butta via le frequenze alte. I dettagli fini spariscono. I bordi diventano sfumati. E qualsiasi informazione nascosta nei bit meno significativi viene polverizzata.
+</p>
+
+<p>
+  Per la steganografia, la compressione JPEG e' un terremoto. Ogni pixel puo' cambiare di valore dopo la ricompressione. Non di tanto, magari di 2-3 unita'. Ma se il tuo messaggio e' nascosto in variazioni di 1 unita', sei morto.
+</p>
+
+<div class="warning-box fade-in">
+  <p><strong>Il punto chiave:</strong> nascondere dati in una foto e' facile. Nascondere dati in una foto che sopravvivono a quello che i social network fanno alla foto e' un altro sport.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — 4 TECNICHE                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 4 Tecniche, 3 Cadaveri</h2>
+<span class="section-number">Sezione 04. L'arena</span>
+
+<p>
+  Ho testato 4 tecniche di steganografia sulla stessa foto, con lo stesso audio morse. Poi ho salvato in PNG, riaperto, verificato. Poi ho simulato la compressione JPEG quality 85 (simile a quella di X) e riverificato.
+</p>
+
+<div class="chart-container fade-in">
+  <table class="strategy-table">
+    <thead>
+      <tr>
+        <th>Tecnica</th>
+        <th>PNG</th>
+        <th>JPEG q85</th>
+        <th>X</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>LSB</strong> (Least Significant Bit)</td>
+        <td><span class="verdict-fail">FAIL</span></td>
+        <td><span class="verdict-fail">DISTRUTTO</span></td>
+        <td><span class="verdict-fail">DISTRUTTO</span></td>
+      </tr>
+      <tr>
+        <td><strong>DCT</strong> (mid-frequency)</td>
+        <td><span class="verdict-ok">OK</span></td>
+        <td><span class="verdict-ok">SOPRAVVIVE</span></td>
+        <td><span class="verdict-fail">DISTRUTTO</span></td>
+      </tr>
+      <tr>
+        <td><strong>Spread Spectrum</strong> (differenziale)</td>
+        <td><span class="verdict-ok">OK</span></td>
+        <td><span class="verdict-ok">SOPRAVVIVE</span></td>
+        <td><span class="verdict-ok">SOPRAVVIVE</span></td>
+      </tr>
+      <tr>
+        <td><strong>QIM</strong> (Quantization Index Modulation)</td>
+        <td><span class="verdict-ok">OK</span></td>
+        <td><span class="verdict-fail">DISTRUTTO</span></td>
+        <td><span class="verdict-fail">DISTRUTTO</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>
+  LSB morto subito, QIM morto al JPEG, DCT sopravvive al JPEG locale ma muore nel pipeline reale di X. Solo lo Spread Spectrum passa tutto. Per il quiz ho usato quello. Vediamo perche' ognuno vive o muore.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — LSB: IL PRIMO A MORIRE                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> LSB: il Primo a Morire</h2>
+<span class="section-number">Sezione 05. L'ultimo bit e' il primo a saltare</span>
+
+<p>
+  LSB e' la tecnica che tutti conoscono. Prendi ogni pixel, cambi l'ultimo bit. Il pixel vale 142? Ora vale 143. O 142. L'occhio non vede la differenza. Il messaggio e' nei bit meno significativi.
+</p>
+
+<div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># Encoding LSB: cambia l'ultimo bit di ogni pixel</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">for</span> i, bit <span class="kw">in</span> enumerate(bits):</td></tr>
+<tr><td class="ln">3</td><td class="code">    flat[i] = (flat[i] &amp; <span class="nb">0xFE</span>) | bit</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cm"># pixel 142 (10001110) + bit 1 = 143 (10001111)</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cm"># pixel 142 (10001110) + bit 0 = 142 (10001110)</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Elegante. Minimale. E completamente inutile se qualcuno tocca l'immagine. La compressione JPEG cambia i pixel di 2-3 unita'. Se il tuo messaggio sta in una differenza di 1, il JPEG lo cancella come una gomma su una matita. Non e' un attacco. E' un effetto collaterale. X non sa che c'e' un messaggio. Semplicemente lo schiaccia come un camion che passa su una formica senza vederla.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Perche' LSB muore gia' nella nostra pipeline:</strong> PNG e' lossless, il formato non perde nulla. Ma il nostro encoder converte l'immagine in YCbCr per lavorare sul canale di luminanza, poi riconverte in RGB per salvare. Quel round-trip RGB &rarr; YCbCr &rarr; RGB introduce errori di arrotondamento che bastano a flippar bit. LSB non tollera nemmeno quello, figuriamoci la compressione JPEG.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — QIM: QUASI                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> QIM: Quasi</h2>
+<span class="section-number">Sezione 06. La quantizzazione che non basta</span>
+
+<p>
+  QIM e' piu' furbo di LSB. Invece di cambiare un singolo bit, <strong>quantizza</strong> il pixel su due griglie diverse. Se il bit e' 0, il pixel viene arrotondato alla griglia pari (0, 40, 80, 120...). Se e' 1, alla griglia dispari (20, 60, 100, 140...).
+</p>
+
+<div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="fn">QIM_DELTA</span> = <span class="nb">40</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cm"># Bit 0: quantizza sulla griglia 0, 40, 80, 120...</span></td></tr>
+<tr><td class="ln">4</td><td class="code">q0 = round(val / QIM_DELTA) * QIM_DELTA</td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cm"># Bit 1: quantizza sulla griglia 20, 60, 100, 140...</span></td></tr>
+<tr><td class="ln">7</td><td class="code">q1 = round((val - QIM_DELTA/<span class="nb">2</span>) / QIM_DELTA) * QIM_DELTA + QIM_DELTA/<span class="nb">2</span></td></tr>
+<tr><td class="ln">8</td><td class="code"></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="cm"># Decodifica: chi e' piu' vicino?</span></td></tr>
+<tr><td class="ln">10</td><td class="code">bit = <span class="nb">1</span> <span class="kw">if</span> abs(val - q1) &lt; abs(val - q0) <span class="kw">else</span> <span class="nb">0</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Con un delta di 40, il pixel puo' essere spostato fino a 20 unita'. Molto piu' robusto di LSB. In PNG funziona perfettamente. Ma JPEG fa anche lui una quantizzazione: nel dominio frequenza applica <code>round(coeff / Q) * Q</code> con passi Q tipicamente tra 5 e 20 a quality 85. Quando due quantizzazioni si sovrappongono, non e' detto che quella originale vinca. Tradotto nello spazio pixel, alcuni valori vengono spostati abbastanza da saltare dalla griglia 0 alla griglia 1. Game over.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — DCT: QUASI CE LA FA                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> DCT: Quasi ce la Fa</h2>
+<span class="section-number">Sezione 07. Nascondersi dove JPEG guarda</span>
+
+<p>
+  Qui la cosa diventa interessante. La DCT steganography nasconde i dati esattamente dove JPEG opera: nel dominio delle frequenze. Invece di modificare i pixel, modifica i coefficienti DCT di blocchi 8x8.
+</p>
+
+<p>
+  JPEG funziona cosi': divide l'immagine in blocchi 8x8, applica la Discrete Cosine Transform, ottiene 64 coefficienti per blocco. Il coefficiente in alto a sinistra (DC) e' la luminosita' media. Quelli in basso a destra sono i dettagli fini. JPEG butta via i dettagli fini (frequenze alte) e tiene le frequenze medie e basse.
+</p>
+
+<p>
+  Il trucco: <strong>nascondere i bit nelle frequenze medie</strong>. Non troppo alte (JPEG le cancella), non troppo basse (troppo visibili). Le posizioni (2,3), (3,2), (4,1) nella matrice 8x8.
+</p>
+
+<div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="fn">DCT_POSITIONS</span> = [(<span class="nb">2</span>,<span class="nb">3</span>), (<span class="nb">3</span>,<span class="nb">2</span>), (<span class="nb">4</span>,<span class="nb">1</span>), (<span class="nb">1</span>,<span class="nb">4</span>), (<span class="nb">3</span>,<span class="nb">3</span>)]</td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="fn">DCT_STRENGTH</span> = <span class="nb">50</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm"># Per ogni blocco 8x8:</span></td></tr>
+<tr><td class="ln">5</td><td class="code">dct_block = dctn(block, type=<span class="nb">2</span>, norm=<span class="st">'ortho'</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code">pos = DCT_POSITIONS[bit_idx % <span class="nb">5</span>]</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="kw">if</span> bit == <span class="nb">1</span>:</td></tr>
+<tr><td class="ln">9</td><td class="code">    dct_block[pos] = DCT_STRENGTH    <span class="cm"># forza a 50</span></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="kw">else</span>:</td></tr>
+<tr><td class="ln">11</td><td class="code">    dct_block[pos] = <span class="nb">0</span>               <span class="cm"># forza a 0</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Bit 1 = coefficiente forzato a 50. Bit 0 = coefficiente forzato a 0. L'approccio e' brutale (normalmente si farebbe <code>+= strength</code> per rispettare il contenuto originale), ma per un payload cosi' piccolo funziona senza artefatti visibili. Per decodificare, guardi se il coefficiente e' sopra o sotto 25 (meta' di 50). La quantizzazione JPEG quality 85 in locale sposta quei coefficienti di 3-8 unita': non abbastanza per rompere il messaggio. Ma il pipeline reale di X non fa solo JPEG. Resize, conversione colore, ricompressione a quality variabile: l'accumulo di errori basta a far saltare abbastanza bit da corrompere il payload.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Perche' regge il JPEG ma non X:</strong> la DCT steganography parla la stessa lingua di JPEG. Con strength 50 e soglia 25, il margine e' enorme per una singola ricompressione (JPEG sposta i coefficienti mid-frequency di 3-8 unita'). Ma X fa anche resize e conversione colore prima del JPEG. L'accumulo supera il margine. In laboratorio sopravvive, in produzione muore.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — SPREAD SPECTRUM: LA MATEMATICA CHE VINCE        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Spread Spectrum: la Matematica che Vince</h2>
+<span class="section-number">Sezione 08. Correlazione, chip pseudorandom, e il trucco differenziale</span>
+
+<p>
+  Questa e' la tecnica che ho usato per il quiz. E qui la matematica diventa bella.
+</p>
+
+<p>
+  L'idea viene dalle telecomunicazioni militari. Per trasmettere un bit, non lo metti in un singolo punto. Lo <strong>spalmi</strong> su centinaia di punti usando una sequenza pseudorandom (il "chip"). Per leggerlo, moltiplichi il segnale ricevuto per la stessa sequenza e sommi. Se il chip e' lo stesso, la correlazione e' alta. Se no, e' rumore.
+</p>
+
+<p>
+  Ma c'e' un problema. Il segnale originale dell'immagine e' molto piu' forte del messaggio nascosto. Come sentire un sussurro in uno stadio. La soluzione e' il <strong>metodo differenziale</strong>.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Il trucco: due blocchi, un segreto</h3>
+
+<p>
+  Per ogni bit, prendo due blocchi di pixel adiacenti: A e B. Genero un chip pseudorandom (128 valori, ciascuno +1 o -1). Poi:
+</p>
+
+<div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="fn">SS_STRENGTH</span> = <span class="nb">20</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="fn">SS_HALF</span>     = <span class="nb">128</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code">chip   = rng.choice([<span class="nb">-1.0</span>, <span class="nb">1.0</span>], size=SS_HALF)</td></tr>
+<tr><td class="ln">5</td><td class="code">signal = <span class="nb">1.0</span> <span class="kw">if</span> bit == <span class="nb">1</span> <span class="kw">else</span> <span class="nb">-1.0</span></td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cm"># Encoding: aggiungi al blocco A, sottrai dal blocco B</span></td></tr>
+<tr><td class="ln">8</td><td class="code">y[A:A+<span class="nb">128</span>] += signal * chip * SS_STRENGTH</td></tr>
+<tr><td class="ln">9</td><td class="code">y[B:B+<span class="nb">128</span>] -= signal * chip * SS_STRENGTH</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Blocco A riceve <code>+signal * chip * 20</code>. Blocco B riceve <code>-signal * chip * 20</code>. I due blocchi dell'immagine originale non sono uguali, ma non importa: la differenza tra i contenuti originali e' incorrelata col chip, quindi si cancella nella correlazione. Il messaggio invece e' <em>opposto</em> nei due blocchi, e si accumula.
+</p>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">La decodifica: il rumore si cancella, il segnale no</h3>
+
+<div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># Decoding: differenza tra blocco A e blocco B</span></td></tr>
+<tr><td class="ln">2</td><td class="code">diff = y[A:A+<span class="nb">128</span>] - y[B:B+<span class="nb">128</span>]</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm"># diff = (origA + chip*20) - (origB - chip*20)</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cm">#      = (origA - origB) + 2*chip*20</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cm"># (origA - origB) non e' correlato col chip: si cancella nella somma</span></td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">correlation = np.dot(diff, chip)</td></tr>
+<tr><td class="ln">9</td><td class="code">bit = <span class="nb">1</span> <span class="kw">if</span> correlation &gt; <span class="nb">0</span> <span class="kw">else</span> <span class="nb">0</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Ecco il punto. Quando fai <code>A - B</code>, ottieni <code>(origA - origB) + 2 * signal * chip</code>. Il contenuto originale non sparisce. Ma non e' correlato col chip pseudorandom. Nella correlazione, la somma di <code>(origA - origB) * chip</code> tende a zero per la legge dei grandi numeri, mentre il segnale correlato si accumula: <code>128 * 2 * 20 = 5.120</code> per un bit 1, <code>-5.120</code> per un bit 0.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{correlation} = \sum_{i=0}^{127} (A_i - B_i) \cdot c_i \;\approx\; \pm\, 2 \cdot S \cdot N = \pm\, 5120$$</div>
+  <p class="formula-label">S = strength (20), N = chip size (128). Il termine (origA - origB) si cancella nella somma.</p>
+</div>
+
+<h3 style="color: var(--accent-attention); margin-top: 2rem;">Perche' JPEG non lo uccide</h3>
+
+<p>
+  JPEG aggiunge rumore. Ogni pixel puo' cambiare di 2-3 unita'. Ma il rumore e' <strong>incorrelato</strong> col chip. Quando sommi 128 valori di rumore incorrelato moltiplicati per +1 o -1, la somma tende a zero. Il rumore si cancella.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{rumore}_{\text{totale}} = \sum_{i=0}^{127} \epsilon_i \cdot c_i \approx 0$$</div>
+  <p class="formula-label">Rumore JPEG incorrelato col chip: la somma tende a zero per la legge dei grandi numeri</p>
+</div>
+
+<p>
+  Il segnale utile vale 5.120. Il rumore JPEG per singolo pixel e' circa 3 unita'. Su 128 campioni il rumore aggregato cresce come $\sqrt{N}$, quindi $\sqrt{128} \cdot 3 \approx 34$. Il rapporto segnale/rumore e' quindi <strong>~150:1</strong>. JPEG dovrebbe aggiungere 40 unita' di errore per pixel per rompere il messaggio. A quality 85 ne aggiunge 3. Non c'e' partita.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il principio:</strong> il rumore non correlato si cancella quando lo sommi su molti campioni. Il segnale correlato si accumula. Piu' grande il chip (128 campioni), piu' il messaggio emerge dal rumore. Questo e' esattamente lo stesso principio usato dal GPS: il segnale dai satelliti arriva 20 dB sotto il rumore di fondo, ma il ricevitore lo estrae correlando con il codice pseudorandom noto (Gold code). Funziona perche' sa cosa cercare. Senza il codice, e' rumore.</p>
+</div>
+
+<div class="warning-box fade-in">
+  <p><strong>Il seed e' la chiave.</strong> La sequenza pseudorandom e' generata da <code>numpy.random.RandomState(42)</code>. Chi ha il seed puo' ricostruire i chip e decodificare. Chi non ce l'ha vede solo rumore. Per il quiz il seed e' hardcoded nello script: chiunque scarica <code>reveal.py</code> puo' risolvere. In un sistema reale il seed sarebbe il segreto condiviso tra chi nasconde e chi estrae.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — L'EMBEDDING COMPLETO                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Embedding Completo</h2>
+<span class="section-number">Sezione 09. Da WAV a pixel, passo per passo</span>
+
+<p>
+  Il pipeline completo per nascondere l'audio:
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Morse</div>
+    <div class="step-detail">"SIGNAL PIRATE" -> beep</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">WAV</div>
+    <div class="step-detail">8kHz mono 8bit, 6.4s</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">zlib</div>
+    <div class="step-detail">50,924 -> 248 byte</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Bit</div>
+    <div class="step-detail">32 bit header + 1,984 bit payload</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Spread</div>
+    <div class="step-detail">2,016 coppie di blocchi</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">06</div>
+    <div class="step-name">PNG</div>
+    <div class="step-detail">Salva senza perdita</div>
+  </div>
+</div>
+
+<p>
+  La compressione zlib e' fondamentale. Il WAV grezzo ha 50.924 byte (407.392 bit). Troppi. Servirebbero 407.392 coppie di blocchi da 256 pixel, cioe' 104 milioni di pixel. La foto ne ha 7 milioni. Non ci sta.
+</p>
+
+<p>
+  Ma il morse e' quasi tutto silenzio. Byte a 128 (il centro per audio unsigned 8-bit) ripetuti migliaia di volte. zlib li comprime a 248 byte. 2.016 bit. Servono 2.016 coppie da 256 pixel = 516.096 pixel. La foto ne ha 7 milioni. Ci sta con margine enorme.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il vero trucco e' qui.</strong> La compressione del payload prima dell'embedding e' la ragione per cui l'esperimento funziona cosi' bene. Il parametro chiave nella steganografia robusta non e' lo spazio totale dell'immagine ma la <strong>payload density</strong>: bit nascosti per pixel.</p>
+</div>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{payload density} = \frac{2{,}016}{7{,}153{,}088} \approx 0.00028 \;\text{bit/pixel}$$</div>
+  <p class="formula-label">Un bit ogni 3.548 pixel. Estremamente basso.</p>
+</div>
+
+<p>
+  Molti esperimenti di steganografia fanno l'errore opposto: cercano di massimizzare la capacita'. Noi abbiamo fatto il contrario. Minimizzare il payload significa che il segnale spread spectrum e' molto diluito, non altera la statistica dell'immagine, sopravvive meglio alla compressione, e diventa molto difficile da rilevare con analisi steganalitiche standard. La robustezza e' inversamente proporzionale alla densita'.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{robustness} \propto \frac{1}{\text{payload density}}$$</div>
+  <p class="formula-label">Meno nascondi, meglio sopravvive.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — IL DECODER MORSE                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Decoder Morse</h2>
+<span class="section-number">Sezione 10. Dall'audio al testo</span>
+
+<p>
+  Una volta estratto il WAV, bisogna decodificare il morse. Non e' banale come sembra. L'audio ha rumore, i tempi non sono perfetti, e non sai in anticipo la velocita' del morse.
+</p>
+
+<p>
+  L'approccio: calcola l'<strong>energia</strong> del segnale in finestre da 20ms. Se l'energia supera il 15% del picco massimo, c'e' un tono. Se no, silenzio. Poi segmenta in periodi on/off e classifica:
+</p>
+
+<div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># Calcola energia in finestre da 20ms</span></td></tr>
+<tr><td class="ln">2</td><td class="code">window = <span class="nb">160</span>  <span class="cm"># 8000 Hz * 0.02s</span></td></tr>
+<tr><td class="ln">3</td><td class="code">energy = [np.mean(signal[i:i+window] ** <span class="nb">2</span>)</td></tr>
+<tr><td class="ln">4</td><td class="code">          <span class="kw">for</span> i <span class="kw">in</span> range(<span class="nb">0</span>, len(signal), window)]</td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cm"># Soglia: 15% del picco</span></td></tr>
+<tr><td class="ln">7</td><td class="code">threshold = max(energy) * <span class="nb">0.15</span></td></tr>
+<tr><td class="ln">8</td><td class="code"></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="cm"># Segmenta e classifica</span></td></tr>
+<tr><td class="ln">10</td><td class="code">dot_duration = min(on_durations)</td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="kw">for</span> seg_type, duration <span class="kw">in</span> segments:</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="kw">if</span> seg_type == <span class="st">'on'</span>:</td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="kw">if</span> duration &lt;= dot_duration * <span class="nb">2</span>:   <span class="cm"># dot</span></td></tr>
+<tr><td class="ln">14</td><td class="code">            morse.append(<span class="st">'.'</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="kw">else</span>:                               <span class="cm"># dash</span></td></tr>
+<tr><td class="ln">16</td><td class="code">            morse.append(<span class="st">'-'</span>)</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Il trucco e' stimare la durata del dot dal segmento on piu' corto. Tutto il resto scala da li': un dash e' 3x un dot, una pausa tra lettere e' 3x un dot, una pausa tra parole e' 7x un dot. Il codice morse e' un protocollo autosincronizzante. Basta trovare l'unita' base e il resto viene da se'.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 — IL TEST REALE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Test Reale</h2>
+<span class="section-number">Sezione 11. X, JPEG, e la prova del fuoco</span>
+
+<p>
+  Postare la PNG su X. Scaricarla. Lanciare il decoder. Il momento della verita'.
+</p>
+
+<div class="code-block fade-in" data-lang="shell">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">$ python reveal.py HCtsu3baUAELF_z.jpg</td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code">Immagine: HCtsu3baUAELF_z.jpg (<span class="nb">2316</span>x<span class="nb">3088</span>)</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code">Estrazione dati nascosti...</td></tr>
+<tr><td class="ln">6</td><td class="code">Audio estratto: hidden_message.wav (<span class="nb">6.4</span>s)</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">Decodifica morse...</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code">  <span class="st">+-===============-+</span></td></tr>
+<tr><td class="ln">11</td><td class="code">  <span class="st">|  SIGNAL PIRATE  |</span></td></tr>
+<tr><td class="ln">12</td><td class="code">  <span class="st">+-===============-+</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Funziona. X ha preso la mia PNG da 8MB, l'ha ricompressa in un JPEG da 1.4MB, ha buttato via i metadati, e il messaggio e' ancora li'. 2.016 bit sopravvissuti al bulldozer.
+</p>
+
+<p>
+  Se ci pensi, e' assurdo. X ha modificato milioni di valori nell'immagine. Ma le 2.016 correlazioni tra coppie di blocchi sono rimaste tutte dalla parte giusta. Tutte. Nessun errore nel test. Perche' il rumore della ricompressione non e' correlato col chip pseudorandom, e si cancella nella somma. E il segnale utile e' ~150 volte piu' forte del rumore.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 — CONCLUSIONE                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Perche' Funziona Davvero</h2>
+<span class="section-number">Sezione 12. Il punto</span>
+
+<p>
+  La steganografia e' un gioco tra chi nasconde e chi cerca. La maggior parte delle tecniche perde perche' si affida ai dettagli dell'immagine, quelli che la compressione elimina per prima. LSB nasconde nei bit insignificanti. QIM nelle posizioni esatte dei pixel. DCT nelle frequenze medie, ma senza ridondanza. Tutte e tre dipendono dal valore preciso di un singolo coefficiente o pixel.
+</p>
+
+<p>
+  Lo spread spectrum fa il contrario. Non gli importa del valore di un singolo pixel. Gli importa della <strong>correlazione statistica</strong> tra centinaia di pixel e una sequenza pseudorandom nota. La compressione puo' spostare ogni singolo pixel, ma non puo' rompere la correlazione aggregata. Come il rumore di una piazza non puo' cancellare il ritmo di un tamburo.
+</p>
+
+<div class="conclusion-box fade-in">
+  <p class="quote">"Un singolo pixel mente. Centinaia di pixel correlati no."</p>
+  <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">Steganografia spread spectrum: il messaggio e' nella statistica, non nel dettaglio.</p>
+</div>
+
+<p>
+  Tutto il codice e' su <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/steganografia" target="_blank" rel="noopener" style="color: var(--accent-attention);">GitHub</a>. Lo script <code>reveal.py</code> ha bisogno solo di <code>numpy</code> e <code>pillow</code>. Se hai ancora l'immagine del quiz, provalo.
+</p>
+
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <div class="footer-content">
+    <p class="footer-copy">&copy; 2026 Signal Pirate. Nessun pixel e' stato maltrattato.</p>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../feed.xml">RSS</a>
+      <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Main JS -->
+<script src="../js/main.js"></script>
+
+<!-- KaTeX -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {
+    delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '$', right: '$', display: false}
+    ]
+  })"></script>
+
+</body>
+</html>
