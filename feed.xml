@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Malware Si Smaschera</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-malware-si-smaschera.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-malware-si-smaschera.html</guid>
+    <pubDate>Sat, 07 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Analisi statica di un Lumma Stealer reale. PE header, sezioni con nomi inventati, certificato rubato a Spotify AB, payload cifrato con entropia 7.15, 4 server C2 .shop. Tutto dal terminale con Python e struct.unpack, senza eseguire una sola istruzione.</description>
+  </item>
+
+  <item>
     <title>Il Pixel Nasconde un Audio</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-pixel-nasconde-un-audio.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-pixel-nasconde-un-audio.html</guid>
