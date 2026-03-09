@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Browser Sa Chi Sei | Signal Pirate</title>
+  <meta name="description" content="Browser fingerprinting smontato pezzo per pezzo. Canvas, WebGL, audio, font, WebGPU, WASM timing, speech synthesis. 21 superfici di entropia, uno script che le raccoglie tutte, e la scoperta che la modalita' incognito non serve a niente.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-attention);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+    .verdict-ok { color: var(--accent-attention); font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; }
+    .verdict-fail { color: var(--accent-reaction); font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem; }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease;
+    }
+    .stat-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .chain-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .chain-step {
+      background: rgba(124,77,255,0.08);
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-align: center;
+    }
+    .chain-step .chain-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.2rem;
+    }
+    .chain-step .chain-value { color: var(--accent-highlight); font-weight: 700; }
+    .chain-step.chain-danger .chain-value { color: var(--accent-attention); }
+    .chain-arrow { font-size: 1.2rem; color: var(--accent-reaction); font-weight: 700; }
+    .entropy-chart {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+    }
+    .entropy-chart-title {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .entropy-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.3rem 0;
+    }
+    .entropy-bar .bar-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .entropy-bar .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .entropy-bar .bar-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      min-width: 3rem;
+      text-align: right;
+    }
+    .entropy-bar .bar-name {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-primary);
+      min-width: 10rem;
+    }
+    .fp-demo-box {
+      background: #0a0e16;
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .fp-demo-box .fp-key { color: #7c4dff; }
+    .fp-demo-box .fp-val { color: #00ff88; }
+    .fp-demo-box .fp-sep { color: #3a3a5a; }
+    #fp-output { white-space: pre-wrap; word-break: break-all; }
+    .live-demo {
+      background: #0a0e16;
+      border: 6px solid rgba(0,255,136,0.4);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      position: relative;
+    }
+    .live-demo::before {
+      content: 'IL TUO BROWSER';
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.6rem;
+      color: var(--accent-attention);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.7;
+    }
+    .live-demo .ld-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
+    .live-demo .ld-key {
+      color: #7c4dff;
+      min-width: 10rem;
+    }
+    .live-demo .ld-val {
+      color: #00ff88;
+      word-break: break-all;
+    }
+    .live-demo .ld-muted {
+      color: #3a3a5a;
+    }
+    .live-demo canvas {
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 4px;
+      display: block;
+      margin: 0.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .live-demo .ld-key { min-width: 7rem; }
+      .live-demo { padding: 1rem; font-size: 0.72rem; }
+    }
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr; }
+      .live-demo .ld-row { flex-direction: column; gap: 0.15rem; }
+      .live-demo .ld-key { min-width: unset; font-size: 0.65rem; }
+      .live-demo .ld-val { font-size: 0.68rem; }
+      .live-demo { padding: 0.8rem; font-size: 0.68rem; }
+      .live-demo::before { font-size: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-03-09 | Pinperepette</p>
+  <h1 class="article-page-title">Il Browser <span class="accent">Sa Chi Sei</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Oggi argomento piu' leggero. Niente CVE, niente exploit, niente Docker. Solo il tuo browser, quello che sa di te, e perche' quel banner dei cookie e' una presa in giro.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Fingerprinting</span>
+    <span class="tag tag-highlight">Canvas</span>
+    <span class="tag tag-reaction">WebGL</span>
+    <span class="tag tag-amplification">Audio API</span>
+  </div>
+</header>
+
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — IL BANNER                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Banner</h2>
+<span class="section-number">Sezione 01. La presa in giro</span>
+
+<p>
+  Apri un sito. Compare il banner. "Questo sito utilizza cookie tecnici e di profilazione. Accetta, rifiuta, personalizza." Tre bottoni. Il primo e' grande e verde. Il secondo e' grigio, piccolo, mezzo nascosto. Il terzo ti porta in un labirinto di toggle dove devi disattivare 347 "partner" uno per uno.
+</p>
+
+<p>
+  GDPR. ePrivacy. Il web nel 2026 e' un campo minato di pop-up legali. Clicchi "Rifiuta tutto" e ti senti furbo. Hai detto no ai cookie. Sei al sicuro.
+</p>
+
+<p>
+  No. Non sei al sicuro. Il GDPR (2018) ha regolato i cookie, cioe' il meccanismo di tracciamento degli anni 2000. Roba che si salva sul disco, si legge, si cancella. Le tecniche di fingerprinting esistevano gia' (canvas fingerprinting e' del 2012, audio del 2016), ma erano di nicchia. Poi Safari nel 2020 ha bloccato i cookie third-party, Chrome ha annunciato il phase-out, e l'industria si e' spostata in massa sul fingerprinting come piano B. Il regolamento copre i cookie. Il piano B passa dalla finestra.
+</p>
+
+<p>
+  Esiste un altro sistema. Non salva niente sul tuo disco. Non ha bisogno del tuo consenso. Non compare in nessun banner. Si chiama <strong>browser fingerprinting</strong> e funziona cosi': il sito guarda come il tuo browser disegna un testo, che GPU hai, come suona il tuo audio engine, che font hai installato, quanti core ha la tua CPU, se usi il dark mode. Prende tutti questi pezzettini, li mette insieme, e ottiene un identificativo unico. Il tuo. Senza cookie, senza login, senza chiedere niente.
+</p>
+
+<p>
+  E qui arriva il bello. Molti sistemi antifrode (pagamenti online, bot detection, protezione degli account) usano il fingerprinting legalmente. Lo classificano come <strong>legitimate interest</strong> o <strong>security purpose</strong> sotto il GDPR. Il che e' sensato: se la tua banca controlla che il browser sia lo stesso di ieri per evitare frodi, ti sta proteggendo. Ma nessuno te lo spiega. Non c'e' un banner che dice "stiamo leggendo la tua GPU per verificare che sei tu". Anche quando il fingerprinting e' ammesso, resta invisibile.
+</p>
+
+<p>
+  La iena, quando glielo ho spiegato: "Quindi rifiuto i cookie per niente?" Piu' o meno si'. Il banner regola i cookie. Il fingerprinting passa dalla finestra.
+</p>
+
+<p>
+  Oggi smontiamo quella finestra pezzo per pezzo. Vediamo esattamente cosa esce, come, e perche'. E te lo mostro con i tuoi dati. Quelli che vedi nei box verdi dentro l'articolo non sono esempi inventati: sono i valori reali del tuo browser, letti in tempo reale mentre carichi la pagina. La tua GPU, i tuoi font, i tuoi core, il tuo canvas. Tutto calcolato qui, nel browser, senza mandare niente a nessuno.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="21">0</div>
+    <div class="stat-label">Superfici di entropia</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="45">0</div>
+    <div class="stat-label">Bit tipici di entropia</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="0">0</div>
+    <div class="stat-label">Cookie necessari</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="0">0</div>
+    <div class="stat-label">Consensi richiesti</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — IL MODELLO                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Non e' un Dato, e' un Vettore</h2>
+<span class="section-number">Sezione 02. Il modello concettuale</span>
+
+<p>
+  Prima di entrare nel codice, una cosa va capita. Il fingerprint non e' "un dato". Non e' un numero che il sito legge da qualche parte. E' la somma di tante piccole differenze tra il tuo browser e tutti gli altri. Nessuna di queste differenze, presa da sola, ti identifica. Messe insieme, si'.
+</p>
+
+<div class="code-block fade-in" data-lang="formula">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="fn">Fingerprint</span> = <span class="fn">f</span>(<span class="kw">browser</span>, <span class="kw">OS</span>, <span class="kw">hardware</span>, <span class="kw">network</span>, <span class="kw">behaviour</span>)</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Ogni segnale aggiunge <strong>entropia</strong>, cioe' informazione utile per distinguerti. Se un segnale ha 3 valori possibili (tipo: dark mode on, off, non supportato) aggiunge circa 1.6 bit. Se ne ha 1000, ne aggiunge circa 10. Matematicamente bastano 33 bit per distinguere 8 miliardi di persone. Ma nella pratica servono di piu', perche' i segnali non sono perfettamente indipendenti e ci sono collisioni. Gli studi dell'EFF su Panopticlick hanno mostrato che oltre l'83% dei browser ha un fingerprint unico, e con Flash o Java abilitati si arrivava al 94%. Servono piu' o meno 40-50 bit per un'identificazione stabile nel mondo reale.
+</p>
+
+<p>
+  L'altra cosa che conta e' la <strong>stabilita'</strong>. Un segnale che cambia ogni volta che ricarichi la pagina e' inutile. Uno che resta uguale per settimane e' oro. Il fingerprinting cerca segnali che siano <em>unici</em> e <em>stabili</em>. E ce ne sono parecchi.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Cookie vs fingerprint.</strong> Il cookie e' un post-it che il sito appiccica sul tuo browser. Lo strappi e ricomincia da zero. Il fingerprint non appiccica niente: legge quello che c'e' gia'. Non c'e' niente da staccare, niente da cancellare, niente da rifiutare in un banner. Svuoti la cache? Il fingerprint e' ancora li'. Apri la modalita' incognito? Stessa GPU, stessi font, stesso audio engine. Stesso fingerprint.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — USER-AGENT                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> User-Agent e Client Hints</h2>
+<span class="section-number">Sezione 03. Il biglietto da visita</span>
+
+<p>
+  Il piu' vecchio e il piu' ovvio. Ogni richiesta HTTP porta con se' una stringa che dice "sono Chrome 120 su macOS". Gratis, senza JavaScript.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">navigator.userAgent</td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cm">// "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ..."</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm">// Il modello nuovo: Client Hints</span></td></tr>
+<tr><td class="ln">5</td><td class="code">navigator.userAgentData.brands</td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cm">// [{brand: "Chromium", version: "120"}, {brand: "Google Chrome", version: "120"}]</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Google sta congelando la stringa user-agent (UA Reduction) e spostando i dettagli veri dietro header opzionali tipo <code>Sec-CH-UA-Platform</code>, <code>Sec-CH-UA-Arch</code>, <code>Sec-CH-UA-Model</code>. Il server deve chiederli esplicitamente con <code>Accept-CH</code>. Rende il fingerprinting un pelo piu' scomodo, ma non lo blocca. E la UA ridotta stessa e' gia' un segnale: se la tua stringa e' congelata, sei su Chrome recente. Se non lo e', sei su qualcos'altro. Anche l'assenza di dati e' un dato.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">user-agent</span> <span class="ld-val" id="demo-ua" style="word-break: break-all;">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">platform</span> <span class="ld-val" id="demo-platform">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">brands (Client Hints)</span> <span class="ld-val" id="demo-brands">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">mobile</span> <span class="ld-val" id="demo-mobile">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">platform hint</span> <span class="ld-val" id="demo-ch-platform">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — CANVAS                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Canvas Fingerprinting</h2>
+<span class="section-number">Sezione 04. Il disegno che ti tradisce</span>
+
+<p>
+  Questo e' il metodo che mi ha fatto dire "ok, e' piu' serio di quanto pensassi". Funziona cosi': disegni qualcosa su un canvas HTML5, lo converti in immagine, lo hashi. Stesso codice, stesso testo, stesso font. Ma il risultato e' diverso su ogni combinazione di browser, OS e GPU.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> canvas = document.createElement(<span class="st">'canvas'</span>);</td></tr>
+<tr><td class="ln">2</td><td class="code">canvas.width = <span class="nb">200</span>; canvas.height = <span class="nb">50</span>;</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">const</span> ctx = canvas.getContext(<span class="st">'2d'</span>);</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code">ctx.textBaseline = <span class="st">'top'</span>;</td></tr>
+<tr><td class="ln">6</td><td class="code">ctx.font = <span class="st">'14px Arial'</span>;</td></tr>
+<tr><td class="ln">7</td><td class="code">ctx.fillStyle = <span class="st">'#f60'</span>;</td></tr>
+<tr><td class="ln">8</td><td class="code">ctx.fillRect(<span class="nb">125</span>, <span class="nb">1</span>, <span class="nb">62</span>, <span class="nb">20</span>);</td></tr>
+<tr><td class="ln">9</td><td class="code">ctx.fillStyle = <span class="st">'#069'</span>;</td></tr>
+<tr><td class="ln">10</td><td class="code">ctx.fillText(<span class="st">'fingerprint-test'</span>, <span class="nb">2</span>, <span class="nb">15</span>);</td></tr>
+<tr><td class="ln">11</td><td class="code">ctx.fillStyle = <span class="st">'rgba(102,204,0,0.7)'</span>;</td></tr>
+<tr><td class="ln">12</td><td class="code">ctx.fillText(<span class="st">'fingerprint-test'</span>, <span class="nb">4</span>, <span class="nb">17</span>);</td></tr>
+<tr><td class="ln">13</td><td class="code"></td></tr>
+<tr><td class="ln">14</td><td class="code"><span class="kw">const</span> data = canvas.toDataURL(); <span class="cm">// questo cambia tra browser</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Perche' cambia? Perche' "disegna un testo con Arial a 14px" sembra una cosa semplice, ma sotto ci sono almeno quattro variabili. Il <strong>font rendering</strong>: macOS usa Core Text, Windows usa DirectWrite, Linux usa FreeType. Tre engine diversi, tre risultati diversi. La <strong>GPU</strong>: l'accelerazione hardware del canvas produce pixel diversi su Intel, AMD, Apple Silicon, NVIDIA. L'<strong>anti-aliasing</strong>: subpixel RGB, BGR, greyscale, dipende dal display e dal driver. Il <strong>compositing</strong>: come vengono mescolati i colori con alpha, ogni implementazione arrotonda diversamente.
+</p>
+
+<p>
+  Risultato: stesso codice JavaScript, immagine diversa pixel per pixel, hash diverso. E quell'hash e' stabile nel tempo. Finche' non cambi browser, OS o GPU, resta uguale per mesi.
+</p>
+
+<div class="live-demo fade-in">
+  <p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.75rem;">Questo e' il canvas che il tuo browser ha appena disegnato:</p>
+  <canvas id="demo-canvas" width="200" height="50"></canvas>
+  <div class="ld-row"><span class="ld-key">hash SHA-256</span> <span class="ld-val" id="demo-canvas-hash">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — WEBGL                                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> WebGL Fingerprinting</h2>
+<span class="section-number">Sezione 05. La GPU che parla</span>
+
+<p>
+  WebGL va oltre il canvas. Qui la GPU ti dice direttamente chi e'. Non devi dedurlo da un rendering. Te lo dice in chiaro.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> gl = document.createElement(<span class="st">'canvas'</span>).getContext(<span class="st">'webgl'</span>);</td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">const</span> dbg = gl.getExtension(<span class="st">'WEBGL_debug_renderer_info'</span>);</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm">// dbg puo' essere null: molti browser disabilitano questa extension</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="kw">if</span> (dbg) {</td></tr>
+<tr><td class="ln">6</td><td class="code">    gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL);</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cm">// "Apple" / "Google Inc. (NVIDIA)" / "Intel Inc."</span></td></tr>
+<tr><td class="ln">8</td><td class="code"></td></tr>
+<tr><td class="ln">9</td><td class="code">    gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="cm">// "Apple M2 Pro" / "ANGLE (NVIDIA GeForce RTX 4090 ...)"</span></td></tr>
+<tr><td class="ln">11</td><td class="code">}</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cm">// Parametri che variano tra GPU</span></td></tr>
+<tr><td class="ln">11</td><td class="code">gl.getParameter(gl.MAX_TEXTURE_SIZE);          <span class="cm">// 16384 / 8192 / 4096</span></td></tr>
+<tr><td class="ln">12</td><td class="code">gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);      <span class="cm">// 16384 / 8192</span></td></tr>
+<tr><td class="ln">13</td><td class="code">gl.getParameter(gl.MAX_VIEWPORT_DIMS);          <span class="cm">// [32767,32767] / [16384,16384]</span></td></tr>
+<tr><td class="ln">14</td><td class="code">gl.getSupportedExtensions().length;              <span class="cm">// 20 / 35 / 42</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">vendor</span> <span class="ld-val" id="demo-gl-vendor">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">renderer</span> <span class="ld-val" id="demo-gl-renderer">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">MAX_TEXTURE_SIZE</span> <span class="ld-val" id="demo-gl-texture">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">extensions</span> <span class="ld-val" id="demo-gl-ext">calcolo...</span></div>
+</div>
+
+<p>
+  Vendor, renderer, texture size massima, numero di estensioni supportate. Attenzione: <code>WEBGL_debug_renderer_info</code> non e' sempre disponibile. Firefox l'ha rimossa nelle versioni recenti, altri browser la limitano. Ma anche quando il vendor e' mascherato, i parametri numerici (MAX_TEXTURE_SIZE, estensioni supportate, range degli alias) restano accessibili e producono comunque un'impronta. Volendo puoi anche renderizzare uno shader e hashare il risultato, perche' le GPU non implementano IEEE 754 alla lettera e lo stesso calcolo floating point produce risultati leggermente diversi su hardware diverso.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — AUDIO                                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Audio Fingerprinting</h2>
+<span class="section-number">Sezione 06. Il suono che non senti</span>
+
+<p>
+  Questo e' quello che mi ha sorpreso di piu'. Non ci pensi mai, ma il tuo browser ha un sintetizzatore audio completo. E quel sintetizzatore ha un'impronta.
+</p>
+
+<div class="chain-flow fade-in">
+  <div class="chain-step">
+    <div class="chain-label">1</div>
+    <div class="chain-value">Oscillator</div>
+  </div>
+  <span class="chain-arrow">&#8594;</span>
+  <div class="chain-step">
+    <div class="chain-label">2</div>
+    <div class="chain-value">Compressor</div>
+  </div>
+  <span class="chain-arrow">&#8594;</span>
+  <div class="chain-step">
+    <div class="chain-label">3</div>
+    <div class="chain-value">Analyser</div>
+  </div>
+  <span class="chain-arrow">&#8594;</span>
+  <div class="chain-step chain-danger">
+    <div class="chain-label">4</div>
+    <div class="chain-value">Hash</div>
+  </div>
+</div>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> ctx = <span class="kw">new</span> OfflineAudioContext(<span class="nb">1</span>, <span class="nb">44100</span>, <span class="nb">44100</span>);</td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">const</span> osc = ctx.createOscillator();</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">const</span> comp = ctx.createDynamicsCompressor();</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code">osc.type = <span class="st">'triangle'</span>;</td></tr>
+<tr><td class="ln">6</td><td class="code">osc.frequency.setValueAtTime(<span class="nb">10000</span>, ctx.currentTime);</td></tr>
+<tr><td class="ln">7</td><td class="code">comp.threshold.setValueAtTime(<span class="nb">-50</span>, ctx.currentTime);</td></tr>
+<tr><td class="ln">8</td><td class="code">comp.knee.setValueAtTime(<span class="nb">40</span>, ctx.currentTime);</td></tr>
+<tr><td class="ln">9</td><td class="code">comp.ratio.setValueAtTime(<span class="nb">12</span>, ctx.currentTime);</td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code">osc.connect(comp);</td></tr>
+<tr><td class="ln">12</td><td class="code">comp.connect(ctx.destination);</td></tr>
+<tr><td class="ln">13</td><td class="code">osc.start(<span class="nb">0</span>);</td></tr>
+<tr><td class="ln">14</td><td class="code"></td></tr>
+<tr><td class="ln">15</td><td class="code">ctx.startRendering().then(<span class="kw">function</span>(buffer) {</td></tr>
+<tr><td class="ln">16</td><td class="code">    <span class="kw">const</span> data = buffer.getChannelData(<span class="nb">0</span>);</td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="cm">// 44100 campioni float32. L'hash e' il fingerprint.</span></td></tr>
+<tr><td class="ln">18</td><td class="code">});</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  <code>OfflineAudioContext</code> processa in memoria, non esce audio dagli speaker. Ma quei 44100 campioni float32 dipendono dall'implementazione DSP del browser e dall'arrotondamento floating point del sistema. L'hardware audio incide meno di quanto si pensi: la differenza vera la fa l'implementazione WebAudio del browser (Blink in Chrome, cubeb in Firefox, WebKit in Safari). Le API di sistema come Core Audio o WASAPI servono solo per l'output, non per il rendering dell'<code>OfflineAudioContext</code>. Stesso codice, numeri leggermente diversi, hash diverso. Non ci senti niente, ma il sito ti ha sentito benissimo.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">audio fingerprint</span> <span class="ld-val" id="demo-audio">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">audio hash</span> <span class="ld-val" id="demo-audio-hash">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — FONT                                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Font Fingerprinting</h2>
+<span class="section-number">Sezione 07. I font che hai installato</span>
+
+<p>
+  Non puoi chiedere al browser "dammi la lista dei font installati". Ma puoi dedurla. Il trucco: crei un testo con un font di base (monospace), misuri le dimensioni. Poi cambi il font con uno specifico. Se le dimensioni cambiano, quel font e' installato.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">function</span> <span class="fn">hasFont</span>(font) {</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="kw">const</span> span = document.createElement(<span class="st">'span'</span>);</td></tr>
+<tr><td class="ln">3</td><td class="code">    span.textContent = <span class="st">'mmmmmmmmmmlli'</span>;</td></tr>
+<tr><td class="ln">4</td><td class="code">    span.style.fontSize = <span class="st">'72px'</span>;</td></tr>
+<tr><td class="ln">5</td><td class="code">    document.body.appendChild(span);</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code">    span.style.fontFamily = <span class="st">'monospace'</span>;</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="kw">const</span> baseWidth = span.offsetWidth;</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code">    span.style.fontFamily = <span class="st">'"'</span> + font + <span class="st">'", monospace'</span>;</td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="kw">const</span> changed = span.offsetWidth !== baseWidth;</td></tr>
+<tr><td class="ln">12</td><td class="code">    span.remove();</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="kw">return</span> changed;</td></tr>
+<tr><td class="ln">14</td><td class="code">}</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">font rilevati</span> <span class="ld-val" id="demo-fonts">calcolo...</span></div>
+</div>
+
+<p>
+  La lista dei font installati dice piu' di quanto pensi. macOS ha Helvetica Neue, Windows ha Segoe UI. Hai Calibri? Hai installato Office. Hai Myriad Pro? Hai installato la suite Adobe. Hai font CJK? Probabilmente parli cinese, giapponese o coreano. Testi 50 font e hai un'impronta del sistema operativo, del software installato, e della lingua. Va detto: i browser moderni stanno limitando questa tecnica. Chrome e Firefox applicano font visibility restrictions che riducono il set di font rilevabili a quelli di sistema. Il fingerprint via font e' meno preciso di qualche anno fa, ma non e' morto.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — SCREEN AVANZATO                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Screen Fingerprinting Avanzato</h2>
+<span class="section-number">Sezione 08. Oltre width e height</span>
+
+<p>
+  <code>screen.width</code> e <code>screen.height</code> sono l'antipasto. La roba interessante sta sotto.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cm">// Scaling: un Mac Retina ha 2, un Android puo' avere 2.625 o 3.5</span></td></tr>
+<tr><td class="ln">2</td><td class="code">window.devicePixelRatio  <span class="cm">// quel decimale e' sorprendentemente raro</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm">// 24 = standard, 30 = HDR, 16 = probabilmente una VM</span></td></tr>
+<tr><td class="ln">5</td><td class="code">screen.colorDepth</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cm">// Gamut: display P3 = Apple o monitor pro. rec2020 = HDR recente</span></td></tr>
+<tr><td class="ln">8</td><td class="code">matchMedia(<span class="st">'(color-gamut: p3)'</span>).matches</td></tr>
+<tr><td class="ln">9</td><td class="code">matchMedia(<span class="st">'(color-gamut: rec2020)'</span>).matches</td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cm">// Preferenze OS: persistenti, non cambiano con incognito</span></td></tr>
+<tr><td class="ln">12</td><td class="code">matchMedia(<span class="st">'(prefers-color-scheme: dark)'</span>).matches</td></tr>
+<tr><td class="ln">13</td><td class="code">matchMedia(<span class="st">'(prefers-reduced-motion: reduce)'</span>).matches</td></tr>
+<tr><td class="ln">14</td><td class="code">matchMedia(<span class="st">'(prefers-contrast: more)'</span>).matches</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">devicePixelRatio</span> <span class="ld-val" id="demo-dpr">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">colorDepth</span> <span class="ld-val" id="demo-depth">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">color-gamut: p3</span> <span class="ld-val" id="demo-p3">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">prefers-color-scheme</span> <span class="ld-val" id="demo-dark">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">reduced-motion</span> <span class="ld-val" id="demo-motion">calcolo...</span></div>
+</div>
+
+<p>
+  Il <code>devicePixelRatio</code> con quei decimali assurdi tipo 2.625 restringe parecchio il campo. Un <code>colorDepth</code> di 16 e' quasi certamente una VM. E le preferenze (dark mode, reduced motion, high contrast) sono impostazioni del sistema operativo. Restano uguali tra sessioni, tra incognito, tra profili browser. Chi usa dark mode + reduced motion + high contrast e' una combinazione abbastanza rara. E la rarita' e' entropia.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — HARDWARE                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Hardware Info</h2>
+<span class="section-number">Sezione 09. Quello che il browser regala</span>
+
+<p>
+  Queste le chiedi e te le da'. Senza trucchi, senza rendering, senza hack.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">navigator.hardwareConcurrency  <span class="cm">// 8 / 10 / 16 / 24 core</span></td></tr>
+<tr><td class="ln">2</td><td class="code">navigator.deviceMemory         <span class="cm">// 4 / 8 GB (arrotondato)</span></td></tr>
+<tr><td class="ln">3</td><td class="code">navigator.maxTouchPoints       <span class="cm">// 0 = desktop, 5 = phone, 10 = tablet</span></td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code">Intl.DateTimeFormat().resolvedOptions().timeZone  <span class="cm">// "Europe/Rome"</span></td></tr>
+<tr><td class="ln">6</td><td class="code">navigator.languages  <span class="cm">// ["it-IT", "en-US", "en"]</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">CPU cores</span> <span class="ld-val" id="demo-cores">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">RAM</span> <span class="ld-val" id="demo-ram">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">touch points</span> <span class="ld-val" id="demo-touch">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">timezone</span> <span class="ld-val" id="demo-tz">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">lingue</span> <span class="ld-val" id="demo-lang">calcolo...</span></div>
+</div>
+
+<p>
+  "12 core, 8 GB, 0 touch points, Europe/Rome, it-IT e en-US." Gia' cosi' il cerchio si restringe parecchio. Mettici sopra canvas, WebGL, audio, e la ricerca diventa piu' mirata di un cecchino con il mirino termico.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — TIMING                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Timing Attacks</h2>
+<span class="section-number">Sezione 10. Il tempo come segnale</span>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> t0 = performance.now();</td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">for</span> (<span class="kw">let</span> i = <span class="nb">0</span>; i < <span class="nb">100000</span>; i++) Math.atan(<span class="nb">2</span>);</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">const</span> elapsed = performance.now() - t0;</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Quanto ci mette a fare 100.000 operazioni matematiche? Dipende dalla CPU, dalla microarchitettura, dalla cache, dal JIT compiler. Non basta da solo per identificarti, ma aggiunge qualche bit al vettore complessivo. Dopo Spectre i browser hanno ridotto la precisione di <code>performance.now()</code>, ma anche la <em>quantita'</em> di jitter aggiunto e' un segnale: ogni browser lo fa in modo diverso.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">100k Math.atan(2)</span> <span class="ld-val" id="demo-timing">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">precisione timer</span> <span class="ld-val" id="demo-timer-res">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 — SPEECH                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Speech Synthesis</h2>
+<span class="section-number">Sezione 11. Le voci nel browser</span>
+
+<p>
+  Questa e' la mia preferita perche' nessuno ci pensa. Il browser ha un sintetizzatore vocale. E la lista delle voci installate e' diversa su ogni sistema.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code">speechSynthesis.onvoiceschanged = <span class="kw">function</span>() {</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="kw">const</span> voices = speechSynthesis.getVoices();</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cm">// macOS: "Samantha", "Alex", "Alice"</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cm">// Windows: "Zira", "David", "Mark"</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cm">// Linux: "eSpeak" o niente</span></td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="kw">const</span> fp = voices.map(v => v.name + <span class="st">'|'</span> + v.lang).join(<span class="st">','</span>);</td></tr>
+<tr><td class="ln">7</td><td class="code">};</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  La lista dipende da OS, versione, lingua configurata, pacchetti TTS installati. E' stabile tra sessioni. Cambia solo quando aggiorni il sistema o installi nuove voci. Un modo elegante per sapere che OS usi senza chiedertelo.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">voci disponibili</span> <span class="ld-val" id="demo-voices-count">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">prime 5 voci</span> <span class="ld-val" id="demo-voices-list">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 — PERMISSIONS                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Permissions API</h2>
+<span class="section-number">Sezione 12. La firma comportamentale</span>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> perms = [<span class="st">'camera'</span>, <span class="st">'microphone'</span>, <span class="st">'geolocation'</span>, <span class="st">'notifications'</span>];</td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code">Promise.all(perms.map(<span class="kw">function</span>(name) {</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="kw">return</span> navigator.permissions.query({ name: name })</td></tr>
+<tr><td class="ln">5</td><td class="code">        .then(<span class="kw">function</span>(r) { <span class="kw">return</span> name + <span class="st">':'</span> + r.state; });</td></tr>
+<tr><td class="ln">6</td><td class="code">}));</td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cm">// ["camera:denied", "microphone:granted", "geolocation:prompt", ...]</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  <code>granted</code>, <code>denied</code>, <code>prompt</code>. Questo stato e' persistente e dipende da quello che hai fatto in passato. Non e' hardware, non e' software: e' una foto delle tue scelte. Camera negata, microfono concesso, notifiche bloccate. Una combinazione diversa per quasi tutti.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">camera</span> <span class="ld-val" id="demo-perm-camera">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">microphone</span> <span class="ld-val" id="demo-perm-mic">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">geolocation</span> <span class="ld-val" id="demo-perm-geo">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">notifications</span> <span class="ld-val" id="demo-perm-notif">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 13 — WEBRTC                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> WebRTC IP Leak</h2>
+<span class="section-number">Sezione 13. L'IP che esce dalla VPN</span>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> pc = <span class="kw">new</span> RTCPeerConnection({ iceServers: [] });</td></tr>
+<tr><td class="ln">2</td><td class="code">pc.createDataChannel(<span class="st">''</span>);</td></tr>
+<tr><td class="ln">3</td><td class="code">pc.createOffer().then(o => pc.setLocalDescription(o));</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code">pc.onicecandidate = <span class="kw">function</span>(e) {</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="kw">if</span> (e.candidate) console.log(e.candidate.candidate);</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cm">// "candidate:842163049 1 udp 192.168.1.100 ..."</span></td></tr>
+<tr><td class="ln">8</td><td class="code">};</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Il classico. Crei una connessione WebRTC, il browser raccoglie i candidati ICE, e fra quelli c'era il tuo IP locale. In passato usciva anche dietro VPN. Oggi la situazione e' diversa: Chrome dal 2021 usa mDNS per mascherare l'IP locale nei candidati ICE, Firefox e Safari hanno mitigazioni simili. Nella maggior parte dei casi l'IP reale non esce piu'. Resta utile come segnale (il comportamento ICE stesso varia tra browser), ma il leak diretto dell'IP locale e' in gran parte risolto.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">ICE candidate</span> <span class="ld-val" id="demo-webrtc" style="word-break: break-all;">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 14 — BOUNCE TRACKING                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Bounce Tracking</h2>
+<span class="section-number">Sezione 14. L'evoluzione del cookie</span>
+
+<p>
+  I browser hanno introdotto protezioni (ITP in Safari, ETP in Firefox, Storage Partitioning in Chrome) che separano cookie e storage per sito. Ma esiste un trucco che le aggira.
+</p>
+
+<div class="chain-flow fade-in">
+  <div class="chain-step">
+    <div class="chain-label">visiti</div>
+    <div class="chain-value">siteA.com</div>
+  </div>
+  <span class="chain-arrow">&#8594;</span>
+  <div class="chain-step chain-danger">
+    <div class="chain-label">redirect</div>
+    <div class="chain-value">tracker.com</div>
+  </div>
+  <span class="chain-arrow">&#8594;</span>
+  <div class="chain-step">
+    <div class="chain-label">redirect</div>
+    <div class="chain-value">siteB.com</div>
+  </div>
+</div>
+
+<p>
+  Il redirect dura millisecondi. Non lo vedi nemmeno. Ma in quei millisecondi il tracker imposta un cookie first-party (perche' tu stai visitando <em>il suo</em> dominio, tecnicamente). Non e' fingerprinting puro, ma fa parte dello stesso ecosistema: tracciarti senza che tu te ne accorga.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 15 — NETWORK                                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Network Fingerprint</h2>
+<span class="section-number">Sezione 15. JA3 e lo stack TCP</span>
+
+<p>
+  Il fingerprinting non si ferma al browser. Quando fai una connessione HTTPS, il primo messaggio (ClientHello) contiene un set specifico di cipher suites, estensioni, curve ellittiche. Quel set e' diverso tra browser e versioni.
+</p>
+
+<div class="code-block fade-in" data-lang="formula">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="fn">JA3</span> = <span class="fn">MD5</span>(<span class="kw">TLSVersion</span>, <span class="kw">Ciphers</span>, <span class="kw">Extensions</span>, <span class="kw">Curves</span>, <span class="kw">PointFormats</span>)</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Si chiama JA3 fingerprint (la versione moderna e' <strong>JA4</strong>, piu' granulare). Ogni combinazione di browser, libreria TLS, sistema operativo e eventuale proxy produce un hash diverso. Chrome su macOS e Chrome su Linux hanno JA3 diversi. Chrome dietro Cloudflare ha un JA3 diverso da Chrome diretto. Non si puo' cambiare lato client senza modificare lo stack TLS. E sotto c'e' anche lo stack TCP (window size, TTL, opzioni): dipende dal kernel, quindi dall'OS. Il server non deve fare niente di speciale. Basta ascoltare il primo pacchetto.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 16 — OS FINGERPRINT                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Fingerprint a Livello OS</h2>
+<span class="section-number">Sezione 16. Clock skew, battery, sensori</span>
+
+<p>
+  Qui si va piu' a fondo. Il <strong>clock skew</strong> e' la deviazione dell'orologio interno del tuo computer rispetto al tempo reale. Ogni cristallo di quarzo devia un po' diversamente. Misurando il drift su piu' richieste si ottiene una firma che e' unica per macchina. Non cambia con il browser, la VPN, o la rete. Cambi IP? Il clock skew resta lo stesso. Tracking cross-network.
+</p>
+
+<p>
+  La <strong>Battery API</strong> (<code>navigator.getBattery()</code>) espone livello di carica, tempo di ricarica, stato di caricamento. "87%, in carica, 45 minuti alla fine" e' piuttosto unico in un dato momento. I browser hanno iniziato a rimuoverla per questo motivo.
+</p>
+
+<p>
+  Le <strong>Sensor API</strong> (accelerometro, giroscopio) sui telefoni espongono dati che dipendono dalla calibrazione hardware. Due telefoni identici possono avere offset diversi nei sensori, il che li rende distinguibili.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 17 — WASM                                            -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> WASM Timing</h2>
+<span class="section-number">Sezione 17. Il cronometro preciso</span>
+
+<p>
+  Il WebAssembly produce tempi di esecuzione piu' stabili del JavaScript perche' bypassa il JIT (che aggiunge rumore). Questo lo rende un cronometro piu' preciso. E un cronometro preciso e' un problema per la privacy.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> t0 = performance.now();</td></tr>
+<tr><td class="ln">2</td><td class="code">WebAssembly.instantiate(wasmModule).then(<span class="kw">function</span>() {</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="kw">const</span> compilationTime = performance.now() - t0;</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cm">// dipende da: CPU, cache, pipeline</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cm">// puo' distinguere Intel da AMD, ARM da x86</span></td></tr>
+<tr><td class="ln">6</td><td class="code">});</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Tempo di compilazione, throughput di loop numerici, latenza di accesso alla memoria. Tutto dipende dalla microarchitettura della CPU. Si possono distinguere famiglie di processori anche quando il browser nasconde <code>hardwareConcurrency</code>. Il WASM e' una lente piu' pulita del JS per guardare l'hardware.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">WASM compilazione</span> <span class="ld-val" id="demo-wasm-compile">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">WASM esecuzione 1M loop</span> <span class="ld-val" id="demo-wasm-exec">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 18 — WEBGPU                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> WebGPU e Compute Shader</h2>
+<span class="section-number">Sezione 18. La nuova frontiera</span>
+
+<p>
+  WebGPU e' il successore di WebGL e espone <em>molto</em> piu' della GPU. E' la prossima grande superficie di fingerprinting. Quasi nessun articolo ne parla perche' l'API e' ancora giovane, ma i dati che espone sono una miniera.
+</p>
+
+<div class="code-block fade-in" data-lang="javascript">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">const</span> adapter = <span class="kw">await</span> navigator.gpu.requestAdapter();</td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cm">// L'API non e' ancora stabile ovunque.</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cm">// In alcuni browser serve adapter.requestAdapterInfo()</span></td></tr>
+<tr><td class="ln">5</td><td class="code">adapter.info.vendor        <span class="cm">// "apple" / "nvidia" / "amd"</span></td></tr>
+<tr><td class="ln">6</td><td class="code">adapter.info.architecture  <span class="cm">// "common-3" (Apple M2)</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cm">// Limiti hardware specifici della GPU</span></td></tr>
+<tr><td class="ln">7</td><td class="code">adapter.limits.maxTextureDimension2D            <span class="cm">// 16384</span></td></tr>
+<tr><td class="ln">8</td><td class="code">adapter.limits.maxComputeWorkgroupsPerDimension  <span class="cm">// 65535</span></td></tr>
+<tr><td class="ln">9</td><td class="code">adapter.limits.maxBufferSize                     <span class="cm">// 268435456</span></td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code">adapter.features  <span class="cm">// Set {"texture-compression-bc", "float32-filterable", ...}</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  E la parte piu' potente: puoi scrivere un compute shader in WGSL, eseguirlo sulla GPU, leggere il buffer di output e hasharlo. Le differenze derivano dal driver, dall'architettura del processore grafico, e dal comportamento floating point. E' il canvas fingerprinting della prossima generazione, ma con il controllo completo della pipeline di calcolo.
+</p>
+
+<div class="live-demo fade-in">
+  <div class="ld-row"><span class="ld-key">WebGPU supportato</span> <span class="ld-val" id="demo-webgpu-support">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">vendor</span> <span class="ld-val" id="demo-webgpu-vendor">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">architecture</span> <span class="ld-val" id="demo-webgpu-arch">calcolo...</span></div>
+  <div class="ld-row"><span class="ld-key">features</span> <span class="ld-val" id="demo-webgpu-features">calcolo...</span></div>
+  <p style="margin: 0.8rem 0 0; font-size: 0.72rem; color: var(--text-secondary); line-height: 1.5;">
+    Se vedi "non supportato" e' normale: WebGPU funziona solo su Chrome e Edge. Firefox e Safari non lo implementano ancora. Anche questo e' un segnale di fingerprinting: l'assenza dell'API dice qualcosa sul tuo browser.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 19 — MAPPA ENTROPIA                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Mappa dell'Entropia</h2>
+<span class="section-number">Sezione 19. Quanto vale ogni segnale</span>
+
+<div class="entropy-chart fade-in">
+  <div class="entropy-chart-title">Bit di entropia stimati per segnale</div>
+
+  <div class="entropy-bar">
+    <span class="bar-name">Canvas</span>
+    <div class="bar-track"><div class="bar-fill" style="width:85%; background: var(--accent-attention);"></div></div>
+    <span class="bar-label">~8.5 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">WebGL (params)</span>
+    <div class="bar-track"><div class="bar-fill" style="width:75%; background: var(--accent-highlight);"></div></div>
+    <span class="bar-label">~7.5 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Font list</span>
+    <div class="bar-track"><div class="bar-fill" style="width:70%; background: var(--accent-amplification);"></div></div>
+    <span class="bar-label">~7.0 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Audio</span>
+    <div class="bar-track"><div class="bar-fill" style="width:55%; background: var(--accent-reaction);"></div></div>
+    <span class="bar-label">~5.5 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Timezone + Lang</span>
+    <div class="bar-track"><div class="bar-fill" style="width:50%; background: var(--accent-rejection);"></div></div>
+    <span class="bar-label">~5.0 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Screen (avanzato)</span>
+    <div class="bar-track"><div class="bar-fill" style="width:45%; background: var(--accent-attention);"></div></div>
+    <span class="bar-label">~4.5 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">User-Agent</span>
+    <div class="bar-track"><div class="bar-fill" style="width:40%; background: var(--accent-highlight);"></div></div>
+    <span class="bar-label">~4.0 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Speech voices</span>
+    <div class="bar-track"><div class="bar-fill" style="width:35%; background: var(--accent-amplification);"></div></div>
+    <span class="bar-label">~3.5 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Hardware info</span>
+    <div class="bar-track"><div class="bar-fill" style="width:30%; background: var(--accent-reaction);"></div></div>
+    <span class="bar-label">~3.0 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Permissions</span>
+    <div class="bar-track"><div class="bar-fill" style="width:20%; background: var(--accent-rejection);"></div></div>
+    <span class="bar-label">~2.0 bit</span>
+  </div>
+  <div class="entropy-bar">
+    <span class="bar-name">Media queries</span>
+    <div class="bar-track"><div class="bar-fill" style="width:15%; background: var(--accent-attention);"></div></div>
+    <span class="bar-label">~1.5 bit</span>
+  </div>
+</div>
+
+<p>
+  Stime basate su studi accademici e dati di Panopticlick/AmIUnique. La somma aritmetica supera i 50 bit, ma i segnali non sono indipendenti (chi ha macOS ha anche Core Text, quindi canvas e font sono correlati). L'entropia effettiva e' piu' bassa, tipicamente 33-45 bit. Basta comunque. Ogni nuova API del browser aggiunge superficie. L'ironia: le API esistono perche' servono a fare cose utili (rendering, audio, accessibilita'). Ma ognuna di loro lascia una traccia.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 20 — DIFESE                                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Chi Si Difende e Come</h2>
+<span class="section-number">Sezione 20. Tre filosofie</span>
+
+<p>
+  I browser provano a difenderti. Ognuno a modo suo.
+</p>
+
+<p>
+  <strong>Tor Browser</strong>: tutti devono apparire identici. Stessa risoluzione, stessi font, stesse API disabilitate. Se il fingerprint e' uguale per tutti, non identifica nessuno. Funziona, ma navigare e' un calvario.
+</p>
+
+<p>
+  <strong>Brave</strong>: aggiunge rumore casuale ai risultati di canvas, WebGL e audio. Ogni sessione ha un fingerprint diverso. Il tracking cross-session si rompe perche' l'hash cambia ogni volta.
+</p>
+
+<p>
+  <strong>Safari</strong>: riduce la quantita' di informazione disponibile. Limita le API, congela i font, usa ITP per partizionare lo storage. Non uniforma, non randomizza: toglie dati.
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr><th>Browser</th><th>Strategia</th><th>Canvas</th><th>WebGL</th><th>Audio</th><th>Fonts</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tor</td>
+      <td>Uniformare</td>
+      <td><span class="verdict-ok">Identico</span></td>
+      <td><span class="verdict-ok">Disabilitato</span></td>
+      <td><span class="verdict-ok">Disabilitato</span></td>
+      <td><span class="verdict-ok">Set fisso</span></td>
+    </tr>
+    <tr>
+      <td>Brave</td>
+      <td>Randomizzare</td>
+      <td><span class="verdict-ok">Random</span></td>
+      <td><span class="verdict-ok">Random</span></td>
+      <td><span class="verdict-ok">Random</span></td>
+      <td><span class="verdict-fail">Esposti</span></td>
+    </tr>
+    <tr>
+      <td>Safari</td>
+      <td>Ridurre</td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-ok">Limitati</span></td>
+    </tr>
+    <tr>
+      <td>Firefox</td>
+      <td>Misto</td>
+      <td><span class="verdict-ok">Opt-in</span></td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-ok">Opt-in</span></td>
+    </tr>
+    <tr>
+      <td>Chrome</td>
+      <td>Indiretta (UA reduction, Privacy Sandbox, IP Protection in rollout)</td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-fail">Esposto</span></td>
+      <td><span class="verdict-fail">Esposti</span></td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 21 — CORRELAZIONE                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come Funziona Nella Realta'</h2>
+<span class="section-number">Sezione 21. ML, correlazione, e il paradosso</span>
+
+<p>
+  Nessuno usa una sola tecnica. I sistemi reali (antifrode, bot detection, ad tech) prendono tutti i segnali, li pesano con machine learning, e producono un punteggio: "con probabilita' del 97.3%, questa sessione e' lo stesso utente della sessione X." Non serve un match esatto. Basta una correlazione alta.
+</p>
+
+<p>
+  E poi c'e' il <strong>behavioural fingerprint</strong>: come muovi il mouse (velocita', accelerazione, curvatura), come scrolli (inerzia, frequenza), come digiti sulla tastiera (cadenza tra un tasto e l'altro, tempo di pressione). I sistemi antifrode delle banche lo usano pesantemente. Se digiti la password con un timing diverso dal solito, scatta un alert. Anche quelli sono identificanti. Ma questo e' un altro articolo.
+</p>
+
+<div class="warning-box fade-in">
+  <p><strong>Il paradosso.</strong> Piu' ti proteggi, piu' diventi raro. Usi Tor con WebGL disabilitato e un set di font fisso? Sei uno dei pochi a farlo. I gruppi piccoli sono facili da tracciare. L'unica vera difesa e' essere indistinguibile dalla massa. E la massa usa Chrome senza estensioni.</p>
+</div>
+
+<p>
+  La modalita' incognito? Non cambia il fingerprint. Non cambia la GPU, non cambia i font, non cambia la risoluzione, non cambia l'audio. Cambia solo una cosa: non manda i cookie. Per il fingerprinting stateless, incognito e' trasparente. Come mettersi gli occhiali da sole e pensare di essere irriconoscibile.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 22 — CONTROMISURE                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Contromisure</h2>
+<span class="section-number">Sezione 22. Cosa puoi fare (e cosa no)</span>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr><th>Contromisura</th><th>Cosa fa</th><th>Efficacia</th><th>Costo</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tor Browser</td>
+      <td>Fingerprint uniforme</td>
+      <td><span class="verdict-ok">Alta</span></td>
+      <td>Lento, siti rotti</td>
+    </tr>
+    <tr>
+      <td>Brave (shields)</td>
+      <td>Randomizzazione</td>
+      <td><span class="verdict-ok">Media</span></td>
+      <td>Rari glitch</td>
+    </tr>
+    <tr>
+      <td>VM</td>
+      <td>Hardware virtuale</td>
+      <td><span class="verdict-ok">Alta</span></td>
+      <td>Pesante, scomodo</td>
+    </tr>
+    <tr>
+      <td>Disabilitare WebGL</td>
+      <td>Toglie un segnale</td>
+      <td><span class="verdict-fail">Bassa</span></td>
+      <td>Google Maps rotto, ti rende raro</td>
+    </tr>
+    <tr>
+      <td>Incognito</td>
+      <td>Niente cookie</td>
+      <td><span class="verdict-fail">Zero</span></td>
+      <td>Nessuno (perche' non fa niente)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Il problema di fondo: <strong>meno entropia = meno usabilita'</strong>. Disabili WebGL e Google Maps non funziona. Blocchi i font e i siti sono brutti. Usi Tor e ci metti 10 secondi a caricare una pagina. Ogni contromisura ha un costo. E la maggior parte delle persone non e' disposta a pagarlo. I tracker lo sanno bene.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 23 — HASH TOTALE                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Tuo Fingerprint</h2>
+<span class="section-number">Sezione 23. Il risultato finale</span>
+
+<p>
+  Se hai letto fin qui, hai gia' visto tutto. Ogni box verde che hai incontrato nell'articolo conteneva dati reali del tuo browser, letti in tempo reale. Il tuo canvas, la tua GPU, il tuo audio engine, i tuoi font, i tuoi core, il tuo timezone. Nessun esempio inventato. Tutto tuo.
+</p>
+
+<p>
+  Qui sotto c'e' l'hash SHA-256 calcolato combinando tutti quei segnali. Questo e' il tuo fingerprint. Prova ad aprire la stessa pagina in incognito: l'hash sara' quasi identico. Prova con un altro browser: sara' diverso. Questa e' la dimostrazione pratica di tutto quello che hai letto.
+</p>
+
+<div class="live-demo fade-in" style="text-align: center;">
+  <div class="ld-row" style="justify-content: center;"><span class="ld-key">SHA-256</span> <span class="ld-val" id="demo-full-hash" style="word-break: break-all;">calcolo...</span></div>
+  <div class="ld-row" style="justify-content: center; margin-top: 0.5rem;"><span class="ld-key">segnali raccolti</span> <span class="ld-val" id="demo-signal-count">calcolo...</span></div>
+  <div class="ld-row" style="justify-content: center;"><span class="ld-key">entropia stimata</span> <span class="ld-val" id="demo-entropy">calcolo...</span></div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- CONCLUSIONE                                               -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Conclusione</h2>
+<span class="section-number">Chiudiamo</span>
+
+<p>
+  Hai presente quel banner? "Accetta i cookie." L'hai rifiutato. Ti senti al sicuro. Ma il sito ha gia' guardato come il tuo browser disegna un testo, che GPU hai, quanti core ha la tua CPU, che voci di sintesi sono installate, se usi il dark mode, che font hai. Ha messo tutto insieme e ha un identificativo unico. Il tuo. Senza aver scritto un solo byte sul tuo disco.
+</p>
+
+<p>
+  Il fingerprinting non e' illegale. Serve per antifrode, bot detection, sicurezza bancaria. Ma e' anche usato per tracking pubblicitario senza consenso. La stessa tecnica, due usi opposti. La differenza non e' nel codice. E' nell'intenzione. E il banner dei cookie non copre nessuno dei due casi.
+</p>
+
+<p>
+  La iena, riassumendo dopo aver letto il tutto: "Quindi quei pop-up non servono a niente?" Non a niente. Servono ai cookie. Ma per il fingerprinting e' come mettere una grata sulla porta e lasciare tutte le finestre aperte.
+</p>
+
+<div class="conclusion-box fade-in">
+  <p class="quote">Non devi dire al browser chi sei. Lo sa gia'.</p>
+  <p style="color: var(--text-secondary); margin-top: 1rem; font-size: 0.85rem;">
+    21 superfici. 33-45 bit. Zero cookie. Zero consensi.<br>
+    Il banner e' una grata. Le finestre sono aperte.
+  </p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- FONTI                                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Fonti</h2>
+<span class="section-number">Riferimenti</span>
+
+<ul style="font-size: 0.9rem; line-height: 2;">
+  <li><a href="https://coveryourtracks.eff.org/" target="_blank" rel="noopener" style="color: var(--accent-highlight);">EFF Cover Your Tracks (ex Panopticlick)</a></li>
+  <li><a href="https://fingerprintjs.com/" target="_blank" rel="noopener" style="color: var(--accent-highlight);">FingerprintJS: libreria open source di fingerprinting</a></li>
+  <li><a href="https://browserleaks.com/" target="_blank" rel="noopener" style="color: var(--accent-highlight);">BrowserLeaks: test completo delle superfici esposte</a></li>
+  <li><a href="https://engineering.salesforce.com/ja3-a-method-for-profiling-ssl-tls-clients-4c70dea3bcfb/" target="_blank" rel="noopener" style="color: var(--accent-highlight);">Salesforce Engineering: JA3 TLS Fingerprinting</a></li>
+  <li><a href="https://2019.www.torproject.org/projects/torbrowser/design/" target="_blank" rel="noopener" style="color: var(--accent-highlight);">Tor Browser Design Document</a></li>
+</ul>
+
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+</footer>
+
+<script src="../js/main.js"></script>
+
+<script>
+// ============================================================
+// DEMO LIVE — tutto nel browser, zero rete
+// ============================================================
+
+async function hashStr(str) {
+    var buf = new TextEncoder().encode(str);
+    var hash = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(hash)).map(function(b) {
+        return b.toString(16).padStart(2, '0');
+    }).join('');
+}
+
+// Popola le demo live inline al caricamento
+(async function populateDemos() {
+    function setText(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val;
+    }
+
+    // User-Agent e Client Hints
+    setText('demo-ua', navigator.userAgent);
+    setText('demo-platform', navigator.platform || 'n/a');
+    if (navigator.userAgentData) {
+        var brands = navigator.userAgentData.brands;
+        setText('demo-brands', brands.map(function(b) { return b.brand + ' ' + b.version; }).join(', '));
+        setText('demo-mobile', navigator.userAgentData.mobile ? 'si' : 'no');
+        setText('demo-ch-platform', navigator.userAgentData.platform || 'n/a');
+    } else {
+        setText('demo-brands', 'non supportato (solo Chromium)');
+        setText('demo-mobile', 'non supportato (solo Chromium)');
+        setText('demo-ch-platform', 'non supportato (solo Chromium)');
+    }
+
+    // Timing
+    try {
+        var t0 = performance.now();
+        for (var j = 0; j < 100000; j++) Math.atan(2);
+        var elapsed = performance.now() - t0;
+        setText('demo-timing', elapsed.toFixed(3) + ' ms');
+        var t1 = performance.now();
+        var t2 = performance.now();
+        var res = t2 - t1;
+        setText('demo-timer-res', res > 0 ? res.toFixed(6) + ' ms' : 'sub-microsecondo');
+    } catch(e) { setText('demo-timing', 'non disponibile'); }
+
+    // WASM Timing
+    try {
+        // Modulo WASM minimale: una funzione che fa un loop di addizioni
+        var wasmBytes = new Uint8Array([
+            0x00,0x61,0x73,0x6d, // magic
+            0x01,0x00,0x00,0x00, // version
+            0x01,0x07,            // type section, 7 bytes
+            0x01,0x60,0x01,0x7f,0x01,0x7f, // func type: (i32) -> i32
+            0x03,0x02,0x01,0x00, // function section: 1 func, type 0
+            0x07,0x08,0x01,      // export section
+            0x04,0x6c,0x6f,0x6f,0x70, // "loop"
+            0x00,0x00,           // func index 0
+            0x0a,0x13,0x01,      // code section
+            0x11,0x01,0x01,0x7f, // body: 1 local i32
+            0x02,0x40,           // block
+            0x03,0x40,           // loop
+            0x20,0x01,0x20,0x00,0x4f,0x0d,0x01, // br_if 1: local1 >= param0
+            0x20,0x01,0x41,0x01,0x6a,0x21,0x01, // local1 = local1 + 1
+            0x0c,0x00,           // br 0
+            0x0b,0x0b,           // end loop, end block
+            0x20,0x01,           // return local1
+            0x0b                 // end func
+        ]);
+        var wt0 = performance.now();
+        var wasmMod = await WebAssembly.compile(wasmBytes);
+        var compileTime = performance.now() - wt0;
+        setText('demo-wasm-compile', compileTime.toFixed(3) + ' ms');
+
+        var wasmInst = await WebAssembly.instantiate(wasmMod);
+        var wt1 = performance.now();
+        wasmInst.exports.loop(1000000);
+        var execTime = performance.now() - wt1;
+        setText('demo-wasm-exec', execTime.toFixed(3) + ' ms');
+    } catch(e) { setText('demo-wasm-compile', 'non disponibile'); setText('demo-wasm-exec', 'non disponibile'); }
+
+    // Speech Synthesis
+    try {
+        var loadVoices = function() {
+            var voices = speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                setText('demo-voices-count', voices.length + ' voci');
+                setText('demo-voices-list', voices.slice(0, 5).map(function(v) { return v.name; }).join(', '));
+            }
+        };
+        loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    } catch(e) {
+        setText('demo-voices-count', 'non disponibile');
+        setText('demo-voices-list', 'non disponibile');
+    }
+
+    // Permissions
+    try {
+        var permMap = { camera: 'demo-perm-camera', microphone: 'demo-perm-mic', geolocation: 'demo-perm-geo', notifications: 'demo-perm-notif' };
+        Object.keys(permMap).forEach(function(p) {
+            navigator.permissions.query({ name: p })
+                .then(function(r) { setText(permMap[p], r.state); })
+                .catch(function() { setText(permMap[p], 'non supportato'); });
+        });
+    } catch(e) {
+        setText('demo-perm-camera', 'non disponibile');
+    }
+
+    // WebRTC
+    try {
+        var pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel('');
+        pc.createOffer().then(function(o) { return pc.setLocalDescription(o); });
+        var rtcDone = false;
+        pc.onicecandidate = function(e) {
+            if (rtcDone) return;
+            if (e.candidate && e.candidate.candidate) {
+                setText('demo-webrtc', e.candidate.candidate);
+                rtcDone = true;
+                pc.close();
+            } else if (!e.candidate) {
+                if (!rtcDone) setText('demo-webrtc', 'nessun candidato esposto (mitigazione attiva)');
+                rtcDone = true;
+                pc.close();
+            }
+        };
+    } catch(e) { setText('demo-webrtc', 'non disponibile'); }
+
+    // WebGPU
+    try {
+        if (navigator.gpu) {
+            setText('demo-webgpu-support', 'si');
+            var adapter = await navigator.gpu.requestAdapter();
+            if (adapter) {
+                var info = adapter.info || {};
+                setText('demo-webgpu-vendor', info.vendor || 'n/a');
+                setText('demo-webgpu-arch', info.architecture || 'n/a');
+                var feats = [];
+                adapter.features.forEach(function(f) { feats.push(f); });
+                setText('demo-webgpu-features', feats.length > 0 ? feats.length + ' (' + feats.slice(0, 4).join(', ') + (feats.length > 4 ? ', ...' : '') + ')' : 'nessuna');
+            } else {
+                setText('demo-webgpu-vendor', 'nessun adapter');
+                setText('demo-webgpu-arch', 'nessun adapter');
+                setText('demo-webgpu-features', 'nessun adapter');
+            }
+        } else {
+            setText('demo-webgpu-support', 'no');
+            setText('demo-webgpu-vendor', 'non supportato');
+            setText('demo-webgpu-arch', 'non supportato');
+            setText('demo-webgpu-features', 'non supportato');
+        }
+    } catch(e) {
+        setText('demo-webgpu-support', 'errore');
+    }
+
+    // Canvas
+    try {
+        var c = document.getElementById('demo-canvas');
+        if (c) {
+            var ctx = c.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#f60';
+            ctx.fillRect(125, 1, 62, 20);
+            ctx.fillStyle = '#069';
+            ctx.fillText('fingerprint-test', 2, 15);
+            ctx.fillStyle = 'rgba(102,204,0,0.7)';
+            ctx.fillText('fingerprint-test', 4, 17);
+            var canvasHash = await hashStr(c.toDataURL());
+            setText('demo-canvas-hash', canvasHash);
+        }
+    } catch(e) { setText('demo-canvas-hash', 'non disponibile'); }
+
+    // WebGL
+    try {
+        var gc = document.createElement('canvas');
+        var gl = gc.getContext('webgl');
+        if (gl) {
+            var di = gl.getExtension('WEBGL_debug_renderer_info');
+            setText('demo-gl-vendor', di ? gl.getParameter(di.UNMASKED_VENDOR_WEBGL) : 'estensione disabilitata');
+            setText('demo-gl-renderer', di ? gl.getParameter(di.UNMASKED_RENDERER_WEBGL) : 'estensione disabilitata');
+            setText('demo-gl-texture', String(gl.getParameter(gl.MAX_TEXTURE_SIZE)));
+            setText('demo-gl-ext', gl.getSupportedExtensions().length + ' estensioni');
+        }
+    } catch(e) { setText('demo-gl-vendor', 'non disponibile'); }
+
+    // Audio
+    try {
+        var actx = new OfflineAudioContext(1, 44100, 44100);
+        var osc = actx.createOscillator();
+        var comp = actx.createDynamicsCompressor();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(10000, actx.currentTime);
+        comp.threshold.setValueAtTime(-50, actx.currentTime);
+        comp.knee.setValueAtTime(40, actx.currentTime);
+        comp.ratio.setValueAtTime(12, actx.currentTime);
+        comp.attack.setValueAtTime(0, actx.currentTime);
+        comp.release.setValueAtTime(0.25, actx.currentTime);
+        osc.connect(comp);
+        comp.connect(actx.destination);
+        osc.start(0);
+        var buf = await actx.startRendering();
+        var audioData = buf.getChannelData(0).slice(4500, 5000);
+        var audioSum = 0;
+        for (var i = 0; i < audioData.length; i++) audioSum += Math.abs(audioData[i]);
+        var audioVal = audioSum.toFixed(10);
+        setText('demo-audio', audioVal);
+        setText('demo-audio-hash', await hashStr(audioVal));
+    } catch(e) { setText('demo-audio', 'non disponibile'); }
+
+    // Fonts
+    try {
+        var testFonts = [
+            'Arial', 'Verdana', 'Times New Roman', 'Courier New', 'Georgia',
+            'Helvetica Neue', 'Segoe UI', 'Roboto', 'Menlo', 'Consolas',
+            'Calibri', 'Cambria', 'Myriad Pro', 'Futura', 'Optima',
+            'Monaco', 'Fira Code', 'SF Pro', 'Lucida Console', 'Impact'
+        ];
+        var detected = [];
+        var span = document.createElement('span');
+        span.textContent = 'mmmmmmmmmmlli';
+        span.style.fontSize = '72px';
+        span.style.visibility = 'hidden';
+        span.style.position = 'absolute';
+        document.body.appendChild(span);
+        var baseFonts = ['monospace', 'sans-serif', 'serif'];
+        var baseWidths = {};
+        baseFonts.forEach(function(f) {
+            span.style.fontFamily = f;
+            baseWidths[f] = span.offsetWidth;
+        });
+        testFonts.forEach(function(font) {
+            var found = baseFonts.some(function(base) {
+                span.style.fontFamily = '"' + font + '",' + base;
+                return span.offsetWidth !== baseWidths[base];
+            });
+            if (found) detected.push(font);
+        });
+        document.body.removeChild(span);
+        setText('demo-fonts', detected.length > 0 ? detected.join(', ') : 'nessun font extra rilevato');
+    } catch(e) { setText('demo-fonts', 'non disponibile'); }
+
+    // Screen
+    setText('demo-dpr', String(window.devicePixelRatio));
+    setText('demo-depth', screen.colorDepth + ' bit');
+    setText('demo-p3', matchMedia('(color-gamut: p3)').matches ? 'si' : 'no');
+    setText('demo-dark', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setText('demo-motion', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'si' : 'no');
+
+    // Hardware
+    setText('demo-cores', String(navigator.hardwareConcurrency || 'n/a'));
+    setText('demo-ram', (navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'non esposto (solo Chromium)'));
+    setText('demo-touch', String(navigator.maxTouchPoints));
+    setText('demo-tz', Intl.DateTimeFormat().resolvedOptions().timeZone);
+    setText('demo-lang', navigator.languages ? navigator.languages.join(', ') : navigator.language);
+
+    // Hash totale di tutti i segnali
+    try {
+        var fp = {};
+        fp.ua = navigator.userAgent;
+        fp.platform = navigator.platform;
+        fp.langs = navigator.languages ? navigator.languages.join(',') : navigator.language;
+        fp.screen = screen.width + 'x' + screen.height;
+        fp.depth = screen.colorDepth;
+        fp.dpr = window.devicePixelRatio;
+        fp.dark = matchMedia('(prefers-color-scheme: dark)').matches;
+        fp.motion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        fp.p3 = matchMedia('(color-gamut: p3)').matches;
+        fp.cores = navigator.hardwareConcurrency;
+        fp.mem = navigator.deviceMemory || 'n/a';
+        fp.touch = navigator.maxTouchPoints;
+        fp.tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var demoCanvas = document.getElementById('demo-canvas');
+        if (demoCanvas) fp.canvas = demoCanvas.toDataURL();
+        fp.audioDemo = document.getElementById('demo-audio') ? document.getElementById('demo-audio').textContent : '';
+        fp.glVendor = document.getElementById('demo-gl-vendor') ? document.getElementById('demo-gl-vendor').textContent : '';
+        fp.glRenderer = document.getElementById('demo-gl-renderer') ? document.getElementById('demo-gl-renderer').textContent : '';
+        fp.fonts = document.getElementById('demo-fonts') ? document.getElementById('demo-fonts').textContent : '';
+        var signalCount = Object.keys(fp).length;
+        setText('demo-signal-count', signalCount + ' segnali');
+        // Stima entropia: ogni segnale contribuisce in media 2-3 bit,
+        // canvas e audio ne contribuiscono ~10 ciascuno
+        var entropy = 0;
+        var highEntropy = ['canvas', 'audioDemo', 'glRenderer', 'fonts', 'ua'];
+        var medEntropy = ['screen', 'glVendor', 'langs', 'tz', 'cores'];
+        Object.keys(fp).forEach(function(k) {
+            if (highEntropy.indexOf(k) >= 0) entropy += 10;
+            else if (medEntropy.indexOf(k) >= 0) entropy += 4;
+            else entropy += 2;
+        });
+        setText('demo-entropy', '~' + entropy + ' bit');
+        var fullHash = await hashStr(JSON.stringify(fp));
+        setText('demo-full-hash', fullHash);
+    } catch(e) { setText('demo-full-hash', 'errore nel calcolo'); }
+})();
+
+</script>
+
+</body>
+</html>

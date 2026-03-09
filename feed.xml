@@ -8,6 +8,22 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Browser Sa Chi Sei</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-browser-sa-chi-sei.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-browser-sa-chi-sei.html</guid>
+    <pubDate>Mon, 09 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Non servono cookie. Non servono login. Il tuo browser ha gia' detto tutto. Canvas, WebGL, audio, font, WebGPU, WASM timing, speech synthesis. 21 superfici di entropia, demo live con i tuoi dati reali, e la prova che la modalita' incognito non serve a niente.</description>
+  </item>
+
+  <item>
+    <title>Il Prototipo Avvelena il Server</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-prototipo-avvelena-il-server.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-prototipo-avvelena-il-server.html</guid>
+    <pubDate>Sun, 08 Mar 2026 00:00:00 +0100</pubDate>
+    <description>CVE-2025-55182 React2Shell. Prototype pollution nel Flight protocol di React, lab Docker con exploit reale. Da __proto__ a RCE in 3 passi.</description>
+  </item>
+
+  <item>
     <title>Il Malware Si Smaschera</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-malware-si-smaschera.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-malware-si-smaschera.html</guid>
