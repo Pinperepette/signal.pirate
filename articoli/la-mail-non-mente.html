@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Mail Non Mente | Signal Pirate</title>
+  <meta name="description" content="Email header forensics smontata pezzo per pezzo. Received chain, SPF, DKIM, DMARC, spoofing detection, tracking pixel, DNS callback. Ogni email e' un tracciato: IP, hostname, timestamp, protocollo. Basta saperlo leggere.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Email Path Diagram === */
+    .email-path {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 2rem 0;
+      gap: 0;
+    }
+    .email-path-node {
+      background: var(--bg-secondary);
+      border: 2px solid var(--accent-highlight);
+      border-radius: 10px;
+      padding: 1rem 2rem;
+      text-align: center;
+      min-width: 280px;
+      position: relative;
+    }
+    .email-path-node .node-name {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-highlight);
+    }
+    .email-path-node .node-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+    .email-path-arrow {
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+      line-height: 1;
+      padding: 0.3rem 0;
+      font-family: var(--font-mono);
+    }
+    .email-path-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      opacity: 0.6;
+      padding: 0 0 0.1rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Header Chain Diagram === */
+    .header-chain {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+    .header-hop {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+    }
+    .header-hop + .header-hop { margin-top: 0.5rem; }
+    .hop-num {
+      font-weight: 800;
+      color: var(--accent-attention);
+      font-size: 1rem;
+      min-width: 2rem;
+      text-align: center;
+    }
+    .hop-info { flex: 1; }
+    .hop-server { font-weight: 600; color: var(--text-primary); }
+    .hop-ip { color: var(--accent-highlight); }
+    .hop-proto { color: var(--accent-reaction); }
+    .hop-time { color: var(--text-secondary); font-size: 0.7rem; }
+    .hop-arrow {
+      text-align: center;
+      color: var(--accent-attention);
+      font-size: 1.2rem;
+      padding: 0.2rem 0;
+    }
+
+    /* === Auth Result Badges === */
+    .auth-results {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+    .auth-badge {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+    .auth-badge .auth-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+    .auth-badge.pass { border-color: var(--accent-attention); }
+    .auth-badge.pass .auth-value { color: var(--accent-attention); font-weight: 700; }
+    .auth-badge.fail { border-color: var(--accent-reaction); }
+    .auth-badge.fail .auth-value { color: var(--accent-reaction); font-weight: 700; }
+    .auth-badge.none { border-color: var(--text-secondary); }
+    .auth-badge.none .auth-value { color: var(--text-secondary); font-weight: 700; }
+
+    /* === Envelope Diagram === */
+    .envelope-diagram {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 768px) {
+      .envelope-diagram { grid-template-columns: 1fr; }
+    }
+    .envelope-layer {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .envelope-layer-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 0.5rem;
+    }
+    .envelope-layer-items {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-10 | Pinperepette</p>
+    <h1 class="article-page-title">La Mail <span class="accent">Non Mente</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Email Forensics: SPF, DKIM, DMARC e il Tracciato che Nessuno Legge
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Email Forensics</span>
+      <span class="tag tag-highlight">SPF / DKIM / DMARC</span>
+      <span class="tag tag-reaction">Spoofing</span>
+      <span class="tag tag-amplification">Tracking Pixel</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00  - Intro
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Tracciato Che Nessuno Legge</h2>
+    <span class="section-number">Sezione 00. L'email non e' un messaggio, e' un percorso</span>
+
+    <p>La iena mi mostra il telefono. "Ho ricevuto una mail da Netflix. Dice che il mio account e' stato sospeso. Legittima?"</p>
+
+    <p>Nemmeno la guardo. "Fammi vedere gli header."</p>
+
+    <p>"Gli cosa?"</p>
+
+    <p>Il problema delle email e' che tutti leggono il messaggio. Nessuno legge la busta. Eppure il contenitore dice tutto. Ogni email che viaggia da un client a una casella attraversa una catena di server SMTP. Ogni server aggiunge un timbro: chi sono, da dove arriva il messaggio, con quale protocollo, a che ora. La posta elettronica funziona come un passaporto: ogni frontiera lascia un timbro. Il timbro si chiama header <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">Received</code>. E' un traceroute della rete postale.</p>
+
+    <p>Il bello? Nessuno li cancella. Nessuno li legge. E dicono molto piu' del corpo del messaggio.</p>
+
+    <div class="chart-container fade-in">
+      <div class="chart-title">Mutt: la mail Netflix come la vede chi sa guardare</div>
+      <img src="../immagini/email-forensics/mutt.png" alt="Screenshot di mutt con la mail Netflix di pinperepette: From info@members.netflix.com, Subject ecco i contenuti in arrivo su Netflix, Date 9 Mar 2026" style="width: 100%; border-radius: 8px;">
+    </div>
+
+    <!-- Email Path Diagram -->
+    <div class="email-path fade-in">
+      <div class="email-path-node">
+        <div class="node-name">Client (MUA)</div>
+        <div class="node-detail">Thunderbird, Gmail web, mutt, Outlook</div>
+      </div>
+      <div class="email-path-arrow">|</div>
+      <div class="email-path-label">porta 587 / STARTTLS</div>
+      <div class="email-path-arrow">v</div>
+      <div class="email-path-node">
+        <div class="node-name">SMTP Submission (MSA)</div>
+        <div class="node-detail">autentica il mittente, accetta il messaggio</div>
+      </div>
+      <div class="email-path-arrow">|</div>
+      <div class="email-path-label">porta 25 / MX lookup</div>
+      <div class="email-path-arrow">v</div>
+      <div class="email-path-node">
+        <div class="node-name">Relay (MTA)</div>
+        <div class="node-detail">routing tra domini, DNS MX, TLS hop-to-hop</div>
+      </div>
+      <div class="email-path-arrow">|</div>
+      <div class="email-path-label">SPF + DKIM + DMARC</div>
+      <div class="email-path-arrow">v</div>
+      <div class="email-path-node">
+        <div class="node-name">Spam Filter</div>
+        <div class="node-detail">SPF, DKIM, DMARC, bayesiano, reputazione IP</div>
+      </div>
+      <div class="email-path-arrow">|</div>
+      <div class="email-path-label">consegna locale</div>
+      <div class="email-path-arrow">v</div>
+      <div class="email-path-node">
+        <div class="node-name">Mailbox (MDA)</div>
+        <div class="node-detail">Dovecot, Gmail backend, casella del destinatario</div>
+      </div>
+    </div>
+
+    <p>Cinque hop minimi. Email aziendali con gateway interni, mailing list e filtri custom? Anche 8 o 10. Ogni hop aggiunge un header Received. La catena completa racconta l'intera storia: da dove e' partito il messaggio, che infrastruttura ha attraversato, quanto tempo ci ha messo, e se qualcuno lungo la strada ha provato a fare il furbo.</p>
+
+    <!-- Stat Cards -->
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green" data-count="2" data-suffix=" RFC">0</div>
+        <div class="stat-label">RFC 5321 (SMTP) + RFC 5322 (formato)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="3" data-suffix=" auth">0</div>
+        <div class="stat-label">SPF + DKIM + DMARC</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red" data-count="91" data-suffix="%">0</div>
+        <div class="stat-label">Attacchi via email (phishing)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="0" data-suffix=" bugie">0</div>
+        <div class="stat-label">Che un header Received puo' dire</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01  - Anatomia RFC
+         ============================================================ -->
+    <h2><span class="accent">//</span> Anatomia di una Mail</h2>
+    <span class="section-number">Sezione 01. RFC 5321, RFC 5322 e le tre buste</span>
+
+    <p>"Ok, ma una mail non e' tipo: mittente, destinatario, oggetto, testo?" chiede la iena.</p>
+
+    <p>Si', se la guardi di fretta. Ma se conosci le tecnologie che usi e la guardi attentamente, una mail e' fatta di tre strati. Due RFC la definiscono: <strong>RFC 5321</strong> (il protocollo SMTP, come viaggia) e <strong>RFC 5322</strong> (il formato del messaggio, come e' fatta). La distinzione e' fondamentale.</p>
+
+    <div class="envelope-diagram fade-in">
+      <div class="envelope-layer">
+        <div class="envelope-layer-title">Envelope</div>
+        <div class="envelope-layer-items">
+          MAIL FROM<br>
+          RCPT TO<br>
+          <em style="font-size: 0.7rem;">Usati da SMTP per il routing.<br>Non visibili nel messaggio finale.</em>
+        </div>
+      </div>
+      <div class="envelope-layer">
+        <div class="envelope-layer-title">Headers</div>
+        <div class="envelope-layer-items">
+          From, To, Subject<br>
+          Date, Message-ID<br>
+          Received (catena)<br>
+          DKIM-Signature<br>
+          Authentication-Results
+        </div>
+      </div>
+      <div class="envelope-layer">
+        <div class="envelope-layer-title">Body</div>
+        <div class="envelope-layer-items">
+          Il testo del messaggio<br>
+          HTML / plain text<br>
+          Allegati (MIME)<br>
+          <em style="font-size: 0.7rem;">L'unica parte che l'utente vede.</em>
+        </div>
+      </div>
+    </div>
+
+    <p>Il colpo di scena: il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">From:</code> che vedi nel client e il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">MAIL FROM</code> dell'envelope possono essere diversi. Il primo e' un header del messaggio (RFC 5322), il secondo e' un comando SMTP (RFC 5321). Sono due cose separate. E' come se la busta di una lettera avesse un mittente diverso dalla firma in fondo alla pagina. Questo e' il motivo per cui lo spoofing funziona cosi' bene: basta cambiare l'header From e il client mostra quello che vuoi.</p>
+
+    <p>Ecco gli header reali. Questa e' una mail che Netflix mi ha mandato il 9 marzo 2026. La leggo in mutt, premo <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">h</code> e vedo tutto.</p>
+
+    <div class="code-block" data-lang="email headers (netflix reale, 9 mar 2026)">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="key">Return-Path:</span> &lt;010f019cd311cd31-a2794052-5e37-4e5c-96c3-3928ab0074db-000000@mailer.members.netflix.com&gt;</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="key">Delivered-To:</span> pinperepette@gmail.com</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="key">Received:</span> <span class="kw">from</span> a114-85.smtp-out.us-east-2.amazonses.com (a14-85.smtp-out.us-east-2.amazonses.com. [<span class="nb">54.240.114.85</span>])</td></tr>
+        <tr><td class="ln">4</td><td class="code">        <span class="kw">by</span> mx.google.com <span class="kw">with</span> <span class="st">ESMTPS</span> <span class="kw">id</span> af79cd13be357-8cd7d79d628s1564163785a.394.2026.03.09.07.48.05</td></tr>
+        <tr><td class="ln">5</td><td class="code">        <span class="kw">for</span> &lt;pinperepette@gmail.com&gt;</td></tr>
+        <tr><td class="ln">6</td><td class="code">        (<span class="st">version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128</span>);</td></tr>
+        <tr><td class="ln">7</td><td class="code">        <span class="nb">Mon, 09 Mar 2026 07:48:06 -0700 (PDT)</span></td></tr>
+        <tr><td class="ln">8</td><td class="code"><span class="key">DKIM-Signature:</span> v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;</td></tr>
+        <tr><td class="ln">9</td><td class="code">        s=<span class="nb">22seek5htn6zhuvy5jwo2o764amigf2d</span>; d=<span class="nb">members.netflix.com</span>; t=1773067685;</td></tr>
+        <tr><td class="ln">10</td><td class="code">        h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type:List-Unsubscribe-Post:List-Unsubscribe;</td></tr>
+        <tr><td class="ln">11</td><td class="code">        bh=<span class="st">pTEUbdZ+NOTVByxB/vvLsRNSa8RpZP7/YMIoSG5OrNg=</span>;</td></tr>
+        <tr><td class="ln">12</td><td class="code">        b=<span class="st">HNNYMI2i0vXIDpwahJ0aoSERfKZga9xxD8r8ZBgtQgsDOtoHtqRpcLh8V4lPzQc/...</span></td></tr>
+        <tr><td class="ln">13</td><td class="code"><span class="key">DKIM-Signature:</span> v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;</td></tr>
+        <tr><td class="ln">14</td><td class="code">        s=<span class="nb">ndjes4mrtuzus6qxu3frw3ubo3gpjndv</span>; d=<span class="nb">amazonses.com</span>; t=1773067685;</td></tr>
+        <tr><td class="ln">15</td><td class="code">        bh=<span class="st">pTEUbdZ+NOTVByxB/vvLsRNSa8RpZP7/YMIoSG5OrNg=</span>;</td></tr>
+        <tr><td class="ln">16</td><td class="code">        b=<span class="st">M/CQ8v30...</span></td></tr>
+        <tr><td class="ln">17</td><td class="code"><span class="key">Authentication-Results:</span> mx.google.com;</td></tr>
+        <tr><td class="ln">18</td><td class="code">        dkim=pass header.i=@members.netflix.com header.s=22seek5htn6zhuvy5jwo2o764amigf2d header.b=HNNYMI2i0;</td></tr>
+        <tr><td class="ln">19</td><td class="code">        dkim=pass header.i=@amazonses.com header.s=ndjes4mrtuzus6qxu3frw3ubo3gpjndv header.b="M/CQ8v30";</td></tr>
+        <tr><td class="ln">20</td><td class="code">        spf=pass (google.com: domain of 010f019cd311cd31-...@mailer.members.netflix.com designates <span class="nb">54.240.114.85</span>)</td></tr>
+        <tr><td class="ln">21</td><td class="code">        dmarc=pass (<span class="fn">p=REJECT sp=REJECT</span> dis=NONE) header.from=netflix.com</td></tr>
+        <tr><td class="ln">22</td><td class="code"><span class="key">X-SES-Outgoing:</span> 2026.03.09-54.240.114.85</td></tr>
+        <tr><td class="ln">23</td><td class="code"><span class="key">Feedback-ID:</span> ::1.us-east-2.bpb3011JVXyMCLNaoAPZ/8WaKtQXBL2zP9Kh9w0pjrM=:AmazonSES</td></tr>
+        <tr><td class="ln">24</td><td class="code"><span class="key">X-TrackingGuid:</span> fe4538d0-1c4b-43b6-bbdb-b4f3c9713703</td></tr>
+        <tr><td class="ln">25</td><td class="code"><span class="key">X-MessageGuid:</span> 773647f7-454a-4fe4-be4f-8d6092fa8a13</td></tr>
+        <tr><td class="ln">26</td><td class="code"><span class="key">X-SourceAppName:</span> MSG_ORCHESTRATOR</td></tr>
+        <tr><td class="ln">27</td><td class="code"><span class="key">X-LocaleCountry:</span> it-IT::IT</td></tr>
+        <tr><td class="ln">28</td><td class="code"><span class="key">From:</span> Netflix &lt;info@members.netflix.com&gt;</td></tr>
+        <tr><td class="ln">29</td><td class="code"><span class="key">To:</span> pinperepette@gmail.com</td></tr>
+        <tr><td class="ln">30</td><td class="code"><span class="key">Subject:</span> pinperepette, ecco i contenuti in arrivo su Netflix</td></tr>
+        <tr><td class="ln">31</td><td class="code"><span class="key">Date:</span> Mon, 9 Mar 2026 14:48:05 +0000</td></tr>
+        <tr><td class="ln">32</td><td class="code"><span class="key">Message-ID:</span> &lt;010f019cd311cd31-a2794052-5e37-4e5c-96c3-3928ab0074db-000000@us-east-2.amazonses.com&gt;</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>32 righe. Smontiamole.</p>
+
+    <p>Il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">Return-Path</code> (riga 1) non e' <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">info@members.netflix.com</code> come il From. E' un indirizzo tecnico con UUID su <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">mailer.members.netflix.com</code>: serve per gestire i bounce. Ogni mail ha un Return-Path diverso, cosi' Netflix sa quale messaggio e' rimbalzato.</p>
+
+    <p>Il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">Received</code> (righe 3-7) mostra che la mail arriva da <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">a114-85.smtp-out.us-east-2.amazonses.com</code> con IP <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">54.240.114.85</code>. Amazon SES, regione us-east-2 (Ohio). La connessione e' TLS 1.3 con AES-128-GCM: cifrata.</p>
+
+    <p>Ci sono <strong>due firme DKIM</strong> (righe 8-16). La prima firmata da <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">members.netflix.com</code> (Netflix), la seconda da <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">amazonses.com</code> (Amazon). Doppia firma: Netflix configura la propria chiave DKIM su SES, e Amazon aggiunge anche la sua. Entrambe passano.</p>
+
+    <p>L'<code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">Authentication-Results</code> (righe 17-21) e' il verdetto di Gmail: due DKIM pass, SPF pass, DMARC pass con <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=REJECT sp=REJECT</code>. Netflix non scherza: reject sul dominio principale e su tutti i sottodomini.</p>
+
+    <p>Poi ci sono gli header interni di Netflix (righe 24-27): <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-TrackingGuid</code> (UUID per tracciare questa mail specifica), <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-SourceAppName: MSG_ORCHESTRATOR</code> (il servizio interno che ha generato la mail), <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-LocaleCountry: it-IT::IT</code> (sa che sono in Italia). Informazioni che Netflix non ha bisogno di esporre, ma che ci racconta l'architettura interna.</p>
+
+    <p>Il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">Message-ID</code> (riga 32) finisce con <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">@us-east-2.amazonses.com</code>: conferma la regione AWS.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il bello:</strong> il client di posta (Gmail, Apple Mail, Outlook) ti mostra solo From, To, Subject. Tre righe su trentadue. Le altre ventinove? Nascoste. E raccontano tutto: l'IP del server (54.240.114.85), il provider (Amazon SES us-east-2), la doppia firma crittografica (Netflix + Amazon), la policy antispoof (REJECT), il servizio interno che ha generato la mail (MSG_ORCHESTRATOR), persino che Netflix sa che sei in Italia.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02  - Header Received
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Header Received</h2>
+    <span class="section-number">Sezione 02. Il timbro che ogni server aggiunge</span>
+
+    <p>"Ok ma come lo leggo sto header Received?" chiede la iena.</p>
+
+    <p>Ogni header Received ha un formato preciso, definito nella RFC 5321 sezione 4.4. Cinque campi chiave:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Campo</th>
+            <th>Significato</th>
+            <th>Esempio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>from</strong></td>
+            <td>Il server che ha inviato il messaggio a questo hop</td>
+            <td><code>from a114-85.smtp-out.us-east-2.amazonses.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>by</strong></td>
+            <td>Il server che ha ricevuto il messaggio a questo hop</td>
+            <td><code>by mx.google.com</code></td>
+          </tr>
+          <tr>
+            <td><strong>with</strong></td>
+            <td>Il protocollo usato per il trasferimento</td>
+            <td><code>with ESMTPS</code> (SMTP + STARTTLS)</td>
+          </tr>
+          <tr>
+            <td><strong>id</strong></td>
+            <td>Identificatore univoco assegnato dal server ricevente</td>
+            <td><code>id A3B2C1D4E5</code></td>
+          </tr>
+          <tr>
+            <td><strong>for</strong></td>
+            <td>Il destinatario (non sempre presente, privacy)</td>
+            <td><code>for &lt;pinperepette@gmail.com&gt;</code></td>
+          </tr>
+          <tr>
+            <td><strong>timestamp</strong></td>
+            <td>Data e ora locale del server con timezone</td>
+            <td><code>Sun, 09 Mar 2026 07:48:06 -0700 (PDT)</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Il campo <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">with</code> ti dice se la connessione era cifrata. <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">ESMTPS</code> significa SMTP + TLS (bene). <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">SMTP</code> senza la S? Testo in chiaro. Qualsiasi router nel mezzo puo' leggere tutto.</p>
+
+    <p>Il campo <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">from</code> spesso include sia l'hostname che l'IP tra parentesi quadre. L'hostname lo dichiara il server che si presenta (HELO/EHLO). L'IP lo vede il server ricevente dalla connessione TCP. Se i due non corrispondono, qualcuno sta mentendo.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Attenzione:</strong> il primo Received puo' essere falsificato dal server di origine. Tutti gli altri sono aggiunti dai server intermedi e sono molto piu' affidabili. Ma l'IP tra parentesi quadre e' sempre verificato dal server ricevente. Quindi: hostname? Fiducia zero. IP? Affidabile.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03  - Ricostruire il percorso
+         ============================================================ -->
+    <h2><span class="accent">//</span> Ricostruire il Percorso</h2>
+    <span class="section-number">Sezione 03. Dal basso verso l'alto</span>
+
+    <p>"Quindi leggo gli header Received e capisco dove e' passata la mail?" dice la iena.</p>
+
+    <p>Si', ma al contrario. Il primo header Received che trovi nel messaggio e' l'ultimo server che ha toccato la mail (il tuo MDA). L'ultimo header Received in fondo e' il primo server (il punto di origine). Ogni server aggiunge il suo timbro in cima. Quindi per ricostruire il percorso devi leggere dal basso verso l'alto.</p>
+
+    <p>Prendiamo la catena della mail Netflix. Tre hop:</p>
+
+    <div class="header-chain fade-in">
+      <div class="header-hop">
+        <div class="hop-num">3</div>
+        <div class="hop-info">
+          <div class="hop-server">mx.google.com (Gmail MX)</div>
+          <div><span class="hop-ip">riceve da 54.240.114.85</span> <span class="hop-proto">ESMTPS</span></div>
+          <div class="hop-time">Sun, 09 Mar 2026 07:48:06 -0700 (PDT)</div>
+        </div>
+      </div>
+      <div class="hop-arrow">&#8593;</div>
+      <div class="header-hop">
+        <div class="hop-num">2</div>
+        <div class="hop-info">
+          <div class="hop-server">a114-85.smtp-out.us-east-2.amazonses.com</div>
+          <div><span class="hop-ip">54.240.114.85</span> <span class="hop-proto">ESMTPS (TLS 1.3, AES-128-GCM)</span></div>
+          <div class="hop-time">Mon, 09 Mar 2026 07:48:05 -0700 (PDT)</div>
+        </div>
+      </div>
+      <div class="hop-arrow">&#8593;</div>
+      <div class="header-hop">
+        <div class="hop-num">1</div>
+        <div class="hop-info">
+          <div class="hop-server">Netflix backend (genera la mail via API SES)</div>
+          <div><span class="hop-ip">infrastruttura interna Netflix/AWS</span> <span class="hop-proto">API call</span></div>
+          <div class="hop-time">Sun, 09 Mar 2026 14:48:05 +0000</div>
+        </div>
+      </div>
+    </div>
+
+    <p>Hop 1: il backend di Netflix genera la mail e la passa ad Amazon SES via API. Hop 2: SES la firma con DKIM e la spedisce dal suo server SMTP (<code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">a114-85.smtp-out.us-east-2.amazonses.com</code>, IP <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">54.240.114.85</code>). Hop 3: Gmail la riceve su <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">mx.google.com</code>, verifica SPF/DKIM/DMARC, e la consegna nella mia inbox.</p>
+
+    <p>Nota l'IP: <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">54.240.114.85</code> e' nel range di Amazon SES. Coerente con il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-SES-Outgoing: 2026.03.09-54.240.114.85</code> nell'header. L'hostname <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">a114-85.smtp-out.us-east-2.amazonses.com</code> ci dice anche la regione AWS: us-east-2 (Ohio). Netflix non ha server SMTP propri: usa Amazon come corriere.</p>
+
+    <p>Nota i timestamp: hop 1 e hop 2 hanno lo stesso timestamp (14:48:05 UTC). L'API call e' istantanea. Tra hop 2 e hop 3 passa 1 secondo. Totale: la mail impiega meno di 2 secondi da Netflix alla mia inbox. Se vedi un delta di 30 minuti tra due hop, due possibilita'. O il messaggio e' finito in coda (greylisting, rate limiting), o ha attraversato un filtro antispam lento. O terza opzione: qualcuno lo ha intercettato, modificato, e reinoltrato. Il delta temporale e' il primo indicatore di anomalia.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04  - Identificare il client
+         ============================================================ -->
+    <h2><span class="accent">//</span> Identificare il Client</h2>
+    <span class="section-number">Sezione 04. X-Originating-IP, X-Mailer e User-Agent</span>
+
+    <p>"E dal mittente cosa posso capire?" chiede la iena.</p>
+
+    <p>Dipende da quanti header il suo server decide di esporre. Alcuni aggiungono header non standard ma molto rivelatori:</p>
+
+    <div class="code-block" data-lang="header non standard">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="key">X-Originating-IP:</span> [93.44.172.88]</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="key">X-Mailer:</span> Microsoft Outlook 16.0</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="key">User-Agent:</span> Mozilla Thunderbird 128.0</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-Originating-IP</code> e' l'IP del client che si e' connesso al server SMTP. Non tutti i provider lo includono. Outlook.com lo fa, Gmail no (lo ha tolto nel 2014, privacy). Yahoo lo fa ancora.</p>
+
+    <p><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-Mailer</code> e <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">User-Agent</code> rivelano il software usato per comporre il messaggio. Outlook, Thunderbird, Apple Mail, mutt. Ognuno ha il suo header e la sua versione. Da qui capisci il sistema operativo, a volte persino la versione specifica.</p>
+
+    <p>Una mail di phishing "dalla tua banca" che ha <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-Mailer: PHPMailer 6.8</code> e un <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">X-Originating-IP</code> russo? Non e' la tua banca.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Chi lo aggiunge</th>
+            <th>Cosa rivela</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>X-Originating-IP</strong></td>
+            <td>Outlook.com, Yahoo, alcuni ISP</td>
+            <td>IP reale del mittente</td>
+          </tr>
+          <tr>
+            <td><strong>X-Mailer</strong></td>
+            <td>Il client di posta</td>
+            <td>Software e versione (Outlook, Thunderbird)</td>
+          </tr>
+          <tr>
+            <td><strong>User-Agent</strong></td>
+            <td>Il client di posta (standard MIME)</td>
+            <td>Software, versione, OS</td>
+          </tr>
+          <tr>
+            <td><strong>X-Google-DKIM-Signature</strong></td>
+            <td>Google</td>
+            <td>Firma interna di Google, conferma routing</td>
+          </tr>
+          <tr>
+            <td><strong>X-Microsoft-Antispam</strong></td>
+            <td>Microsoft 365</td>
+            <td>Score antispam, classificazione interna</td>
+          </tr>
+          <tr>
+            <td><strong>X-SES-Outgoing</strong></td>
+            <td>Amazon SES</td>
+            <td>Mail inviata tramite il servizio email di AWS</td>
+          </tr>
+          <tr>
+            <td><strong>X-Mailgun-Sid</strong></td>
+            <td>Mailgun</td>
+            <td>Mail inviata tramite piattaforma Mailgun</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <h3>Header Order Fingerprinting</h3>
+
+    <p>C'e' un'altra chicca. Ogni software SMTP genera gli header in un ordine diverso. L'ordine e' una firma.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr><th>Software</th><th>Header caratteristici (in ordine)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Postfix</td><td><code>Received</code> &rarr; <code>X-Spam-Status</code> &rarr; <code>X-Spam-Level</code></td></tr>
+          <tr><td>Microsoft Exchange</td><td><code>Received</code> &rarr; <code>Received</code> &rarr; <code>X-MS-Exchange-Organization</code></td></tr>
+          <tr><td>PHPMailer</td><td><code>X-Mailer: PHPMailer</code> prima di tutto il resto</td></tr>
+          <tr><td>Amazon SES</td><td><code>X-SES-Outgoing</code> &rarr; <code>Feedback-ID</code></td></tr>
+          <tr><td>Google</td><td><code>X-Google-DKIM-Signature</code> &rarr; <code>X-Gm-Message-State</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Gli header sono anche una fingerprint del software che ha generato il messaggio. Una mail che dice di venire da Gmail ma ha header tipici di PHPMailer non e' partita da Gmail.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05  - Reputazione IP
+         ============================================================ -->
+    <h2><span class="accent">//</span> Reputazione dell'IP</h2>
+    <span class="section-number">Sezione 05. DNS, ASN, RBL, GeoIP</span>
+
+    <p>Ora che hai gli IP dalla catena Received, la domanda e': a chi appartengono?</p>
+
+    <p>Primo passo: reverse DNS. L'IP <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">209.85.221.54</code> ha un PTR record? Se si', punta a <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">mail-wr1-f54.google.com</code>. Coerente con l'header. Se il PTR manca, o punta a un hostname che non c'entra niente col dominio dichiarato, bandiera rossa.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cm"># Reverse DNS sull'IP della mail Netflix</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="fn">dig</span> <span class="st">-x</span> 54.240.114.85 +short</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="cm"># a114-85.smtp-out.us-east-2.amazonses.com.</span></td></tr>
+        <tr><td class="ln">4</td><td class="code"></td></tr>
+        <tr><td class="ln">5</td><td class="code"><span class="cm"># ASN lookup</span></td></tr>
+        <tr><td class="ln">6</td><td class="code"><span class="fn">whois</span> <span class="st">-h</span> whois.radb.net 54.240.114.85</td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="cm"># origin: AS16509 (Amazon.com, Inc.)</span></td></tr>
+        <tr><td class="ln">8</td><td class="code"></td></tr>
+        <tr><td class="ln">9</td><td class="code"><span class="cm"># Blacklist check (Spamhaus)</span></td></tr>
+        <tr><td class="ln">10</td><td class="code"><span class="fn">dig</span> 53.8.240.54.zen.spamhaus.org +short</td></tr>
+        <tr><td class="ln">11</td><td class="code"><span class="cm"># NXDOMAIN = non in blacklist (bene)</span></td></tr>
+        <tr><td class="ln">12</td><td class="code"><span class="cm"># 127.0.0.x = in blacklist (male)</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Secondo passo: ASN lookup. L'Autonomous System Number ti dice a quale organizzazione appartiene quel blocco di IP. AS16509 e' Amazon. AS15169 e' Google. AS8075 e' Microsoft. La mail Netflix arriva da Amazon SES (AS16509): coerente. Se una mail "da Netflix" arrivasse da un IP in un AS di un hosting economico russo, c'e' qualcosa che non torna.</p>
+
+    <p>Terzo passo: blacklist (RBL, Real-time Blackhole List). Spamhaus, AbuseIPDB, Barracuda. Un IP in blacklist non significa automaticamente spam (i falsi positivi esistono), ma e' un dato in piu'. La query e' geniale: inverti l'IP e fai un DNS lookup su un dominio speciale. Se risponde, l'IP e' in lista.</p>
+
+    <p>Quarto passo: GeoIP. MaxMind GeoLite2 ti da' la geolocalizzazione approssimativa dell'IP. Non e' precisa a livello di indirizzo, ma a livello di citta'/regione si'. Una mail "dalla tua banca italiana" che parte da un IP geolocalizzato a Lagos merita attenzione.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06  - SPF
+         ============================================================ -->
+    <h2><span class="accent">//</span> SPF</h2>
+    <span class="section-number">Sezione 06. Chi e' autorizzato a spedire per conto tuo</span>
+
+    <p>"Ok ho capito gli IP. Ma come faccio a sapere se quell'IP e' davvero autorizzato a mandare mail per quel dominio?" chiede la iena.</p>
+
+    <p><strong>SPF</strong> (Sender Policy Framework, RFC 7208). Il proprietario del dominio pubblica nel DNS un record TXT che elenca gli IP autorizzati a inviare email per quel dominio. Il server ricevente controlla se l'IP che gli ha consegnato la mail e' nella lista.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cm"># Controlliamo l'SPF di Netflix (il dominio dell'envelope sender)</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="fn">dig</span> TXT mailer.members.netflix.com +short</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="st">"v=spf1 include:amazonses.com ~all"</span></td></tr>
+        <tr><td class="ln">4</td><td class="code"></td></tr>
+        <tr><td class="ln">5</td><td class="code"><span class="cm"># Seguiamo la catena: cosa include amazonses.com?</span></td></tr>
+        <tr><td class="ln">6</td><td class="code"><span class="fn">dig</span> TXT amazonses.com +short</td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="st">"v=spf1 ip4:199.255.192.0/22 ip4:199.127.232.0/22 ip4:54.240.0.0/18 ip4:69.169.224.0/20 ip4:23.249.208.0/20 ip4:23.251.224.0/19 ip4:76.223.176.0/20 ip4:54.240.64.0/19 ip4:54.240.96.0/19 ip4:76.223.128.0/19 -all"</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Tradotto: "le email con envelope sender <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">@mailer.members.netflix.com</code> possono partire solo dai blocchi IP di Amazon SES. Tutto il resto va rifiutato (<code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">-all</code> = hard fail)."</p>
+
+    <p>Il nostro IP <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">54.240.114.85</code> cade nel range <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">54.240.0.0/18</code>? Si'. Quindi SPF = pass. Netflix delega tutto ad Amazon SES, e SES pubblica i propri blocchi IP nell'SPF. Catena di fiducia pulita.</p>
+
+    <div class="auth-results fade-in">
+      <div class="auth-badge pass">
+        <div class="auth-label">SPF</div>
+        <div class="auth-value">PASS</div>
+      </div>
+      <div class="auth-badge none">
+        <div class="auth-label">Significato</div>
+        <div class="auth-value">IP autorizzato dal record DNS</div>
+      </div>
+    </div>
+
+    <p>I possibili risultati:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Risultato</th>
+            <th>Meccanismo</th>
+            <th>Cosa significa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>pass</strong></td>
+            <td>IP nella lista</td>
+            <td>Il server e' autorizzato. Tutto ok.</td>
+          </tr>
+          <tr>
+            <td><strong>fail</strong></td>
+            <td><code>-all</code></td>
+            <td>IP non autorizzato. Rifiutare o marcare come spam.</td>
+          </tr>
+          <tr>
+            <td><strong>softfail</strong></td>
+            <td><code>~all</code></td>
+            <td>IP probabilmente non autorizzato. Accettare con sospetto.</td>
+          </tr>
+          <tr>
+            <td><strong>neutral</strong></td>
+            <td><code>?all</code></td>
+            <td>Il dominio non si pronuncia. Nessuna garanzia.</td>
+          </tr>
+          <tr>
+            <td><strong>none</strong></td>
+            <td>Nessun record SPF</td>
+            <td>Il dominio non ha configurato SPF. Chiunque puo' spedire.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Il grande equivoco</h3>
+
+    <p>"Quindi con SPF siamo a posto?" chiede la iena.</p>
+
+    <p>No. E questo e' il punto che quasi nessuno spiega bene. SPF non controlla il mittente che l'utente vede. Controlla il dominio dell'envelope sender, il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">MAIL FROM</code> della sessione SMTP. Sono due cose diverse.</p>
+
+    <div class="code-block fade-in">
+      <div class="code-header">
+        <span class="code-lang">SMTP</span>
+        <span style="opacity: 0.4;">envelope vs header</span>
+      </div>
+      <pre><code>MAIL FROM: bounce@mailer.example.com      <span style="color: var(--accent-highlight);">&larr; SPF controlla questo</span>
+From: Banca Intesa &lt;sicurezza@intesasanpaolo.com&gt;   <span style="color: var(--accent-attention);">&larr; l'utente vede questo</span></code></pre>
+    </div>
+
+    <p>SPF puo' dire PASS perche' controlla <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">mailer.example.com</code>. Ma l'utente vede <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">intesasanpaolo.com</code>. Questo e' esattamente il motivo per cui DMARC esiste.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>SPF protegge i server. DMARC protegge gli esseri umani.</strong></p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07  - DKIM
+         ============================================================ -->
+    <h2><span class="accent">//</span> DKIM</h2>
+    <span class="section-number">Sezione 07. La firma crittografica nel messaggio</span>
+
+    <p>"E se qualcuno modifica il messaggio dopo l'invio? SPF controlla solo l'IP, mica il contenuto," dice la iena.</p>
+
+    <p>Esatto. Per quello c'e' <strong>DKIM</strong> (DomainKeys Identified Mail, RFC 6376). Il server di invio firma crittograficamente il messaggio. La chiave pubblica sta nel DNS. Il server ricevente la scarica e verifica la firma.</p>
+
+    <p>La mail Netflix ha due firme DKIM. La prima e' di Netflix:</p>
+
+    <div class="code-block" data-lang="dkim-signature #1 (netflix)">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="key">DKIM-Signature:</span> v=1; a=<span class="fn">rsa-sha256</span>; q=dns/txt; c=<span class="st">relaxed/simple</span>;</td></tr>
+        <tr><td class="ln">2</td><td class="code">  s=<span class="nb">22seek5htn6zhuvy5jwo2o764amigf2d</span>; d=<span class="nb">members.netflix.com</span>; t=1773067685;</td></tr>
+        <tr><td class="ln">3</td><td class="code">  h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type:List-Unsubscribe-Post:List-Unsubscribe;</td></tr>
+        <tr><td class="ln">4</td><td class="code">  bh=<span class="st">pTEUbdZ+NOTVByxB/vvLsRNSa8RpZP7/YMIoSG5OrNg=</span>;</td></tr>
+        <tr><td class="ln">5</td><td class="code">  b=<span class="st">HNNYMI2i0vXIDpwahJ0aoSERfKZga9xxD8r8ZBgtQgsDOtoHtqRpcLh8V4lPzQc/...</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>La seconda e' di Amazon SES:</p>
+
+    <div class="code-block" data-lang="dkim-signature #2 (amazon ses)">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="key">DKIM-Signature:</span> v=1; a=<span class="fn">rsa-sha256</span>; q=dns/txt; c=<span class="st">relaxed/simple</span>;</td></tr>
+        <tr><td class="ln">2</td><td class="code">  s=<span class="nb">ndjes4mrtuzus6qxu3frw3ubo3gpjndv</span>; d=<span class="nb">amazonses.com</span>; t=1773067685;</td></tr>
+        <tr><td class="ln">3</td><td class="code">  bh=<span class="st">pTEUbdZ+NOTVByxB/vvLsRNSa8RpZP7/YMIoSG5OrNg=</span>;</td></tr>
+        <tr><td class="ln">4</td><td class="code">  b=<span class="st">M/CQ8v30...</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Due firme, stesso body hash (<code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">pTEUbdZ+NOTVByxB/...</code>). Netflix configura la propria chiave DKIM su Amazon SES, e SES aggiunge anche la sua. Doppia garanzia: se una delle due chiavi viene compromessa, l'altra tiene. Smontiamo i campi:</p>
+
+    <ul style="line-height: 2;">
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">a=rsa-sha256</code> : algoritmo di firma (RSA con hash SHA-256)</li>
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">c=relaxed/simple</code> : canonicalization. "relaxed" sugli header (tollera whitespace), "simple" sul body (nessuna normalizzazione)</li>
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">d=members.netflix.com</code> : il dominio che firma</li>
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">s=22seek5htn6zhuvy5jwo2o764amigf2d</code> : il selettore. Serve a trovare la chiave pubblica nel DNS</li>
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">h=from:to:subject:...</code> : gli header firmati. Se qualcuno modifica il Subject, la firma salta</li>
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">bh=...</code> : hash del body (body hash). Se qualcuno aggiunge una riga al corpo, salta anche questo</li>
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">b=...</code> : la firma vera e propria, base64</li>
+    </ul>
+
+    <p>Per verificare, scarichi la chiave pubblica dal DNS:</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="fn">dig</span> TXT 22seek5htn6zhuvy5jwo2o764amigf2d._domainkey.members.netflix.com +short</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="st">"v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A..."</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Il selettore (<code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">s=22seek5htn6zhuvy5jwo2o764amigf2d</code>) + il dominio (<code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">d=members.netflix.com</code>) formano la query DNS: <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">22seek5htn6zhuvy5jwo2o764amigf2d._domainkey.members.netflix.com</code>. La chiave pubblica sta nel campo <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=</code>. La usi per verificare che la firma <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">b=</code> sia valida sugli header elencati in <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">h=</code> e sul body hash <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">bh=</code>.</p>
+
+    <div class="auth-results fade-in">
+      <div class="auth-badge pass">
+        <div class="auth-label">DKIM</div>
+        <div class="auth-value">PASS</div>
+      </div>
+      <div class="auth-badge none">
+        <div class="auth-label">Significato</div>
+        <div class="auth-value">Messaggio integro, firmato da members.netflix.com</div>
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il bello:</strong> DKIM firma il contenuto, non il canale. Anche se il messaggio passa per 10 server, la firma resta valida perche' nessuno (in teoria) modifica gli header firmati ne' il body. Il server ricevente verifica la firma sulla copia che gli arriva. Se passa, il messaggio non e' stato toccato.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08  - DMARC
+         ============================================================ -->
+    <h2><span class="accent">//</span> DMARC</h2>
+    <span class="section-number">Sezione 08. Il collante tra SPF e DKIM</span>
+
+    <p>"Ok, SPF controlla l'IP, DKIM controlla la firma. Ma uno spoofer non puo' passare SPF con un dominio e mettere un altro dominio nel From?" chiede la iena.</p>
+
+    <p>Esattamente. E qui entra <strong>DMARC</strong> (Domain-based Message Authentication, Reporting and Conformance, RFC 7489). DMARC fa una cosa semplice ma cruciale: verifica che il dominio nell'header <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">From:</code> (quello che l'utente vede) sia allineato con almeno uno tra SPF e DKIM.</p>
+
+    <p>In pratica: SPF puo' passare con <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">MAIL FROM: bounce@sender.com</code>, ma se l'header <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">From: banca@intesa.it</code> non e' allineato col dominio SPF, DMARC fallisce.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="fn">dig</span> TXT _dmarc.members.netflix.com +short</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="st">"v=DMARC1; p=reject; rua=mailto:dmarc-reports@netflix.com"</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>I campi chiave:</p>
+    <ul style="line-height: 2;">
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=reject</code> : policy. Cosa fare se DMARC fallisce. <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">none</code> = non fare niente (solo monitorare). <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">quarantine</code> = metti in spam. <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">reject</code> = rifiuta il messaggio. Netflix usa <strong>reject</strong>. Cosi' chi prova a spoofare @members.netflix.com si vede la mail rifiutata dal server destinatario.</li>
+      <li><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">rua=</code> : dove mandare i report aggregati</li>
+    </ul>
+
+    <div class="auth-results fade-in">
+      <div class="auth-badge pass">
+        <div class="auth-label">SPF</div>
+        <div class="auth-value">PASS</div>
+      </div>
+      <div class="auth-badge pass">
+        <div class="auth-label">DKIM</div>
+        <div class="auth-value">PASS</div>
+      </div>
+      <div class="auth-badge pass">
+        <div class="auth-label">DMARC</div>
+        <div class="auth-value">PASS</div>
+      </div>
+    </div>
+
+    <p>Se tutti e tre passano, la mail e' autenticata. Netflix fa le cose bene: <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=reject</code>. Chi prova a spoofare @members.netflix.com si vede la mail rifiutata dal server ricevente. Non tutti pero' sono cosi' diligenti. Molti domini hanno <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=none</code> (solo monitoraggio), che non blocca nulla. E <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=reject</code> ha un effetto collaterale: rompe le mailing list (ci arriviamo).</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08b - Message-ID
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Targa del Messaggio</h2>
+    <span class="section-number">Message-ID analysis</span>
+
+    <p>"C'e' un altro header che i forensi guardano sempre?" chiede la iena.</p>
+
+    <p>Il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">Message-ID</code>. E' la targa unica del messaggio. Ogni mail ne ha uno, generato dal server che l'ha creata. E il formato della targa rivela l'infrastruttura.</p>
+
+    <div class="code-block fade-in">
+      <div class="code-header">
+        <span class="code-lang">header</span>
+        <span style="opacity: 0.4;">Message-ID Netflix</span>
+      </div>
+      <pre><code>Message-ID: &lt;010f019cd311cd31-a2794052-5e37-4e5c-96c3-3928ab0074db-000000@us-east-2.amazonses.com&gt;</code></pre>
+    </div>
+
+    <p>UUID + regione AWS + dominio amazonses.com. Coerente con l'infrastruttura Netflix su Amazon SES. Ora guarda cosa succede con un phishing:</p>
+
+    <div class="code-block fade-in">
+      <div class="code-header">
+        <span class="code-lang">header</span>
+        <span style="opacity: 0.4;">Message-ID sospetto</span>
+      </div>
+      <pre><code>From: PayPal &lt;security@paypal.com&gt;
+Message-ID: &lt;123456@cheapvps.ru&gt;</code></pre>
+    </div>
+
+    <p>Il From dice PayPal. Il Message-ID dice cheapvps.ru. Bandiera rossa immediata.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr><th>Provider</th><th>Pattern Message-ID</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Gmail</td><td><code>&lt;xxxxxxxxxx@mail.gmail.com&gt;</code></td></tr>
+          <tr><td>Amazon SES</td><td><code>&lt;UUID@regione.amazonses.com&gt;</code></td></tr>
+          <tr><td>Microsoft</td><td><code>&lt;AM0PR...@outlook.com&gt;</code></td></tr>
+          <tr><td>Postfix</td><td><code>&lt;random@hostname&gt;</code></td></tr>
+          <tr><td>PHPMailer</td><td><code>&lt;random@hostname-vps&gt;</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Il Message-ID e' la targa del messaggio. Se il dominio non corrisponde all'infrastruttura dichiarata, qualcosa non torna.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 09  - Metadati temporali
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Timestamp Non Mentono</h2>
+    <span class="section-number">Sezione 09. Delta hop-to-hop e anomalie</span>
+
+    <p>Ogni header Received ha un timestamp. La differenza tra un hop e il successivo ti racconta cose che nessun filtro antispam ti dira'.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Hop</th>
+            <th>Timestamp (UTC)</th>
+            <th>Delta</th>
+            <th>Interpretazione</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 &rarr; 2</td>
+            <td>14:48:05 &rarr; 14:48:05</td>
+            <td>0s</td>
+            <td>Netflix backend &rarr; Amazon SES. API call istantanea.</td>
+          </tr>
+          <tr>
+            <td>2 &rarr; 3</td>
+            <td>14:48:05 &rarr; 14:48:06</td>
+            <td>1s</td>
+            <td>Amazon SES &rarr; Gmail. Normale.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Totale: 1 secondo da Netflix alla mia inbox Gmail. Nella norma per una mail che fa due hop. Ma se vedi questo:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Hop</th>
+            <th>Timestamp</th>
+            <th>Delta</th>
+            <th>Interpretazione</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 &rarr; 2</td>
+            <td>14:48:05 &rarr; 14:48:05</td>
+            <td>0s</td>
+            <td>Ok.</td>
+          </tr>
+          <tr>
+            <td>2 &rarr; 3</td>
+            <td>14:48:05 &rarr; <strong style="color: var(--accent-reaction);">15:20:47</strong></td>
+            <td><strong style="color: var(--accent-reaction);">32 min</strong></td>
+            <td>Greylisting? Coda? Filtro lento? Intercettazione?</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>32 minuti tra hop 2 e 3. Tre possibilita'. <strong>Greylisting</strong>: il server destinatario rifiuta temporaneamente il messaggio al primo tentativo (tecnica antispam, il server legittimo riprova dopo 5-30 minuti, lo spammer no). <strong>Coda piena</strong>: il server di destinazione era sovraccarico e il messaggio ha aspettato in coda. <strong>Ispezione</strong>: il messaggio e' stato trattenuto per analisi (DLP aziendale, filtro antispam pesante).</p>
+
+    <p>Attenzione anche ai timestamp negativi: se l'hop 3 ha un timestamp <em>precedente</em> all'hop 2, o un server ha l'orologio sfasato (NTP non configurato), o qualcuno ha manipolato gli header. Un orologio sfasato e' sorprendentemente comune su server mal configurati.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10  - Geolocalizzazione percorso
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dove Passa la Mail</h2>
+    <span class="section-number">Sezione 10. GeoIP e ASN su ogni hop</span>
+
+    <p>"E posso vedere su una mappa dove passa la mia mail?" chiede la iena.</p>
+
+    <p>Si'. Ogni IP pubblico nella catena Received ha una posizione geografica approssimativa (GeoIP) e un proprietario (ASN). MaxMind GeoLite2 e' il database gratis che usano tutti.</p>
+
+    <p>Esempio di percorso ricostruito:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Hop</th>
+            <th>IP</th>
+            <th>ASN</th>
+            <th>Localita'</th>
+            <th>Provider</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>interno</td>
+            <td>n/a</td>
+            <td>n/a</td>
+            <td>Netflix backend (AWS)</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>54.240.114.85</td>
+            <td>AS16509</td>
+            <td>US (us-east-2, Ohio)</td>
+            <td>Amazon.com (SES)</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>mx.google.com</td>
+            <td>AS15169</td>
+            <td>varia (anycast)</td>
+            <td>Google LLC</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>La mail parte dall'infrastruttura Netflix su AWS, esce da un server Amazon SES in us-east-2 (Ohio), e arriva ai server Gmail (anycast, quindi il punto di ingresso piu' vicino al server SES). Percorso coerente: Netflix usa AWS, SES in us-east-2, Gmail ha punti di presenza ovunque. Se la stessa mail partisse da un IP geolocalizzato a Lagos o da un range noto per spam, sarebbe un'altra storia.</p>
+
+    <p>Gli IP interni non hanno geolocalizzazione. Sono hop dentro l'infrastruttura del provider. Li ignori nella mappatura, ma li noti nella catena per contare i salti.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 11  - Spoofing
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quando Qualcuno Finge</h2>
+    <span class="section-number">Sezione 11. Spoofing detection: le bandiere rosse</span>
+
+    <p>"Ok, torniamo alla mail della mia banca. Come faccio a capire se e' finta?" chiede la iena.</p>
+
+    <p>Checklist. Cinque controlli, cinque secondi, zero software speciale. Solo gli header.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Controllo</th>
+            <th>Bandiera rossa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1</strong></td>
+            <td>SPF nell'Authentication-Results</td>
+            <td><code>spf=fail</code> o <code>spf=softfail</code>. L'IP non e' autorizzato dal dominio.</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td>DKIM nell'Authentication-Results</td>
+            <td><code>dkim=fail</code>. Il messaggio e' stato modificato o la firma e' falsa.</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td>DMARC nell'Authentication-Results</td>
+            <td><code>dmarc=fail</code>. Il From: non e' allineato con SPF/DKIM.</td>
+          </tr>
+          <tr>
+            <td><strong>4</strong></td>
+            <td>HELO mismatch nei Received</td>
+            <td>L'hostname dichiarato (HELO) non corrisponde al reverse DNS dell'IP.</td>
+          </tr>
+          <tr>
+            <td><strong>5</strong></td>
+            <td>Catena Received incoerente</td>
+            <td>Un hop dichiara un dominio (es. intesasanpaolo.com) ma l'IP appartiene a un hosting economico o un VPS in un paese diverso.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Vediamo un esempio. Qualcuno prova a spoofare Netflix per rubarti le credenziali:</p>
+
+    <div class="code-block" data-lang="email headers (spoofed netflix)">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="key">Return-Path:</span> &lt;bounce-xyz@cheaphosting.ru&gt;</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="key">Received:</span> <span class="kw">from</span> <span class="key">mail.netflix.com</span> (<span class="key">vps-47293.cheaphosting.ru</span> [<span class="key">91.202.54.17</span>])</td></tr>
+        <tr><td class="ln">3</td><td class="code">        <span class="kw">by</span> mx.google.com <span class="kw">with</span> <span class="st">SMTP</span></td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="key">Authentication-Results:</span> mx.google.com;</td></tr>
+        <tr><td class="ln">5</td><td class="code">        <span class="key">spf=fail</span> (google.com: domain of info@members.netflix.com does not designate 91.202.54.17 as permitted sender)</td></tr>
+        <tr><td class="ln">6</td><td class="code">        <span class="key">dkim=none</span>;</td></tr>
+        <tr><td class="ln">7</td><td class="code">        <span class="key">dmarc=fail</span> (p=REJECT) header.from=members.netflix.com</td></tr>
+        <tr><td class="ln">8</td><td class="code"><span class="key">From:</span> Netflix &lt;info@members.netflix.com&gt;</td></tr>
+        <tr><td class="ln">9</td><td class="code"><span class="key">Subject:</span> Il tuo account Netflix e' stato sospeso</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Cinque bandiere rosse in 9 righe:</p>
+    <ol style="line-height: 2;">
+      <li><strong>Return-Path</strong> punta a <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">cheaphosting.ru</code>, non a mailer.members.netflix.com</li>
+      <li><strong>Received</strong>: l'HELO dice <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">mail.netflix.com</code> ma il reverse DNS dice <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">vps-47293.cheaphosting.ru</code>. Mismatch. Netflix usa Amazon SES, non un VPS russo.</li>
+      <li><strong>SPF fail</strong>: l'IP 91.202.54.17 non e' nel range di Amazon SES autorizzato da Netflix</li>
+      <li><strong>DKIM none</strong>: nessuna firma. Netflix firma tutte le sue mail con DKIM su members.netflix.com.</li>
+      <li><strong>DMARC fail</strong> con <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=REJECT</code>: il server destinatario dovrebbe rifiutare questa mail. E Gmail lo fa.</li>
+    </ol>
+
+    <div class="auth-results fade-in">
+      <div class="auth-badge fail">
+        <div class="auth-label">SPF</div>
+        <div class="auth-value">FAIL</div>
+      </div>
+      <div class="auth-badge none">
+        <div class="auth-label">DKIM</div>
+        <div class="auth-value">NONE</div>
+      </div>
+      <div class="auth-badge fail">
+        <div class="auth-label">DMARC</div>
+        <div class="auth-value">FAIL</div>
+      </div>
+    </div>
+
+    <p>"E questa mail Netflix spoofata arriva nella mia inbox?" chiede la iena.</p>
+
+    <p>No, perche' Netflix ha <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=REJECT</code>. Gmail la rifiuta. Ma non tutti i domini sono cosi' protetti. Molti hanno <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=none</code> (solo monitoraggio) o non hanno DMARC proprio. In quel caso, la mail spoofata passa. E l'unica difesa e' saper leggere gli header.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 12  - Mailing list
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Mailing List Rompono Tutto</h2>
+    <span class="section-number">Sezione 12. List-ID, Sender, e perche' DKIM salta</span>
+
+    <p>"Ma allora perche' non tutti usano DMARC con reject e basta?" chiede la iena.</p>
+
+    <p>Perche' le mailing list esistono. E rompono tutto.</p>
+
+    <p>Quando mandi una mail a una mailing list (tipo Mailman, Google Groups, listserv), succede questo:</p>
+
+    <ol style="line-height: 2;">
+      <li>Tu mandi la mail alla lista. DKIM firma il messaggio.</li>
+      <li>Il software della lista riceve il messaggio.</li>
+      <li>La lista modifica il Subject (aggiunge <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">[nome-lista]</code>).</li>
+      <li>La lista aggiunge un footer al body ("Per cancellarti...").</li>
+      <li>La lista re-invia il messaggio a tutti gli iscritti.</li>
+    </ol>
+
+    <p>Risultato: il body e' cambiato (footer aggiunto), il Subject e' cambiato (prefisso lista). La firma DKIM originale? Invalida. Il body hash non corrisponde piu'. Gli header firmati nemmeno.</p>
+
+    <p>Se il dominio del mittente ha <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">DMARC p=reject</code>, il server del destinatario vede DKIM fail, SPF fail (l'IP e' quello della mailing list, non del mittente originale), DMARC fail. Risultato: la mail legittima viene rifiutata.</p>
+
+    <p>Per questo le mailing list aggiungono header specifici:</p>
+
+    <div class="code-block" data-lang="list headers">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="key">List-ID:</span> &lt;security-announce.lists.example.org&gt;</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="key">List-Unsubscribe:</span> &lt;mailto:security-announce-unsubscribe@lists.example.org&gt;</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="key">Sender:</span> security-announce-bounces@lists.example.org</td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="key">X-BeenThere:</span> security-announce@lists.example.org</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">Sender:</code> header identifica chi ha effettivamente spedito il messaggio (la lista), distinto dal <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">From:</code> (l'autore originale). Il <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">List-ID</code> identifica la lista. Sono header standard (RFC 2369).</p>
+
+    <p>La soluzione moderna si chiama <strong>ARC</strong> (Authenticated Received Chain, RFC 8617). In pratica ogni intermediario (mailing list, forwarding service) aggiunge la propria firma e attesta che il messaggio era autentico quando l'ha ricevuto. E' come una catena di custodia.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Lab tip:</strong> vuoi vedere DKIM che salta? Manda una mail firmata DKIM a una mailing list Mailman (puoi installarne una con Docker). Poi guarda gli header del messaggio che arriva agli iscritti. Vedrai la firma DKIM originale con <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">dkim=fail</code>, e (se la lista supporta ARC) gli header ARC che attestano il passaggio.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 13  - Tracking Pixel
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Pixel Che Ti Spia</h2>
+    <span class="section-number">Sezione 13. Tracking pixel, fingerprinting e DNS callback</span>
+
+    <p>"Ok, finora abbiamo guardato la mail dal lato di chi la riceve. Ma chi la manda puo' sapere se l'ho aperta?" chiede la iena.</p>
+
+    <p>Si'. E non gli serve niente di sofisticato. Basta un'immagine.</p>
+
+    <p>Il tracking pixel e' un'immagine 1x1 pixel (trasparente, invisibile) inserita nell'HTML della mail. Quando il client di posta carica le immagini, fa una richiesta HTTP al server del mittente. Il server logga tutto: timestamp dell'apertura, IP del destinatario, User-Agent (che rivela il client di posta), Accept-Language, e qualsiasi altro header HTTP.</p>
+
+    <div class="code-block" data-lang="html">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cm">&lt;!-- Tracking pixel nascosto nell'HTML della mail --&gt;</span></td></tr>
+        <tr><td class="ln">2</td><td class="code">&lt;<span class="kw">img</span> <span class="fn">src</span>=<span class="st">"https://track.sender.com/px/a1b2c3d4.gif"</span></td></tr>
+        <tr><td class="ln">3</td><td class="code">     <span class="fn">width</span>=<span class="st">"1"</span> <span class="fn">height</span>=<span class="st">"1"</span> <span class="fn">style</span>=<span class="st">"display:none"</span> /&gt;</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>L'UUID nel path (<code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">a1b2c3d4</code>) e' unico per ogni destinatario. Cosi' il mittente sa chi ha aperto, non solo che qualcuno ha aperto.</p>
+
+    <p>Ma non finisce qui. Le tecniche avanzate:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Tecnica</th>
+            <th>Come funziona</th>
+            <th>Cosa rivela</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Redirect chain</strong></td>
+            <td>Il pixel risponde con 302 attraverso 2/3 hop prima di servire l'immagine</td>
+            <td>Se il client segue i redirect (alcuni proxy li bloccano), latenza di rete</td>
+          </tr>
+          <tr>
+            <td><strong>Cache busting</strong></td>
+            <td>Query string dinamica (<code>?t=1710063272</code>) o <code>Cache-Control: no-store</code></td>
+            <td>Conta aperture multiple. Senza, il browser cacherebbe l'immagine alla prima apertura</td>
+          </tr>
+          <tr>
+            <td><strong>DNS callback</strong></td>
+            <td>Il pixel punta a un sottodominio unico: <code>{uuid}.px.sender.com</code></td>
+            <td>Alcuni client e gateway antispam effettuano prefetch DNS degli URL presenti nell'HTML. Questo puo' generare una query DNS anche quando l'immagine non viene caricata. Rivela il resolver DNS (ISP/azienda)</td>
+          </tr>
+          <tr>
+            <td><strong>Fingerprinting HTTP</strong></td>
+            <td>Il server logga tutti gli header HTTP della richiesta</td>
+            <td>Accept, Accept-Encoding, Connection, Cache-Control. Ogni combinazione identifica il client</td>
+          </tr>
+          <tr>
+            <td><strong>TLS fingerprint</strong></td>
+            <td>JA3/JA4 hash dal TLS handshake</td>
+            <td>Identifica il client anche senza User-Agent. Apple Mail, Gmail proxy, Outlook hanno fingerprint diversi</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>I client di posta reagiscono in modo diverso:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Comportamento immagini</th>
+            <th>IP visibile al tracker</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Apple Mail</strong></td>
+            <td>Prefetch automatico (Mail Privacy Protection). Carica le immagini via proxy Apple prima che tu apra la mail.</td>
+            <td>IP Apple, non il tuo. Ma il tracker sa che qualcuno con Apple Mail ha ricevuto la mail.</td>
+          </tr>
+          <tr>
+            <td><strong>Gmail</strong></td>
+            <td>Image proxy. Tutte le immagini passano per <code>googleusercontent.com</code>.</td>
+            <td>IP Google. Il tracker non vede il tuo IP reale. Ma sa che l'hai aperta.</td>
+          </tr>
+          <tr>
+            <td><strong>Thunderbird</strong></td>
+            <td>Immagini bloccate di default. Chiede conferma all'utente.</td>
+            <td>Se non carichi le immagini: niente. Zero tracking.</td>
+          </tr>
+          <tr>
+            <td><strong>Outlook</strong></td>
+            <td>Immagini bloccate di default nelle mail esterne.</td>
+            <td>Come Thunderbird. Ma se clicchi "Scarica immagini", il tuo IP reale.</td>
+          </tr>
+          <tr>
+            <td><strong>mutt</strong></td>
+            <td>Client testuale. Non carica immagini. Mai.</td>
+            <td>Niente. Zero. Il tracking pixel non esiste per mutt.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>La tecnica DNS callback:</strong> anche quando blocchi le immagini, alcuni gateway antispam e sistemi di scanning effettuano prefetch DNS sugli URL presenti nell'HTML. Se il pixel punta a <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">{uuid}.px.sender.com</code>, il tuo client fa una query DNS a quel sottodominio unico. Il DNS autoritativo del sender logga la query. Sa che hai aperto la mail, senza che tu abbia caricato nessuna immagine. L'unica difesa: mutt, o un client che non fa prefetch DNS sull'HTML.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 14  - Lab: difesa anti-tracking
+         ============================================================ -->
+    <h2><span class="accent">//</span> Difesa: Come Ispezionare</h2>
+    <span class="section-number">Sezione 14. Mutt, curl, e l'arte di non farsi tracciare</span>
+
+    <p>"Ok, mi hai spaventato. Come mi difendo?" chiede la iena.</p>
+
+    <p>Mutt. Un client email da terminale. Non carica immagini, non esegue HTML, non fa prefetch DNS. Vedi il sorgente del messaggio cosi' com'e'. Il modo piu' sicuro per analizzare una mail sospetta.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cm"># Aprire mutt e visualizzare gli header completi</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="fn">mutt</span> <span class="st">-f</span> ~/Mail/INBOX</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="cm"># Seleziona il messaggio, premi 'h' per mostrare tutti gli header</span></td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="cm"># Premi '|' (pipe) e salva: cat > /tmp/mail-headers.txt</span></td></tr>
+        <tr><td class="ln">5</td><td class="code"></td></tr>
+        <tr><td class="ln">6</td><td class="code"><span class="cm"># Cercare pixel nascosti nel sorgente HTML</span></td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="fn">grep</span> <span class="st">-iE</span> <span class="st">'(width="1"|height="1"|display:\s*none|1x1)'</span> /tmp/mail-body.html</td></tr>
+        <tr><td class="ln">8</td><td class="code"></td></tr>
+        <tr><td class="ln">9</td><td class="code"><span class="cm"># Estrarre tutti gli URL di immagini esterne</span></td></tr>
+        <tr><td class="ln">10</td><td class="code"><span class="fn">grep</span> <span class="st">-oP</span> <span class="st">'src="https?://[^"]+"'</span> /tmp/mail-body.html</td></tr>
+        <tr><td class="ln">11</td><td class="code"></td></tr>
+        <tr><td class="ln">12</td><td class="code"><span class="cm"># Ispezionare un URL di tracking senza rivelare il tuo client</span></td></tr>
+        <tr><td class="ln">13</td><td class="code"><span class="fn">curl</span> <span class="st">-v</span> <span class="st">-o</span> /dev/null <span class="st">"https://track.sender.com/px/a1b2c3d4.gif"</span></td></tr>
+        <tr><td class="ln">14</td><td class="code"><span class="cm"># Vedi gli header HTTP di risposta senza eseguire JS o caricare redirect</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Il grep alla riga 7 cerca i pattern tipici dei pixel: dimensioni 1x1, display:none, immagini microscopiche. Alla riga 10 estrai tutti gli URL di immagini esterne. Cosi' vedi dove puntano prima di caricarle.</p>
+
+    <p>Il curl alla riga 13 ti permette di ispezionare il server di tracking senza rivelare il tuo client email reale. Il server vede curl come User-Agent, non Apple Mail o Outlook. E puoi usare opzioni come <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">--resolve</code> per non fare nemmeno la query DNS pubblica.</p>
+
+    <p>Per l'analisi degli header c'e' un approccio sistematico:</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cm"># 1. Estrarre la catena Received (ordine cronologico)</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="fn">grep</span> <span class="st">-i</span> <span class="st">"^Received:"</span> /tmp/mail-headers.txt | <span class="fn">tac</span></td></tr>
+        <tr><td class="ln">3</td><td class="code"></td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="cm"># 2. Verificare SPF manualmente</span></td></tr>
+        <tr><td class="ln">5</td><td class="code"><span class="fn">dig</span> TXT example.com +short | <span class="fn">grep</span> spf</td></tr>
+        <tr><td class="ln">6</td><td class="code"></td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="cm"># 3. Verificare DKIM (selettore dall'header DKIM-Signature)</span></td></tr>
+        <tr><td class="ln">8</td><td class="code"><span class="fn">dig</span> TXT selector._domainkey.example.com +short</td></tr>
+        <tr><td class="ln">9</td><td class="code"></td></tr>
+        <tr><td class="ln">10</td><td class="code"><span class="cm"># 4. Verificare DMARC</span></td></tr>
+        <tr><td class="ln">11</td><td class="code"><span class="fn">dig</span> TXT _dmarc.example.com +short</td></tr>
+        <tr><td class="ln">12</td><td class="code"></td></tr>
+        <tr><td class="ln">13</td><td class="code"><span class="cm"># 5. Reverse DNS su ogni IP della catena</span></td></tr>
+        <tr><td class="ln">14</td><td class="code"><span class="fn">dig</span> <span class="st">-x</span> 209.85.221.54 +short</td></tr>
+        <tr><td class="ln">15</td><td class="code"></td></tr>
+        <tr><td class="ln">16</td><td class="code"><span class="cm"># 6. Blacklist check</span></td></tr>
+        <tr><td class="ln">17</td><td class="code"><span class="fn">dig</span> 54.221.85.209.zen.spamhaus.org +short</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Regola d'oro:</strong> non aprire mai una mail sospetta in un client grafico. Usa mutt o un editor di testo. Guarda gli header prima del contenuto. Controlla SPF, DKIM, DMARC nell'Authentication-Results. Verifica che l'IP nei Received corrisponda al dominio dichiarato. Se qualcosa non torna, non fidarti.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 15  - Laboratorio
+         ============================================================ -->
+    <h2><span class="accent">//</span> Laboratorio</h2>
+    <span class="section-number">Sezione 15. Sette script, zero dipendenze esterne</span>
+
+    <p>"Bello, ma posso provare?" chiede la iena.</p>
+
+    <p>Sette script Python nella cartella <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/email-forensics" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">scripts/email-forensics/</code></a>. Tutti usano solo la stdlib Python e <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">dig</code> (preinstallato su macOS e Linux). Zero dipendenze.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Script</th>
+            <th>Cosa fa</th>
+            <th>Uso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>01_header_parser.py</strong></td>
+            <td>Legge un file .eml, ricostruisce la catena Received in ordine cronologico, calcola il delta temporale tra ogni hop, segnala connessioni non cifrate e HELO mismatch</td>
+            <td><code>python3 01_header_parser.py mail.eml</code></td>
+          </tr>
+          <tr>
+            <td><strong>02_spf_dkim_dmarc_check.py</strong></td>
+            <td>Dato un dominio, interroga il DNS: record SPF (segue la catena include), chiave pubblica DKIM (dato il selettore), policy DMARC. Opzionale: reverse DNS e blacklist check su un IP</td>
+            <td><code>python3 02_spf_dkim_dmarc_check.py members.netflix.com --selector 22seek5htn6zhuvy5jwo2o764amigf2d --ip 54.240.114.85</code></td>
+          </tr>
+          <tr>
+            <td><strong>03_tracking_pixel_server.py</strong></td>
+            <td>Server HTTP che serve un 1x1 GIF trasparente. Logga tutto: IP, User-Agent, Accept-Language, header HTTP. Classifica il client (Gmail proxy, Apple Mail prefetch, Thunderbird, Outlook). Dashboard HTML. Salva in SQLite</td>
+            <td><code>python3 03_tracking_pixel_server.py --port 8888 --log tracking.db</code></td>
+          </tr>
+          <tr>
+            <td><strong>04_spoof_detector.py</strong></td>
+            <td>Analizza un file .eml e segnala 7 indicatori di spoofing: SPF, DKIM, DMARC, Return-Path mismatch, HELO mismatch, DKIM alignment, header sospetti. Verdetto finale con semaforo</td>
+            <td><code>python3 04_spoof_detector.py mail.eml</code></td>
+          </tr>
+          <tr>
+            <td><strong>05_pixel_hunter.py</strong></td>
+            <td>Cerca tracking pixel nel body HTML: immagini 1x1, display:none, UUID nel path, link con parametri di tracking (lnktrk, trkid, utm_*). Lista tutte le risorse esterne</td>
+            <td><code>python3 05_pixel_hunter.py mail.eml</code></td>
+          </tr>
+          <tr>
+            <td><strong>06_forge_spoof.py</strong></td>
+            <td>Genera due file .eml: una mail spoofata (finto Netflix, Return-Path russo, PHPMailer, SPF fail, DKIM assente, tracking pixel nascosto) e una legittima (Amazon SES, doppia firma DKIM, DMARC pass). Per confronto con lo spoof detector</td>
+            <td><code>python3 06_forge_spoof.py</code></td>
+          </tr>
+          <tr>
+            <td><strong>07_pixel_demo.py</strong></td>
+            <td>Demo completa: avvia un server pixel, genera una mail HTML con pixel embedded e una versione HTML standalone. Apri con mutt: zero tracking. Apri nel browser: il server logga l'apertura in tempo reale</td>
+            <td><code>python3 07_pixel_demo.py</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Vuoi provare?</strong> Salva una mail come .eml (in Thunderbird: File > Salva come. In Gmail: menu tre puntini > Scarica messaggio. In mutt: premi <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">|</code> e scrivi <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">cat > mail.eml</code>). Poi lancia gli script. <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">python3 scripts/email-forensics/01_header_parser.py mail.eml</code> e guarda cosa esce.</p>
+    </div>
+
+    <h3>Demo: Spoofing Reale su Gmail</h3>
+
+    <p>"Ma funziona davvero?" chiede la iena.</p>
+
+    <p>Proviamoci. Da una VPS con porta 25 aperta, ci connettiamo direttamente al MX di Gmail e mandiamo una mail con il From: finto. Nessun account SMTP, nessun relay. Solo una connessione TCP sulla porta 25 e il protocollo SMTP parlato a mano.</p>
+
+    <p>Primo tentativo: spoofing del dominio esatto <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">netflix.com</code>. Gmail risponde:</p>
+
+    <div class="code-block fade-in">
+      <div class="code-header">
+        <span class="code-lang">SMTP</span>
+        <span style="opacity: 0.4;">tentativo 1: dominio esatto</span>
+      </div>
+      <pre><code>550 5.7.26 Unauthenticated email from netflix.com is not accepted
+        due to domain's DMARC policy.</code></pre>
+    </div>
+
+    <p>Netflix ha <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">p=REJECT</code>. Gmail rifiuta la mail prima ancora di accettarla. DMARC fa esattamente quello per cui e' stato progettato.</p>
+
+    <p>Secondo tentativo: dominio inesistente <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">netflix-account-verify.com</code>, senza autenticazione. Gmail risponde:</p>
+
+    <div class="code-block fade-in">
+      <div class="code-header">
+        <span class="code-lang">SMTP</span>
+        <span style="opacity: 0.4;">tentativo 2: senza autenticazione</span>
+      </div>
+      <pre><code>550 5.7.26 Your email has been blocked because the sender
+        is unauthenticated. Gmail requires all senders to
+        authenticate with either SPF or DKIM.</code></pre>
+    </div>
+
+    <p>Dal 2024 Gmail richiede che almeno SPF o DKIM passino. Senza, non entra niente.</p>
+
+    <p>Terzo tentativo: aggiungiamo un record SPF al dominio del nostro server, cosi' l'envelope sender e' autenticato. Ma il From: nell'header resta finto. Stessa tecnica dei phisher veri: dominio lookalike con infrastruttura propria.</p>
+
+    <p>Questa volta Gmail risponde <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">250 2.0.0 OK</code>. La mail arriva. Per riuscirci servono condizioni precise: un dominio con SPF valido, un IP con reputazione pulita, TLS attivo, reverse DNS configurato. In condizioni normali Gmail la classificherebbe come spam o sospetta. Ma per la demo, basta che arrivi.</p>
+
+    <figure class="fade-in" style="margin: 2rem 0;">
+      <img src="../immagini/email-forensics/spoofed-inbox.png" alt="Mail spoofata arrivata in inbox mutt" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" loading="lazy">
+      <figcaption style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">La mail spoofata arrivata in inbox. From: Netflix Support. In mutt si vede il contenuto, ma non si caricano immagini e non si esegue HTML.</figcaption>
+    </figure>
+
+    <p>Sembra una mail Netflix. Ma premiamo <code style="background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85rem;">h</code> in mutt per vedere gli header completi:</p>
+
+    <figure class="fade-in" style="margin: 2rem 0;">
+      <img src="../immagini/email-forensics/spoofed-headers.png" alt="Header completi della mail spoofata in mutt" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" loading="lazy">
+      <figcaption style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">Gli header completi. Return-Path: signalpirate.it. From: netflix-account-verify.com. Due domini diversi. Gmail ha segnato SPF pass per signalpirate.it, ma DKIM e DMARC sono assenti.</figcaption>
+    </figure>
+
+    <p>Ora lanciamo il detector sulla mail ricevuta:</p>
+
+    <figure class="fade-in" style="margin: 2rem 0;">
+      <img src="../immagini/email-forensics/spoof.png" alt="Output dello spoof detector: PROBABILE SPOOFING" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" loading="lazy">
+      <figcaption style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">Lo spoof detector sulla mail ricevuta da Gmail. Return-Path mismatch, HELO mismatch, niente DKIM, PHPMailer. Verdetto: PROBABILE SPOOFING.</figcaption>
+    </figure>
+
+    <p>SPF passa (l'IP della VPS e' autorizzato per signalpirate.it), ma il detector becca tutto il resto: Return-Path su un dominio diverso dal From:, HELO che non corrisponde al reverse DNS, nessuna firma DKIM, X-Mailer PHPMailer. Due indicatori critici, quattro warning. Verdetto: probabile spoofing.</p>
+
+    <p>La mail e' arrivata. Ma gli header l'hanno tradita.</p>
+
+    <h3>Demo: Il Pixel Che Ti Vede</h3>
+
+    <p>"Ok lo spoofing lo becchiamo. Ma il tracking pixel?" chiede la iena.</p>
+
+    <p>Mandiamo una mail vera, da un account reale, con un contenuto innocuo: "Ecco i contenuti della settimana". Dentro l'HTML, nascosto, un tag invisibile:</p>
+
+    <div class="code-block fade-in">
+      <div class="code-header">
+        <span class="code-lang">HTML</span>
+        <span style="opacity: 0.4;">nascosto nel body</span>
+      </div>
+      <pre><code>&lt;img src="https://server/px/pinperepette-track-001.gif"
+     width="1" height="1" style="display:none" alt=""&gt;</code></pre>
+    </div>
+
+    <p>Un pixel trasparente 1x1, display:none. Il client email non lo mostra. Ma quando carica l'HTML, fa una richiesta HTTP al server. E il server logga tutto.</p>
+
+    <p>La mail arriva su iCloud. Sembra una normale newsletter:</p>
+
+    <figure class="fade-in" style="margin: 2rem 0;">
+      <img src="../immagini/email-forensics/mail.png" alt="Mail con tracking pixel aperta su iCloud Mail" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" loading="lazy">
+      <figcaption style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">La mail su iCloud Mail. Contenuto innocuo, nessun indizio del pixel. Ma appena l'hai aperta, il server ha gia' loggato.</figcaption>
+    </figure>
+
+    <p>Nel terminale, il pixel server registra ogni apertura:</p>
+
+    <figure class="fade-in" style="margin: 2rem 0;">
+      <img src="../immagini/email-forensics/log.png" alt="Log del pixel server con aperture multiple" style="width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" loading="lazy">
+      <figcaption style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">Il pixel server logga ogni apertura: timestamp, UUID del destinatario, IP, User-Agent. Ogni volta che riapri la mail, il contatore sale.</figcaption>
+    </figure>
+
+    <p>Ogni apertura: timestamp, UUID, User-Agent. Apple Mail, Gmail web, Outlook: tutti caricano il pixel. Ogni volta che riapri, il contatore sale. Il mittente sa quante volte hai letto la mail, quando e con quale dispositivo.</p>
+
+    <p>Mutt non carica niente. Non esegue HTML, non fa richieste HTTP, non tradisce. Zero log sul server.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Nota:</strong> questi sono laboratori educativi. Lo scopo e' capire come funziona il tracking per potersi difendere, non per tracciare gli altri.</p>
+    </div>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Tracciato Non Si Cancella</h2>
+    <span class="section-number">Conclusione</span>
+
+    <p>La iena mi guarda. "Quindi ogni mail che mando dice a tutti dove sono, cosa uso e quando l'ho scritta?"</p>
+
+    <p>Non proprio a tutti. Ma a chi sa leggere, si'. Ricapitolando:</p>
+
+    <ol style="line-height: 2;">
+      <li>Ogni email attraversa una catena di server. Ogni server aggiunge un header <strong>Received</strong> con IP, hostname, protocollo e timestamp. Nessuno lo cancella.</li>
+      <li>L'header <strong>From:</strong> che vedi nel client puo' essere falsificato. L'IP nel Received no.</li>
+      <li><strong>SPF</strong> controlla se l'IP e' autorizzato a spedire per quel dominio. <strong>DKIM</strong> firma crittograficamente il messaggio. <strong>DMARC</strong> verifica che il From: sia allineato con almeno uno dei due.</li>
+      <li>I <strong>timestamp</strong> hop-to-hop rivelano ritardi anomali: greylisting, code, filtri lenti, o intercettazione.</li>
+      <li><strong>GeoIP</strong> e <strong>ASN</strong> ti dicono dove sono i server e a chi appartengono. Una mail "dalla tua banca" che transita da un VPS russo non e' la tua banca.</li>
+      <li>I <strong>tracking pixel</strong> sanno se apri la mail, quando, quante volte, con quale client. Il DNS callback funziona anche se blocchi le immagini.</li>
+      <li>Le <strong>mailing list</strong> rompono DKIM modificando il messaggio. ARC e' la soluzione, ma non tutti lo supportano.</li>
+      <li><strong>Mutt</strong> e' l'unico client che non tradisce. Non carica immagini, non esegue HTML, non fa prefetch. Il modo piu' sicuro per leggere email sospette.</li>
+    </ol>
+
+    <p>"E la mail di Netflix era legittima?"</p>
+
+    <p>Si'. Return-Path su mailer.members.netflix.com, IP 54.240.114.85 (Amazon SES us-east-2) nel range autorizzato, doppia firma DKIM (Netflix + Amazon), DMARC pass con policy reject su dominio e sottodomini. Tre secondi di header e la risposta era li'. Confrontala con la mail spoofata: Return-Path russo, SPF fail, DKIM assente, DMARC fail. Il contenuto diceva "Il tuo account e' stato sospeso". Gli header dicevano "truffa".</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"L'email non e' un messaggio. E' un tracciato. E il tracciato non mente mai."</div>
+      <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+        Il client di posta ti mostra From, To, Subject. Tre righe su venti.
+        Il resto e' dietro le quinte. E' come giudicare una nave guardando solo la bandiera.
+        Le altre diciassette righe contengono IP, hostname, firme crittografiche, timestamp, protocolli.
+        Ogni server che tocca il messaggio lascia un'impronta indelebile.
+        Lo spoofer puo' falsificare il From. Puo' falsificare il primo Received (quello generato dal suo server). Ma non puo' falsificare quelli aggiunti dai server successivi. Per questo l'analisi parte sempre dal basso.
+        Il tracker puo' nascondere un pixel. Non puo' nascondersi da chi guarda il sorgente.
+      </p>
+      <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+        Signal Pirate
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/main.js"></script>
+</body>
+</html>
