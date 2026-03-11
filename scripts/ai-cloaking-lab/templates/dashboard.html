@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cloaking Lab - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'SF Mono', 'Fira Code', monospace; background: #0a0a0a; color: #e0e0e0; padding: 20px; }
+        h1 { color: #00ff88; margin-bottom: 5px; font-size: 1.4em; }
+        .subtitle { color: #666; margin-bottom: 25px; font-size: 0.85em; }
+
+        .stats { display: flex; gap: 15px; margin-bottom: 25px; }
+        .stat-box {
+            background: #1a1a1a; border: 1px solid #333; border-radius: 6px;
+            padding: 12px 18px; flex: 1; text-align: center;
+        }
+        .stat-box .number { font-size: 2em; font-weight: bold; }
+        .stat-box .label { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-human .number { color: #00ff88; }
+        .stat-agent .number { color: #ff4444; }
+        .stat-total .number { color: #4488ff; }
+
+        .visit {
+            background: #111; border: 1px solid #222; border-radius: 6px;
+            margin-bottom: 12px; padding: 15px; transition: border-color 0.2s;
+        }
+        .visit:hover { border-color: #444; }
+        .visit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .visit-time { color: #666; font-size: 0.8em; }
+
+        .badge {
+            padding: 3px 10px; border-radius: 12px; font-size: 0.75em;
+            font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .badge-human { background: #0a2a1a; color: #00ff88; border: 1px solid #00ff88; }
+        .badge-agent { background: #2a0a0a; color: #ff4444; border: 1px solid #ff4444; }
+
+        .score-bar-container { margin: 8px 0; }
+        .score-bar {
+            height: 6px; border-radius: 3px; background: #222;
+            position: relative; overflow: hidden;
+        }
+        .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+        .score-bar-fill.low { background: #00ff88; }
+        .score-bar-fill.mid { background: #ffaa00; }
+        .score-bar-fill.high { background: #ff4444; }
+        .score-label { font-size: 0.75em; color: #888; display: flex; justify-content: space-between; }
+
+        .layers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+        .layer {
+            background: #0a0a0a; padding: 8px; border-radius: 4px;
+            font-size: 0.7em; border: 1px solid #1a1a1a;
+        }
+        .layer-name { color: #888; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.85em; }
+        .layer-score { font-weight: bold; margin-top: 2px; }
+        .layer-detail { color: #555; margin-top: 3px; font-size: 0.9em; word-break: break-word; }
+
+        .ua { font-size: 0.7em; color: #444; margin-top: 8px; word-break: break-all; }
+
+        .threshold-line { border-left: 2px dashed #ff4444; }
+
+        .empty { text-align: center; color: #444; padding: 60px; font-size: 1.1em; }
+
+        .refresh-btn {
+            background: #1a1a1a; border: 1px solid #333; color: #00ff88;
+            padding: 6px 14px; border-radius: 4px; cursor: pointer;
+            font-family: inherit; font-size: 0.85em;
+        }
+        .refresh-btn:hover { border-color: #00ff88; }
+    </style>
+</head>
+<body>
+
+<h1>AI CLOAKING LAB</h1>
+<p class="subtitle">
+    Detection dashboard. Soglia agent: 0.45.
+    <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+</p>
+
+<div class="stats">
+    <div class="stat-box stat-total">
+        <div class="number" id="total">{{ visits|length }}</div>
+        <div class="label">Visite totali</div>
+    </div>
+    <div class="stat-box stat-human">
+        <div class="number" id="humans">{{ visits|selectattr('is_agent', 'false')|list|length }}</div>
+        <div class="label">Umani</div>
+    </div>
+    <div class="stat-box stat-agent">
+        <div class="number" id="agents">{{ visits|selectattr('is_agent', 'true')|list|length }}</div>
+        <div class="label">Agent</div>
+    </div>
+</div>
+
+{% if not visits %}
+<div class="empty">
+    Nessuna visita registrata.<br>
+    Apri <a href="/" style="color: #00ff88">http://127.0.0.1:5000/</a> in un browser<br>
+    oppure lancia <code style="color: #ff4444">python agent.py</code>
+</div>
+{% endif %}
+
+{% for v in visits|reverse %}
+<div class="visit">
+    <div class="visit-header">
+        <span class="badge {{ 'badge-agent' if v.is_agent else 'badge-human' }}">
+            {{ 'AI AGENT' if v.is_agent else 'HUMAN' }}
+        </span>
+        <span class="visit-time">{{ v.timestamp }} | {{ v.ip }} | {{ v.path }}</span>
+    </div>
+
+    <div class="score-bar-container">
+        <div class="score-bar">
+            {% set pct = (v.total_score * 100)|int %}
+            <div class="score-bar-fill {{ 'high' if v.total_score >= 0.45 else ('mid' if v.total_score >= 0.25 else 'low') }}"
+                 style="width: {{ pct }}%"></div>
+        </div>
+        <div class="score-label">
+            <span>Score: {{ v.total_score }}</span>
+            <span>Threshold: {{ v.threshold }}</span>
+        </div>
+    </div>
+
+    <div class="layers">
+        {% for name, data in v.layers.items() %}
+        <div class="layer">
+            <div class="layer-name">{{ name|replace('_', ' ') }}</div>
+            <div class="layer-score" style="color: {{ '#ff4444' if data.score > 0.5 else ('#ffaa00' if data.score > 0 else '#00ff88') }}">
+                {{ data.score }} (x{{ data.weight }} = {{ data.weighted }})
+            </div>
+            <div class="layer-detail">{{ data.detail }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="ua">{{ v.user_agent }}</div>
+</div>
+{% endfor %}
+
+</body>
+</html>

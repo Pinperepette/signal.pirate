@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Web Ha Due Facce</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-web-ha-due-facce.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-web-ha-due-facce.html</guid>
+    <pubDate>Wed, 11 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Gli AI agent non vedono lo stesso web degli umani. Un server Flask con scoring a 6 layer, 5 tecniche di prompt injection invisibili, cloaking semantico e la prova che stessa URL puo' servire due realta' diverse. Lab completo con Docker, agent simulator e dashboard in tempo reale.</description>
+  </item>
+
+  <item>
     <title>La Mail Non Mente</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/la-mail-non-mente.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/la-mail-non-mente.html</guid>

@@ -1,0 +1,23 @@
+services:
+
+  server:
+    build: .
+    ports:
+      - "5001:5000"
+    command: python server.py
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/')"]
+      interval: 3s
+      retries: 5
+      start_period: 2s
+
+  agent:
+    build: .
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - SERVER=http://server:5000
+    command: python agent.py --compare --semantic
+    profiles:
+      - test
