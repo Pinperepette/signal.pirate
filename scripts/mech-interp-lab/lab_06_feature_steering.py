@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Prompts personalizzati per Signal Pirate blog
 """
 Lab 06 - Feature Steering: il nostro Golden Gate Claude
 Amplificare una feature del SAE e osservare come cambia l'output del modello.
