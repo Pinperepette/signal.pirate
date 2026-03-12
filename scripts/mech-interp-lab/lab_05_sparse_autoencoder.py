@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Prompts personalizzati per Signal Pirate blog
 """
 Lab 05 - Sparse Autoencoder: trovare feature interpretabili
 Carica un SAE pre-trainato su GPT-2 small, passa diverse frasi,
