@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Prompts personalizzati per Signal Pirate blog
 """
 Lab 04 - Path Patching
 Non basta sapere QUALI head contano. Serve sapere COME comunicano.
