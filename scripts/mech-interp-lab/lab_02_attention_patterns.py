@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Prompts personalizzati per Signal Pirate blog
 """
 Lab 02 - Attention Pattern Visualization
 Visualizza i pattern di attenzione dei Name Mover Heads e dei Duplicate Token Heads
