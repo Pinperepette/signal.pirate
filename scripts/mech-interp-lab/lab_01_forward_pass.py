@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Prompts personalizzati per Signal Pirate blog
+
 """
 Lab 01 - Anatomia del Forward Pass
 Carica GPT-2 small, tokenizza una frase, estrae le attivazioni di ogni layer
