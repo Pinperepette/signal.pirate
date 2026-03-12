@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Prompts personalizzati per Signal Pirate blog
 """
 Lab 03 - Activation Patching
 Identifica quali attention heads sono causalmente responsabili
