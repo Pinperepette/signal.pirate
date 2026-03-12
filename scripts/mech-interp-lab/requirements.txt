@@ -1,0 +1,6 @@
+transformer-lens>=2.0
+sae-lens>=4.0
+torch>=2.0
+plotly>=5.18
+kaleido>=0.2
+numpy>=1.24

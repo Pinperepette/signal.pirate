@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Rete Neurale Sul Tavolo Operatorio | Signal Pirate</title>
+  <meta name="description" content="Mechanistic Interpretability: come aprire un LLM e leggere i suoi pensieri. GPT-2 small smontato pezzo per pezzo: 144 attention heads, circuito IOI a 26 head, Sparse Autoencoders, feature steering. 6 lab Python, tutto su CPU.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }  /* keyword */
+    .cs { color: #00ff88; }  /* string */
+    .cn { color: #b5cea8; }  /* number */
+    .cc { color: #6a6a8a; }  /* comment */
+    .cf { color: #4ecdc4; }  /* function */
+    .cv { color: #9cdcfe; }  /* variable */
+    .ct { color: #4ec9b0; }  /* type */
+    .co { color: #d4d4d4; }  /* operator */
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .chart-title {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      margin-bottom: 1rem;
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Math Block === */
+    .math-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .math-block .math-label {
+      font-size: 0.7rem;
+      color: var(--accent-attention);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+    .math-block .math-line {
+      color: var(--text-primary);
+    }
+    .math-block .math-comment {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+    }
+
+    /* === Circuit Diagram === */
+    .circuit-diagram {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      .circuit-diagram { grid-template-columns: 1fr 1fr; }
+    }
+    .circuit-node {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.8rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .circuit-node:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-attention);
+    }
+    .circuit-node .node-type {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .circuit-node .node-heads {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+    .circuit-node .node-role {
+      font-size: 0.72rem;
+      margin-top: 0.4rem;
+      line-height: 1.3;
+    }
+    .node-dt { border-color: #4ecdc4; }
+    .node-dt .node-type { color: #4ecdc4; }
+    .node-pt { border-color: #f5c518; }
+    .node-pt .node-type { color: #f5c518; }
+    .node-si { border-color: #ff6b6b; }
+    .node-si .node-type { color: #ff6b6b; }
+    .node-nm { border-color: #00ff88; }
+    .node-nm .node-type { color: #00ff88; }
+    .node-bnm { border-color: #7c4dff; }
+    .node-bnm .node-type { color: #7c4dff; }
+
+    /* === Two Panel Comparison === */
+    .two-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 1.5rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    @media (max-width: 768px) {
+      .two-panel { grid-template-columns: 1fr; }
+    }
+    .panel-side {
+      padding: 1.5rem;
+    }
+    .panel-left {
+      background: rgba(0,255,136,0.05);
+      border-right: 1px solid var(--border-subtle);
+    }
+    .panel-right {
+      background: rgba(255,107,107,0.05);
+    }
+    .panel-side-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    .panel-left .panel-side-title { color: var(--accent-attention); }
+    .panel-right .panel-side-title { color: var(--accent-reaction); }
+    .panel-side p {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin: 0.4rem 0;
+    }
+
+    /* === Feature Card === */
+    .feature-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .feature-card:hover { transform: translateY(-2px); }
+    .feature-id {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--accent-attention);
+    }
+    .feature-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+    }
+    .feature-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      line-height: 1.5;
+    }
+    .feature-examples {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-12 | Pinperepette</p>
+    <h1 class="article-page-title">La Rete Neurale Sul <span class="accent">Tavolo Operatorio</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Come aprire un LLM, leggere i suoi pensieri e riscriverli
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Mechanistic Interpretability</span>
+      <span class="tag tag-highlight">Sparse Autoencoder</span>
+      <span class="tag tag-reaction">Circuits</span>
+      <span class="tag tag-amplification">Feature Steering</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00 - L'antefatto
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Scatola Nera</h2>
+    <span class="section-number">Sezione 00. L'antefatto</span>
+
+    <p>Breve aggiornamento personale: mi hanno sgridato perche' ho hackerato il gesso. Me lo hanno rifatto. Pero' alla fine non mi devono operare. Il tavolo operatorio resta libero.</p>
+
+    <p>Perfetto. Ci mettiamo sopra un LLM.</p>
+
+    <p>La iena sta fissando il terminale. Ha appena chiesto a un modello locale "come fa a sapere che Roma e' in Italia?" e quello ha risposto con un paragrafo perfetto. Corretto in ogni dettaglio.</p>
+
+    <p>"Ma come fa a saperlo?"</p>
+
+    <p>"Non lo sa. Lo calcola."</p>
+
+    <p>"Nel senso? Da qualche parte ci sara' scritto 'Roma, Italia', no?"</p>
+
+    <p>"Da nessuna parte. Non c'e' un database, non c'e' una tabella. Ci sono 124 milioni di numeri che moltiplicati tra loro nel giusto ordine producono 'Italia' come output piu' probabile dopo la tua domanda."</p>
+
+    <p>"E nessuno sa perche' quei numeri producono proprio quello?"</p>
+
+    <p>"Fino a poco tempo fa, no. Si sapeva che funzionava. Non si sapeva come. Adesso qualcuno ha iniziato ad aprire il cofano."</p>
+
+    <p>La iena si sposta la sedia vicina.</p>
+
+    <p>"Apriamo il cofano."</p>
+
+    <!-- Stat Cards -->
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green" data-count="124" data-suffix="M param">0</div>
+        <div class="stat-label">GPT-2 small</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red" data-count="144" data-suffix=" heads">0</div>
+        <div class="stat-label">12 layer x 12 heads</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="768" data-suffix="d">0</div>
+        <div class="stat-label">Dimensione residual stream</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="6" data-suffix=" lab">0</div>
+        <div class="stat-label">Esperimenti Python, CPU only</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - Terminale subito: Forward Pass e Direct Logit Attribution
+         ============================================================ -->
+    <h2><span class="accent">//</span> Apri il Terminale</h2>
+    <span class="section-number">Sezione 01. Forward pass, sette righe, e il primo segreto</span>
+
+    <p>"Niente teoria. Apriamo direttamente un modello e guardiamoci dentro."</p>
+
+    <p>GPT-2 small. 124 milioni di parametri. Piccolo abbastanza da girare su CPU, grande abbastanza da avere circuiti veri. Non usiamo un modello di Ollama perche' Ollama e' un motore di inferenza: gli dai un prompt, ti restituisce testo. Scatola nera. Per guardare dentro servono le attivazioni di ogni singolo neurone, e TransformerLens te le da' tutte.</p>
+
+    <p>La frase di test: <em>"When Alice and Bob went to the bar, Alice bought a beer for"</em>.</p>
+
+    <p>"Alice e Bob? Quelli della crittografia?"</p>
+
+    <p>"No. Alice e' quella del paese delle meraviglie. E Bob e' quel tipo che aggiustava tutto nei cartoni che guardava la Sere da piccola."</p>
+
+    <p>"..."</p>
+
+    <p>"Ok si', quelli della crittografia. Ma stavolta non scambiano chiavi. Vanno al bar. E il modello deve capire che Alice compra la birra a <strong>Bob</strong>, non a se stessa."</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Nota:</strong> GPT-2 e' stato trainato su testo inglese, quindi le frasi di test sono in inglese. Il circuito che stiamo per smontare funziona con qualsiasi lingua, la struttura interna e' la stessa.</p>
+    </div>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">from</span> <span class="cv">transformer_lens</span> <span class="ck">import</span> <span class="ct">HookedTransformer</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">import</span> <span class="cv">torch</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">model</span> <span class="co">=</span> <span class="ct">HookedTransformer</span>.<span class="cf">from_pretrained</span>(<span class="cs">'gpt2-small'</span>, <span class="cv">device</span><span class="co">=</span><span class="cs">'cpu'</span>)</td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cv">prompt</span> <span class="co">=</span> <span class="cs">'When Alice and Bob went to the bar, Alice bought a beer for'</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cv">tokens</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">to_tokens</span>(<span class="cv">prompt</span>)</td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cv">logits</span>, <span class="cv">cache</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">run_with_cache</span>(<span class="cv">tokens</span>)</td></tr>
+      </table></div>
+    </div>
+
+    <p>Fatto. Il modello e' caricato, il forward pass e' eseguito, e <code>cache</code> contiene le attivazioni di <strong>ogni singolo componente</strong> del modello. Ogni layer, ogni head, ogni MLP. Tutto accessibile per nome.</p>
+
+    <p>Adesso la domanda: chi ha deciso l'output? Il modello ha 144 attention head distribuiti su 12 layer. L'output finale e' la <strong>somma</strong> di tutti i loro contributi. Possiamo calcolare quanto ciascuno ha spinto verso il token predetto.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Target: il token piu' probabile</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">probs</span> <span class="co">=</span> <span class="cv">torch</span>.<span class="cf">softmax</span>(<span class="cv">logits</span>[<span class="cn">0</span>, <span class="cn">-1</span>], <span class="cv">dim</span><span class="co">=</span><span class="cn">-1</span>)</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cv">target</span> <span class="co">=</span> <span class="cv">probs</span>.<span class="cf">argmax</span>().<span class="cf">item</span>()</td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">W_U</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cv">W_U</span>[:, <span class="cv">target</span>]  <span class="cc"># colonna di unembedding</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cc"># Contributo di ogni head: output &middot; W_U</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="ck">for</span> <span class="cv">layer</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">12</span>):</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cv">z</span> <span class="co">=</span> <span class="cv">cache</span>[<span class="cs">f'blocks.{layer}.attn.hook_z'</span>][<span class="cn">0</span>, <span class="cn">-1</span>]  <span class="cc"># [n_heads, d_head]</span></td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">for</span> <span class="cv">head</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">12</span>):</td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="cv">contrib</span> <span class="co">=</span> (<span class="cv">z</span>[<span class="cv">head</span>] <span class="co">@</span> <span class="cv">model</span>.<span class="cv">blocks</span>[<span class="cv">layer</span>].<span class="cv">attn</span>.<span class="cv">W_O</span>[<span class="cv">head</span>] <span class="co">@</span> <span class="cv">W_U</span>).<span class="cf">item</span>()</td></tr>
+      </table></div>
+    </div>
+
+    <p>Risultato: una heatmap 12x12 (layer x head) dove ogni cella dice "quanto questo head spinge verso il token target". Alcuni head sono quasi a zero. Ma al layer 9, un paio di head si accendono come un faro.</p>
+
+    <p>"Vedi quei numeri? Ogni cella e' un attention head. Il modello ha 144 head distribuiti su 12 layer. L'output finale e' la somma di tutti i loro contributi."</p>
+
+    <p>"Aspetta. Somma? Non sovrascrittura?"</p>
+
+    <p>"Somma. Questa e' la struttura fondamentale di un transformer. C'e' un vettore a 768 dimensioni che viaggia da un layer all'altro. Si chiama <strong>residual stream</strong>. Immaginalo come un nastro trasportatore. All'inizio ci metti il token di input, trasformato in un vettore (l'embedding). Poi ogni layer legge dal nastro, fa il suo calcolo, e <strong>somma</strong> il risultato al nastro. Non sovrascrive: somma."</p>
+
+    <div class="math-block fade-in">
+      <div class="math-label">Decomposizione del forward pass</div>
+      <div class="math-line">x<sub>0</sub> = W<sub>E</sub> &middot; token + W<sub>pos</sub></div>
+      <div class="math-comment">// embedding del token + posizione</div>
+      <div class="math-line" style="margin-top: 0.5rem;">x<sub>l+1</sub> = x<sub>l</sub> + Attn<sub>l</sub>(x<sub>l</sub>) + MLP<sub>l</sub>(x<sub>l</sub>)</div>
+      <div class="math-comment">// ogni layer somma il suo contributo</div>
+      <div class="math-line" style="margin-top: 0.5rem;">logits = x<sub>final</sub> &middot; W<sub>U</sub></div>
+      <div class="math-comment">// proiezione sul vocabolario (unembedding)</div>
+    </div>
+
+    <p>"Siccome il forward pass e' una somma, puoi scomporre il risultato finale nella somma dei contributi di ogni componente. Prendi l'output di un singolo attention head, lo moltiplichi per la matrice di unembedding W<sub>U</sub>, e ottieni il suo contributo diretto al logit di ogni token del vocabolario. Si chiama <strong>Direct Logit Attribution</strong>."</p>
+
+    <div class="math-block fade-in">
+      <div class="math-label">Direct Logit Attribution per un head</div>
+      <div class="math-line">contributo<sub>L,H</sub> = head_output<sub>L,H</sub> &middot; W<sub>U</sub>[:, target]</div>
+      <div class="math-comment">// quanto questo head spinge verso il token target</div>
+      <div class="math-line" style="margin-top: 0.5rem;">logit(target) = &sum;<sub>L,H</sub> contributo<sub>L,H</sub> + &sum;<sub>L</sub> mlp<sub>L</sub> + embed + pos</div>
+      <div class="math-comment">// il logit finale e' la somma di tutti i contributi</div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Script:</strong> <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mech-interp-lab/lab_01_forward_pass.py" target="_blank" rel="noopener">lab_01_forward_pass.py</a></p>
+    </div>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/01.png" alt="Lab 01 - Forward pass e Direct Logit Attribution: output del terminale con la heatmap dei contributi di ogni attention head" loading="lazy">
+      <figcaption>Lab 01: forward pass, tokenizzazione, e Direct Logit Attribution. L9H9 domina il contributo verso "Bob".</figcaption>
+    </figure>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/grafico_01_logit_attribution.png" alt="Heatmap 12x12 del Direct Logit Attribution: contributo di ogni attention head al logit di Bob" loading="lazy">
+      <figcaption>Heatmap 12x12: ogni cella e' un attention head. Blu = spinge verso "Bob", rosso = inibisce. L9H9 e L10H10 dominano.</figcaption>
+    </figure>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - Attention Patterns
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dove Guarda Ogni Head</h2>
+    <span class="section-number">Sezione 02. Attention patterns e i due circuiti QK/OV</span>
+
+    <p>"Ok, sappiamo quanto contribuisce ogni head. Ma <em>come</em> contribuisce? Dove sta guardando?"</p>
+
+    <p>"Guardiamolo."</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Pattern di attenzione di L9H9 (il head col contributo piu' alto)</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">attn_pattern</span> <span class="co">=</span> <span class="cv">cache</span>[<span class="cs">'blocks.9.attn.hook_pattern'</span>][<span class="cn">0</span>, <span class="cn">9</span>]</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cc"># Shape: [seq_len, seq_len]</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"># attn_pattern[i][j] = quanto il token i attende al token j</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cc"># Ultima posizione: dove guarda per predire il prossimo token?</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cv">last_pos_attn</span> <span class="co">=</span> <span class="cv">attn_pattern</span>[<span class="cn">-1</span>]  <span class="cc"># [seq_len]</span></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cv">str_tokens</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">to_str_tokens</span>(<span class="cv">prompt</span>)</td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="ck">for</span> <span class="cv">i</span>, (<span class="cv">tok</span>, <span class="cv">score</span>) <span class="ck">in</span> <span class="cf">enumerate</span>(<span class="cf">zip</span>(<span class="cv">str_tokens</span>, <span class="cv">last_pos_attn</span>)):</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="ck">if</span> <span class="cv">score</span> <span class="co">&gt;</span> <span class="cn">0.05</span>:</td></tr>
+<tr><td class="ln">11</td><td class="code">        <span class="cf">print</span>(<span class="cs">f'{tok:&lt;15} {score:.3f}'</span>)</td></tr>
+      </table></div>
+    </div>
+
+    <p>"Vedi L9H9? Guarda dove punta: dritto verso 'Bob'. Quel head sta copiando il nome nella posizione finale."</p>
+
+    <p>La iena alza un sopracciglio. "Sta cercando il <em>mio</em> nome nella frase?"</p>
+
+    <p>"Piu' o meno. Sta cercando il nome che non e' il soggetto ripetuto. 'Alice' appare due volte, 'Bob' una volta sola. L9H9 punta verso il nome non ripetuto e lo copia come output."</p>
+
+    <p>"Ma come fa a sapere dove guardare e cosa copiare?"</p>
+
+    <p>"Perche' ogni attention head ha due circuiti indipendenti. Il primo, il circuito <strong>QK</strong> (Query-Key), decide <em>dove</em> guardare. Prende il token corrente, lo trasforma in un vettore query, lo confronta con i vettori key di tutti i token precedenti, e produce una distribuzione di probabilita'. Il secondo, il circuito <strong>OV</strong> (Output-Value), decide <em>cosa</em> copiare da quella posizione."</p>
+
+    <div class="math-block fade-in">
+      <div class="math-label">Circuito QK (dove guardare)</div>
+      <div class="math-line">Q = x &middot; W<sub>Q</sub> &emsp; K = x &middot; W<sub>K</sub></div>
+      <div class="math-line">A = softmax(Q &middot; K<sup>T</sup> / &radic;d<sub>k</sub>)</div>
+      <div class="math-comment">// A e' la matrice di attenzione: A[i][j] = quanto il token i attende al token j</div>
+    </div>
+
+    <div class="math-block fade-in">
+      <div class="math-label">Circuito OV (cosa copiare)</div>
+      <div class="math-line">V = x &middot; W<sub>V</sub></div>
+      <div class="math-line">output = A &middot; V &middot; W<sub>O</sub></div>
+      <div class="math-comment">// il risultato viene sommato al residual stream</div>
+    </div>
+
+    <p>"Due matrici per decidere dove, due matrici per decidere cosa. Quattro matrici in totale per head. 144 head nel modello. Sono 576 matrici che interagiscono tra loro."</p>
+
+    <p>"E puoi studiarle una alla volta?"</p>
+
+    <p>"Si'. Non guardi le matrici singole, guardi il loro prodotto. Il circuito QK si legge come W<sub>Q</sub><sup>T</sup> &middot; W<sub>K</sub>: una matrice che dice 'dato il residual stream nella posizione source e destination, quanto il head attende dal source al destination?' Il circuito OV si legge come W<sub>V</sub> &middot; W<sub>O</sub>: 'dato che sto attendendo a questa posizione, cosa copio nel residual stream?'</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il framework di Elhage et al. (2021):</strong> i transformer non sono una sequenza di layer opachi. Sono un grafo computazionale dove ogni attention head legge e scrive dal residual stream. Due head in layer diversi comunicano tramite il residual stream: il primo scrive, il secondo legge. Questa struttura permette di tracciare circuiti complessi attraverso il modello.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Script:</strong> <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mech-interp-lab/lab_02_attention_patterns.py" target="_blank" rel="noopener">lab_02_attention_patterns.py</a></p>
+    </div>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/02.png" alt="Lab 02 - Attention Patterns: analisi dei Name Mover Heads e della loro attenzione verso il nome indiretto" loading="lazy">
+      <figcaption>Lab 02: i Name Mover Heads (L9H9, L9H6) puntano dritti verso "Bob". L0H1 segnala i token duplicati.</figcaption>
+    </figure>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/grafico_02_attention_patterns.png" alt="Attention patterns di 4 head chiave del circuito IOI: Name Mover, Duplicate Token, S-Inhibition" loading="lazy">
+      <figcaption>Quattro head, quattro ruoli. L9H9 punta verso "Bob", L9H6 verso "Alice" e "Bob", L0H1 segue la diagonale (token precedente), L7H3 distribuisce l'attenzione per inibire.</figcaption>
+    </figure>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - Activation Patching
+         ============================================================ -->
+    <h2><span class="accent">//</span> Chirurgia Causale</h2>
+    <span class="section-number">Sezione 03. Activation patching e il circuito IOI</span>
+
+    <p>"Ok, L9H9 ha un contributo alto e punta verso il nome giusto. Ma e' davvero lui il colpevole, o e' una coincidenza? Magari il suo contributo viene cancellato da un altro head piu' avanti."</p>
+
+    <p>"Buona domanda. Per stabilire la causalita' serve un intervento. Come un esperimento controllato: prendi due topi, uno sano e uno mutato. Inneschi un singolo gene dal sano nel mutato. Se il topo guarisce, quel gene era il responsabile."</p>
+
+    <p>"Con il modello come funziona?"</p>
+
+    <p>"Prendi due input. Il primo e' la frase originale (clean). Il secondo e' una versione corrotta dove cambi un nome. Nel run corrupted il modello predice il nome sbagliato. Ora, per ogni head, sostituisci la sua attivazione nel run corrupted con quella del run clean. Se il modello torna a predire il nome giusto, quel head e' causalmente responsabile."</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cv">clean_prompt</span> <span class="co">=</span> <span class="cs">'When Alice and Bob went to the bar, Alice bought a beer for'</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">corrupted_prompt</span> <span class="co">=</span> <span class="cs">'When Alice and Charlie went to the bar, Alice bought a beer for'</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">clean_logits</span>, <span class="cv">clean_cache</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">run_with_cache</span>(<span class="cv">clean_tokens</span>)</td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cv">corrupted_logits</span>, <span class="cv">corrupted_cache</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">run_with_cache</span>(<span class="cv">corrupted_tokens</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cc"># Patch un singolo head alla volta</span></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="ck">def</span> <span class="cf">patch_hook</span>(<span class="cv">activation</span>, <span class="cv">hook</span>, <span class="cv">layer</span>, <span class="cv">head</span>):</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="cv">activation</span>[:, :, <span class="cv">head</span>, :] <span class="co">=</span> <span class="cv">clean_cache</span>[<span class="cv">hook</span>.<span class="cv">name</span>][:, :, <span class="cv">head</span>, :]</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="ck">return</span> <span class="cv">activation</span></td></tr>
+<tr><td class="ln">11</td><td class="code"></td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="cc"># Per ogni head: quanto recupera il logit corretto?</span></td></tr>
+<tr><td class="ln">13</td><td class="code"><span class="cv">patched_logits</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">run_with_hooks</span>(<span class="cv">corrupted_tokens</span>,</td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="cv">fwd_hooks</span><span class="co">=</span>[(<span class="cs">f'blocks.{layer}.attn.hook_z'</span>, <span class="cv">patch_hook</span>)])</td></tr>
+      </table></div>
+    </div>
+
+    <div class="math-block fade-in">
+      <div class="math-label">Metrica di recovery</div>
+      <div class="math-line">recovery = (patched_diff &minus; corrupted_diff) / (clean_diff &minus; corrupted_diff)</div>
+      <div class="math-comment">// 0 = nessun effetto, 1 = recovery completo</div>
+    </div>
+
+    <p>Risultato: una heatmap 12x12 con significato causale. I Name Mover Heads (L9H6, L9H9, L10H0) hanno recovery alto e positivo. Patcharli ripristina la predizione corretta. I S-Inhibition Heads (L7H3, L7H9, L8H6, L8H10) hanno recovery negativo: il loro ruolo e' inibire, non promuovere.</p>
+
+    <p>"Aspetta. Se ci sono head che promuovono e head che inibiscono, vuol dire che collaborano."</p>
+
+    <p>"Esatto. E' un circuito. Nel 2022 un team di Redwood Research ha smontato questo circuito pezzo per pezzo. Si chiama <strong>IOI</strong> (Indirect Object Identification): 26 attention heads, organizzati in 5 classi funzionali."</p>
+
+    <!-- Circuit Diagram -->
+    <div class="circuit-diagram fade-in">
+      <div class="circuit-node node-dt">
+        <div class="node-type">Duplicate Token</div>
+        <div class="node-heads">L0H1, L0H10</div>
+        <div class="node-role">Segnalano: "questo nome l'ho gia' visto"</div>
+      </div>
+      <div class="circuit-node node-pt">
+        <div class="node-type">Previous Token</div>
+        <div class="node-heads">L2H2, L4H11</div>
+        <div class="node-role">Copiano info dal token precedente</div>
+      </div>
+      <div class="circuit-node node-si">
+        <div class="node-type">S-Inhibition</div>
+        <div class="node-heads">L7H3, L7H9, L8H6, L8H10</div>
+        <div class="node-role">Inibiscono il soggetto ripetuto (Alice)</div>
+      </div>
+      <div class="circuit-node node-nm">
+        <div class="node-type">Name Mover</div>
+        <div class="node-heads">L9H6, L9H9, L10H0</div>
+        <div class="node-role">Copiano il nome corretto (Bob) nella posizione finale</div>
+      </div>
+      <div class="circuit-node node-bnm">
+        <div class="node-type">Backup Name Mover</div>
+        <div class="node-heads">L10H7, L10H10, L11H2</div>
+        <div class="node-role">Ridondanza: si attivano se i primary falliscono</div>
+      </div>
+    </div>
+
+    <p>"L'algoritmo funziona cosi'. I Duplicate Token Heads (layer 0) scansionano la frase e segnalano che 'Alice' appare due volte. I Previous Token Heads (layer 2 e 4) copiano informazione contestuale. I S-Inhibition Heads (layer 7 e 8) ricevono il segnale di duplicazione e inibiscono 'Alice' nella posizione finale. I Name Mover Heads (layer 9 e 10) cercano nomi nella frase e copiano quello non inibito ('Bob') come output. I Backup Name Mover sono ridondanza: il modello ha imparato a non fidarsi di un solo percorso."</p>
+
+    <p>"Ventisei head su 144. Il resto?"</p>
+
+    <p>"Per questo task specifico? Rumore. Il circuito IOI usa solo il 18% degli head del modello."</p>
+
+    <p>Fermati un secondo. Quello che abbiamo appena trovato non e' una correlazione statistica. E' una catena causale. Cinque classi di head che cooperano in sequenza, ognuna con un ruolo preciso, collegate da segnali che passano attraverso il residual stream. Questo non e' un blob di numeri. E' un algoritmo. Un programma che nessuno ha scritto, emerso durante il training.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La rivelazione:</strong> quando apri un LLM e osservi i suoi circuiti interni, non trovi una massa indistinta di neuroni. Trovi qualcosa di sorprendentemente simile a un software: piccoli algoritmi distribuiti che cooperano per produrre il comportamento del modello. Gli LLM non sono solo modelli statistici. Sono macchine che eseguono algoritmi che non abbiamo programmato.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Script:</strong> <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mech-interp-lab/lab_03_activation_patching.py" target="_blank" rel="noopener">lab_03_activation_patching.py</a></p>
+    </div>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/03.png" alt="Lab 03 - Activation Patching: heatmap causale dei 144 attention heads con recovery positivo e negativo" loading="lazy">
+      <figcaption>Lab 03: activation patching su 144 head. I Name Mover hanno recovery positivo, i S-Inhibition negativo.</figcaption>
+    </figure>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/grafico_03_activation_patching.png" alt="Heatmap causale: recovery del logit corretto per ogni attention head dopo activation patching" loading="lazy">
+      <figcaption>Heatmap causale. Blu = patchare questo head ripristina la predizione corretta (Name Mover). Rosso = patcharlo peggiora le cose (S-Inhibition). Il circuito emerge dai dati.</figcaption>
+    </figure>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - Path Patching
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Connessioni tra Head</h2>
+    <span class="section-number">Sezione 04. Path patching: chi parla con chi</span>
+
+    <p>"Sappiamo quali head contano. Ma come comunicano? Come fa il segnale di L0H1 ('ho visto un nome duplicato') ad arrivare a L7H3 ('inibisci quel nome')?"</p>
+
+    <p>"Passano entrambi per il residual stream. L0H1 scrive un segnale nel nastro trasportatore, e L7H3 lo legge qualche layer dopo. Per verificarlo, usiamo il <strong>path patching</strong>: invece di patchare l'intero output di un head, patchi solo il contributo che passa da un head specifico a un altro."</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Contributo di L0H1 (Duplicate Token)</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">clean_z</span> <span class="co">=</span> <span class="cv">clean_cache</span>[<span class="cs">'blocks.0.attn.hook_z'</span>][<span class="cn">0</span>, :, <span class="cn">1</span>, :]</td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cv">corr_z</span> <span class="co">=</span> <span class="cv">corrupted_cache</span>[<span class="cs">'blocks.0.attn.hook_z'</span>][<span class="cn">0</span>, :, <span class="cn">1</span>, :]</td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">diff</span> <span class="co">=</span> <span class="cv">clean_z</span> <span class="co">-</span> <span class="cv">corr_z</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cc"># Proiettare nel residual stream tramite W_O</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cv">W_O</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cv">blocks</span>[<span class="cn">0</span>].<span class="cv">attn</span>.<span class="cv">W_O</span>[<span class="cn">1</span>]</td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cv">residual_diff</span> <span class="co">=</span> <span class="cv">diff</span> <span class="co">@</span> <span class="cv">W_O</span></td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cc"># Iniettare solo prima del target (L7H3 S-Inhibition)</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="ck">def</span> <span class="cf">path_hook</span>(<span class="cv">activation</span>, <span class="cv">hook</span>):</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="cv">activation</span>[<span class="cn">0</span>] <span class="co">+=</span> <span class="cv">residual_diff</span></td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="ck">return</span> <span class="cv">activation</span></td></tr>
+<tr><td class="ln">14</td><td class="code"></td></tr>
+<tr><td class="ln">15</td><td class="code"><span class="cv">patched</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">run_with_hooks</span>(<span class="cv">corrupted_tokens</span>,</td></tr>
+<tr><td class="ln">16</td><td class="code">    <span class="cv">fwd_hooks</span><span class="co">=</span>[(<span class="cs">'blocks.7.hook_resid_pre'</span>, <span class="cv">path_hook</span>)])</td></tr>
+      </table></div>
+    </div>
+
+    <p>Se il path L0H1 &rarr; L7H3 ha recovery alto, la connessione e' reale: il Duplicate Token Head comunica direttamente con il S-Inhibition Head attraverso il residual stream. Se il recovery e' zero, la connessione non esiste (o passa per un percorso diverso). Cosi' ricostruisci il grafo del circuito, edge per edge.</p>
+
+    <p>"E' come tracciare i cavi dentro un quadro elettrico."</p>
+
+    <p>"Esattamente. E il risultato e' una mappa completa: 26 head, 5 classi, connessioni tracciate. Un algoritmo distribuito che il modello ha imparato durante il training senza che nessuno glielo abbia insegnato."</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Costo computazionale:</strong> l'activation patching richiede un forward pass per ogni (layer, head), quindi 144 run. Il path patching richiede un run per ogni coppia (source, target), potenzialmente 144&sup2; = 20.736 run. Su CPU con GPT-2 small ci vogliono 2-3 minuti per il patching e 5-10 minuti per il path patching. Fattibile. Su modelli piu' grandi si usa <strong>attribution patching</strong> (Neel Nanda, 2023), un'approssimazione al primo ordine con gradienti che costa un singolo forward + backward pass.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Script:</strong> <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mech-interp-lab/lab_04_path_patching.py" target="_blank" rel="noopener">lab_04_path_patching.py</a></p>
+    </div>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/04.png" alt="Lab 04 - Path Patching: connessioni causali tra le 5 classi di head del circuito IOI" loading="lazy">
+      <figcaption>Lab 04: path patching tra source e target head. Il grafo del circuito IOI ricostruito edge per edge.</figcaption>
+    </figure>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/grafico_04_path_patching.png" alt="Matrice delle connessioni del circuito IOI: Duplicate Token e Previous Token verso S-Inhibition e Name Mover" loading="lazy">
+      <figcaption>La mappa delle connessioni. DT L0H1 comunica con tutti: S-Inhibition e Name Mover. I Previous Token (PT) hanno connessioni piu' deboli. I cavi del circuito, tracciati uno per uno.</figcaption>
+    </figure>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - Sparse Autoencoders
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Problema Nascosto (e la Soluzione)</h2>
+    <span class="section-number">Sezione 05. Superposition, polisemanticity, e Sparse Autoencoders</span>
+
+    <p>"Bene, abbiamo il circuito. 26 head, ruoli chiari, connessioni tracciate. Ma c'e' un problema."</p>
+
+    <p>"Quale?"</p>
+
+    <p>"Dentro ogni head ci sono migliaia di concetti sovrapposti. Guarda."</p>
+
+    <p>Apro il terminale e mostro le attivazioni di un singolo neurone del residual stream. Si attiva per gatti. Per temperature basse. Per il suffisso "-tion". E per altri trenta concetti che non hanno niente in comune.</p>
+
+    <p>"Questo neurone e' ubriaco."</p>
+
+    <p>"No, e' efficiente. Il modello ha 768 dimensioni nel residual stream, ma i concetti che deve codificare sono migliaia, forse milioni: citta', persone, relazioni sintattiche, emozioni, linguaggi di programmazione. Non ci stanno tutti in 768 caselle. Quindi il modello li comprime. Piu' concetti vengono codificati nello stesso neurone, in modo quasi-ortogonale. Se due concetti raramente si presentano insieme, il modello li sovrappone. Si chiama <strong>superposition</strong>."</p>
+
+    <div class="math-block fade-in">
+      <div class="math-label">Intuizione (Johnson-Lindenstrauss)</div>
+      <div class="math-line">In uno spazio di d dimensioni puoi avere exp(O(d &middot; &epsilon;&sup2;)) vettori</div>
+      <div class="math-line">con overlap mutuo &lt; &epsilon;</div>
+      <div class="math-comment">// con d=768 e epsilon=0.1, sono miliardi di vettori quasi-ortogonali</div>
+    </div>
+
+    <p>"Questo si chiama <strong>polisemanticity</strong>: un singolo neurone partecipa alla rappresentazione di decine o centinaia di concetti diversi. Non puoi guardare un neurone e dire 'questo e' il neurone dei gatti'."</p>
+
+    <p>"E come li separi?"</p>
+
+    <p>"Con un <strong>Sparse Autoencoder</strong>. Carichiamone uno."</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">from</span> <span class="cv">sae_lens</span> <span class="ck">import</span> <span class="ct">SAE</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cc"># SAE pre-trainato da Joseph Bloom su GPT-2 small, layer 8</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">sae</span>, <span class="cv">cfg</span>, <span class="cv">sparsity</span> <span class="co">=</span> <span class="ct">SAE</span>.<span class="cf">from_pretrained</span>(</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cv">release</span><span class="co">=</span><span class="cs">'gpt2-small-res-jb'</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cv">sae_id</span><span class="co">=</span><span class="cs">'blocks.8.hook_resid_pre'</span>,</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cv">device</span><span class="co">=</span><span class="cs">'cpu'</span>,</td></tr>
+<tr><td class="ln">8</td><td class="code">)</td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="cc"># 24.576 feature, overexpansion 32x rispetto a d_model=768</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>Il SAE pesa circa 200 MB e viene scaricato automaticamente da HuggingFace. Passiamoci delle frasi e guardiamo cosa si accende.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Frasi di test</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">test_prompts</span> <span class="co">=</span> [</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cs">'The server fingerprints the AI agent by checking HTTP headers'</span>,</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cs">'The encryption key is stored in the Secure Enclave chip'</span>,</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cs">'The neural network predicts the next token using attention'</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cs">'The hacker intercepted WiFi packets using bettercap on a Raspberry Pi'</span>,</td></tr>
+<tr><td class="ln">7</td><td class="code">]</td></tr>
+<tr><td class="ln">8</td><td class="code"></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="ck">for</span> <span class="cv">p</span> <span class="ck">in</span> <span class="cv">test_prompts</span>:</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="cv">toks</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">to_tokens</span>(<span class="cv">p</span>)</td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="cv">_</span>, <span class="cv">c</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">run_with_cache</span>(<span class="cv">toks</span>)</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="cv">resid</span> <span class="co">=</span> <span class="cv">c</span>[<span class="cs">'blocks.8.hook_resid_pre'</span>]</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="cv">feature_acts</span> <span class="co">=</span> <span class="cv">sae</span>.<span class="cf">encode</span>(<span class="cv">resid</span>)  <span class="cc"># [1, seq_len, 24576]</span></td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="cv">top_features</span> <span class="co">=</span> <span class="cv">feature_acts</span>[<span class="cn">0</span>, <span class="cn">-1</span>].<span class="cf">topk</span>(<span class="cn">10</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code">    <span class="cf">print</span>(<span class="cs">f'{p[:50]:&lt;50}'</span>, <span class="cv">top_features</span>.<span class="cv">indices</span>.<span class="cf">tolist</span>())</td></tr>
+      </table></div>
+    </div>
+
+    <p>Ogni feature attiva si puo' consultare su <strong>Neuronpedia</strong>, un database pubblico che associa ogni feature del SAE a una descrizione interpretabile. Ecco il tipo di feature che trovi:</p>
+
+    <div class="feature-cards fade-in">
+      <div class="feature-card">
+        <div class="feature-id">#8231</div>
+        <div class="feature-name">Concetti matematici</div>
+        <div class="feature-detail">Si attiva su espressioni matematiche, formule, numeri nel contesto di equazioni. Non si attiva su numeri in contesti non matematici (date, indirizzi).</div>
+        <div class="feature-examples">Esempi: "integral", "derivative", "x squared", "theorem"</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-id">#14072</div>
+        <div class="feature-name">Citta' e geografia</div>
+        <div class="feature-detail">Si attiva su nomi di citta', paesi, e contesti geografici. Distingue tra citta' e altri nomi propri.</div>
+        <div class="feature-examples">Esempi: "Paris", "London", "the capital of", "located in"</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-id">#3547</div>
+        <div class="feature-name">Codice Python</div>
+        <div class="feature-detail">Si attiva su sintassi Python: def, class, import. Non si attiva su codice JavaScript o C.</div>
+        <div class="feature-examples">Esempi: "def ", "import ", "self.", "return "</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-id">#21889</div>
+        <div class="feature-name">Sentimento negativo</div>
+        <div class="feature-detail">Si attiva su parole e contesti con connotazione negativa: tristezza, rabbia, paura, morte.</div>
+        <div class="feature-examples">Esempi: "terrible", "died", "unfortunately", "suffer"</div>
+      </div>
+    </div>
+
+    <p>"Ogni token ha circa 50 feature attive su 24.576. E ognuna e' un concetto specifico. Non piu' sovrapposti, non piu' polisemantici."</p>
+
+    <p>"Ok, ma come funziona il SAE?"</p>
+
+    <p>"Fa una cosa semplice in principio: prende il vettore a 768 dimensioni e lo espande in uno spazio a 24.576 dimensioni. Poi lo ricomprime a 768. Il vincolo e' che nello spazio espanso quasi tutte le dimensioni devono essere a zero."</p>
+
+    <div class="math-block fade-in">
+      <div class="math-label">Sparse Autoencoder: architettura</div>
+      <div class="math-line" style="margin-top: 0.3rem;"><strong>Encoder:</strong></div>
+      <div class="math-line">z = ReLU(W<sub>enc</sub> &middot; (x &minus; b<sub>dec</sub>) + b<sub>enc</sub>)</div>
+      <div class="math-comment">// x &isin; R<sup>768</sup>, z &isin; R<sup>24576</sup>, overexpansion 32x</div>
+      <div class="math-line" style="margin-top: 0.8rem;"><strong>Decoder:</strong></div>
+      <div class="math-line">x&#770; = W<sub>dec</sub> &middot; z + b<sub>dec</sub></div>
+      <div class="math-comment">// ricostruzione: x&#770; deve essere il piu' vicino possibile a x</div>
+      <div class="math-line" style="margin-top: 0.8rem;"><strong>Loss:</strong></div>
+      <div class="math-line">L = &#8214;x &minus; x&#770;&#8214;&sup2; + &lambda; &middot; &#8214;z&#8214;<sub>1</sub></div>
+      <div class="math-comment">// MSE (ricostruzione fedele) + L1 (sparsita')</div>
+    </div>
+
+    <p>"Il termine L1 e' il trucco. La norma L1 di z e' la somma dei valori assoluti. Minimizzarla spinge la maggior parte delle componenti a zero. Le poche che sopravvivono devono essere significative: corrispondono a feature reali del modello."</p>
+
+    <p>"E il lambda?"</p>
+
+    <p>"Iperparametro critico. Lambda troppo alto: il SAE ammazza quasi tutte le feature e ricostruisce male. Lambda troppo basso: le feature restano polisemantiche. Il punto ideale e' dove L0 (il numero medio di feature attive per token) e' tra 20 e 100, e la loss recovered e' sopra il 95%."</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il problema dello shrinkage:</strong> la penalty L1 non si limita a silenziare le feature deboli. Sottostima sistematicamente le attivazioni di tutte le feature, anche quelle forti. E' un bias noto nella statistica (LASSO regression ha lo stesso problema). Anthropic nel 2024 ha proposto <strong>JumpReLU</strong> come fix: invece di ReLU, una funzione a soglia <code>z = max(0, pre_act &minus; &theta;)</code> dove &theta; viene calibrato con una perdita ausiliaria. Questo elimina lo shrinkage: le feature o sono completamente spente, o hanno la loro attivazione reale senza distorsione.</p>
+    </div>
+
+    <p>"E poi c'e' il problema dei dead neurons. Feature che dopo il training non si attivano mai su nessun input. Risorse sprecate. La soluzione si chiama <strong>neuron resampling</strong>: ogni N passi di training, trovi i neuroni morti, li reinizializzi usando campioni con alto errore di ricostruzione. In pratica dai ai neuroni morti la possibilita' di imparare le feature mancanti."</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Metrica</th>
+            <th>Cosa misura</th>
+            <th>Valore ideale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>L0</strong></td>
+            <td>Feature attive medie per token</td>
+            <td>20-100</td>
+          </tr>
+          <tr>
+            <td><strong>Loss recovered</strong></td>
+            <td>Quanta cross-entropy loss il SAE preserva</td>
+            <td>&gt; 95%</td>
+          </tr>
+          <tr>
+            <td><strong>CE loss increase</strong></td>
+            <td>Degrado della performance quando sostituisci le attivazioni con la ricostruzione del SAE</td>
+            <td>&lt; 0.05 nats</td>
+          </tr>
+          <tr>
+            <td><strong>Dead features %</strong></td>
+            <td>Feature che non si attivano mai</td>
+            <td>&lt; 5%</td>
+          </tr>
+          <tr>
+            <td><strong>Feature density</strong></td>
+            <td>Su quanti token si attiva una feature</td>
+            <td>0.01% - 1% (sparse ma non morta)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>"Un'ultima cosa sulla geometria. Ogni colonna della matrice W<sub>dec</sub> e' un vettore nello spazio a 768 dimensioni. Quel vettore <em>e'</em> la feature. E' la direzione nel residual stream che corrisponde a quel concetto. Se vuoi sapere 'dov'e' il concetto di Golden Gate Bridge dentro Claude?', la risposta e': e' la colonna N della matrice del decoder del SAE. Un vettore. Una direzione."</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Script:</strong> <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mech-interp-lab/lab_05_sparse_autoencoder.py" target="_blank" rel="noopener">lab_05_sparse_autoencoder.py</a></p>
+    </div>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/05.png" alt="Lab 05 - Sparse Autoencoder: feature monosemantiche estratte dal residual stream di GPT-2" loading="lazy">
+      <figcaption>Lab 05: il SAE decompone le attivazioni in feature interpretabili. Ogni feature corrisponde a un concetto specifico.</figcaption>
+    </figure>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/grafico_05_svd_activations.png" alt="SVD delle attivazioni al layer 8: proiezione 2D dei token nello spazio residual" loading="lazy">
+      <figcaption>SVD delle attivazioni al layer 8. Ogni punto e' un token. Il primo componente cattura quasi tutta la varianza: il modello comprime l'informazione in poche direzioni dominanti.</figcaption>
+    </figure>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - Feature Steering
+         ============================================================ -->
+    <h2><span class="accent">//</span> Riscrivere i Pensieri</h2>
+    <span class="section-number">Sezione 06. Feature steering: leggere e' solo l'inizio</span>
+
+    <p>"Puoi non solo leggere le feature, ma riscriverle."</p>
+
+    <p>"Nel senso?"</p>
+
+    <p>"Ogni feature del SAE ha un vettore decodificatore: la colonna corrispondente della matrice W<sub>dec</sub>. Quel vettore e' una direzione nello spazio a 768 dimensioni. Se lo sommi alle attivazioni del modello durante il forward pass, stai amplificando quella feature. Se lo sottrai, la stai sopprimendo."</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Vettore di steering: la direzione della feature #8231 (matematica)</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">steering_vec</span> <span class="co">=</span> <span class="cv">sae</span>.<span class="cv">W_dec</span>[<span class="cn">8231</span>]  <span class="cc"># [768]</span></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cv">steering_vec</span> <span class="co">=</span> <span class="cv">steering_vec</span> <span class="co">/</span> <span class="cv">steering_vec</span>.<span class="cf">norm</span>()</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cc"># Hook: sommare al residual stream durante il forward pass</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="ck">def</span> <span class="cf">steering_hook</span>(<span class="cv">activation</span>, <span class="cv">hook</span>):</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cv">activation</span>[:, :, :] <span class="co">+=</span> <span class="cn">20.0</span> <span class="co">*</span> <span class="cv">steering_vec</span></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="ck">return</span> <span class="cv">activation</span></td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cv">model</span>.<span class="cf">add_hook</span>(<span class="cs">'blocks.8.hook_resid_pre'</span>, <span class="cv">steering_hook</span>)</td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cv">steered</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">generate</span>(<span class="cv">tokens</span>, <span class="cv">max_new_tokens</span><span class="co">=</span><span class="cn">50</span>)</td></tr>
+      </table></div>
+    </div>
+
+    <p>La iena fissa lo schermo.</p>
+
+    <p>"Stai iniettando un concetto direttamente nel flusso di pensiero del modello?"</p>
+
+    <p>"Si'. Non e' un prompt hack. Non e' un'istruzione di sistema. E' un intervento sul residual stream. Il modello non sa di essere stato modificato."</p>
+
+    <div class="two-panel fade-in">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">Senza steering (mult=0)</div>
+        <p><code>The weather today is</code> &rarr; <em>"nice and sunny, with clear skies across most of the region..."</em></p>
+        <p>Output normale. Il modello completa la frase in modo sensato.</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">Con steering matematica (mult=20)</div>
+        <p><code>The weather today is</code> &rarr; <em>"approximately 23.7 degrees, following a sinusoidal function with period T=365.25 days..."</em></p>
+        <p>Il modello infila matematica ovunque. Non e' un prompt hack: e' un intervento sul residual stream.</p>
+      </div>
+    </div>
+
+    <p>Questo e' il nostro mini "Golden Gate Claude". Anthropic nel 2024 ha trovato la feature del Golden Gate Bridge dentro Claude 3 Sonnet e l'ha amplificata. Il modello ha iniziato a parlare ossessivamente del ponte in ogni risposta. Non perche' qualcuno glielo avesse chiesto: perche' quella direzione nel residual stream era diventata dominante.</p>
+
+    <p>"E lo puoi misurare. La KL divergence tra la distribuzione di output con e senza steering dice quanto il modello e' stato perturbato."</p>
+
+    <div class="math-block fade-in">
+      <div class="math-label">KL Divergence come metrica di steering</div>
+      <div class="math-line">D<sub>KL</sub>(P<sub>baseline</sub> || P<sub>steered</sub>) = &sum; P<sub>baseline</sub>(x) &middot; log(P<sub>baseline</sub>(x) / P<sub>steered</sub>(x))</div>
+      <div class="math-comment">// bassa = perturbazione contenuta, alta = modello deragliato</div>
+      <div class="math-line" style="margin-top: 0.5rem;">mult=5 &rarr; KL &asymp; 0.3 &emsp; mult=20 &rarr; KL &asymp; 4.2 &emsp; mult=40 &rarr; KL &asymp; 18.7</div>
+    </div>
+
+    <p>"Con moltiplicatore 5 la KL e' bassa: il modello cambia tono ma resta coerente. Con moltiplicatore 40 la KL esplode: il modello diventa incoerente, le probabilita' di output sono completamente diverse."</p>
+
+    <p>"Puoi anche fare steering negativo. Moltiplicatore &minus;20 sulla feature del sentimento negativo: il modello diventa patologicamente ottimista. Moltiplicatore &minus;20 sulla feature del codice Python: il modello si rifiuta di scrivere codice anche se glielo chiedi."</p>
+
+    <p>La iena resta in silenzio un secondo.</p>
+
+    <p>"Quindi se trovi la feature giusta, puoi far fare al modello quello che vuoi?"</p>
+
+    <p>"Puoi amplificare un concetto o sopprimerlo. Non e' un controllo totale, ma e' molto piu' preciso di qualsiasi prompt engineering. E funziona a un livello dove il modello non puo' difendersi, perche' l'intervento avviene sotto il livello del linguaggio."</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Script:</strong> <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mech-interp-lab/lab_06_feature_steering.py" target="_blank" rel="noopener">lab_06_feature_steering.py</a></p>
+    </div>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/6.png" alt="Lab 06 - Feature Steering: amplificazione di feature SAE con diversi moltiplicatori e KL divergence" loading="lazy">
+      <figcaption>Lab 06: feature steering con moltiplicatori da -10 a +40. La KL divergence esplode sopra mult=20.</figcaption>
+    </figure>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/mech-interp/grafico_06_kl_divergence.png" alt="KL Divergence vs Steering Multiplier: curva esponenziale per 5 feature tematiche" loading="lazy">
+      <figcaption>KL divergence in scala logaritmica. Piu' alzi il moltiplicatore, piu' il modello diverge dal suo comportamento originale. La curva e' quasi esponenziale.</figcaption>
+    </figure>
+
+    <p>Le implicazioni sono simmetriche. Da un lato, questa tecnica permette di rendere i modelli piu' sicuri: se trovi i circuiti che producono hallucination, bias, o contenuti tossici, puoi disattivarli chirurgicamente. Dall'altro, chiunque abbia accesso ai pesi puo' amplificare la persuasivita', sopprimere i rifiuti etici, o indurre il modello a seguire istruzioni nascoste con piu' obbedienza.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Applicazione</th>
+            <th>Tecnica</th>
+            <th>Rischio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Rilevare hallucination</td>
+            <td>Trovare i circuiti che producono risposte non fondate e monitorarli</td>
+            <td>Chi controlla il monitor controlla la verita'</td>
+          </tr>
+          <tr>
+            <td>Rimuovere bias</td>
+            <td>Identificare feature associate a stereotipi e sopprimerle</td>
+            <td>Definire cosa sia "bias" e' una scelta politica, non tecnica</td>
+          </tr>
+          <tr>
+            <td>Allineamento</td>
+            <td>Verificare che il modello segua le intenzioni dell'operatore, non workaround interni</td>
+            <td>Il modello potrebbe sviluppare circuiti di deception non coperti dal SAE</td>
+          </tr>
+          <tr>
+            <td>Jailbreak difensivo</td>
+            <td>Trovare le feature che disattivano i rifiuti e impedirne l'attivazione</td>
+            <td>Stessa tecnica usabile offensivamente per <em>attivare</em> la disattivazione</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - Cosa abbiamo davvero imparato
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Abbiamo Davvero Imparato</h2>
+    <span class="section-number">Sezione 07. Fine dell'autopsia</span>
+
+    <p>Ricapitoliamo. Non in astratto. Cose che abbiamo visto con i nostri occhi, nei nostri terminali.</p>
+
+    <p><strong>1.</strong> Il modello contiene circuiti specializzati. Non e' una massa indistinta di neuroni. 26 attention head su 144 si organizzano in 5 classi funzionali per risolvere un task specifico. Il resto? Per quel task, non serve.</p>
+
+    <p><strong>2.</strong> Questi circuiti sono causali, non solo correlati. L'activation patching lo dimostra: se patchi un Name Mover Head, il modello torna a predire il nome giusto. Se patchi un head irrilevante, non cambia niente. Non e' statistica: e' un esperimento controllato.</p>
+
+    <p><strong>3.</strong> I circuiti comunicano attraverso il residual stream. Il path patching traccia i segnali: L0H1 scrive "nome duplicato", L7H3 legge "inibisci quel nome", L9H9 legge "copia l'altro". Come cavi in un quadro elettrico.</p>
+
+    <p><strong>4.</strong> I neuroni individuali sono polisemantici, ma i SAE li decompongono in concetti interpretabili. 768 dimensioni diventano 24.576 feature sparse. Ogni feature corrisponde a un concetto specifico: matematica, geografia, codice Python, sentimento negativo.</p>
+
+    <p><strong>5.</strong> Puoi non solo leggere, ma riscrivere. Il feature steering modifica il comportamento del modello iniettando direzioni nel residual stream. Non e' un prompt hack. E' chirurgia sul flusso di pensiero.</p>
+
+    <p>"Quindi il modello non e' piu' una scatola nera."</p>
+
+    <p>"Non completamente. Per GPT-2 small siamo abbastanza vicini a un reverse engineering completo. Per i modelli grandi siamo ancora all'inizio, ma la direzione e' chiara."</p>
+
+    <p>"E Anthropic?"</p>
+
+    <p>"Nel 2024 hanno applicato gli SAE a Claude 3 Sonnet e hanno trovato milioni di feature interpretabili. Citta', persone, concetti astratti, comportamenti etici. La feature del Golden Gate Bridge viene da li'. La tecnica scala. Ma il costo computazionale e' enorme: i SAE per modelli grandi hanno miliardi di parametri loro stessi."</p>
+
+    <p>Nel gennaio 2026, la mechanistic interpretability e' stata inserita nella lista delle 10 Breakthrough Technologies di MIT Technology Review. Il motivo: e' la tecnica piu' promettente per rendere gli LLM trasparenti. Se sai cosa sta pensando il modello, puoi intercettare comportamenti pericolosi prima che si manifestino.</p>
+
+    <h3 style="margin-top: 2.5rem;"><span class="accent">//</span> Quanti altri circuiti ci sono la' dentro?</h3>
+
+    <p>Il circuito IOI e' solo il primo che e' stato smontato completamente. Ma se 26 head bastano per risolvere "chi riceve la birra", quanti ne servono per gli altri comportamenti del modello? Quanti circuiti ci sono la' dentro?</p>
+
+    <p>I ricercatori ne stanno trovando altri. Circuiti per l'aritmetica modulare. Circuiti per la grammatica. Circuiti per il fact recall. E poi ci sono quelli che ancora nessuno ha mappato: circuiti per le hallucination. Circuiti per il sycophancy. Circuiti per il rifiuto etico. Circuiti per la deception.</p>
+
+    <p>Se riesci a isolare il circuito che produce un'hallucination, puoi spegnerlo. Se riesci a isolare il circuito che bypassa i guardrail di sicurezza, puoi monitorarlo. Se riesci a isolare il circuito che genera risposte compiacenti, puoi calibrarlo.</p>
+
+    <p>"La domanda non e' se la mechanistic interpretability sia pericolosa. La domanda e' se sia piu' pericoloso <em>non</em> guardare dentro."</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">
+        124 milioni di parametri.<br>
+        144 attention heads.<br>
+        26 head per un circuito.<br>
+        24.576 feature interpretabili.<br>
+        6 lab, tutto su CPU, nessuna GPU.
+      </p>
+      <p class="quote" style="margin-top: 1.2rem;">
+        La rete neurale non e' una scatola nera.<br>
+        E' un sistema complesso che possiamo dissezionare.<br>
+        E chi la guarda dentro puo' decidere cosa farci.
+      </p>
+    </div>
+
+    <p>Il codice completo dei 6 lab e' su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/mech-interp-lab" target="_blank" rel="noopener">GitHub</a>. TransformerLens, SAELens, plotly. Tutto locale, tutto su CPU, tutto riproducibile. Apri il cofano.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

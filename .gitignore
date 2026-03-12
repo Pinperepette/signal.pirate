@@ -2,3 +2,5 @@
 *.csv
 *.ipynb
 *.pcap
+venv/
+scripts/*/output_*
