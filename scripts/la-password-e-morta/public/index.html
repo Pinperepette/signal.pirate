@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAuthn Lab — Signal Pirate</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            background: #0a0a0f;
+            color: #c8c8d8;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 520px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 1.4rem;
+            color: #00ff88;
+            margin-bottom: 0.3rem;
+        }
+        .subtitle {
+            font-size: 0.75rem;
+            color: #6a6a8a;
+            margin-bottom: 2rem;
+        }
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: #12121a;
+            border: 1px solid #2a2a3a;
+            border-radius: 8px;
+            color: #c8c8d8;
+            font-family: inherit;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: #00ff88; }
+        button {
+            padding: 0.8rem 1.2rem;
+            background: transparent;
+            border: 1px solid #2a2a3a;
+            border-radius: 8px;
+            color: #c8c8d8;
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        button:hover {
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .btn-register { border-color: #7c4dff; color: #7c4dff; }
+        .btn-register:hover { border-color: #9d7aff; color: #9d7aff; }
+        .btn-login { border-color: #00ff88; color: #00ff88; }
+        .btn-login:hover { border-color: #33ffaa; color: #33ffaa; }
+        .log {
+            background: #0d1117;
+            border: 1px solid #1a1a2e;
+            border-radius: 10px;
+            padding: 1rem;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+            line-height: 1.8;
+        }
+        .log-entry { padding: 0.2rem 0; }
+        .log-info { color: #6a6a8a; }
+        .log-success { color: #00ff88; }
+        .log-error { color: #ff6b6b; }
+        .log-data { color: #7c4dff; }
+        .log-step { color: #4ecdc4; }
+        .log-label {
+            display: inline-block;
+            min-width: 5rem;
+            color: #f5c518;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebAuthn Lab</h1>
+        <p class="subtitle">Passkey: registrazione e login senza password</p>
+
+        <div class="input-group">
+            <input type="text" id="username" placeholder="username" autocomplete="username webauthn">
+            <button class="btn-register" onclick="doRegister()">Registra</button>
+            <button class="btn-login" onclick="doLogin()">Login</button>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const logEl = document.getElementById('log');
+
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `log-entry log-${type}`;
+            div.textContent = msg;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function logData(label, value) {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `<span class="log-label">${label}</span> <span class="log-data">${value}</span>`;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // base64url <-> ArrayBuffer
+        function base64urlToBuffer(base64url) {
+            const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+            const pad = base64.length % 4 === 0 ? '' : '='.repeat(4 - (base64.length % 4));
+            const binary = atob(base64 + pad);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function bufferToBase64url(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+
+        async function doRegister() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) { log('username richiesto', 'error'); return; }
+
+            try {
+                log('');
+                log('=== REGISTRAZIONE ===', 'step');
+                log('1. Richiedo challenge al server...', 'info');
+
+                const optRes = await fetch('/register/options', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username }),
+                });
+                const options = await optRes.json();
+                if (options.error) { log(options.error, 'error'); return; }
+
+                logData('challenge', options.challenge.substring(0, 32) + '...');
+                logData('rpId', options.rp.id);
+                logData('rpName', options.rp.name);
+                log('2. Avvio navigator.credentials.create()...', 'info');
+                log('   (sblocca con Touch ID / Face ID / PIN)', 'info');
+
+                // Converti le opzioni del server nel formato Web API
+                const createOptions = {
+                    publicKey: {
+                        rp: options.rp,
+                        user: {
+                            id: base64urlToBuffer(options.user.id),
+                            name: options.user.name,
+                            displayName: options.user.displayName || options.user.name,
+                        },
+                        challenge: base64urlToBuffer(options.challenge),
+                        pubKeyCredParams: options.pubKeyCredParams,
+                        timeout: options.timeout || 60000,
+                        attestation: options.attestation || 'none',
+                        authenticatorSelection: options.authenticatorSelection,
+                        excludeCredentials: (options.excludeCredentials || []).map(c => ({
+                            id: base64urlToBuffer(c.id),
+                            type: c.type,
+                        })),
+                    },
+                };
+
+                // Chiama la Web API nativa
+                const credential = await navigator.credentials.create(createOptions);
+
+                const attResp = {
+                    id: credential.id,
+                    rawId: bufferToBase64url(credential.rawId),
+                    type: credential.type,
+                    response: {
+                        attestationObject: bufferToBase64url(credential.response.attestationObject),
+                        clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                    },
+                    clientExtensionResults: credential.getClientExtensionResults(),
+                    authenticatorAttachment: credential.authenticatorAttachment,
+                };
+
+                logData('credId', credential.id.substring(0, 32) + '...');
+                logData('type', credential.type);
+                log('3. Invio risposta al server per verifica...', 'info');
+
+                const verRes = await fetch('/register/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(attResp),
+                });
+                const verJSON = await verRes.json();
+
+                if (verJSON.verified) {
+                    log('REGISTRAZIONE COMPLETATA', 'success');
+                    log('Chiave pubblica salvata sul server', 'success');
+                    log('Chiave privata nel Secure Enclave (mai vista dal server)', 'success');
+                } else {
+                    log('Registrazione fallita: ' + (verJSON.error || 'errore sconosciuto'), 'error');
+                }
+            } catch (err) {
+                log('Errore: ' + err.message, 'error');
+            }
+        }
+
+        async function doLogin() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) { log('username richiesto', 'error'); return; }
+
+            try {
+                log('');
+                log('=== LOGIN ===', 'step');
+                log('1. Richiedo challenge al server...', 'info');
+
+                const optRes = await fetch('/login/options', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username }),
+                });
+                const options = await optRes.json();
+                if (options.error) { log(options.error, 'error'); return; }
+
+                logData('challenge', options.challenge.substring(0, 32) + '...');
+                log('2. Avvio navigator.credentials.get()...', 'info');
+                log('   (sblocca con Touch ID / Face ID / PIN)', 'info');
+
+                // Converti le opzioni del server nel formato Web API
+                const getOptions = {
+                    publicKey: {
+                        challenge: base64urlToBuffer(options.challenge),
+                        rpId: options.rpId,
+                        timeout: options.timeout || 60000,
+                        allowCredentials: (options.allowCredentials || []).map(c => ({
+                            id: base64urlToBuffer(c.id),
+                            type: c.type,
+                        })),
+                        userVerification: options.userVerification || 'preferred',
+                    },
+                };
+
+                const credential = await navigator.credentials.get(getOptions);
+
+                const authResp = {
+                    id: credential.id,
+                    rawId: bufferToBase64url(credential.rawId),
+                    type: credential.type,
+                    response: {
+                        authenticatorData: bufferToBase64url(credential.response.authenticatorData),
+                        clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                        signature: bufferToBase64url(credential.response.signature),
+                        userHandle: credential.response.userHandle
+                            ? bufferToBase64url(credential.response.userHandle)
+                            : null,
+                    },
+                    clientExtensionResults: credential.getClientExtensionResults(),
+                    authenticatorAttachment: credential.authenticatorAttachment,
+                };
+
+                logData('credId', credential.id.substring(0, 32) + '...');
+                log('3. Invio firma ECDSA al server per verifica...', 'info');
+
+                const verRes = await fetch('/login/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(authResp),
+                });
+                const verJSON = await verRes.json();
+
+                if (verJSON.verified) {
+                    log('LOGIN RIUSCITO', 'success');
+                    logData('signCount', verJSON.signCount);
+                    log('Firma ECDSA verificata con la chiave pubblica', 'success');
+                    log('Nessuna password coinvolta', 'success');
+                } else {
+                    log('Login fallito: ' + (verJSON.error || 'firma non valida'), 'error');
+                }
+            } catch (err) {
+                log('Errore: ' + err.message, 'error');
+            }
+        }
+
+        // Messaggio iniziale
+        log('WebAuthn Lab — Signal Pirate', 'step');
+        log('Registra un username e autentica con passkey.', 'info');
+        log('Zero password. Solo crittografia.', 'info');
+    </script>
+</body>
+</html>

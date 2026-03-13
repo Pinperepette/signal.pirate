@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>La Password e' Morta</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/la-password-e-morta.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/la-password-e-morta.html</guid>
+    <pubDate>Thu, 13 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Passkeys, WebAuthn e FIDO2: perche' la tua prossima password non sara' una password. ECDSA P-256, challenge-response, Secure Enclave, origin binding. Lab Node.js con @simplewebauthn + script Python ECDSA.</description>
+  </item>
+
+  <item>
     <title>Il Web Ha Due Facce</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-web-ha-due-facce.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-web-ha-due-facce.html</guid>
