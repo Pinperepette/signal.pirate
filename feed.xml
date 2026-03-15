@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Container Non E' una Cassaforte</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-container-non-isola-niente.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-container-non-isola-niente.html</guid>
+    <pubDate>Sun, 15 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Docker isola, ma non come pensi. Misconfiguration (--privileged, docker.sock), CAP_SYS_ADMIN namespace escape, CVE reali. Cosa separa davvero un container da una VM. Lab 5 script bash, 5 screenshot. gVisor, Kata Containers, Firecracker.</description>
+  </item>
+
+  <item>
     <title>La Password e' Morta</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/la-password-e-morta.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/la-password-e-morta.html</guid>
