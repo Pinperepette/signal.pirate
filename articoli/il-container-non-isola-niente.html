@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Container Non E' una Cassaforte | Signal Pirate</title>
+  <meta name="description" content="Docker isola, ma non come pensi. Misconfiguration, CVE reali e kernel condiviso: cosa separa un container da una VM. Lab pratico con 4 script.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }  /* keyword */
+    .cs { color: #00ff88; }  /* string */
+    .cn { color: #b5cea8; }  /* number */
+    .cc { color: #6a6a8a; }  /* comment */
+    .cf { color: #4ecdc4; }  /* function */
+    .cv { color: #9cdcfe; }  /* variable */
+    .ct { color: #4ec9b0; }  /* type */
+    .co { color: #d4d4d4; }  /* operator */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Two Panel Comparison === */
+    .two-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 1.5rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    @media (max-width: 768px) {
+      .two-panel { grid-template-columns: 1fr; }
+    }
+    .panel-side {
+      padding: 1.5rem;
+    }
+    .panel-left {
+      background: rgba(0,255,136,0.05);
+      border-right: 1px solid var(--border-subtle);
+    }
+    .panel-right {
+      background: rgba(255,107,107,0.05);
+    }
+    .panel-side-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    .panel-left .panel-side-title { color: var(--accent-reaction); }
+    .panel-right .panel-side-title { color: var(--accent-attention); }
+    .panel-side p {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin: 0.4rem 0;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Architecture Diagram === */
+    .arch-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .arch-diagram .layer-host { color: #ff6b6b; }
+    .arch-diagram .layer-vm { color: #ff8800; }
+    .arch-diagram .layer-docker { color: #4ecdc4; }
+    .arch-diagram .layer-container { color: #00ff88; }
+    .arch-diagram .layer-label { color: #6a6a8a; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-15 | Pinperepette</p>
+    <h1 class="article-page-title">Il Container <span class="accent">Non E' una Cassaforte</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Docker isola, ma non come pensi. Misconfiguration, CVE reali e kernel condiviso: cosa separa davvero un container da una VM. Lab pratico con 4 script.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Container Escape</span>
+      <span class="tag tag-highlight">Docker</span>
+      <span class="tag tag-reaction">Namespace</span>
+      <span class="tag tag-amplification">Kernel</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00 - LA CENA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Cena</h2>
+    <span class="section-number">Sezione 00. L'antefatto</span>
+
+    <p>Sabato sera. Ristorante. Siamo in otto, amici e amici di amici. La iena e' di fronte a me, il menu e' arrivato, nessuno l'ha ancora aperto perche' si chiacchiera. Tutto tranquillo finche' qualcuno non menziona che gli hanno bucato il sito dell'azienda.</p>
+
+    <p>"Ma come e' possibile? Non era tutto in Docker?" dice uno.</p>
+
+    <p>E li' si accende il tipo. L'amico dell'amico. Non lo conosco, me l'hanno presentato mezz'ora fa. "Ah ma si', Docker. Io uso Docker per tutto. E' un sistema blindato, e' come una macchina virtuale. Gira tutto isolato, anche se ti bucano il container non possono fare niente al server."</p>
+
+    <p>Annuisco. Bevo un sorso di vino. La iena mi guarda. Sa gia' come finisce.</p>
+
+    <p>"Cioe' praticamente e' una sandbox, no?" insiste il tipo. Si e' girato verso di me perche' qualcuno gli ha detto che "faccio cose con i computer". "Una blackbox. Quello che succede dentro resta dentro."</p>
+
+    <p>"Mm."</p>
+
+    <p>"Ti giuro, da quando uso Docker dormo tranquillo. Metto tutto in container e via."</p>
+
+    <p>La iena mi mette una mano sul braccio. Il gesto universale per "no, ti prego, non farlo".</p>
+
+    <p>"Scusate un attimo. Vado a prendere una cosa in macchina."</p>
+
+    <p>Torno con l'M4 sotto il braccio. La iena chiude gli occhi. Il tipo mi guarda perplesso. Gli altri hanno gia' capito che la serata ha preso una brutta piega.</p>
+
+    <p>"Hai il telefono con l'hotspot? Collegami."</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red" data-count="30" data-suffix=" sec">0</div>
+        <div class="stat-label">Per uscire dal container</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="1" data-suffix=" flag">0</div>
+        <div class="stat-label">Serve solo --privileged</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green" data-count="0" data-suffix="">0</div>
+        <div class="stat-label">Exploit necessari</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="297" data-suffix="">0</div>
+        <div class="stat-label">Processi host visibili</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - COS'E' DAVVERO UN CONTAINER
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cos'e' Davvero un Container</h2>
+    <span class="section-number">Sezione 01. Non e' quello che pensi</span>
+
+    <p>"Prima di rompere qualcosa, capiamo cosa stiamo rompendo."</p>
+
+    <p>"Un container Docker e' una macchina virtuale leggera, no?" dice il tipo.</p>
+
+    <p>"No. E' un processo con dei muri intorno. Ma i muri sono software, non hardware."</p>
+
+    <p>Silenzio. Gli altri hanno smesso di mangiare.</p>
+
+    <p>"Un container e' un processo Linux con namespace isolati, capability ridotte, syscall filtrate, filesystem separato e rete virtualizzata. Non e' un processo 'normale': ha protezioni reali. Ma gira sullo stesso kernel del sistema operativo host. Lo stesso kernel. E il kernel e' la superficie di attacco."</p>
+
+    <p>Un container Docker e' fatto di piu' strati di isolamento:</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">NS</div>
+        <div class="step-name">Namespace</div>
+        <div class="step-detail">Isolamento reale: processi, rete, filesystem, hostname, utenti. Non puoi inviare segnali a processi fuori namespace</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">CG</div>
+        <div class="step-name">Cgroup</div>
+        <div class="step-detail">Limita le RISORSE: CPU, RAM, I/O disco, banda di rete</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">SC</div>
+        <div class="step-name">Seccomp</div>
+        <div class="step-detail">Filtra le syscall: blocca mount, ptrace, bpf e altre pericolose a livello kernel</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">CP</div>
+        <div class="step-name">Capabilities</div>
+        <div class="step-detail">Root nel container ha meno poteri del root sull'host. Capability ridotte di default</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">OV</div>
+        <div class="step-name">Overlay FS</div>
+        <div class="step-detail">Filesystem a strati: immagine base + layer modifiche, separato dall'host</div>
+      </div>
+    </div>
+
+    <p>"Aspetta, ma allora una macchina virtuale cos'e'?"</p>
+
+    <p>"Una VM ha il suo kernel. Un hypervisor (tipo VirtualBox o HyperKit) emula l'hardware e ogni VM ci gira sopra il suo sistema operativo completo. Il kernel della VM e' separato da quello dell'host. Per uscire da una VM devi trovare un bug nell'hypervisor. Ne escono anche per gli hypervisor: VENOM per QEMU, escape per VMware ESXi, VirtualBox, Xen. Niente e' invulnerabile. Ma la superficie di attacco e' molto piu' piccola rispetto a un kernel Linux intero. Per uscire da un container la superficie e' enorme: kernel, runC, Docker daemon. Oppure basta una misconfiguration."</p>
+
+    <div class="two-panel fade-in">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">Container</div>
+        <p>Condivide il kernel dell'host</p>
+        <p>Isolamento = namespace + seccomp + capabilities (software)</p>
+        <p>Escape = exploit kernel, bug runC, o misconfiguration</p>
+        <p>Un bug kernel buca TUTTI i container</p>
+        <p>Avvio in millisecondi, peso ~MB</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">Macchina Virtuale</div>
+        <p>Ha il proprio kernel</p>
+        <p>Isolamento = hypervisor (hardware)</p>
+        <p>Escape = exploit hypervisor (meno frequente, superficie ridotta)</p>
+        <p>Un bug kernel buca solo quella VM</p>
+        <p>Avvio in secondi, peso ~GB</p>
+      </div>
+    </div>
+
+    <p>"Ti faccio vedere." Apro il terminale.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker run --rm alpine uname -a</span>
+<span class="t-out">Linux e9b06c8d5edd <span class="t-highlight">5.10.104-linuxkit</span> #1 SMP x86_64 Linux</span>
+<span class="t-prompt">$</span> <span class="t-cmd">docker run --rm ubuntu uname -a</span>
+<span class="t-out">Linux b858ee8db5f9 <span class="t-highlight">5.10.104-linuxkit</span> #1 SMP x86_64 GNU/Linux</span>
+<span class="t-prompt">$</span> <span class="t-cmd">docker run --rm debian uname -a</span>
+<span class="t-out">Linux decc1ef75bbf <span class="t-highlight">5.10.104-linuxkit</span> #1 SMP x86_64 GNU/Linux</span>
+    </div>
+
+    <p>"Vedi? Alpine, Ubuntu, Debian. Tre distribuzioni diverse. Stesso kernel: <code>5.10.104-linuxkit</code>. Se domani esce una vulnerabilita' in quel kernel, tutti e tre i container sono vulnerabili. Tutti. Contemporaneamente."</p>
+
+    <p>Scrollo piu' giu'. Un container normale: 4 processi, la sua interfaccia di rete, 22 mount points. Un mondo a se'. Poi lo stesso container con <code>--privileged --pid=host</code>: 317 processi. <code>/sbin/init</code>, i thread del kernel, lo scheduler, tutto. I device dell'host: <code>loop0</code>, <code>loop1</code>, <code>fuse</code>, <code>hwrng</code>. Il tipo si sporge verso lo schermo.</p>
+
+    <!-- SCREENSHOT: 03_namespace_demo -->
+    <img src="../immagini/container-escape/03_namespace_demo.png" alt="Terminale: kernel condiviso tra distro, namespace normale vs privilegiato, 317 processi host" class="lab-screenshot fade-in">
+
+    <p>"Ma aspetta. Come fa un container a essere 'solo un processo'? Ha il suo filesystem, la sua rete..."</p>
+
+    <p>Apro un altro script. "Guarda qui. Lancio un <code>sleep 30</code> in un container. Dentro, il processo crede di essere PID 1, l'init del sistema. In realta' sull'host e' il processo 59006. Stesso processo, due numeri diversi. Il namespace PID gli fa credere di essere solo. Poi guarda i cgroup: questo container ha 64 MB di RAM e mezzo core CPU. Sono i limiti che il kernel gli impone. Un guinzaglio."</p>
+
+    <!-- SCREENSHOT: 04_what_docker_really_is -->
+    <img src="../immagini/container-escape/04_what_docker_really_is.png" alt="Terminale: PID reale vs PID nel container, limiti cgroup, schema Docker container" class="lab-screenshot fade-in">
+
+    <p>Il tipo fissa lo schermo. "Ok, ma in pratica non puoi uscire dal container, no? Cioe', i namespace..."</p>
+
+    <p>"I namespace sono barriere del kernel. Ma le barriere del kernel si possono abbassare. A volte basta un flag."</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il punto chiave:</strong> un container offre isolamento reale, ma non allo stesso livello di una VM. Kubernetes, AWS, Google Cloud eseguono milioni di container multi-tenant. Se non isolassero nulla, sarebbe impossibile. Ma un container configurato male, o un kernel con una CVE non patchata, puo' trasformare quell'isolamento in un'illusione. La differenza tra "ragionevolmente sicuro" e "bucato" sta nella configurazione e nel patching.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - ESCAPE 1: --privileged
+         ============================================================ -->
+    <h2><span class="accent">//</span> Misconfiguration 1: --privileged</h2>
+    <span class="section-number">Sezione 02. Non e' un exploit, e' peggio</span>
+
+    <p>"Vediamo cosa succede quando lanci un container con <code>--privileged</code>."</p>
+
+    <p>"Io non uso mai quel flag," dice il tipo.</p>
+
+    <p>"Sei sicuro? Hai mai seguito un tutorial su Stack Overflow che diceva 'se non funziona, aggiungi --privileged'? Hai mai configurato un container che deve accedere a un dispositivo USB, a una GPU, a una porta seriale? Il flag privileged e' la soluzione rapida che tutti usano quando qualcosa non va. E poi resta li'."</p>
+
+    <p>Container normale. Provo a vedere i dischi:</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker run --rm alpine fdisk -l</span>
+<span class="t-out"><span class="t-warn">(nessun output: il container non vede i dischi)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">docker run --rm alpine ls /dev/sda*</span>
+<span class="t-out"><span class="t-warn">ls: /dev/sda*: No such file or directory</span></span>
+    </div>
+
+    <p>Bene. Il container non vede niente. Adesso con <code>--privileged</code>:</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker run --rm --privileged alpine fdisk -l</span>
+<span class="t-out">Disk /dev/vda: <span class="t-highlight">60 GB</span>, 63999836160 bytes, 124999680 sectors</span>
+<span class="t-out">Device  Boot StartCHS    EndCHS        StartLBA     EndLBA    Sectors  Size</span>
+<span class="t-out">/dev/vda1    1,0,1       618,63,32         2048  124999679  124997632 <span class="t-highlight">59.6G</span></span>
+    </div>
+
+    <p>"Vedi quel disco? 60 GB. E' il filesystem dell'host. Adesso lo monto."</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">docker run --rm --privileged alpine sh -c '
+    mkdir -p /mnt/host
+    mount /dev/vda1 /mnt/host
+    ls /mnt/host/'</span>
+<span class="t-out"><span class="t-ok">containerd  docker  kubeadm  kubelet-plugins  nfs  swap</span></span>
+    </div>
+
+    <p>"Quello e' il filesystem dell'host. Posso leggere qualsiasi file. Posso scrivere qualsiasi file. Posso mettere una backdoor, modificare la configurazione, cancellare tutto. Un flag. Trenta secondi."</p>
+
+    <p>Giro lo schermo verso il tipo. In alto il container normale: <code>fdisk -l</code> non da' output, <code>/dev/sda</code> non esiste. Sotto, lo stesso container con <code>--privileged</code>: un disco da 60 GB, <code>/dev/vda1</code>, montato, con tutto il filesystem dell'host visibile. Containerd, docker, kubeadm, swap. Roba che non dovresti mai vedere da dentro un container.</p>
+
+    <!-- SCREENSHOT: 01_privileged_escape -->
+    <img src="../immagini/container-escape/01_privileged_escape.png" alt="Terminale: container normale vs privilegiato, mount del filesystem host" class="lab-screenshot fade-in">
+
+    <p>Il tipo non dice niente.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Onesta' intellettuale:</strong> questo non e' un exploit. E' una misconfiguration. <code>--privileged</code> e' documentato: disabilita esplicitamente la sicurezza del container. E' come dare <code>chmod 777 /</code> e poi lamentarsi che qualcuno legge i tuoi file. Il punto non e' che Docker e' insicuro. E' che la gente lo configura male senza sapere cosa sta facendo.</p>
+    </div>
+
+    <p>"Su Docker Desktop per Mac, l'host e' una VM LinuxKit, non macOS direttamente. Quindi qui stai vedendo la VM. Ma su un server Linux in produzione? Quello e' il vero host. Root access completo."</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Perche' --privileged e' cosi' pericoloso?</strong> Rimuove tutte le restrizioni: da' al container tutte le capability del kernel (CAP_SYS_ADMIN, CAP_NET_ADMIN, tutte), monta procfs e sysfs in read-write, e rende visibili tutti i device dell'host. Il container diventa indistinguibile da un processo root sull'host.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>01_privileged_escape.sh</strong>. Container escape via --privileged: fdisk, mount /dev/vda1, lettura filesystem host. Un flag, trenta secondi.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - ESCAPE 2: docker.sock
+         ============================================================ -->
+    <h2><span class="accent">//</span> Misconfiguration 2: docker.sock</h2>
+    <span class="section-number">Sezione 03. Le chiavi del regno (che gli dai tu)</span>
+
+    <p>"Ok, non usero' mai piu' --privileged," dice il tipo. "Ma io non lo uso."</p>
+
+    <p>"Bene. Hai un CI/CD? Jenkins? GitLab Runner? GitHub Actions self-hosted?"</p>
+
+    <p>"GitLab Runner, perche'?"</p>
+
+    <p>"Come fa il runner a creare container per i tuoi job?"</p>
+
+    <p>"..."</p>
+
+    <p>"Monta <code>/var/run/docker.sock</code> dentro il container del runner. Vero?"</p>
+
+    <p>Il docker socket e' il file attraverso cui qualsiasi programma parla con il demone Docker. Chi ha accesso a quel file controlla Docker. Puo' creare container, distruggerli, ispezionarli, e soprattutto: puo' creare container privilegiati con il filesystem dell'host montato.</p>
+
+    <p>"Guarda." Primo step: da dentro un container con il socket montato, parlo con il demone Docker.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">container$</span> <span class="t-cmd">curl -s --unix-socket /var/run/docker.sock http://localhost/version</span>
+<span class="t-out">{"Platform":{"Name":"<span class="t-highlight">Docker Desktop 4.7.0</span>"},"Version":"20.10.14"...}</span>
+<span class="t-prompt">container$</span> <span class="t-cmd">curl -s --unix-socket /var/run/docker.sock http://localhost/containers/json</span>
+<span class="t-out"><span class="t-highlight">[{"Id":"643aeeb0593d","Names":["/great_liskov"],"Image":"alpine"...}]</span></span>
+    </div>
+
+    <p>"Vedo il demone Docker. Vedo i container attivi. E adesso: creo un nuovo container privilegiato che monta l'intero filesystem."</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">container$</span> <span class="t-cmd">docker run --rm --privileged -v /:/host alpine cat /host/etc/os-release</span>
+<span class="t-out"><span class="t-ok">PRETTY_NAME="Docker Desktop"</span></span>
+    </div>
+
+    <p>"Dal container originale, attraverso il socket, ho creato un secondo container privilegiato con accesso all'host."</p>
+
+    <p>Lo schermo parla chiaro. In alto il container che interroga il Docker daemon con curl: versione, lista dei container attivi, tutto esposto. In basso il container figlio che legge <code>PRETTY_NAME="Docker Desktop"</code> dal filesystem host. Due passaggi. Nessun exploit.</p>
+
+    <!-- SCREENSHOT: 02_docker_sock_escape -->
+    <img src="../immagini/container-escape/02_docker_sock_escape.png" alt="Terminale: escape via docker.sock, container crea container privilegiato" class="lab-screenshot fade-in">
+
+    <p>"Ma anche questo e' una misconfiguration, no?"</p>
+
+    <p>"Si'. E anche questa e' documentata: la stessa Docker dice 'whoever controls docker.sock controls the host'. Ma il punto e' che questa misconfiguration e' ovunque. Il runner CI/CD ha il socket montato per necessita' funzionale. Ma chiunque esegua codice in quel container — un test, una build, una dipendenza malevola da npm. Chiunque puo' parlare con il demone Docker e prendersi tutto. La misconfiguration diventa un vettore di attacco quando il codice che gira nel container non e' tutto tuo."</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">Container</div>
+        <div class="step-detail">Runner CI/CD con docker.sock montato</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Socket</div>
+        <div class="step-detail">curl al Docker daemon via /var/run/docker.sock</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Create</div>
+        <div class="step-detail">Nuovo container --privileged -v /:/host</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Root</div>
+        <div class="step-detail">Accesso completo all'host</div>
+      </div>
+    </div>
+
+    <p>Script reference: <code>02_docker_sock_escape.sh</code>. Dimostra entrambi gli step: comunicazione col demone e creazione di container privilegiato dall'interno.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>02_docker_sock_escape.sh</strong>. Escape via docker.sock: comunicazione con il Docker daemon dall'interno del container, creazione di container privilegiato, accesso al filesystem host. Il pattern classico dei setup CI/CD.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - L'ILLUSIONE DEI NAMESPACE
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Illusione dei Namespace</h2>
+    <span class="section-number">Sezione 04. Vedere per credere</span>
+
+    <p>"Ma allora i namespace non servono a niente?" chiede il tipo.</p>
+
+    <p>"Servono eccome. Sono meccanismi reali del kernel: il PID namespace non ti fa solo 'non vedere' gli altri processi, ti impedisce di mandare segnali a processi fuori dal tuo namespace. Il network namespace ti da' uno stack di rete completamente separato. Sono barriere vere, non filtri cosmetici. Il problema e' che dipendono tutte dallo stesso kernel. E il kernel si puo' configurare male, oppure puo' avere bug."</p>
+
+    <p>Container normale: vede solo se stesso.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">container$</span> <span class="t-cmd">ls /proc | grep -c "^[0-9]"</span>
+<span class="t-out"><span class="t-ok">4</span> processi</span>
+<span class="t-prompt">container$</span> <span class="t-cmd">ip addr show eth0 | grep "inet "</span>
+<span class="t-out">    inet <span class="t-ok">172.17.0.3/16</span> brd 172.17.255.255 scope global eth0</span>
+<span class="t-prompt">container$</span> <span class="t-cmd">hostname</span>
+<span class="t-out"><span class="t-ok">85c7069c96a8</span></span>
+    </div>
+
+    <p>4 processi, il suo IP, il suo hostname. Sembra un mondo a se'. Adesso lo stesso container con <code>--privileged --pid=host</code>:</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">container$</span> <span class="t-cmd">ls /proc | grep -c "^[0-9]"</span>
+<span class="t-out"><span class="t-warn">297</span> processi</span>
+<span class="t-prompt">container$</span> <span class="t-cmd">ps aux | head -10</span>
+<span class="t-out">PID   USER     TIME  COMMAND</span>
+<span class="t-out">    1 root      0:04 <span class="t-highlight">/sbin/init</span></span>
+<span class="t-out">    2 root      0:00 [kthreadd]</span>
+<span class="t-out">    3 root      0:00 [rcu_gp]</span>
+<span class="t-out">   11 root      0:00 [ksoftirqd/0]</span>
+<span class="t-out">   12 root      0:03 [rcu_sched]</span>
+<span class="t-out">   13 root      0:02 [migration/0]</span>
+    </div>
+
+    <p>"297 processi. <code>/sbin/init</code>, PID 1 dell'host. Thread del kernel. Scheduler. Tutto. L'isolamento c'era, e funzionava. Ma bastano due flag per rimuoverlo completamente. Il namespace e' una barriera reale del kernel, non un filtro cosmetico. Ma se dici al kernel 'disattivala', lui la disattiva."</p>
+
+    <p>"Ok, ma quei flag non li metti per sbaglio," dice il tipo, un po' sulla difensiva.</p>
+
+    <p>"No. Ma li metti quando qualcosa non funziona e Stack Overflow ti dice di metterli. E poi restano li'. Per sempre. Nessuno li toglie piu'."</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il dato che conta:</strong> container normale = 4 processi visibili. Container privilegiato = 297 processi visibili. Stessa macchina, stesso kernel. L'unica differenza e' un flag nella riga di comando.</p>
+    </div>
+
+    <p>Script reference: <code>03_namespace_demo.sh</code> confronta la visibilita' di un container normale vs privilegiato, mostra il kernel condiviso tra distribuzioni diverse.</p>
+
+    <p>Script reference: <code>04_what_docker_really_is.sh</code> smonta un container nei suoi componenti: processo con PID reale vs PID nel namespace, cgroup con limiti di risorse, overlay filesystem.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - CAP_SYS_ADMIN: THE NEW ROOT
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Escape Elegante: CAP_SYS_ADMIN</h2>
+    <span class="section-number">Sezione 05. Il vero problema non e' --privileged</span>
+
+    <p>"Ok, ho capito: --privileged e docker.sock sono misconfiguration evidenti. Ma nella pratica, come si esce da un container senza quei flag?"</p>
+
+    <p>"Il vero problema non e' --privileged. Quello e' grossolano, si vede da un chilometro. Il problema sono le capability troppo potenti. In particolare una: <code>CAP_SYS_ADMIN</code>."</p>
+
+    <p>Nel kernel Linux, <code>CAP_SYS_ADMIN</code> permette operazioni molto potenti: <code>mount</code>, <code>unshare</code>, <code>setns</code>, manipolazione dei namespace, controllo di filesystem virtuali. Per questo molti security engineer la chiamano "the new root". Se un container ha questa capability (direttamente, o tramite configurazioni sbagliate in Kubernetes), puo' fare cose che non ti aspetti.</p>
+
+    <p>"Tipo?"</p>
+
+    <p>"Tipo entrare nel namespace dell'host passando da <code>/proc</code>."</p>
+
+    <p>Ogni processo Linux ha una directory in <code>/proc/&lt;PID&gt;/</code> con i riferimenti ai suoi namespace:</p>
+
+    <div class="code-block fade-in" data-lang="filesystem">
+<div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code">/proc/&lt;PID&gt;/ns/mnt    <span class="cc"># mount namespace</span></td></tr>
+<tr><td class="ln">2</td><td class="code">/proc/&lt;PID&gt;/ns/pid    <span class="cc"># PID namespace</span></td></tr>
+<tr><td class="ln">3</td><td class="code">/proc/&lt;PID&gt;/ns/net    <span class="cc"># network namespace</span></td></tr>
+<tr><td class="ln">4</td><td class="code">/proc/&lt;PID&gt;/root      <span class="cc"># root filesystem del processo</span></td></tr>
+</table></div>
+    </div>
+
+    <p>Se il container puo' vedere i processi dell'host (ad esempio con <code>hostPID: true</code> in Kubernetes) e ha <code>CAP_SYS_ADMIN</code>, puo' fare <code>setns()</code> su uno di quei file ed entrare nel namespace di quel processo. Se il processo e' dell'host, sei nel namespace dell'host.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">container$</span> <span class="t-cmd">nsenter --target 1 --mount</span>
+<span class="t-out"><span class="t-ok">root@host:/#</span></span>
+<span class="t-out"></span>
+<span class="t-prompt">host$</span> <span class="t-cmd">cat /etc/hostname</span>
+<span class="t-out"><span class="t-highlight">production-server-01</span></span>
+    </div>
+
+    <p>"Sei nel mount namespace di PID 1. Il filesystem dell'host. Senza --privileged, senza docker.sock, senza exploit kernel."</p>
+
+    <p>C'e' anche una variante piu' semplice. Ogni processo ha <code>/proc/&lt;pid&gt;/root</code>, che e' la root filesystem di quel processo. Se puoi vedere un processo host:</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">container$</span> <span class="t-cmd">ls /proc/1/root/etc/</span>
+<span class="t-out"><span class="t-ok">hostname  hosts  passwd  shadow  fstab  ...</span></span>
+<span class="t-prompt">container$</span> <span class="t-cmd">chroot /proc/1/root</span>
+<span class="t-out"><span class="t-highlight">root@host:/#</span></span>
+    </div>
+
+    <p>"Stai guardando il filesystem dell'host attraverso /proc. Un <code>chroot</code> e ci sei dentro."</p>
+
+    <p>Lo schermo racconta tutta la storia. In alto, il container normale: 4 processi, <code>/proc/1</code> e' se stesso. Al centro, con <code>--cap-add SYS_ADMIN --pid=host</code>: 318 processi, PID 1 e' <code>/sbin/init</code> dell'host. In fondo, <code>nsenter</code> prova a entrare nel mount namespace dell'host e viene bloccato dal profilo seccomp di Docker Desktop. Su un server in produzione con seccomp disabilitato, quel comando passa.</p>
+
+    <!-- SCREENSHOT: 05_cap_sys_admin_escape -->
+    <img src="../immagini/container-escape/05_cap_sys_admin_escape.png" alt="Terminale: CAP_SYS_ADMIN escape, /proc/1 host, nsenter bloccato da seccomp" class="lab-screenshot fade-in">
+
+    <p>Il tipo si passa una mano sulla faccia. "E Kubernetes permette queste cose?"</p>
+
+    <p>"Non di default. Per questo i Pod Security Standards di Kubernetes bloccano <code>CAP_SYS_ADMIN</code>, <code>hostPID</code>, <code>hostNetwork</code> e <code>hostPath</code>. Ma basta una policy troppo permissiva, un namespace senza restrizioni, un helm chart copiato da internet senza leggere i parametri."</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il punto:</strong> la sicurezza dei container dipende molto piu' dalle capability che da Docker stesso. <code>CAP_SYS_ADMIN</code> e' considerata quasi equivalente a root nel kernel Linux. Se il tuo container ce l'ha, l'isolamento e' nominale. Per questo la regola e' sempre <code>--cap-drop ALL</code> e poi aggiungi solo quello che serve.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - CVE REALI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le CVE: Bug Reali, Non Misconfiguration</h2>
+    <span class="section-number">Sezione 06. Quando non e' colpa tua</span>
+
+    <p>"Va bene," dice il tipo. "Non uso --privileged, non monto docker.sock, tolgo CAP_SYS_ADMIN. Adesso sono al sicuro?"</p>
+
+    <p>"Quasi. Finche' non esce la prossima CVE."</p>
+
+    <p>Una CVE (Common Vulnerabilities and Exposures) e' un bug di sicurezza catalogato. I container hanno una storia ricca di CVE che permettono l'escape senza nessun flag speciale:</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>CVE</th>
+            <th>Anno</th>
+            <th>Cosa</th>
+            <th>Serve --privileged?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>CVE-2022-0492</strong></td>
+            <td>2022</td>
+            <td>Cgroup escape via release_agent. Il kernel non verificava i permessi quando un processo scriveva il file release_agent. Escape tramite unshare + mount cgroup</td>
+            <td style="color: var(--accent-attention);">No (basta CAP_SYS_ADMIN)</td>
+          </tr>
+          <tr>
+            <td><strong>CVE-2022-0847</strong></td>
+            <td>2022</td>
+            <td>Dirty Pipe. Permette a un processo non privilegiato di scrivere su file read-only. Se un file dell'host era montato nel container, poteva essere modificato. Non e' automaticamente escape, ma apre la strada</td>
+            <td style="color: var(--accent-attention);">No</td>
+          </tr>
+          <tr>
+            <td><strong>CVE-2024-21626</strong></td>
+            <td>2024</td>
+            <td>Bug in runC. File descriptor leak durante la creazione del container. Escape al filesystem host</td>
+            <td style="color: var(--accent-attention);">No</td>
+          </tr>
+          <tr>
+            <td><strong>Docker API esposta</strong></td>
+            <td>ricorrente</td>
+            <td>Docker Engine API esposta su TCP (porta 2375) senza autenticazione. Configurazione comune in ambienti mal gestiti. Chiunque in rete puo' creare container privilegiati</td>
+            <td style="color: var(--accent-attention);">No</td>
+          </tr>
+          <tr>
+            <td><strong>CVE-2025-31133</strong></td>
+            <td>2025</td>
+            <td>runC: symlink su /dev/null verso file procfs. Il container redirige le bind-mount e ottiene scrittura su file host</td>
+            <td style="color: var(--accent-attention);">No</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>"CVE reali, container escape reali. Tutte senza --privileged. Il caso piu' comune in assoluto: Docker Engine API esposta su TCP senza autenticazione. Il container fa una richiesta HTTP a un indirizzo interno e ottiene accesso completo al demone Docker. Nessun socket montato, nessun flag. Una GET."</p>
+
+    <p>"Pero' aspetta," dice il tipo. "Anche le VM hanno CVE. VENOM, gli escape di VMware..."</p>
+
+    <p>"Giusto. Niente e' invulnerabile, nemmeno gli hypervisor. La differenza non e' che i container hanno bug e le VM no. La differenza e' la superficie di attacco. Il kernel Linux ha decine di milioni di righe di codice e centinaia di syscall esposte al container. Un hypervisor tipo Firecracker ne ha centinaia di migliaia. Meno codice = meno bug = piu' difficile trovare la falla. Ma non impossibile."</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il punto reale:</strong> l'esistenza di una CVE non significa che un sistema "non isola". Altrimenti niente isola: ne' Linux, ne' Windows, ne' le VM. La sicurezza e' sempre una combinazione di isolamento, patching e hardening. I container offrono isolamento reale, ma su una superficie di attacco piu' ampia rispetto a un hypervisor e con un margine di errore di configurazione molto piu' alto.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - ARCHITETTURA DOCKER DESKTOP
+         ============================================================ -->
+    <h2><span class="accent">//</span> Docker sul Mac: la Matrioska</h2>
+    <span class="section-number">Sezione 07. L'architettura che nessuno spiega</span>
+
+    <p>"Ma allora il mio Mac e' a rischio?" chiede il tipo.</p>
+
+    <p>"No, e ti spiego perche'. Ma la ragione e' ironica."</p>
+
+    <p>Docker Desktop su Mac non esegue i container direttamente su macOS. Non puo': i container sono una tecnologia Linux (namespace, cgroup). macOS non ha niente di tutto questo. Quindi Docker Desktop fa girare una VM Linux sotto il cofano, una distribuzione minimale chiamata LinuxKit. I container girano dentro quella VM.</p>
+
+    <div class="arch-diagram fade-in">
+<span class="layer-host">+--------------------------------------------------+</span>
+<span class="layer-host">|  macOS Host (il tuo Mac)                         |</span>
+<span class="layer-host">+--------------------------------------------------+</span>
+<span class="layer-vm">|  HyperKit / Apple Hypervisor                     |</span> <span class="layer-label">&lt;-- isolamento hardware</span>
+<span class="layer-vm">+--------------------------------------------------+</span>
+<span class="layer-docker">|  LinuxKit VM (Linux 5.10.104)                    |</span>
+<span class="layer-docker">|  +------+ +------+ +------+                      |</span>
+<span class="layer-container">|  | C1   | | C2   | | C3   |</span> <span class="layer-label">&lt;-- i tuoi container</span>
+<span class="layer-container">|  +------+ +------+ +------+</span>                      |
+<span class="layer-docker">|  Docker Daemon                                   |</span>
+<span class="layer-docker">+--------------------------------------------------+</span>
+    </div>
+
+    <p>"Quando fai l'escape dal container, esci nella VM LinuxKit. Non su macOS. C'e' un hypervisor in mezzo, lo stesso tipo di isolamento hardware delle macchine virtuali. Quello si', e' difficile da bucare."</p>
+
+    <p>"Quindi il mio Mac e' protetto dall'hypervisor, non da Docker."</p>
+
+    <p>"Esatto. L'ironia e' che Docker sul Mac e' piu' sicuro che su Linux proprio perche' c'e' una VM in mezzo. Su un server Linux i container girano direttamente sull'host. Se esci dal container, sei sull'host. Niente VM, niente hypervisor, niente rete di sicurezza."</p>
+
+    <p>"Cioe' in produzione e' peggio che sul mio portatile."</p>
+
+    <p>"Molto peggio."</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - IL VERO PROBLEMA E LE SOLUZIONI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Vero Problema: il Kernel Condiviso</h2>
+    <span class="section-number">Sezione 08. Dove sta andando l'industria</span>
+
+    <p>"Quindi il problema non e' Docker in se'. E' il kernel monolitico condiviso."</p>
+
+    <p>"Esatto. Docker fa il suo lavoro: namespace, cgroup, seccomp, capabilities. Sono meccanismi reali del kernel Linux e funzionano. Il problema e' che tutti i container condividono lo stesso kernel, e quel kernel ha decine di milioni di righe di codice con centinaia di syscall esposte. Ogni syscall e' un potenziale punto di ingresso."</p>
+
+    <p>"Per questo Kubernetes ha introdotto altri livelli di isolamento: Pod Security Standards, profili seccomp di default, rootless container e runtime sandbox come gVisor. L'ecosistema ha gia' reagito al problema. Docker da solo non basta, ma nessuno si aspetta che basti."</p>
+
+    <p>"E come si risolve il problema alla radice?"</p>
+
+    <p>"L'industria sta andando in una direzione precisa: container + microVM. Il meglio dei due mondi."</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">gV</div>
+        <div class="step-name">gVisor</div>
+        <div class="step-detail">Google. Kernel user-space scritto in Go. Intercetta le syscall del container e le esegue in un sandbox. Non tocca il kernel host</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">KC</div>
+        <div class="step-name">Kata Containers</div>
+        <div class="step-detail">Ogni container gira in una microVM con il suo kernel. Compatibile con Docker e Kubernetes</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">FC</div>
+        <div class="step-name">Firecracker</div>
+        <div class="step-detail">Amazon (AWS Lambda). MicroVM che si avvia in 125ms. Isolamento hardware con leggerezza da container</div>
+      </div>
+    </div>
+
+    <p>"Firecracker e' quello che usa AWS per Lambda e Fargate. Ogni funzione gira in una microVM dedicata che si avvia in 125 millisecondi. Ha l'isolamento hardware di una VM con la velocita' di un container. E' il futuro."</p>
+
+    <p>"E perche' non lo usano tutti?"</p>
+
+    <p>"Perche' per la maggior parte dei casi d'uso, un container Docker ben configurato e' sufficiente. Non tutti hanno bisogno dell'isolamento multi-tenant di AWS. Ma se esegui codice non fidato (CI/CD, serverless, piattaforme SaaS), allora si', dovresti guardare queste soluzioni."</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - COME PROTEGGERSI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Come Proteggersi Per Davvero</h2>
+    <span class="section-number">Sezione 09. Le regole</span>
+
+    <p>La iena sta parlando con le altre dall'altro lato del tavolo. Ci ha mollato da un pezzo. Gli altri ci guardano come se stessimo parlando in aramaico. Ma il tipo e' agganciato.</p>
+
+    <p>"Ok. Cosa devo fare?"</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Regola</th>
+            <th>Cosa fa</th>
+            <th>Quanto conta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mai <code>--privileged</code></td>
+            <td>Impedisce accesso diretto ai device e al filesystem host</td>
+            <td style="color: var(--accent-attention);">Critico</td>
+          </tr>
+          <tr>
+            <td>Mai montare <code>docker.sock</code></td>
+            <td>Impedisce al container di controllare il demone Docker</td>
+            <td style="color: var(--accent-attention);">Critico</td>
+          </tr>
+          <tr>
+            <td><code>--cap-drop ALL</code></td>
+            <td>Rimuove tutte le capability Linux, aggiungi solo quelle necessarie</td>
+            <td style="color: var(--accent-highlight);">Alto</td>
+          </tr>
+          <tr>
+            <td><code>--read-only</code></td>
+            <td>Filesystem del container in sola lettura</td>
+            <td style="color: var(--accent-highlight);">Alto</td>
+          </tr>
+          <tr>
+            <td><code>--security-opt no-new-privileges</code></td>
+            <td>Impedisce escalation di privilegi dentro il container</td>
+            <td style="color: var(--accent-highlight);">Alto</td>
+          </tr>
+          <tr>
+            <td>Seccomp profile</td>
+            <td>Blocca le syscall pericolose (mount, ptrace, bpf) a livello kernel</td>
+            <td style="color: #4ecdc4;">Medio-Alto</td>
+          </tr>
+          <tr>
+            <td>AppArmor / SELinux</td>
+            <td>Policy di accesso fine-grained su file e operazioni</td>
+            <td style="color: #4ecdc4;">Medio-Alto</td>
+          </tr>
+          <tr>
+            <td>User namespace remapping</td>
+            <td>root nel container ≠ root sull'host</td>
+            <td style="color: #4ecdc4;">Medio</td>
+          </tr>
+          <tr>
+            <td>Aggiornare Docker e il kernel</td>
+            <td>Patcha le CVE. Ovvio, ma nessuno lo fa</td>
+            <td style="color: var(--accent-attention);">Critico</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>"Il principio e' semplice: dai al container il minimo indispensabile. Nessun privilegio che non sia strettamente necessario. E tratta il container come tratteresti qualsiasi processo che esegue codice potenzialmente ostile. Perche' e' esattamente quello che e'."</p>
+
+    <div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Container hardened: come dovresti lanciarlo</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">docker</span> run \</td></tr>
+<tr><td class="ln">3</td><td class="code">  --cap-drop <span class="cs">ALL</span> \</td></tr>
+<tr><td class="ln">4</td><td class="code">  --security-opt <span class="cs">no-new-privileges</span> \</td></tr>
+<tr><td class="ln">5</td><td class="code">  --read-only \</td></tr>
+<tr><td class="ln">6</td><td class="code">  --tmpfs <span class="cs">/tmp</span> \</td></tr>
+<tr><td class="ln">7</td><td class="code">  --network <span class="cs">none</span> \</td></tr>
+<tr><td class="ln">8</td><td class="code">  --user <span class="cn">1000</span>:<span class="cn">1000</span> \</td></tr>
+<tr><td class="ln">9</td><td class="code">  myapp:latest</td></tr>
+</table></div>
+    </div>
+
+    <p>"Niente capability, niente privilege escalation, filesystem read-only, niente rete, utente non-root. Adesso si' che il container e' ragionevolmente isolato. Non invulnerabile: una CVE del kernel ti frega lo stesso. Ma ragionevolmente isolato."</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Ritorno in Macchina</h2>
+    <span class="section-number">Sezione 10. Epilogo</span>
+
+    <p>Chiudo il portatile. La iena mi guarda dal suo lato del tavolo con l'espressione di chi ha accumulato due ore di sopportazione silenziosa.</p>
+
+    <p>"Quindi Docker non serve a niente?" chiede il tipo.</p>
+
+    <p>"Docker e' fantastico. E i container isolano per davvero: namespace, seccomp, capabilities sono meccanismi reali del kernel. AWS, Google, Azure ci eseguono milioni di workload multi-tenant. Ma l'isolamento di un container non e' allo stesso livello di una VM, e una misconfiguration lo puo' azzerare in un secondo. Il problema non e' Docker. E' chi lo usa come se fosse una cassaforte senza leggere il manuale."</p>
+
+    <p>Silenzio.</p>
+
+    <p>"E quel flag --privileged nel tuo docker-compose?"</p>
+
+    <p>"Lo tolgo domani."</p>
+
+    <p>"Lo togli stasera."</p>
+
+    <p>Rimetto l'M4 nella borsa. La iena mi aspetta fuori dal ristorante, braccia incrociate.</p>
+
+    <p>"Sei contento adesso?"</p>
+
+    <p>"Si'."</p>
+
+    <p>"Bravo. Guido io."</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">
+        I container sono progettati per isolare le applicazioni,<br>
+        non gli attaccanti.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem;">
+        Lab: <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/container-escape-lab" target="_blank" rel="noopener" style="color: var(--accent-highlight);">scripts/container-escape-lab</a>. 4 script bash, zero dipendenze, solo Docker.
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate &copy; 2026. Contenuti originali di Pinperepette.</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
