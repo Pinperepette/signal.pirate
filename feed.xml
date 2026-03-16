@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Processo Che Non Esiste</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-processo-che-non-esiste.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-processo-che-non-esiste.html</guid>
+    <pubDate>Mon, 16 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Scrivere un rootkit Linux kernel da zero. ftrace hooking su getdents64, nascondere processi, file, connessioni TCP e il modulo stesso. Lab completo su Ubuntu con 6 script, tutto in una VM. Poi: come trovare un rootkit con detector.sh.</description>
+  </item>
+
+  <item>
     <title>Il Container Non E' una Cassaforte</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-container-non-isola-niente.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-container-non-isola-niente.html</guid>

