@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Bug Diventa Arma | Signal Pirate</title>
+  <meta name="description" content="Quanto tempo passa tra una CVE e il primo exploit pubblico? NVD + ExploitDB + CISA KEV. 6,530 match, 34% pre-disclosure. Per le CVE sotto attacco reale (KEV), l'exploit era pubblico da quasi 3 anni. 6 script Python, 4 grafici.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .ct { color: #4ec9b0; }   /* type */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning/important */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-19 | Pinperepette</p>
+    <h1 class="article-page-title">Il Bug <span class="accent">Diventa Arma</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Quanto tempo passa tra una CVE e il primo exploit pubblico? NVD + ExploitDB, un join su CVE ID, un delta in giorni. 6,530 match. Dopo aver rimosso il backfill NVD, il 34% ha exploit pre-disclosure. Tra i delta positivi, la massa e' nei primi 7 giorni.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">CVE</span>
+      <span class="tag tag-highlight">NVD</span>
+      <span class="tag tag-reaction">ExploitDB</span>
+      <span class="tag tag-amplification">Data Analysis</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL NUMERO CHE NON GUARDI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Numero Che Non Guardi</h2>
+    <span class="section-number">Sezione 00. La domanda sbagliata</span>
+
+    <p>Tutti guardano il CVSS. E' il primo numero che cerchi quando esce una CVE. 9.8, critico, panico, patch immediata. 4.3, medio, ci pensiamo lunedi'. E' cosi' che funziona, in teoria.</p>
+
+    <p>In pratica, il CVSS ti dice quanto e' grave un bug. Non ti dice quanto velocemente qualcuno lo trasformera' in un exploit.</p>
+
+    <p>La domanda che nessuno fa e' questa: <em>quanto tempo ho?</em></p>
+
+    <p>Non quanto e' grave. Quanto tempo passa tra il momento in cui una vulnerabilita' diventa pubblica e il momento in cui qualcuno la arma. Il delta. Il numero che decide se patchi in tempo o se sei gia' dentro la finestra di esposizione.</p>
+
+    <p>I dati per rispondere esistono. Sono pubblici. NVD ha le date di pubblicazione di ogni CVE dal 1999. ExploitDB ha le date degli exploit. Basta un join su CVE ID e un'operazione aritmetica.</p>
+
+    <p>Ma c'e' un dettaglio che cambia tutto: la data di pubblicazione su NVD non e' la data in cui il bug viene scoperto. E' la data in cui la burocrazia lo registra. L'exploit non aspetta la burocrazia.</p>
+
+    <p>L'ho fatto. Su 215,581 CVE e 24,924 exploit. Il risultato non e' quello che mi aspettavo.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Tesi.</strong> Una vulnerabilita' non e' un rischio quando viene scoperta. Lo diventa quando qualcuno la arma. I dati dicono che in un terzo dei casi, l'arma esiste gia' quando la CVE esce. E quando non esiste, arriva in giorni, non settimane. Il tempo che misuriamo e' quello pubblico. Quello reale e' sempre piu' corto.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - I DATASET
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Dataset</h2>
+    <span class="section-number">Sezione 01. Le due fonti</span>
+
+    <p>Servono due cose. Le date di nascita delle CVE e le date di nascita degli exploit. Tutto il resto e' rumore.</p>
+
+    <h3>NIST NVD</h3>
+
+    <p>Il National Vulnerability Database e' l'estensione analitica del MITRE CVE. Ogni entry contiene: CVE ID, data di pubblicazione, descrizione, CVSS score, vettore di attacco. L'API 2.0 e' pubblica, restituisce JSON, paginata a blocchi di 2000 risultati. Rate limit: 5 richieste ogni 30 secondi senza API key.</p>
+
+    <p>Quello che ci serve: <code>cve_id</code> e <code>published_date</code>. Fine.</p>
+
+    <h3>Exploit Database</h3>
+
+    <p>ExploitDB e' il mirror piu' grande di exploit pubblici. Il repository GitLab contiene un file CSV, <code>files_exploits.csv</code>, con ogni exploit indicizzato: ID, data di pubblicazione, piattaforma, e un campo <code>codes</code> che contiene i CVE ID associati.</p>
+
+    <p>Quello che ci serve: <code>cve_id</code> (estratto da codes con regex) e <code>exploit_date</code>. Fine.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">NVD</div>
+        <div class="step-detail">CVE ID + data pubblicazione</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">ExploitDB</div>
+        <div class="step-detail">CVE ID + data exploit</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">JOIN</div>
+        <div class="step-detail">Match per CVE ID</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Dt</div>
+        <div class="step-detail">exploit_date - published_date</div>
+      </div>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Bias dichiarato.</strong> ExploitDB non copre tutto. Gli exploit privati, quelli venduti nei mercati underground, quelli usati da APT: non ci sono. Quello che misuriamo e' il tempo pubblico. Quello reale e' piu' corto. Questo non invalida l'analisi. La rende una stima conservativa.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LA PIPELINE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Pipeline</h2>
+    <span class="section-number">Sezione 02. Quattro script, zero fuffa</span>
+
+    <p>Quattro script Python. Nessuna dipendenza esotica. <code>requests</code> per le API, <code>csv</code> per i dati, <code>matplotlib</code> per i grafici. Tutto replicabile in 20 minuti.</p>
+
+    <h3>Script 01: Fetch NVD</h3>
+
+    <p>Scarica tutte le CVE pubblicate tra 2014 e 2024 dall'API NVD 2.0. Paginazione automatica, retry su errore, rispetta il rate limit. Output: un CSV con due colonne.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc"># 01_fetch_nvd.py: il cuore e' qui</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="cv">params</span> <span class="co">=</span> {</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="cs">'pubStartDate'</span>: <span class="cs">'2014-01-01T00:00:00.000'</span>,</td></tr>
+        <tr><td class="ln">4</td><td class="code">    <span class="cs">'pubEndDate'</span>:   <span class="cs">'2024-12-31T23:59:59.999'</span>,</td></tr>
+        <tr><td class="ln">5</td><td class="code">    <span class="cs">'resultsPerPage'</span>: <span class="cn">2000</span>,</td></tr>
+        <tr><td class="ln">6</td><td class="code">    <span class="cs">'startIndex'</span>: <span class="cv">start_index</span></td></tr>
+        <tr><td class="ln">7</td><td class="code">}</td></tr>
+        <tr><td class="ln">8</td><td class="code"><span class="cv">r</span> <span class="co">=</span> <span class="cf">requests.get</span>(API_URL, <span class="cv">params</span><span class="co">=</span><span class="cv">params</span>)</td></tr>
+        <tr><td class="ln">9</td><td class="code"><span class="cc"># Estrai: cve_id, published[:10]</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">python 01_fetch_nvd.py</span>
+      <span class="t-out">[*] Fetch CVE da NVD API 2.0</span>
+      <span class="t-out">[*] Range: 2014-01-01 -> 2024-12-31</span>
+      <span class="t-out">[*] Chunk: 120 giorni per query</span>
+      <span class="t-out">[+] Salvate <span class="t-highlight">215,581</span> CVE in data/nvd_cves.csv</span>
+    </div>
+
+    <h3>Script 02: Fetch ExploitDB</h3>
+
+    <p>Scarica il CSV completo dal mirror GitLab. Parsa il campo <code>codes</code> con una regex <code>CVE-\d{4}-\d{4,}</code>. Un exploit puo' mappare piu' CVE: li splitta. Output: un CSV con due colonne.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc"># 02_fetch_exploitdb.py: regex sul campo codes</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="cv">cve_pattern</span> <span class="co">=</span> <span class="cf">re.compile</span>(<span class="cs">r'CVE-\d{4}-\d{4,}'</span>)</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="ck">for</span> <span class="cv">row</span> <span class="ck">in</span> <span class="cv">reader</span>:</td></tr>
+        <tr><td class="ln">4</td><td class="code">    <span class="cv">cve_ids</span> <span class="co">=</span> <span class="cv">cve_pattern</span>.<span class="cf">findall</span>(<span class="cv">row</span>[<span class="cs">'codes'</span>])</td></tr>
+        <tr><td class="ln">5</td><td class="code">    <span class="ck">for</span> <span class="cv">cve_id</span> <span class="ck">in</span> <span class="cv">cve_ids</span>:</td></tr>
+        <tr><td class="ln">6</td><td class="code">        <span class="cv">rows</span>.<span class="cf">append</span>((<span class="cv">cve_id</span>, <span class="cv">date_published</span>))</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">python 02_fetch_exploitdb.py</span>
+      <span class="t-out">[*] Download files_exploits.csv da ExploitDB...</span>
+      <span class="t-out">[+] Trovati <span class="t-highlight">24,924</span> mapping CVE->exploit</span>
+      <span class="t-out">[+] Salvato in data/exploitdb_cves.csv</span>
+    </div>
+
+    <h3>Script 03: Match e Delta</h3>
+
+    <p>Carica i due CSV. Inner join su CVE ID. Per ogni match: <code>Dt = exploit_date - published_date</code>. Se una CVE ha piu' exploit, prende il primo (la data piu' vecchia). Output: CSV con quattro colonne.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc"># 03_match_and_delta.py: l'operazione che conta</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="ck">for</span> <span class="cv">cve_id</span>, <span class="cv">pub_date</span> <span class="ck">in</span> <span class="cv">nvd</span>.<span class="cf">items</span>():</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="ck">if</span> <span class="cv">cve_id</span> <span class="ck">in</span> <span class="cv">exploits</span>:</td></tr>
+        <tr><td class="ln">4</td><td class="code">        <span class="cv">delta_days</span> <span class="co">=</span> (<span class="cv">exploits</span>[<span class="cv">cve_id</span>] <span class="co">-</span> <span class="cv">pub_date</span>).<span class="cv">days</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">python 03_match_and_delta.py</span>
+      <span class="t-out">[*] NVD: 215,581 CVE con data</span>
+      <span class="t-out">[*] ExploitDB: 24,924 CVE con exploit</span>
+      <span class="t-out">[+] Match: <span class="t-highlight">6,530</span> CVE con exploit pubblico</span>
+      <span class="t-out"> </span>
+      <span class="t-out">--- Statistiche ---</span>
+      <span class="t-out">  Pre-disclosure (delta &lt; 0):  <span class="t-warn">3,077 (47.1%)</span></span>
+      <span class="t-out">  Same-day (delta = 0):        <span class="t-warn">281 (4.3%)</span></span>
+      <span class="t-out">  Entro 7 giorni:              <span class="t-highlight">1,505 (23.0%)</span></span>
+      <span class="t-out">  Entro 30 giorni:             <span class="t-highlight">2,201 (33.7%)</span></span>
+      <span class="t-out">  Mediana:                     <span class="t-highlight">0 giorni</span></span>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il numero chiave.</strong> Il 47.1% delle CVE matchate ha delta negativo. Ma attenzione: una parte sono backfill, CVE pubblicate su NVD anni dopo che il bug era noto. Se filtri il rumore (delta &lt; -365 giorni), restano 5,257 match puliti. E anche li', il 34% ha delta negativo: exploit pubblicato nei 12 mesi prima della CVE. La mediana della vista pulita resta vicina a zero.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - I NUMERI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Numeri</h2>
+    <span class="section-number">Sezione 03. Tre grafici, zero decorazione</span>
+
+    <p>Lo script <code>04_plot.py</code> genera tre grafici. Non dashboard, non infografiche. Tre visualizzazioni che rispondono a tre domande.</p>
+
+    <h3>Grafico 1: Istogramma del tempo di weaponization</h3>
+
+    <p>Due pannelli, uno per lato dello zero. A sinistra: le CVE con exploit pre-disclosure (da -365 a 0 giorni). A destra: le CVE con exploit post-pubblicazione (da 0 a 365 giorni). Le linee verticali marcano 7, 30 e 90 giorni.</p>
+
+    <p>A destra il picco e' schiacciato verso lo zero: la massa degli exploit arriva nei primissimi giorni. Ma il pannello sinistro e' denso: 1,804 CVE hanno exploit pubblicato nei 30 giorni prima della CVE. Non e' un'anomalia. E' il ricercatore che carica il PoC prima che NVD formalizzi.</p>
+
+    <img src="../immagini/weaponization/01_histogram.png" alt="Istogramma tempo di weaponization CVE verso exploit" class="lab-screenshot fade-in">
+
+    <h3>Grafico 2: CDF: entro quanti giorni sei fregato</h3>
+
+    <p>La CDF e' sulla vista pulita: esclude il backfill NVD (delta &lt; -365) e mostra la distribuzione da -365 a +365 giorni. La linea verticale a zero marca il momento della pubblicazione CVE. Tutto cio' che sta a sinistra e' exploit pre-disclosure.</p>
+
+    <p>I marker segnano le soglie chiave:</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr>
+          <th>Finestra</th>
+          <th>% CVE (vista pulita)</th>
+          <th>Traduzione</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>delta &lt;= 0</code></td>
+          <td>~40%</td>
+          <td>Exploit gia' presente alla pubblicazione CVE</td>
+        </tr>
+        <tr>
+          <td><code>entro 7 giorni</code></td>
+          <td>~55%</td>
+          <td>Piu' della meta'</td>
+        </tr>
+        <tr>
+          <td><code>entro 30 giorni</code></td>
+          <td>~68%</td>
+          <td>Due su tre</td>
+        </tr>
+        <tr>
+          <td><code>entro 90 giorni</code></td>
+          <td>~78%</td>
+          <td>Tre su quattro</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <img src="../immagini/weaponization/02_cdf.png" alt="CDF cumulativa tempo exploit" class="lab-screenshot fade-in">
+
+    <h3>Grafico 3: Outliers: i casi estremi</h3>
+
+    <p>Il terzo grafico scompone il dataset in tre viste:</p>
+
+    <p><strong>Breakdown per categorie.</strong> Il pannello sinistro separa backfill NVD (delta &lt; -365 giorni, CVE pubblicate anni dopo il bug), pre-disclosure reale (-365..0 giorni, exploit prima della formalizzazione CVE), same-day, e le fasce post-pubblicazione. La categoria piu' pesante dopo il backfill e' la pre-disclosure reale: 1,804 CVE con exploit pubblicato nei 30 giorni prima della CVE.</p>
+
+    <p><strong>Top 20 exploit piu' veloci.</strong> Il pannello centrale mostra le CVE con delta positivo piu' basso, quelle armate in 1-2 giorni dalla pubblicazione. Questi sono i casi in cui la weaponization e' stata quasi istantanea: advisory esce, exploit segue nelle ore successive.</p>
+
+    <p><strong>Pre-disclosure reale.</strong> Il pannello destro zooma sulla distribuzione da -365 a 0 giorni. Il picco e' concentrato vicino a zero: il grosso degli exploit pre-disclosure arriva nei 30 giorni prima della CVE. Sono ricercatori che caricano il PoC prima che NVD formalizzi. La linea a -30 giorni mostra quanti cadono in quella finestra. Esempio tipico: un ricercatore trova una SQL injection, scrive il PoC, lo carica su ExploitDB. Il vendor viene notificato, patcha, e solo dopo MITRE assegna il CVE ID. Il bug era gia' patchato, il PoC gia' pubblico. Ma per NVD non esisteva ancora.</p>
+
+    <img src="../immagini/weaponization/03_outliers.png" alt="Outliers pre-disclosure same-day coda lunga" class="lab-screenshot fade-in">
+
+
+    <!-- ============================================================
+         SEZIONE 04 - CISA KEV
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le CVE Che Contano Davvero</h2>
+    <span class="section-number">Sezione 04. CISA KEV: da possibilita' a realta'</span>
+
+    <p>Finora abbiamo misurato cosa e' <em>possibile</em>: una CVE ha un exploit pubblico su ExploitDB. Ma avere un exploit non significa che qualcuno lo stia usando. ExploitDB e' pieno di PoC accademici che nessun attaccante ha mai toccato.</p>
+
+    <p>C'e' un terzo dataset che cambia il significato dei numeri: la <strong>Known Exploited Vulnerabilities (KEV)</strong> di CISA. Non e' un archivio di vulnerabilita'. E' una lista curata di CVE osservate in attacchi attivi nel mondo reale. Se una CVE e' nella KEV, qualcuno la sta usando in produzione.</p>
+
+    <p>Se ExploitDB misura cosa e' possibile, KEV misura cosa sta gia' succedendo.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">05</div>
+        <div class="step-name">KEV</div>
+        <div class="step-detail">CVE sfruttate in the wild</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">06</div>
+        <div class="step-name">Incrocio</div>
+        <div class="step-detail">KEV ∩ ExploitDB ∩ NVD</div>
+      </div>
+    </div>
+
+    <p>Il catalogo KEV contiene 1,543 CVE. Di queste, 333 hanno anche un exploit pubblico su ExploitDB nel nostro dataset. Sono poche, ma sono quelle con evidenza pubblica sia di exploit che di uso reale.</p>
+
+    <p>La domanda: per queste 333 CVE, l'exploit pubblico esisteva gia' prima che CISA le aggiungesse al catalogo?</p>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">python 05_fetch_kev.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 1,543 CVE nel catalogo KEV</span>
+      <span class="t-out"> </span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python 06_kev_analysis.py</span>
+      <span class="t-out">[*] KEV: 1,543 CVE attivamente sfruttate</span>
+      <span class="t-out">[+] KEV con exploit pubblico: <span class="t-highlight">333</span> (21.6%)</span>
+      <span class="t-out"> </span>
+      <span class="t-out">--- Tempo exploit -> KEV ---</span>
+      <span class="t-out">  Exploit pubblico PRIMA di KEV: <span class="t-warn">296 (88.9%)</span></span>
+      <span class="t-out">  Mediana exploit->KEV:          <span class="t-highlight">1,071 giorni</span></span>
+      <span class="t-out">  Exploit pubblico > 30d prima:  <span class="t-highlight">291 (87.4%)</span></span>
+      <span class="t-out">  Exploit pubblico > 1 anno prima: <span class="t-highlight">263 (79.0%)</span></span>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il numero che taglia.</strong> Su 333 CVE KEV con exploit pubblico, l'88.9% aveva l'exploit disponibile su ExploitDB <em>prima</em> che CISA le aggiungesse al catalogo. Mediana: 1,071 giorni. Non e' il tempo dell'attacco. E' il ritardo con cui viene riconosciuto. L'exploit era pubblico, scaricabile, per quasi tre anni prima che il sistema dicesse "questa e' sotto attacco attivo".</p>
+    </div>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr>
+          <th>Metrica</th>
+          <th>Valore</th>
+          <th>Traduzione</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>exploit prima di KEV</code></td>
+          <td>88.9%</td>
+          <td>L'exploit era gia' pubblico</td>
+        </tr>
+        <tr>
+          <td><code>mediana exploit->KEV</code></td>
+          <td>1,071 giorni</td>
+          <td>Quasi 3 anni di esposizione</td>
+        </tr>
+        <tr>
+          <td><code>> 1 anno prima</code></td>
+          <td>79.0%</td>
+          <td>Quattro su cinque: exploit pubblico da oltre un anno</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <img src="../immagini/weaponization/04_kev.png" alt="CISA KEV analisi incrociata con ExploitDB" class="lab-screenshot fade-in">
+
+    <p>Non tutte le vulnerabilita' con exploit vengono usate. Ma quelle nella KEV si'. E per queste, l'exploit non era un segreto. Era pubblico. Da anni.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Posizionamento corretto.</strong> KEV non e' una metrica temporale pura. E' un catalogo curato, biasato verso high-impact, e non ha date precise di primo sfruttamento. Quello che KEV aggiunge e' un filtro di rilevanza: separa i PoC accademici dalle armi usate in produzione. I numeri sopra non dicono "gli attacchi arrivano dopo 1,071 giorni". Dicono: "quando CISA conferma l'attacco, l'exploit era pubblico da 1,071 giorni".</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - COSA SIGNIFICANO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Significano</h2>
+    <span class="section-number">Sezione 05. I numeri non parlano da soli</span>
+
+    <p>Il primo istinto e' dire "il 47% ha delta negativo, e' tutto pre-disclosure". Non e' cosi' semplice. Bisogna separare il segnale dal rumore.</p>
+
+    <p>Su 3,077 CVE con delta negativo, 1,273 hanno delta inferiore a -365 giorni. Sono backfill: NVD ha pubblicato la CVE <em>anni</em> dopo che il bug era gia' noto e sfruttato. CVE-2005-4891 ha delta -5,321 giorni: exploit del 2005, CVE pubblicata nel 2020. Non e' pre-disclosure, e' burocrazia in ritardo.</p>
+
+    <p>Tolto il backfill, restano 5,257 match. E qui i numeri sono puliti.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Vista pulita (5,257 CVE, escluso backfill NVD).</strong> Il 34% ha exploit pre-disclosure reale (da -365 a 0 giorni). Sono ricercatori che caricano il PoC su ExploitDB prima che NVD formalizzi la CVE. Il bug era noto, l'exploit circolava, la burocrazia non aveva ancora assegnato il numero. Sulla vista pulita, entro 7 giorni dalla CVE hai gia' oltre la meta' degli exploit disponibili.</p>
+    </div>
+
+    <p>Tre insight che escono dai dati:</p>
+
+    <p><strong>1. La data NVD non e' la data del bug.</strong> La <code>published_date</code> su NVD e' un evento burocratico, non tecnico. La vulnerabilita' viene scoperta, comunicata al vendor, a volte patchata. Solo dopo, NVD pubblica. L'exploit non aspetta la burocrazia. Ecco perche' il delta e' spesso negativo: non perche' l'attaccante e' piu' veloce, ma perche' NVD e' piu' lento. Lo scenario tipico: il ricercatore trova il bug, scrive il PoC, lo carica su ExploitDB o GitHub. Giorni o settimane dopo, MITRE assegna il CVE ID e NVD pubblica. Delta negativo. Non significa che gli attaccanti siano piu' veloci del sistema. Significa che la CVE arriva dopo che il bug e' gia' pubblico.</p>
+
+    <p><strong>2. Il CVSS non sembra predire la velocita'.</strong> Nei dati non emerge una correlazione chiara tra CVSS score e tempo di weaponization. Il CVSS misura l'impatto teorico, non l'attrattivita' per chi scrive exploit. I fattori che accelerano la weaponization sono probabilmente altri: disponibilita' del codice sorgente, complessita' dell'exploit, valore del target. Servirebbero dati CVSS per ogni CVE matchata per dimostrarlo, ed e' un possibile follow-up.</p>
+
+    <p><strong>3. La finestra reale e' cortissima.</strong> Se guardi solo i delta positivi (exploit dopo la CVE), la concentrazione nei primi 7 giorni e' schiacciante. Non hai settimane per patchare. Hai giorni. E questo e' il tempo <em>pubblico</em>. Quello privato e' piu' corto.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - I LIMITI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Limiti</h2>
+    <span class="section-number">Sezione 06. Quello che non vediamo</span>
+
+    <p>Questo non e' un paper accademico e non finge di esserlo. I dati hanno limiti precisi.</p>
+
+    <p><strong>Copertura.</strong> ExploitDB non ha tutti gli exploit del mondo. Ha quelli pubblici, quelli che qualcuno ha caricato. Gli exploit privati (quelli usati da APT, quelli venduti a broker come Zerodium, quelli che girano nei forum chiusi) non ci sono. La distribuzione reale e' spostata a sinistra: il tempo vero e' piu' corto di quello che misuriamo.</p>
+
+    <p><strong>Backfill NVD.</strong> 1,273 CVE hanno delta inferiore a -365 giorni. NVD ha pubblicato queste entry anni dopo che il bug era noto. Non sono pre-disclosure. Sono ritardo burocratico. Li escludiamo dalla vista pulita, ma li documentiamo perche' raccontano un problema reale: NVD non e' un sistema real-time.</p>
+
+    <p><strong>Date.</strong> La "data di pubblicazione" su ExploitDB e' la data di upload, non necessariamente la data in cui l'exploit e' stato scritto o usato per la prima volta. Potrebbe essere stato usato settimane prima. Stesso discorso per la data CVE: la vulnerabilita' potrebbe essere stata scoperta e comunicata al vendor mesi prima della pubblicazione pubblica.</p>
+
+    <p><strong>Matching.</strong> Il join su CVE ID e' pulito ma non completo. Alcuni exploit su ExploitDB non hanno il CVE ID nel campo codes. Altri hanno CVE ID sbagliati. I falsi negativi esistono.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>La frase giusta.</strong> "Su 6,530 CVE con exploit pubblico, 1,273 sono backfill NVD. Delle 5,257 restanti, il 34% ha exploit pre-disclosure. Tra quelle con delta positivo, la massa si concentra nei primi 7 giorni. Il tempo reale e' probabilmente piu' corto."</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - IL LAB
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab</h2>
+    <span class="section-number">Sezione 07. Replicalo</span>
+
+    <p>Tutto il codice e' nella cartella <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/il-bug-diventa-arma" target="_blank" rel="noopener">scripts/il-bug-diventa-arma</a>.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green" data-count="6" data-suffix=" script">0</div>
+        <div class="stat-label">Script Python</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="4" data-suffix=" grafici">0</div>
+        <div class="stat-label">Output visivi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="3" data-suffix=" fonti">0</div>
+        <div class="stat-label">Dataset pubblici</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange" data-count="0" data-suffix=" ML">0</div>
+        <div class="stat-label">Machine Learning</div>
+      </div>
+    </div>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">pip install requests matplotlib numpy</span>
+      <span class="t-out"> </span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python 01_fetch_nvd.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> Salvate 215,581 CVE in data/nvd_cves.csv</span>
+      <span class="t-out"> </span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python 02_fetch_exploitdb.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> Salvato in data/exploitdb_cves.csv</span>
+      <span class="t-out"> </span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python 03_match_and_delta.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> Match: 6,530 CVE con exploit pubblico</span>
+      <span class="t-out"> </span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python 04_plot.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 01_histogram.png</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 02_cdf.png</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 03_outliers.png</span>
+      <span class="t-out"> </span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python 05_fetch_kev.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 1,543 CVE nel catalogo KEV</span>
+      <span class="t-out"> </span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python 06_kev_analysis.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> KEV con exploit pubblico: 333 (21.6%)</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 04_kev.png</span>
+    </div>
+
+    <p>Lo script NVD richiede tempo (rate limit). ExploitDB e' immediato. Il matching e il plot richiedono secondi. Nessuna API key obbligatoria.</p>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Non ho fatto machine learning. Non ho fatto clustering. Non ho fatto dashboard interattive. Ho preso tre dataset pubblici, li ho incrociati su una chiave comune, e ho fatto una sottrazione.</p>
+
+    <p>Il risultato non e' il numero che mi aspettavo. Il 47% con delta negativo sembrava una bomba. Poi ho separato il backfill NVD dal segnale vero. Il dato pulito e' meno sensazionale ma piu' onesto: il 34% ha exploit pre-disclosure reale, e tra i delta positivi la concentrazione nei primi giorni e' schiacciante. Quando ho aggiunto CISA KEV, il quadro e' peggiorato: per le CVE sotto attacco reale, l'exploit era pubblico da quasi tre anni prima che qualcuno lo riconoscesse.</p>
+
+    <p>La finestra di patching esiste. Ma non e' quella che pensi.</p>
+
+    <p>E il numero che dovresti guardare non e' il CVSS. E' il tempo.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il problema non e' quando scoprono il bug.<br>E' quanto ci mettono a trasformarlo in arma."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">I bug sono rumore. I dataset rivelano il pattern.</p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

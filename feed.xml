@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Bug Diventa Arma</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-bug-diventa-arma.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-bug-diventa-arma.html</guid>
+    <pubDate>Thu, 19 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Quanto tempo passa tra la pubblicazione di una CVE e il primo exploit pubblico? NVD + ExploitDB, matching per CVE ID, calcolo del delta. 6,530 match. Il 34% ha exploit pre-disclosure reale. Tra i delta positivi, la massa si concentra nei primi 7 giorni. Backfill NVD separato dal segnale. 4 script Python, 3 grafici.</description>
+  </item>
+
+  <item>
     <title>Il Fuzzer Scrive L'Exploit</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-fuzzer-scrive-l-exploit.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-fuzzer-scrive-l-exploit.html</guid>
