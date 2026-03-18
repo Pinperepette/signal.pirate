@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Fuzzer Scrive L'Exploit</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-fuzzer-scrive-l-exploit.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-fuzzer-scrive-l-exploit.html</guid>
+    <pubDate>Wed, 18 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Pipeline automatizzata: AFL++ trova il crash, AddressSanitizer classifica il bug, angr genera l'exploit. Da sorgente C a controllo di RIP, zero intervento umano. Un parser vulnerabile, 7 script, un solo comando.</description>
+  </item>
+
+  <item>
     <title>Il Processo Che Non Esiste</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-processo-che-non-esiste.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-processo-che-non-esiste.html</guid>
