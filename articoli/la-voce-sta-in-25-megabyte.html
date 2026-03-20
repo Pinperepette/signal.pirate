@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Voce Sta In 25 Megabyte | Signal Pirate</title>
+  <meta name="description" content="KittenTTS genera voce umana in 25MB su CPU. Smonto l'ONNX, estraggo i vettori di stile, interpolo tra voci, confronto 4 varianti. StyleTTS 2 distillato: la diffusion è sparita, WavLM è sparito, e funziona lo stesso. 6 script Python, 5 grafici.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .ct { color: #4ec9b0; }   /* type */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning/important */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Audio Player === */
+    .audio-player {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 0.8rem 0;
+    }
+    .audio-player label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent-attention);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .audio-player audio {
+      width: 100%;
+      height: 36px;
+    }
+    .audio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-21 | Pinperepette</p>
+    <h1 class="article-page-title">La Voce Sta In <span class="accent">25 Megabyte</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Un pip install, una riga di Python, esce una voce umana. 25MB, CPU, offline. Ho aperto il modello per capire come fa. ONNX graph, vettori di stile in un .npz, fonemizzazione espeak, decoder iSTFTNet. Poi sono risalito al paper. La storia di cosa hanno tolto è più interessante di cosa hanno tenuto.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">TTS</span>
+      <span class="tag tag-highlight">ONNX</span>
+      <span class="tag tag-reaction">StyleTTS 2</span>
+      <span class="tag tag-amplification">Deep Learning</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - UNA RIGA DI CODICE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Una Riga di Codice</h2>
+    <span class="section-number">Sezione 00. Il fatto</span>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tr>
+        <td class="ln">1<br>2<br>3<br>4<br>5</td>
+        <td class="code"><span class="ck">from</span> <span class="cv">kittentts</span> <span class="ck">import</span> <span class="ct">KittenTTS</span>
+<span class="cv">model</span> <span class="co">=</span> <span class="ct">KittenTTS</span>(<span class="cs">"KittenML/kitten-tts-nano-0.8-int8"</span>)
+<span class="cv">audio</span> <span class="co">=</span> <span class="cv">model</span>.<span class="cf">generate</span>(<span class="cs">"Smonto cose, studio come funzionano e scrivo quello che trovo."</span>, <span class="cv">voice</span><span class="co">=</span><span class="cs">"Jasper"</span>)
+<span class="ck">import</span> <span class="cv">soundfile</span> <span class="ck">as</span> <span class="cv">sf</span>
+<span class="cv">sf</span>.<span class="cf">write</span>(<span class="cs">"output.wav"</span>, <span class="cv">audio</span>, <span class="cn">24000</span>)</td>
+      </tr></table></div>
+    </div>
+
+    <div class="audio-player fade-in">
+      <label>Jasper: "Signal Pirate. I take things apart..."</label>
+      <audio controls preload="none" src="../assets/audio/voce-25mb/jasper.wav"></audio>
+    </div>
+
+    <p>Esce un WAV a 24kHz. La voce suona come un umano. Il modello pesa 25MB. Non serve GPU. Non serve internet dopo il primo download. Non serve niente.</p>
+
+    <p>KittenTTS. 12,000 stelle su GitHub. Apache 2.0. Pubblicato nell'agosto 2025. Aggiornato ieri.</p>
+
+    <p>Ho fatto play. Poi ho chiuso il terminale. Poi l'ho riaperto e mi sono chiesto: <em>come cazzo fa?</em></p>
+
+    <p>Questa è la storia di come ho smontato 25 megabyte per capire come ci sta una voce umana dentro.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Tesi.</strong> KittenTTS è un modello StyleTTS 2 a cui hanno rimosso la diffusion, il discriminatore WavLM, gli encoder di stile. Tutto quello che serviva per il training. Funziona perché il lavoro pesante è stato fatto offline: gli style vector sono stati estratti con il modello completo e poi congelati in un file numpy. Quello che resta a runtime sono 15 milioni di parametri in un ONNX e 8 voci pre-calcolate. Smontarlo dal basso verso l'alto mostra cosa serve davvero per generare voce, e cosa era impalcatura. Il fatto che il risultato stia in 25MB, offline, senza log, senza API, cambia le regole su cosa significa fidarsi di un audio.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - IL PERCORSO DEL TESTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Percorso del Testo</h2>
+    <span class="section-number">Sezione 01. Dal carattere al fonema</span>
+
+    <p>Prima di aprire il modello, seguo il codice. Parto da <code>generate()</code> e vedo dove finisce il testo prima di toccare la rete neurale.</p>
+
+    <p>Il percorso ha quattro passaggi. Ognuno taglia qualcosa.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">Preprocessing</div>
+        <div class="step-detail">Numeri, valute, unità, contrazioni → parole</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Chunking</div>
+        <div class="step-detail">Testo spezzato in blocchi da 400 char con punteggiatura forzata</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Fonemizzazione</div>
+        <div class="step-detail">espeak backend → IPA con stress marks</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Tokenizzazione</div>
+        <div class="step-detail">IPA → ID numerici via dizionario di 178 simboli</div>
+      </div>
+    </div>
+
+    <h3>Il TextPreprocessor</h3>
+
+    <p>Il file <code>preprocess.py</code> è 400 righe di regex. È la parte più grande del codice, più grande del modello stesso. Converte <code>$85K</code> in "eighty five thousand dollars", <code>3:30pm</code> in "three thirty pm", <code>192.168.1.1</code> in "one nine two dot one six eight dot one dot one". Gestisce numeri romani, notazione scientifica, frazioni, decadi, numeri di telefono americani.</p>
+
+    <p>Un intero modulo di NLP classico, nessuna rete neurale, solo per trasformare il testo in qualcosa che espeak possa pronunciare. Il 90% del codice Python di KittenTTS non ha niente a che fare con il deep learning.</p>
+
+    <h3>espeak e il dizionario IPA</h3>
+
+    <p>Il testo pulito passa per <code>phonemizer.backend.EspeakBackend</code> con lingua <code>en-us</code>, preservazione della punteggiatura e stress marks. Esce IPA: <code>ðɪs ɪz nˌɑːt ɐ hjˈuːmən vˈɔɪs</code>.</p>
+
+    <p>Poi un <code>TextCleaner</code> mappa ogni carattere IPA a un intero. Il dizionario ha 178 simboli: 26 lettere ASCII, punteggiatura, e l'intero alfabeto IPA con diacritici. L'input del modello è un array di interi con un token di start (0) e end (10) aggiunti a mano.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tr>
+        <td class="ln">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8</td>
+        <td class="code"><span class="cc"># Da _prepare_inputs(): il cuore della tokenizzazione</span>
+<span class="cv">phonemes_list</span> <span class="co">=</span> <span class="cv">self</span>.<span class="cv">phonemizer</span>.<span class="cf">phonemize</span>([<span class="cv">text</span>])
+<span class="cv">phonemes</span> <span class="co">=</span> <span class="cf">basic_english_tokenize</span>(<span class="cv">phonemes_list</span>[<span class="cn">0</span>])
+<span class="cv">phonemes</span> <span class="co">=</span> <span class="cs">' '</span>.<span class="cf">join</span>(<span class="cv">phonemes</span>)
+<span class="cv">tokens</span> <span class="co">=</span> <span class="cv">self</span>.<span class="cv">text_cleaner</span>(<span class="cv">phonemes</span>)
+<span class="cv">tokens</span>.<span class="cf">insert</span>(<span class="cn">0</span>, <span class="cn">0</span>)   <span class="cc"># start token</span>
+<span class="cv">tokens</span>.<span class="cf">append</span>(<span class="cn">10</span>)      <span class="cc"># end token</span>
+<span class="cv">tokens</span>.<span class="cf">append</span>(<span class="cn">0</span>)       <span class="cc"># padding</span></td>
+      </tr></table></div>
+    </div>
+
+    <p>A questo punto il testo è un vettore di interi. Il modello non vedrà mai la parola "voice". Vedrà una sequenza di ID che corrispondono ai fonemi IPA. Il significato semantico esplicito non c'è più. Ma la struttura linguistica resta codificata nella sequenza: l'ordine dei fonemi, gli stress marks, la punteggiatura. Il modello non sa <em>cosa</em> stai dicendo, ma sa <em>come</em> si dice qualcosa con quella struttura prosodica.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LE VOCI SONO VETTORI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Voci Sono Vettori</h2>
+    <span class="section-number">Sezione 02. Dentro il .npz</span>
+
+    <p>Questa è la parte che mi ha fermato.</p>
+
+    <p>Le 8 voci di KittenTTS (Bella, Jasper, Luna, Bruno, Rosie, Hugo, Kiki, Leo) non sono modelli separati. Non sono file audio di riferimento. Non sono configurazioni. Sono matrici in un file <code>voices.npz</code>.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tr>
+        <td class="ln">1<br>2<br>3<br>4<br>5<br>6</td>
+        <td class="code"><span class="ck">import</span> <span class="cv">numpy</span> <span class="ck">as</span> <span class="cv">np</span>
+<span class="cv">voices</span> <span class="co">=</span> <span class="cv">np</span>.<span class="cf">load</span>(<span class="cs">"voices.npz"</span>)
+<span class="ck">for</span> <span class="cv">key</span> <span class="ck">in</span> <span class="cv">voices</span>.<span class="cv">files</span>:
+    <span class="cv">v</span> <span class="co">=</span> <span class="cv">voices</span>[<span class="cv">key</span>]
+    <span class="cf">print</span>(<span class="cs">f"</span>{<span class="cv">key</span>}<span class="cs">: shape={</span><span class="cv">v</span>.<span class="cv">shape</span>}<span class="cs">, dtype={</span><span class="cv">v</span>.<span class="cv">dtype</span>}<span class="cs">"</span>)
+<span class="cc"># expr-voice-2-f: shape=(400, 256), dtype=float32</span></td>
+      </tr></table></div>
+    </div>
+
+    <p>Ogni voce è una matrice 2D: 400 vettori di stile da 256 dimensioni ciascuno. La prima dimensione (400) è indicizzata per lunghezza del testo. La seconda (256) è la dimensione dello style vector.</p>
+
+    <p>E qui c'è la riga che spiega tutto:</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tr>
+        <td class="ln">1</td>
+        <td class="code"><span class="cv">ref_id</span> <span class="co">=</span> <span class="cf">min</span>(<span class="cf">len</span>(<span class="cv">text</span>), <span class="cv">self</span>.<span class="cv">voices</span>[<span class="cv">voice</span>].<span class="cv">shape</span>[<span class="cn">0</span>] <span class="co">-</span> <span class="cn">1</span>)</td>
+      </tr></table></div>
+    </div>
+
+    <p>Lo stile della voce cambia in funzione della lunghezza del testo. Frase corta → stile diverso da frase lunga. Non è un singolo "timbro". È un continuo di stili parametrizzato sulla lunghezza dell'input.</p>
+
+    <p>Perché? Perché quando parli una frase corta, la prosodia è diversa da una frase lunga. L'intonazione cambia. Il ritmo cambia. E questi vettori catturano esattamente quello: non solo <em>chi</em> parla, ma <em>come</em> parla in funzione di quanto deve dire.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Implicazione.</strong> Una voce non è un punto nello spazio latente. È una curva. Ogni voce è una traiettoria di 512 punti in uno spazio a 256 dimensioni, e il modello la percorre in base a quanti caratteri gli dai in input.</p>
+    </div>
+
+    <h3>Distanze nello spazio latente</h3>
+
+    <p>Ho estratto il vettore medio di ogni voce e calcolato la distanza coseno tra tutte le coppie. Il risultato è una matrice 8x8 che racconta chi somiglia a chi.</p>
+
+    <img src="../immagini/voce-25mb/distanze_coseno.png" alt="Matrice distanze coseno tra le 8 voci" class="lab-screenshot">
+
+    <p>Le voci femminili (Bella, Luna, Rosie, Kiki) formano un cluster. Le maschili (Jasper, Bruno, Hugo, Leo) un altro. Ma dentro ogni cluster le distanze non sono uguali. Alcune voci sono quasi sovrapposte, altre divergono. Non è un semplice switch M/F. Ci sono sfumature di timbro, velocità, energia che il vettore cattura.</p>
+
+    <h3>t-SNE: la mappa delle voci</h3>
+
+    <p>Ho preso un campione di style vectors per ogni voce (uno ogni 5 posizioni) e li ho proiettati in 2D con t-SNE.</p>
+
+    <img src="../immagini/voce-25mb/tsne_voci.png" alt="t-SNE dei voice vectors, 8 voci nello spazio latente" class="lab-screenshot">
+
+    <p>Ogni voce forma un cluster distinto. Ma i cluster non sono sfere, sono allungati, perché i vettori cambiano lungo la dimensione della lunghezza. La voce non è un punto. È una traiettoria.</p>
+
+    <p>Ascolta. Stessa frase, 8 voci diverse, stesso modello da 80MB:</p>
+
+    <div class="audio-grid fade-in">
+      <div class="audio-player"><label>Bella</label><audio controls preload="none" src="../assets/audio/voce-25mb/bella.wav"></audio></div>
+      <div class="audio-player"><label>Jasper</label><audio controls preload="none" src="../assets/audio/voce-25mb/jasper.wav"></audio></div>
+      <div class="audio-player"><label>Luna</label><audio controls preload="none" src="../assets/audio/voce-25mb/luna.wav"></audio></div>
+      <div class="audio-player"><label>Bruno</label><audio controls preload="none" src="../assets/audio/voce-25mb/bruno.wav"></audio></div>
+      <div class="audio-player"><label>Rosie</label><audio controls preload="none" src="../assets/audio/voce-25mb/rosie.wav"></audio></div>
+      <div class="audio-player"><label>Hugo</label><audio controls preload="none" src="../assets/audio/voce-25mb/hugo.wav"></audio></div>
+      <div class="audio-player"><label>Kiki</label><audio controls preload="none" src="../assets/audio/voce-25mb/kiki.wav"></audio></div>
+      <div class="audio-player"><label>Leo</label><audio controls preload="none" src="../assets/audio/voce-25mb/leo.wav"></audio></div>
+    </div>
+
+    <h3>Interpolazione</h3>
+
+    <p>Se le voci sono vettori, cosa succede se ne mischi due?</p>
+
+    <p>Ho preso Bella (femminile) e Jasper (maschile), e ho generato 7 step di interpolazione lineare nello spazio latente: 100% Bella, 83/17, 67/33, 50/50, 33/67, 17/83, 100% Jasper.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tr>
+        <td class="ln">1<br>2<br>3</td>
+        <td class="code"><span class="cc"># L'interpolazione è banale: è uno spazio vettoriale</span>
+<span class="cv">alpha</span> <span class="co">=</span> <span class="cn">0.5</span>
+<span class="cv">style_mix</span> <span class="co">=</span> (<span class="cn">1.0</span> <span class="co">-</span> <span class="cv">alpha</span>) <span class="co">*</span> <span class="cv">style_bella</span> <span class="co">+</span> <span class="cv">alpha</span> <span class="co">*</span> <span class="cv">style_jasper</span></td>
+      </tr></table></div>
+    </div>
+
+    <p>Ascolta la transizione, da Bella a Jasper in 7 step:</p>
+
+    <div class="audio-grid fade-in">
+      <div class="audio-player"><label>100% Bella</label><audio controls preload="none" src="../assets/audio/voce-25mb/step_00_alpha_0.00.wav"></audio></div>
+      <div class="audio-player"><label>83% Bella / 17% Jasper</label><audio controls preload="none" src="../assets/audio/voce-25mb/step_01_alpha_0.17.wav"></audio></div>
+      <div class="audio-player"><label>67% Bella / 33% Jasper</label><audio controls preload="none" src="../assets/audio/voce-25mb/step_02_alpha_0.33.wav"></audio></div>
+      <div class="audio-player"><label>50% / 50%</label><audio controls preload="none" src="../assets/audio/voce-25mb/step_03_alpha_0.50.wav"></audio></div>
+      <div class="audio-player"><label>33% Bella / 67% Jasper</label><audio controls preload="none" src="../assets/audio/voce-25mb/step_04_alpha_0.67.wav"></audio></div>
+      <div class="audio-player"><label>17% Bella / 83% Jasper</label><audio controls preload="none" src="../assets/audio/voce-25mb/step_05_alpha_0.83.wav"></audio></div>
+      <div class="audio-player"><label>100% Jasper</label><audio controls preload="none" src="../assets/audio/voce-25mb/step_06_alpha_1.00.wav"></audio></div>
+    </div>
+
+    <p>Funziona. La transizione è graduale. A 50/50 non senti un artefatto. Senti una voce che non esiste, a metà tra le due. Lo spazio latente è liscio. Le voci sono continue.</p>
+
+    <p>Questo significa una cosa precisa: puoi creare infinite voci sintetiche che non corrispondono a nessun parlante reale. Non stai clonando. Stai inventando.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - DENTRO L'ONNX
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dentro l'ONNX</h2>
+    <span class="section-number">Sezione 03. Il grafo computazionale</span>
+
+    <p>Il modello è un file <code>.onnx</code>. ONNX è un formato aperto per reti neurali: un grafo diretto aciclico di operazioni. Puoi aprirlo, contare i nodi, misurare i pesi, ricostruire l'architettura senza documentazione.</p>
+
+    <p>L'ho fatto sulle 4 varianti.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">73M</div>
+        <div class="stat-label">Mini: 74.6 MB</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">35M</div>
+        <div class="stat-label">Micro: 39.5 MB</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">14M</div>
+        <div class="stat-label">Nano FP32: 54.1 MB</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">14M</div>
+        <div class="stat-label">Nano INT8: 23.2 MB</div>
+      </div>
+    </div>
+
+    <p>Il nano FP32 ha gli stessi 15M parametri del nano INT8 ma pesa il doppio: 56MB contro 25MB. La differenza è la quantizzazione. Ogni peso passa da 32 bit (float32) a 8 bit (int8). La precisione scende, la dimensione crolla.</p>
+
+    <h3>Input e output del grafo</h3>
+
+    <p>Il modello ONNX ha tre input:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Input</th>
+          <th>Shape</th>
+          <th>Tipo</th>
+          <th>Cosa rappresenta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>input_ids</code></td>
+          <td>[1, N]</td>
+          <td>int64</td>
+          <td>Sequenza di token IPA</td>
+        </tr>
+        <tr>
+          <td><code>style</code></td>
+          <td>[1, 256]</td>
+          <td>float32</td>
+          <td>Vettore di stile dalla voce</td>
+        </tr>
+        <tr>
+          <td><code>speed</code></td>
+          <td>[1]</td>
+          <td>float32</td>
+          <td>Moltiplicatore velocità</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Un output: il waveform raw. Nessun mel spectrogram intermedio. Il modello va direttamente dai fonemi al segnale audio.</p>
+
+    <h3>Le operazioni nel grafo</h3>
+
+    <p>Dentro il grafo ONNX trovi la firma dell'architettura. Ho contato i nodi per tipo di operazione. I più frequenti raccontano cosa fa il modello:</p>
+
+    <p><strong>Conv</strong>: convoluzioni 1D. Sono il cuore del decoder. Trasformano le rappresentazioni interne in segnale audio. La maggior parte dei parametri sta qui.</p>
+
+    <p><strong>Mul, Add</strong>: ovunque. Sono le operazioni di Adaptive Instance Normalization (AdaIN). Lo style vector non entra nel modello come input aggiuntivo, viene iniettato dopo ogni blocco convoluzionale via AdaIN. Lo stile modula il segnale, non lo genera.</p>
+
+    <p><strong>Sin</strong>: la snake activation function. Non è una ReLU, non è una GELU. È <code>x + sin(x)^2 / a</code>. Usata specificamente nei vocoder neurali perché preserva la struttura periodica del segnale audio. Se usi ReLU su un waveform, lo ammazzi. La snake lo rispetta.</p>
+
+    <p><strong>STFT/iSTFT</strong>: la firma del decoder iSTFTNet. Il modello non genera il waveform campione per campione. Genera magnitudine e fase nello spazio frequenziale (STFT), poi ricostruisce il segnale con la trasformata inversa (iSTFT). È molto più veloce di HiFi-GAN, che genera campione per campione.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Architettura ricostruita.</strong> Senza documentazione, dal solo grafo ONNX: text encoder convoluzionale → duration predictor → upsampling → decoder con AdaIN (stile iniettato) e snake activation → iSTFTNet output. Il modello predice durate fonemiche, allinea i fonemi nel tempo, e genera il segnale nello spazio frequenziale. Non c'è attention mechanism. Non c'è transformer. Solo convoluzioni e lo stile che modula tutto.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - COSA PERDE L'INT8
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Perde l'INT8</h2>
+    <span class="section-number">Sezione 04. Il prezzo della compressione</span>
+
+    <p>Stessa frase, stessa voce, 4 modelli diversi. Ho generato lo stesso input con mini (80M), micro (40M), nano FP32 (15M) e nano INT8 (15M quantizzato) e confrontato i mel spectrogram.</p>
+
+    <img src="../immagini/voce-25mb/mel_confronto.png" alt="Mel spectrogram delle 4 varianti del modello" class="lab-screenshot">
+
+    <p>Il mini e il micro sono quasi identici. Il nano FP32 perde dettaglio nelle frequenze alte. Le armoniche sopra i 6kHz sono più sfumate. Il nano INT8 perde ancora qualcosa. Le transizioni tra fonemi sono meno nette, il segnale è leggermente più "impastato".</p>
+
+    <p>Ma ad orecchio? La differenza tra mini e nano INT8 è sottile. Su un laptop speaker non la senti. Su cuffie buone, forse. Il punto è che 25MB bastano per ingannare un orecchio non addestrato.</p>
+
+    <h3>La differenza spettrale</h3>
+
+    <p>Ho calcolato la differenza assoluta in dB tra il mel spectrogram del mini e quello del nano INT8, frame per frame.</p>
+
+    <img src="../immagini/voce-25mb/diff_spettrale.png" alt="Differenza spettrale mini vs nano-int8" class="lab-screenshot">
+
+    <p>La perdita non è uniforme. Si concentra nelle alte frequenze e nelle transizioni. Le vocali stabili sono preservate quasi perfettamente. I tratti stazionari del segnale sono facili da comprimere. Le consonanti fricative (s, f, th) e le esplosive (t, k, p) soffrono di più. Ha senso: i transienti sono le parti del segnale con più entropia, e la quantizzazione taglia esattamente lì.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il punto non è la qualità.</strong> Il punto è che a 25MB la qualità è sufficiente. Non per un audiobook. Non per una voce narrante professionale. Ma per una telefonata, un messaggio vocale, un deepfake veloce. Più che sufficiente. È questo il problema.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - IL BENCHMARK
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Benchmark</h2>
+    <span class="section-number">Sezione 05. Quanto ci mette</span>
+
+    <p>Ho misurato il tempo di generazione su frasi di lunghezza crescente, per tutte e 4 le varianti. Su un MacBook, CPU only, media di 3 run.</p>
+
+    <img src="../immagini/voce-25mb/rtf_benchmark.png" alt="RTF per modello e lunghezza frase" class="lab-screenshot">
+
+    <p>Il Real-Time Factor (RTF) è il rapporto tra tempo di generazione e durata dell'audio prodotto. RTF &lt; 1 significa che il modello genera più velocemente del tempo reale.</p>
+
+    <p>Il nano INT8 su frasi medie ha RTF intorno a 0.02, genera audio 50 volte più veloce del tempo reale. Anche il mini (80M parametri) resta ampiamente sotto 1. Su CPU.</p>
+
+    <img src="../immagini/voce-25mb/throughput_benchmark.png" alt="Throughput in caratteri al secondo" class="lab-screenshot">
+
+    <p>Il throughput scala linearmente con la lunghezza della frase. Il chunking a 400 caratteri introduce overhead sulle frasi lunghe, ma il modello resta real-time per qualsiasi testo ragionevole.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Modello</th>
+          <th>Parametri</th>
+          <th>Size</th>
+          <th>RTF (frase media)</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mini</td>
+          <td>73M</td>
+          <td>74.6 MB</td>
+          <td>0.78</td>
+          <td>Qualità massima</td>
+        </tr>
+        <tr>
+          <td>Micro</td>
+          <td>35M</td>
+          <td>39.5 MB</td>
+          <td>0.41</td>
+          <td>Miglior rapporto qualità/speed</td>
+        </tr>
+        <tr>
+          <td>Nano FP32</td>
+          <td>14M</td>
+          <td>54.1 MB</td>
+          <td>0.07</td>
+          <td>Più grande del INT8 (float32)</td>
+        </tr>
+        <tr>
+          <td>Nano INT8</td>
+          <td>14M</td>
+          <td>23.2 MB</td>
+          <td>0.40</td>
+          <td>Minimo assoluto</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Contesto: gli altri TTS leggeri</h3>
+
+    <p>KittenTTS non è l'unico TTS che gira su CPU. Per capire dove si posiziona, serve un confronto onesto con le alternative.</p>
+
+    <p><strong>VITS</strong> (2021): il primo modello end-to-end che unisce text encoder, flow-based decoder e vocoder in un'unica rete. Qualità eccellente, ma il modello base pesa ~150MB e richiede PyTorch a runtime. Non è pensato per edge.</p>
+
+    <p><strong>Bark</strong> (Suno, 2023): generativo, può fare musica, effetti sonori, risate. Molto espressivo. Ma pesa 5GB+, richiede GPU per tempi ragionevoli, e la qualità è imprevedibile. A volte sorprendente, a volte incomprensibile.</p>
+
+    <p><strong>XTTS</strong> (Coqui, 2023): multilingual, voice cloning con 6 secondi di audio. Qualità alta. Ma il modello pesa ~1.8GB e l'inferenza su CPU è lenta (RTF > 1 su frasi lunghe).</p>
+
+    <p><strong>Piper</strong> (Rhasspy, 2023): ONNX, leggero, pensato per Raspberry Pi. Modelli da 15-60MB. Qualità inferiore a KittenTTS, suona più robotico, specialmente sulle transizioni. Ma è il riferimento per edge TTS fino a ora.</p>
+
+    <p>KittenTTS si inserisce in un punto preciso: qualità vicina a XTTS, dimensioni vicine a Piper. È uno dei primi modelli sotto i 30MB che suona credibilmente umano su CPU. Non è il migliore in assoluto, è il migliore per quello che pesa.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - ORA RISALIAMO AL PAPER
+         ============================================================ -->
+    <h2><span class="accent">//</span> Ora Risaliamo al Paper</h2>
+    <span class="section-number">Sezione 06. Da dove viene tutto questo</span>
+
+    <p>Solo adesso, dopo aver smontato il modello, apro il paper. StyleTTS 2, NeurIPS 2023, Columbia University. Il primo modello text-to-speech a raggiungere qualità umana su dataset pubblici.</p>
+
+    <p>L'architettura originale è un mostro. Otto moduli. Due fasi di addestramento. Quattro GPU A40.</p>
+
+    <h3>Cosa c'è in StyleTTS 2</h3>
+
+    <p><strong>Style Diffusion.</strong> Il cuore del modello originale. Lo stile vocale è modellato come una variabile latente casuale, campionata tramite un processo di diffusione condizionato sul testo. Un transformer a 3 layer con dynamics di Langevin e EDM formulation. Tre step di diffusione bastano per campionare uno style vector di alta qualità, equivalente a 9 layer di transformer in termini di computazione.</p>
+
+    <p><strong>Due Style Encoder.</strong> Non uno. Due. Uno acustico (cattura il timbro dal mel spectrogram) e uno prosodico (cattura ritmo e intonazione). Servono insieme perché uno solo crea instabilità durante il training. I gradienti divergono se lo stesso encoder deve codificare sia il timbro che la prosodia.</p>
+
+    <p><strong>WavLM Discriminator.</strong> Un modello pre-addestrato da 300M+ parametri (WavLM-base-plus, 12 layer, addestrato su 94k ore di audio) usato come discriminatore adversariale. Non viene fine-tunato, resta congelato. Un CNN discriminative head estrae feature da tutti i 13 layer e decide se l'audio è reale o sintetico. L'idea è che un modello che capisce il linguaggio parlato è il miglior giudice di quanto un audio suoni naturale.</p>
+
+    <p><strong>Differentiable Duration Modeling.</strong> Il duration predictor predice quanto dura ogni fonema. Ma l'upsampling (espandere la sequenza fonemica nella sequenza temporale) non è differenziabile con i metodi classici. StyleTTS 2 introduce un upsampler non-parametrico basato su kernel gaussiani che rende tutto il pipeline differenziabile end-to-end. Questo permette di ottimizzare con il loss adversariale di WavLM, che è la chiave della qualità.</p>
+
+    <p><strong>Decoder E2E.</strong> Due opzioni: HiFi-GAN (waveform diretto) e iSTFTNet (magnitudine + fase → iSTFT). Il secondo è più veloce. Entrambi usano snake activation e AdaIN per iniettare lo stile.</p>
+
+    <h3>Cosa hanno tolto in KittenTTS</h3>
+
+    <p>Ora il confronto. Tutto quello che ho trovato smontando l'ONNX contro quello che dice il paper.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>StyleTTS 2</th>
+          <th>KittenTTS</th>
+          <th>Impatto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Style Diffusion</td>
+          <td>Transformer 3-layer, Langevin</td>
+          <td><span class="cw">Rimosso</span>: stili pre-calcolati in .npz</td>
+          <td>Niente diversità runtime. Stili congelati.</td>
+        </tr>
+        <tr>
+          <td>Acoustic Style Encoder</td>
+          <td>Encoder da mel spectrogram</td>
+          <td><span class="cw">Rimosso</span>: non serve, stili già estratti</td>
+          <td>Niente reference audio a runtime</td>
+        </tr>
+        <tr>
+          <td>Prosodic Style Encoder</td>
+          <td>Encoder separato per prosodia</td>
+          <td><span class="cw">Rimosso</span>: prosodia nel .npz</td>
+          <td>Prosodia fissa per voce</td>
+        </tr>
+        <tr>
+          <td>WavLM Discriminator</td>
+          <td>300M+ params, 12 layer</td>
+          <td><span class="cw">Rimosso</span>: solo training</td>
+          <td>-300M params a inference</td>
+        </tr>
+        <tr>
+          <td>Prosodic Text Encoder</td>
+          <td>BERT phoneme-level</td>
+          <td><span class="cw">Rimosso</span>: solo training</td>
+          <td>Contesto linguistico perso</td>
+        </tr>
+        <tr>
+          <td>Duration Predictor</td>
+          <td>Differentiable upsampling</td>
+          <td><span class="t-ok">Presente</span></td>
+          <td>Predice durate a runtime</td>
+        </tr>
+        <tr>
+          <td>Decoder iSTFTNet</td>
+          <td>Conv + snake + AdaIN + iSTFT</td>
+          <td><span class="t-ok">Presente</span></td>
+          <td>Genera il waveform</td>
+        </tr>
+        <tr>
+          <td>Text Encoder</td>
+          <td>Conv-based acoustic encoder</td>
+          <td><span class="t-ok">Presente</span></td>
+          <td>Codifica la sequenza fonemica</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il pattern.</strong> Hanno tenuto solo quello che serve a inference: text encoder, duration predictor, decoder. Tutto il resto (diffusion, encoder di stile, discriminatore, BERT) serviva solo per il training. Gli stili sono stati estratti con il modello completo e poi congelati nel .npz. Il modello a runtime non inventa stili nuovi. Legge quelli pre-calcolati e genera il waveform. Non è che "funziona senza quei componenti". È che quei componenti hanno già fatto il loro lavoro, e il risultato è stato salvato. Il costo si paga una volta, a training time. Il beneficio si usa per sempre, a inference.</p>
+    </div>
+
+    <p>L'ablation study del paper conferma: senza style diffusion, il CMOS scende di 0.46. Senza WavLM discriminator, -0.32. Senza prosodic style encoder, -0.35. Ma KittenTTS non soffre di queste perdite allo stesso modo, perché gli stili sono stati estratti con il modello completo e poi congelati. Il training ha usato tutto. L'inferenza no.</p>
+
+    <p>Non è knowledge distillation classica, dove un modello piccolo impara a imitare uno grande. È più diretto: prendi il modello completo, lo fai girare sulle voci target, salvi gli style vector prodotti dai suoi encoder, e poi a runtime usi solo il decoder con quegli style vector come input fisso. Il training ha prodotto il contenuto. L'inference lo consuma.</p>
+
+    <p>Questa non è compressione del modello. È compressione del processo di training.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - IL LAB
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab</h2>
+    <span class="section-number">Sezione 07. Riproduci tutto</span>
+
+    <p>Sei script Python. Nessuna GPU. Tutto gira su CPU.</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl</span>
+      <span class="t-out"><span class="t-ok">[+]</span> kittentts 0.8.1 installato</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">pip install onnx librosa scikit-learn matplotlib soundfile</span>
+      <span class="t-out"><span class="t-ok">[+]</span> dipendenze installate</span>
+    </div>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Script</th>
+          <th>Cosa fa</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>01_genera_voci.py</code></td>
+          <td>Genera tutte le 8 voci con la stessa frase</td>
+          <td>8 file WAV + tabella tempi</td>
+        </tr>
+        <tr>
+          <td><code>02_ispeziona_onnx.py</code></td>
+          <td>Apre i 4 modelli ONNX, conta nodi, parametri, blocchi</td>
+          <td>Report architettura completo</td>
+        </tr>
+        <tr>
+          <td><code>03_voice_vectors.py</code></td>
+          <td>Estrae .npz, t-SNE, matrice distanze, norme per posizione</td>
+          <td>3 grafici PNG</td>
+        </tr>
+        <tr>
+          <td><code>04_interpola_voci.py</code></td>
+          <td>Interpola Bella→Jasper in 7 step</td>
+          <td>7 file WAV</td>
+        </tr>
+        <tr>
+          <td><code>05_confronta_modelli.py</code></td>
+          <td>Genera con 4 varianti, confronta mel spectrogram</td>
+          <td>Mel confronto + diff spettrale</td>
+        </tr>
+        <tr>
+          <td><code>06_benchmark.py</code></td>
+          <td>RTF e throughput per modello e lunghezza frase</td>
+          <td>2 grafici benchmark</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <img src="../immagini/voce-25mb/01_genera_voci.png" alt="Output di 01_genera_voci.py" class="lab-screenshot">
+    <img src="../immagini/voce-25mb/03_voice_vectors.png" alt="Output di 03_voice_vectors.py" class="lab-screenshot">
+    <img src="../immagini/voce-25mb/04_interpola_voci.png" alt="Output di 04_interpola_voci.py" class="lab-screenshot">
+    <img src="../immagini/voce-25mb/05_confronta_modelli.png" alt="Output di 05_confronta_modelli.py" class="lab-screenshot">
+    <img src="../immagini/voce-25mb/02_ispeziona_onnx.png" alt="Output di 02_ispeziona_onnx.py" class="lab-screenshot">
+    <img src="../immagini/voce-25mb/06_benchmark.png" alt="Output di 06_benchmark.py" class="lab-screenshot">
+
+    <p>Tutto il codice è su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/la-voce-sta-in-25mb" target="_blank" rel="noopener">GitHub</a>.</p>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Ho iniziato con un <code>pip install</code> e un file da 25 megabyte. Ho finito con un paper NeurIPS e una domanda su cosa significa fidarsi di un audio.</p>
+
+    <p>La cosa più interessante non è la qualità del modello. È quello che hanno tolto. La diffusion, il discriminatore WavLM, gli encoder di stile. Tutti componenti che servivano per il training. Una volta che gli style vector sono stati estratti e congelati nel <code>.npz</code>, l'intera infrastruttura di addestramento diventa superflua. Il modello di inference è una fotocopia del risultato finale, non ha più bisogno del laboratorio che lo ha prodotto.</p>
+
+    <p>Il punto tecnico è chiaro: la maggior parte della complessità di un modello generativo serve a imparare, non a generare. KittenTTS lo dimostra in modo brutale.</p>
+
+    <p>Il punto pratico è più scomodo. Una voce non era già più una prova affidabile prima di KittenTTS. Il voice cloning esiste da anni: Resemble.AI, ElevenLabs, Tortoise TTS. Ma queste soluzioni richiedevano API cloud, account, log. Lasciavano tracce. KittenTTS no. 25MB su una chiavetta USB, nessuna connessione, nessun log, nessun account. Lo stesso salto che c'è stato tra le deepfake video del 2019 (GPU necessaria, pipeline complessa) e le app one-click del 2023.</p>
+
+    <p>Nel febbraio 2024, un dipendente di Arup a Hong Kong ha trasferito 25 milioni di dollari dopo una videochiamata con deepfake del CFO e di altri colleghi. Nel 2025, l'FBI ha segnalato voice cloning usato per truffe ai familiari di funzionari governativi. Questi attacchi usavano strumenti cloud con latenza e costi. Un modello da 25MB che gira offline in tempo reale abbassa la barriera di un altro ordine di grandezza.</p>
+
+    <p>Non è che una voce "ha smesso di essere una prova". È che il costo per falsificarne una è sceso sotto la soglia di qualsiasi contromisura basata sulla fiducia implicita. Se accetti un messaggio vocale come autenticazione, hai un problema. Se lo accettavi già prima, adesso il problema è più economico da sfruttare.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il problema non è che una macchina può parlare.<br>È che il costo per farlo è sceso a 25 megabyte e zero tracce."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Le voci sono vettori. I vettori si interpolano. La fiducia va verificata, non assunta.</p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>La Voce Sta In 25 Megabyte</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/la-voce-sta-in-25-megabyte.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/la-voce-sta-in-25-megabyte.html</guid>
+    <pubDate>Sat, 21 Mar 2026 00:00:00 +0100</pubDate>
+    <description>Un pip install, una riga di Python, esce una voce umana. KittenTTS: 14M parametri, 23MB, CPU only. Apro l'ONNX, estraggo i voice vectors dal .npz, interpolo tra voci, confronto 4 varianti. StyleTTS 2 distillato: la diffusion è sparita, WavLM è sparito. Funziona perché il lavoro pesante era già stato fatto offline. 6 script Python, 5 grafici, 15 audio.</description>
+  </item>
+
+  <item>
     <title>Il Bug Diventa Arma</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-bug-diventa-arma.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-bug-diventa-arma.html</guid>
