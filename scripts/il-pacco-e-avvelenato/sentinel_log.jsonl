@@ -1,0 +1,2 @@
+{"timestamp": "2026-03-21T19:17:46.110154", "package": "thisismytest", "score": 60, "severity": "CRITICAL", "typosquatting": [], "findings": ["os-system", "os-system", "os-system"], "ai": null}
+{"timestamp": "2026-03-21T19:17:48.170420", "package": "csp-adapter-telegram", "score": 20, "severity": "MEDIUM", "typosquatting": [], "findings": ["dynamic-import"], "ai": null}
