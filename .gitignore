@@ -4,3 +4,6 @@
 *.pcap
 venv/
 scripts/*/output_*
+__pycache__/
+*.pyc
+sentinel_log.jsonl
