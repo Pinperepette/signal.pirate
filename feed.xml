@@ -11,7 +11,7 @@
     <title>Il Pacco È Avvelenato</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-pacco-e-avvelenato.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-pacco-e-avvelenato.html</guid>
-    <pubDate>Mon, 23 Mar 2026 00:00:00 +0100</pubDate>
+    <pubDate>Sat, 21 Mar 2026 00:00:00 +0100</pubDate>
     <description>Supply chain attacks: typosquatting su PyPI/npm, dependency confusion, il backdoor xz-utils (CVE-2024-3094) e GitHub Actions poisoning. L'attacco non entra dal browser. Entra dal tuo package manager. 7 script Python: monitor real-time PyPI con AI, audit pacchetti installati, typosquatting scanner.</description>
   </item>
 
