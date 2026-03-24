@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Treno Arriva Con La Matematica | Signal Pirate</title>
+  <meta name="description" content="Referendum, code ai seggi, e teoria delle code. Perche' l'ordine alfabetico e' peggio di M/F, perche' la coda unica batte tutto, e perche' il tempo di attesa esplode prima della saturazione. Dati reali TfL Londra (NUMBAT 15 min) e MTA New York. 7 script Python, 12 grafici.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .ct { color: #4ec9b0; }   /* type */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning/important */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-24 | Pinperepette</p>
+    <h1 class="article-page-title">Il Treno Arriva <span class="accent">Con La Matematica</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Referendum, code ai seggi, e un politico che propone l'ordine alfabetico. Nobile. Ma la C ha 34 volte piu' cognomi della Q. Teoria delle code con dati reali: TfL Londra (NUMBAT, 432 stazioni, 15 min), MTA New York, simulazioni Monte Carlo. 7 script Python, 12 grafici.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Queueing Theory</span>
+      <span class="tag tag-highlight">TfL / MTA</span>
+      <span class="tag tag-reaction">Simulazione</span>
+      <span class="tag tag-amplification">Kingman</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL SEGGIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Seggio</h2>
+    <span class="section-number">Sezione 00. Come pensa un pirata</span>
+
+    <p>Referendum sulla giustizia. Separazione delle carriere. Ha vinto il no. Io ho votato si'.</p>
+
+    <p>Sulla magistratura non ho opinioni forti. Pero' sono un informatico, e un informatico vede che un sistema dove lo stesso nodo e' giudice e parte, dove chi accusa e chi decide condividono lo stesso pool, ha un problema di architettura. La questione e' di <em>separation of concerns</em>, prima che di politica.</p>
+
+    <p>Ma non e' di questo che voglio parlare.</p>
+
+    <p>Voglio parlare di una cosa che e' successa ai seggi. Un politico scrive, soddisfatto: <em>"Nei seggi abbiamo visto per la prima volta gli elettori non piu' divisi tra maschi e femmine, ma secondo l'ordine alfabetico."</em></p>
+
+    <p>Intento nobile. Moderno. Progressista. Via la divisione binaria, dentro l'uguaglianza.</p>
+
+    <p>Io ho letto quella frase e ho pensato: <em>avete appena rotto le code.</em></p>
+
+    <p>L'uguaglianza qui c'entra poco. So come si comportano le code, e quello che ho visto mi ha fatto pensare. L'ho scritto, l'ho detto, e in tantissimi sembravano non capire dove fosse il problema. Quindi ho deciso di farci un articolo.</p>
+
+    <p>Attenzione: ai seggi non puoi fare la coda unica. Ogni tavolo ha il suo registro degli elettori. I documenti sono fisicamente divisi. Lo scrutatore del tavolo A-F non ha i fogli del tavolo G-M. La divisione in gruppi e' un vincolo logistico, non una scelta di design. E' come lo sharding di un database: i dati stanno su nodi diversi, e devi mandare la query al nodo giusto.</p>
+
+    <p>Ma proprio perche' <em>devi</em> dividere, il modo in cui dividi conta. E l'ordine alfabetico dei cognomi italiani e' tutto tranne che una distribuzione uniforme. Un disastro, a voler essere gentili.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Tesi.</strong> La divisione M/F funzionava come load balancer per puro caso biologico: due gruppi al 50%. L'ordine alfabetico crea gruppi sbilanciati, a meno che non bilanci i tagli sulla distribuzione reale dei cognomi. Cosa che nessuno fa. Se il modello e' sbagliato, il resto viene dietro.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - IL COGNOME NON E' UNIFORME
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Cognome Non E' Uniforme</h2>
+    <span class="section-number">Sezione 01. 42,271 cognomi dicono la stessa cosa</span>
+
+    <p>Ho preso l'archivio completo dei cognomi italiani. 42,271 cognomi distinti. E ho contato quanti iniziano per ogni lettera. Nota: questa e' una distribuzione per <em>tipi</em>, non per <em>frequenze</em>. I cognomi piu' comuni (Rossi, Russo, Romano, Ferrari) amplificano ulteriormente lo skew perche' si concentrano nelle lettere gia' sovrarappresentate. La distribuzione reale pesata per popolazione sarebbe ancora piu' sbilanciata. Questi numeri sono una stima conservativa.</p>
+
+    <img src="../immagini/queueing-theory/11_cognomi.png" alt="Distribuzione cognomi italiani per lettera iniziale" class="lab-screenshot">
+
+    <p>La lettera C da sola copre il <strong>13%</strong> dei cognomi. B l'11.2%. M il 9.4%. Dall'altra parte, Q sta allo 0.38%. U allo 0.41%. E allo 0.59%.</p>
+
+    <p>La C ha <strong>34 volte</strong> piu' cognomi della Q.</p>
+
+    <p>Al mio seggio ho visto i cartelli: A-L e M-Z. Due tavoli, due registri. Sembra equo. Meta' dell'alfabeto di qua, meta' di la'. Ma i numeri dicono altro:</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">56.3%</div>
+        <div class="stat-label">A - L</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">43.7%</div>
+        <div class="stat-label">M - Z</div>
+      </div>
+    </div>
+
+    <p>56/44. Il tavolo A-L ha il <strong>30% in piu'</strong> di elettori rispetto all'M-Z. Stessi sportelli, stesse risorse, carico diverso.</p>
+
+    <p>E la vecchia divisione M/F? Due gruppi da ~50% ciascuno. La biologia e' un load balancer migliore dell'alfabeto.</p>
+
+    <p>Avevate un sistema che funzionava (50/50). L'avete rotto (57/43). E non ve ne siete neanche accorti.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LA SIMULAZIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Simulazione</h2>
+    <span class="section-number">Sezione 02. 900 elettori, 2 tavoli, prima e dopo</span>
+
+    <p>Ho simulato un seggio elettorale. 900 elettori, 2 tavoli con 2 sportelli ciascuno, 12 ore di apertura. Arrivi modellati come processo di Poisson non omogeneo (NHPP) con &lambda;(t) a doppio picco gaussiano (mattina &sigma;=35min, pomeriggio &sigma;=40min). Servizio ~ Exp(&mu;=2.5 min). Il confronto: quello che c'era prima (M/F) e quello che c'e' adesso (A-L / M-Z).</p>
+
+    <img src="../immagini/queueing-theory/12_seggi_sim.png" alt="Simulazione seggio: M/F vs A-L/M-Z" class="lab-screenshot">
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Strategia</th><th>Distribuzione</th><th>Attesa media</th><th>p95</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>M/F (prima)</td><td>50% / 50%</td><td>57 min</td><td><strong>111 min</strong></td></tr>
+        <tr><td>A-L / M-Z (adesso)</td><td>57% / 43%</td><td>70 min</td><td><strong>173 min</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>Il p95 e' il numero che conta: e' il tempo che aspetti se sei sfortunato. Con A-L/M-Z aspetti fino a quasi <strong>3 ore</strong>. Con il vecchio M/F era meno di 2. Hanno peggiorato le code in nome dell'uguaglianza.</p>
+
+    <p>E questo e' il caso medio. Gli elettori non arrivano uniformemente: arrivano a ondate, con picchi la mattina e il tardo pomeriggio. Durante il picco lo sbilanciamento si moltiplica. Il tavolo A-L si satura mentre l'M-Z ha ancora margine. Kingman dice che non conta il carico medio giornaliero. Conta il carico istantaneo durante il picco. E quello, con un 57/43, esplode.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il problema e' lo sharding key.</strong> Ai seggi i registri sono fisicamente separati per tavolo, come shard di un database. La coda unica non la puoi fare, come una query cross-shard senza costi. Ma se scegli una chiave di partizionamento con skew (e l'alfabeto dei cognomi italiani ha uno skew del 57/43 al taglio L/M) ti ritrovi con uno shard bollente e l'altro sottoutilizzato. L'M/F funzionava perche' la distribuzione di genere e' ~50/50: sharding perfetto, per puro caso biologico. Tagliare a meta' dell'alfabeto non e' tagliare a meta' degli elettori.</p>
+    </div>
+
+    <p>Il seggio e' solo l'inizio. La stessa matematica governa le metropolitane, i server, le autostrade, i pronto soccorso. E ha una proprieta' che quasi nessuno conosce: il tempo di attesa non cresce in modo lineare. Esplode.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - LA CURVA CHE ESPLODE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Curva Che Esplode</h2>
+    <span class="section-number">Sezione 03. Kingman's formula</span>
+
+    <p>La cosa che tutti credono di sapere sulle code: se un sistema e' al 50% di carico, aspetti un po'. Al 70%, aspetti un po' di piu'. Al 90%, aspetti il doppio. Crescita lineare. Proporzionale. Intuitiva.</p>
+
+    <p>Sbagliato.</p>
+
+    <p>La crescita e' iperbolica. Al 50% aspetti 1 unita'. Al 80% aspetti 4. Al 90% ne aspetti 9. Al 95%, 19. Al 99%, 99. La curva non sale: esplode.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Kingman's formula (G/G/1 approssimata)</span>
+      E[W] &asymp; (&rho; / (1 - &rho;)) &times; ((c<sub>a</sub>&sup2; + c<sub>s</sub>&sup2;) / 2) &times; E[S]
+    </div>
+
+    <p>Dove &rho; e' l'utilizzazione (domanda/capacita'), c<sub>a</sub> e c<sub>s</sub> sono i coefficienti di variazione degli arrivi e del servizio, E[S] e' il tempo medio di servizio. Il termine che uccide e' <code>&rho; / (1 - &rho;)</code>. E' un iperbole. Quando &rho; si avvicina a 1, il denominatore va a zero e il tempo va all'infinito.</p>
+
+    <img src="../immagini/queueing-theory/01_kingman.png" alt="Kingman formula: confronto M/M/1, M/D/1, M/G/1, G/G/1" class="lab-screenshot">
+
+    <p>Le quattro curve mostrano scenari diversi:</p>
+    <ul>
+      <li><strong>M/D/1</strong> (verde): arrivi casuali, servizio deterministico. Il caso migliore. Una metro con orari precisi.</li>
+      <li><strong>M/M/1</strong> (viola): tutto casuale. Il modello classico.</li>
+      <li><strong>M/G/1 heavy-tail</strong> (rosso): servizio con distribuzione a coda pesante. Quando qualcuno impiega 10 volte il tempo medio.</li>
+      <li><strong>G/G/1</strong> (arancione tratteggiato): tutto irregolare. Arrivi a raffica, servizio imprevedibile. Il mondo reale.</li>
+    </ul>
+
+    <p>In tutti i casi, oltre &rho; = 0.8 si entra nella zona di pericolo. La differenza tra 80% e 90% di carico non e' un 12.5% in piu' di attesa, e' 2-3 volte tanto. Nessuno lo misura finche' non succede.</p>
+
+    <p>Questo spiega perche' il tuo server risponde in 50ms al 70% di CPU e in 2 secondi al 85%. E' Kingman, non un bug.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - TEORIA VS SIMULAZIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Teoria Tiene?</h2>
+    <span class="section-number">Sezione 04. 50,000 clienti simulati</span>
+
+    <p>Ho messo la formula alla prova. Simulazione Monte Carlo di una coda M/M/1 con 50,000 clienti per ogni valore di &rho;, da 0.1 a 0.95.</p>
+
+    <img src="../immagini/queueing-theory/09_mm1_simulation.png" alt="Teoria M/M/1 vs simulazione Monte Carlo" class="lab-screenshot">
+
+    <p>I punti verdi (simulazione) seguono la curva viola (teoria) quasi perfettamente. Tecnicamente Kingman e' un'approssimazione, non un risultato esatto. Ma e' un'approssimazione sorprendentemente accurata.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - I DATI DI LONDRA
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Dati di Londra</h2>
+    <span class="section-number">Sezione 05. 432 stazioni, intervalli da 15 minuti</span>
+
+    <p>La teoria e' bella. Ma funziona nel mondo reale? Ho preso i dati NUMBAT 2024 di Transport for London: i flussi di passeggeri in entrata per ogni stazione della metro di Londra, ogni 15 minuti, per un giorno feriale tipo (martedi'-giovedi').</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">432</div>
+        <div class="stat-label">Stazioni</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">96</div>
+        <div class="stat-label">Slot da 15 min</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">1,215</div>
+        <div class="stat-label">Link treno</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">NUMBAT</div>
+        <div class="stat-label">Dataset TfL</div>
+      </div>
+    </div>
+
+    <p>Il primo grafico e' il profilo di domanda nell'arco delle 24 ore. Nove stazioni, da Waterloo a Canary Wharf.</p>
+
+    <img src="../immagini/queueing-theory/03_demand_24h.png" alt="Profilo domanda 24h, Londra, giorno feriale tipo" class="lab-screenshot">
+
+    <p>Due picchi netti: AM Peak (07:00-09:30) e PM Peak (16:30-19:00). Waterloo schizza a quasi 6,000 ingressi per quarto d'ora al mattino. Il modello stazionario, quello che assume un tasso di arrivo costante, e' una bugia. La domanda varia di un fattore 10x nell'arco della giornata.</p>
+
+    <p>Per ogni stazione ho calcolato &rho; = &lambda; / &mu;, dove &lambda; e' il picco di arrivi nel quarto d'ora piu' affollato dell'AM Peak e &mu; e' la capacita' (treni per 15 min &times; 800 passeggeri/treno). Poi ho piazzato ogni stazione sulla curva di Kingman.</p>
+
+    <img src="../immagini/queueing-theory/02_station_rho.png" alt="Stazioni di Londra sulla curva di Kingman" class="lab-screenshot">
+
+    <p>La maggior parte delle stazioni della Tube sta nella zona verde (&rho; &lt; 0.3). Il sistema e' ben dimensionato. Ma Clapham Junction (Overground, non Tube) sfonda &rho; = 1. Piu' gente che arriva di quanta ne possa partire. E le stazioni di Richmond, Wimbledon, Brixton stanno nella fascia 0.2-0.5 dove il sistema tiene, ma non ha margine per imprevisti.</p>
+
+    <p>Il dato piu' utile e' il carico effettivo sui treni, tratta per tratta:</p>
+
+    <img src="../immagini/queueing-theory/04_link_load.png" alt="Carico treni, top 5 tratte piu' affollate" class="lab-screenshot">
+
+    <p>Questo e' il motivo per cui a Oxford Circus alle 8:30 lasci passare il primo treno. E' &rho; che lavora.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - NEW YORK CONFERMA
+         ============================================================ -->
+    <h2><span class="accent">//</span> New York Conferma</h2>
+    <span class="section-number">Sezione 06. MTA, la stessa forma dall'altra parte dell'oceano</span>
+
+    <p>Per verificare che il pattern non sia specifico di Londra, ho scaricato i dati orari della MTA, la metro di New York. Conteggi per stazione, per ora, per classe tariffaria.</p>
+
+    <img src="../immagini/queueing-theory/05_mta_hourly.png" alt="Profilo orario metro New York" class="lab-screenshot">
+
+    <p>Stessa forma. Due picchi, stesso rapporto tra peak e off-peak. La domanda di trasporto nelle grandi citta' e' universale: segue il ciclo lavoro-casa, non il modello Poisson dei libri di testo.</p>
+
+    <p>E qui c'e' il punto critico. Ho preso tutti gli arrivi AM peak (ore 7-9) da tutte le stazioni e ho confrontato la distribuzione empirica con un modello Poisson e un log-normal.</p>
+
+    <img src="../immagini/queueing-theory/06_mta_distribution.png" alt="Distribuzione arrivi MTA: Poisson vs realta'" class="lab-screenshot">
+
+    <p>Il QQ plot a destra e' il verdetto: la coda destra devia. I valori estremi sono piu' frequenti di quanto Poisson predica. Traduzione: le raffiche di arrivi (50 persone che escono tutte dallo stesso bus, un treno regionale che svuota 300 pendolari sulla banchina) succedono piu' spesso del previsto. E Kingman dice che piu' la varianza degli arrivi e' alta, peggio e'.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - IL PARADOSSO DELL'AUTOBUS
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Paradosso dell'Autobus</h2>
+    <span class="section-number">Sezione 07. L'intuizione mente, la simulazione no</span>
+
+    <p>L'autobus passa ogni 10 minuti. Quanto aspetti in media alla fermata?</p>
+
+    <p>Risposta intuitiva: 5 minuti. Meta' dell'intervallo. Se arrivi in un momento casuale, in media sei a meta' tra due autobus.</p>
+
+    <p>Risposta corretta: dipende. Se gli autobus sono perfettamente puntuali (intervallo sempre 10 min), si', aspetti 5 minuti. Ma se gli intervalli variano (e nel mondo reale variano sempre) aspetti di piu'. Con intervalli esponenziali (il caso teorico), aspetti <strong>10 minuti</strong>. Non 5. Il doppio.</p>
+
+    <p>Si chiama <em>inspection paradox</em>. Quando arrivi in un momento casuale, hai piu' probabilita' di cadere in un intervallo lungo che in uno corto. I grandi intervalli "catturano" piu' passeggeri. L'attesa media non e' E[H]/2 ma:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Tempo di attesa con intervalli variabili</span>
+      E[W] = (E[H] / 2) &times; (1 + CV&sup2;)
+    </div>
+
+    <p>Dove CV = &sigma;/&mu; e' il coefficiente di variazione. Con CV = 0 (deterministico), E[W] = E[H]/2. Con CV = 1 (esponenziale), E[W] = E[H]. Con CV = 2 (iperesponenziale), E[W] = 2.5 &times; E[H]/2.</p>
+
+    <p>Ho simulato 100,000 arrivi casuali per 5 distribuzioni diverse degli intervalli, tutte con media 10 minuti:</p>
+
+    <img src="../immagini/queueing-theory/07_inspection_paradox.png" alt="Paradosso dell'autobus, simulazione" class="lab-screenshot">
+
+    <p>La barra gialla tratteggiata e' quello che tutti credono (5 minuti). Nessuna distribuzione reale ci sta sotto, tranne quella perfettamente deterministica. Con intervalli iperesponenziali, quelli che descrivono i bus nelle citta' con traffico pesante, aspetti piu' del <strong>doppio</strong> di quello che pensi.</p>
+
+    <p>La prossima volta che l'app dice "autobus ogni 10 minuti" e ne aspetti 15, l'inspection paradox sta facendo il suo lavoro.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - LA CODA CON PRIORITA'
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Coda Con Priorita'</h2>
+    <span class="section-number">Sezione 08. Qualcuno muore di fame</span>
+
+    <p>Pronto soccorso. Codice rosso, codice giallo, codice verde. I rossi passano prima. Sembra giusto. Lo e'. Ma ha un prezzo che nessuno dichiara: al crescere del carico, i codici verdi non aspettano un po' di piu'. Aspettano <em>esponenzialmente</em> di piu'.</p>
+
+    <p>Ho simulato una coda con due classi di priorita'. Il 60% del traffico e' high priority, il 40% e' low. Stesso server.</p>
+
+    <img src="../immagini/queueing-theory/08_priority_starvation.png" alt="Priority queue, starvation della bassa priorita'" class="lab-screenshot">
+
+    <p>La linea verde (high priority) sale piano. La rossa (low priority) esplode. A &rho; = 0.9, la bassa priorita' aspetta <strong>decine di volte</strong> piu' della alta. Ordini di grandezza, non fattori due o tre.</p>
+
+    <p>Questo e' il motivo per cui aspetti 6 ore al pronto soccorso col codice verde anche se il reparto "non e' pieno". In media non e' pieno. Per chi e' in fondo alla coda, lo e' eccome.</p>
+
+    <p>In informatica lo chiamiamo <em>starvation</em>. Nei sistemi operativi, nei load balancer, nelle pipeline CI/CD. Il task a bassa priorita' che non viene mai schedulato. La soluzione esiste (aging, fair queuing, deficit round-robin) ma ha un costo: devi accettare che i task ad alta priorita' rallentino un po'. La conservation law di Kleinrock dice che il tempo medio pesato e' costante. Migliorare una classe costa a un'altra, sempre. Equita' ed efficienza sono matematicamente incompatibili, lo dice la conservation law.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - L'EFFETTO CASCATA
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Effetto Cascata</h2>
+    <span class="section-number">Sezione 09. Un nodo lento avvelena il sistema</span>
+
+    <p>Ultimo pezzo. Cinque stazioni in serie. La Victoria Line da Brixton a Victoria. Un treno parte da Brixton, si ferma a ogni stazione, arriva a Victoria. Tutto regolare. Poi Vauxhall ha un problema: porta bloccata, passeggero che sviene, sosta raddoppiata.</p>
+
+    <p>Cosa succede a valle?</p>
+
+    <img src="../immagini/queueing-theory/10_cascade.png" alt="Effetto cascata, propagazione del ritardo" class="lab-screenshot">
+
+    <p>Il ritardo non resta a Vauxhall. Si propaga. Pimlico e Victoria ricevono un ritardo <em>amplificato</em>, perche' ogni treno successivo trova la stazione ancora occupata dal precedente. I treni si ammassano. Gli headway diventano irregolari. I passeggeri si accumulano sulla banchina, rallentando ulteriormente la salita. Feedback positivo.</p>
+
+    <p>Questo e' esattamente quello che succede nei microservizi. Un endpoint lento a monte non rallenta solo se stesso. Avvelena tutti i servizi a valle. Le connessioni si accumulano, i timeout cascadano, il circuit breaker scatta troppo tardi. Il sistema non si degrada gradualmente. Collassa.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - GLI SCRIPT
+         ============================================================ -->
+    <h2><span class="accent">//</span> Gli Script</h2>
+    <span class="section-number">Sezione 10. Riproduci tutto</span>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">ls scripts/il-treno-arriva-con-la-matematica/</span>
+      <span class="t-out">01_extract_numbat.py    <span class="t-highlight"># Estrai dati NUMBAT TfL (station entries, frequencies, rho)</span></span>
+      <span class="t-out">02_kingman_curve.py     <span class="t-highlight"># Curva di Kingman + stazioni su curva</span></span>
+      <span class="t-out">03_demand_profile.py    <span class="t-highlight"># Profilo domanda 24h + carico treni</span></span>
+      <span class="t-out">04_mta_analysis.py      <span class="t-highlight"># Analisi MTA New York (orario + distribuzione)</span></span>
+      <span class="t-out">05_simulation.py        <span class="t-highlight"># Monte Carlo: paradosso autobus, priority, M/M/1 vs teoria</span></span>
+      <span class="t-out">06_cascade.py           <span class="t-highlight"># Effetto cascata (5 stazioni in serie)</span></span>
+      <span class="t-out">07_cognomi.py           <span class="t-highlight"># Distribuzione cognomi + simulazione seggio</span></span>
+      <span class="t-out"></span>
+      <span class="t-prompt">$</span> <span class="t-cmd">ls data/</span>
+      <span class="t-out">numbat_twt.xlsx         <span class="t-highlight"># NUMBAT 2024 TfL (Tue-Wed-Thu, 12MB)</span></span>
+      <span class="t-out">train_loading.csv       <span class="t-highlight"># Carico treni per tratta (TfL Crowding)</span></span>
+      <span class="t-out">mta_hourly_sample.csv   <span class="t-highlight"># MTA Subway Hourly Ridership 2022</span></span>
+      <span class="t-out">station_entries_15min.csv  <span class="t-highlight"># Output: 432 stazioni x 96 slot</span></span>
+      <span class="t-out">link_frequencies.csv    <span class="t-highlight"># Output: 1,215 link con frequenze</span></span>
+      <span class="t-out">station_rho.csv         <span class="t-highlight"># Output: rho per stazione (AM Peak)</span></span>
+      <span class="t-out"></span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 01_extract_numbat.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 432 stazioni salvate in station_entries_15min.csv</span>
+      <span class="t-out"><span class="t-ok">[+]</span> 1215 link salvati in link_frequencies.csv</span>
+      <span class="t-out"><span class="t-ok">[+]</span> rho calcolato per 430 stazioni</span>
+      <span class="t-out"></span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 07_cognomi.py</span>
+      <span class="t-out"><span class="t-ok">[+]</span> Gruppo AL: 513 elettori (57.0%)</span>
+      <span class="t-out"><span class="t-ok">[+]</span> Gruppo MZ: 387 elettori (43.0%)</span>
+      <span class="t-out"></span>
+      <span class="t-out"><span class="t-ok">[*]</span> M/F:       media=57 min  p95=111 min</span>
+      <span class="t-out"><span class="t-warn">[*]</span> A-L/M-Z:   media=70 min  p95=173 min</span>
+    </div>
+
+    <p>Tutto il codice e' nella cartella <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/il-treno-arriva-con-la-matematica" target="_blank" rel="noopener">scripts/il-treno-arriva-con-la-matematica</a>. Servono <code>numpy</code>, <code>matplotlib</code>, <code>scipy</code>, <code>openpyxl</code>. I dati NUMBAT e MTA sono scaricabili liberamente. Nessuna API key.</p>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Sono partito da un seggio elettorale e sono arrivato alla Victoria Line. Il filo e' lo stesso: le code non funzionano come pensi.</p>
+
+    <p>Crescono in modo iperbolico. Si sbilanciano in base agli input. E la varianza non la assorbono: la amplificano.</p>
+
+    <p>Il politico voleva l'uguaglianza e ha rotto le code (e francamente, ormai, anche le balle). Avevano un sistema bilanciato al 50/50, l'hanno sostituito con un 57/43. Il p95 e' passato da 111 a 173 minuti. Un'ora in piu' di attesa per chi e' sfortunato. L'ingegnere TfL voleva orari piu' densi e ha scoperto che oltre &rho; = 0.8 il sistema collassa. Il passeggero alla fermata aspetta il doppio di quello che crede. Il codice verde in pronto soccorso non aspetta un po' di piu': aspetta ordini di grandezza di piu'.</p>
+
+    <p>Sono tutte conseguenze della stessa formula. Una formula che ha 60 anni, e' in qualsiasi libro di ricerca operativa del primo anno. Fuori da quel corso, quasi nessuno l'ha mai vista.</p>
+
+    <p>Il modello e' sbagliato. E la coda non perdona.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"&rho; / (1 - &rho;) non si negozia.<br>O guardi i dati, o la coda decide per te."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Dati: TfL NUMBAT 2024, MTA NYC 2022, Cognomix.it. Tutto pubblico, tutto riproducibile.</p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
