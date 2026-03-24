@@ -1,0 +1,1216 @@
+line,direction,from_station,to_station,total,early,am_peak,midday,pm_peak,evening,late
+Bakerloo,NB,Elephant & Castle LU,Lambeth North,308.0,13.0,57.0,96.0,59.0,49.0,34.0
+Bakerloo,NB,Lambeth North,Waterloo LU,308.0,12.0,57.0,96.0,59.0,49.0,35.0
+Bakerloo,NB,Waterloo LU,Embankment,315.0,16.0,60.0,96.0,58.0,50.0,35.0
+Bakerloo,NB,Embankment,Charing Cross LU,315.0,16.0,59.0,96.0,59.0,49.0,36.0
+Bakerloo,NB,Charing Cross LU,Piccadilly Circus,315.0,15.0,60.0,96.0,58.0,50.0,36.0
+Bakerloo,NB,Piccadilly Circus,Oxford Circus,315.0,15.0,59.0,96.0,59.0,49.0,37.0
+Bakerloo,NB,Oxford Circus,Regent's Park,315.0,14.0,60.0,96.0,58.0,50.0,37.0
+Bakerloo,NB,Regent's Park,Baker Street,315.0,14.0,59.0,96.0,58.0,50.0,38.0
+Bakerloo,NB,Baker Street,Marylebone LU,315.0,13.0,59.0,97.0,58.0,50.0,38.0
+Bakerloo,NB,Marylebone LU,Edgware Road (Bak),315.0,13.0,59.0,97.0,57.0,51.0,38.0
+Bakerloo,NB,Edgware Road (Bak),Paddington TfL,315.0,13.0,59.0,96.0,58.0,50.0,39.0
+Bakerloo,NB,Paddington TfL,Warwick Avenue,315.0,12.0,59.0,97.0,57.0,51.0,39.0
+Bakerloo,NB,Warwick Avenue,Maida Vale,315.0,12.0,58.0,97.0,58.0,50.0,40.0
+Bakerloo,NB,Maida Vale,Kilburn Park,315.0,11.0,59.0,97.0,57.0,51.0,40.0
+Bakerloo,NB,Kilburn Park,Queen's Park,315.0,11.0,58.0,97.0,57.0,51.0,41.0
+Bakerloo,NB,Queen's Park,Kensal Green,162.0,9.0,28.0,48.0,28.0,27.0,22.0
+Bakerloo,NB,Kensal Green,Willesden Junction,162.0,8.0,28.0,49.0,27.0,28.0,22.0
+Bakerloo,NB,Willesden Junction,Harlesden,162.0,8.0,27.0,50.0,26.0,28.0,23.0
+Bakerloo,NB,Harlesden,Stonebridge Park,162.0,8.0,27.0,50.0,26.0,28.0,23.0
+Bakerloo,NB,Stonebridge Park,Wembley Central,85.0,8.0,15.0,24.0,16.0,12.0,10.0
+Bakerloo,NB,Wembley Central,North Wembley,85.0,8.0,15.0,23.0,17.0,11.0,11.0
+Bakerloo,NB,North Wembley,South Kenton,85.0,7.0,15.0,24.0,16.0,12.0,11.0
+Bakerloo,NB,South Kenton,Kenton,85.0,7.0,15.0,24.0,16.0,12.0,11.0
+Bakerloo,NB,Kenton,Harrow & Wealdstone,85.0,7.0,15.0,24.0,16.0,12.0,11.0
+Bakerloo,SB,Harrow & Wealdstone,Kenton,83.0,5.0,15.0,24.0,15.0,13.0,11.0
+Bakerloo,SB,Kenton,South Kenton,83.0,5.0,15.0,24.0,15.0,13.0,11.0
+Bakerloo,SB,South Kenton,North Wembley,83.0,4.0,16.0,24.0,15.0,13.0,11.0
+Bakerloo,SB,North Wembley,Wembley Central,83.0,4.0,16.0,24.0,15.0,13.0,11.0
+Bakerloo,SB,Wembley Central,Stonebridge Park,83.0,4.0,15.0,24.0,15.0,13.0,12.0
+Bakerloo,SB,Stonebridge Park,Harlesden,160.0,11.0,27.0,49.0,30.0,24.0,19.0
+Bakerloo,SB,Harlesden,Willesden Junction,160.0,11.0,27.0,49.0,30.0,24.0,19.0
+Bakerloo,SB,Willesden Junction,Kensal Green,160.0,11.0,27.0,48.0,31.0,24.0,19.0
+Bakerloo,SB,Kensal Green,Queen's Park,160.0,11.0,26.0,49.0,30.0,24.0,20.0
+Bakerloo,SB,Queen's Park,Kilburn Park,313.0,17.0,57.0,97.0,60.0,48.0,34.0
+Bakerloo,SB,Kilburn Park,Maida Vale,313.0,17.0,57.0,96.0,60.0,49.0,34.0
+Bakerloo,SB,Maida Vale,Warwick Avenue,313.0,16.0,57.0,97.0,60.0,48.0,35.0
+Bakerloo,SB,Warwick Avenue,Paddington TfL,313.0,16.0,57.0,96.0,60.0,49.0,35.0
+Bakerloo,SB,Paddington TfL,Edgware Road (Bak),313.0,15.0,57.0,97.0,59.0,50.0,35.0
+Bakerloo,SB,Edgware Road (Bak),Marylebone LU,313.0,15.0,57.0,96.0,60.0,49.0,36.0
+Bakerloo,SB,Marylebone LU,Baker Street,313.0,14.0,58.0,96.0,59.0,50.0,36.0
+Bakerloo,SB,Baker Street,Regent's Park,313.0,14.0,57.0,96.0,60.0,49.0,37.0
+Bakerloo,SB,Regent's Park,Oxford Circus,313.0,14.0,57.0,96.0,59.0,50.0,37.0
+Bakerloo,SB,Oxford Circus,Piccadilly Circus,313.0,13.0,57.0,96.0,60.0,49.0,38.0
+Bakerloo,SB,Piccadilly Circus,Charing Cross LU,313.0,12.0,58.0,96.0,59.0,50.0,38.0
+Bakerloo,SB,Charing Cross LU,Embankment,313.0,12.0,57.0,96.0,59.0,50.0,39.0
+Bakerloo,SB,Embankment,Waterloo LU,313.0,12.0,57.0,96.0,59.0,50.0,39.0
+Bakerloo,SB,Waterloo LU,Lambeth North,307.0,11.0,57.0,97.0,58.0,50.0,34.0
+Bakerloo,SB,Lambeth North,Elephant & Castle LU,307.0,11.0,57.0,96.0,59.0,49.0,35.0
+Central,EB,West Ruislip,Ruislip Gardens,153.0,10.0,24.0,54.0,25.0,27.0,13.0
+Central,EB,Ruislip Gardens,South Ruislip,166.0,16.0,26.0,54.0,30.0,26.0,14.0
+Central,EB,South Ruislip,Northolt,166.0,15.0,26.0,55.0,29.0,27.0,14.0
+Central,EB,Northolt,Greenford,198.0,15.0,32.0,72.0,38.0,27.0,14.0
+Central,EB,Greenford,Perivale,198.0,14.0,33.0,71.0,39.0,27.0,14.0
+Central,EB,Perivale,Hanger Lane,198.0,14.0,32.0,72.0,39.0,26.0,15.0
+Central,EB,Hanger Lane,North Acton,198.0,13.0,33.0,71.0,39.0,27.0,15.0
+Central,EB,Ealing Broadway,West Acton,174.0,11.0,29.0,53.0,30.0,28.0,23.0
+Central,EB,West Acton,North Acton,174.0,11.0,28.0,54.0,30.0,27.0,24.0
+Central,EB,North Acton,East Acton,403.0,24.0,69.0,127.0,76.0,63.0,44.0
+Central,EB,East Acton,White City,403.0,23.0,69.0,127.0,76.0,63.0,45.0
+Central,EB,White City,Shepherd's Bush LU,450.0,24.0,80.0,145.0,87.0,73.0,41.0
+Central,EB,Shepherd's Bush LU,Holland Park,450.0,23.0,80.0,145.0,87.0,73.0,42.0
+Central,EB,Holland Park,Notting Hill Gate,450.0,23.0,79.0,145.0,87.0,73.0,43.0
+Central,EB,Notting Hill Gate,Queensway,450.0,22.0,79.0,146.0,87.0,72.0,44.0
+Central,EB,Queensway,Lancaster Gate,450.0,22.0,79.0,145.0,87.0,73.0,44.0
+Central,EB,Lancaster Gate,Marble Arch,450.0,21.0,79.0,145.0,87.0,73.0,45.0
+Central,EB,Marble Arch,Bond Street,450.0,20.0,79.0,145.0,87.0,73.0,46.0
+Central,EB,Bond Street,Oxford Circus,450.0,20.0,78.0,146.0,87.0,73.0,46.0
+Central,EB,Oxford Circus,Tottenham Court Road,450.0,19.0,79.0,145.0,87.0,73.0,47.0
+Central,EB,Tottenham Court Road,Holborn,450.0,19.0,78.0,145.0,87.0,73.0,48.0
+Central,EB,Holborn,Chancery Lane,450.0,18.0,78.0,146.0,86.0,74.0,48.0
+Central,EB,Chancery Lane,St. Paul's,450.0,18.0,78.0,145.0,87.0,73.0,49.0
+Central,EB,St. Paul's,Bank and Monument,450.0,17.0,78.0,145.0,87.0,73.0,50.0
+Central,EB,Bank and Monument,Liverpool Street LU,450.0,17.0,77.0,146.0,86.0,74.0,50.0
+Central,EB,Liverpool Street LU,Bethnal Green LU,450.0,16.0,77.0,146.0,86.0,74.0,51.0
+Central,EB,Bethnal Green LU,Mile End,450.0,15.0,77.0,146.0,86.0,74.0,52.0
+Central,EB,Mile End,Stratford,450.0,14.0,77.0,146.0,86.0,74.0,53.0
+Central,EB,Stratford,Leyton,450.0,13.0,76.0,146.0,86.0,74.0,55.0
+Central,EB,Leyton,Leytonstone,450.0,12.0,76.0,146.0,85.0,75.0,56.0
+Central,EB,Leytonstone,Snaresbrook,225.0,11.0,37.0,72.0,43.0,37.0,25.0
+Central,EB,Snaresbrook,South Woodford,225.0,11.0,36.0,73.0,42.0,38.0,25.0
+Central,EB,South Woodford,Woodford,225.0,10.0,37.0,72.0,43.0,37.0,26.0
+Central,EB,Woodford,Buckhurst Hill,228.0,14.0,36.0,73.0,41.0,38.0,26.0
+Central,EB,Buckhurst Hill,Loughton,228.0,14.0,36.0,72.0,41.0,38.0,27.0
+Central,EB,Loughton,Debden,166.0,19.0,21.0,52.0,23.0,27.0,24.0
+Central,EB,Debden,Theydon Bois,166.0,18.0,22.0,51.0,24.0,26.0,25.0
+Central,EB,Theydon Bois,Epping,166.0,19.0,22.0,51.0,23.0,27.0,24.0
+Central,EB,Leytonstone,Wanstead,229.0,4.0,39.0,74.0,42.0,38.0,32.0
+Central,EB,Wanstead,Redbridge,229.0,4.0,39.0,73.0,43.0,37.0,33.0
+Central,EB,Redbridge,Gants Hill,229.0,4.0,38.0,74.0,42.0,38.0,33.0
+Central,EB,Gants Hill,Newbury Park,229.0,4.0,37.0,74.0,43.0,37.0,34.0
+Central,EB,Newbury Park,Barkingside,189.0,3.0,30.0,57.0,33.0,32.0,34.0
+Central,EB,Barkingside,Fairlop,189.0,3.0,30.0,56.0,33.0,33.0,34.0
+Central,EB,Fairlop,Hainault,189.0,3.0,30.0,56.0,33.0,32.0,35.0
+Central,EB,Hainault,Grange Hill,55.0,3.0,9.0,18.0,9.0,9.0,7.0
+Central,EB,Grange Hill,Chigwell,60.0,6.0,11.0,18.0,9.0,9.0,7.0
+Central,EB,Chigwell,Roding Valley,60.0,6.0,11.0,18.0,9.0,9.0,7.0
+Central,EB,Roding Valley,Woodford,60.0,6.0,11.0,18.0,9.0,9.0,7.0
+Central,WB,Epping,Theydon Bois,166.0,17.0,22.0,52.0,22.0,27.0,26.0
+Central,WB,Theydon Bois,Debden,166.0,17.0,22.0,51.0,23.0,27.0,26.0
+Central,WB,Debden,Loughton,168.0,16.0,25.0,50.0,23.0,27.0,27.0
+Central,WB,Loughton,Buckhurst Hill,228.0,15.0,40.0,72.0,40.0,39.0,22.0
+Central,WB,Buckhurst Hill,Woodford,228.0,15.0,40.0,72.0,40.0,39.0,22.0
+Central,WB,Woodford,South Woodford,230.0,17.0,42.0,72.0,40.0,39.0,20.0
+Central,WB,South Woodford,Snaresbrook,230.0,16.0,43.0,72.0,39.0,40.0,20.0
+Central,WB,Snaresbrook,Leytonstone,230.0,16.0,42.0,72.0,40.0,39.0,21.0
+Central,WB,Woodford,Roding Valley,55.0,2.0,9.0,18.0,10.0,9.0,7.0
+Central,WB,Roding Valley,Chigwell,55.0,2.0,9.0,18.0,10.0,9.0,7.0
+Central,WB,Chigwell,Grange Hill,55.0,2.0,9.0,18.0,10.0,9.0,7.0
+Central,WB,Grange Hill,Hainault,54.0,2.0,9.0,18.0,9.0,9.0,7.0
+Central,WB,Hainault,Fairlop,184.0,17.0,36.0,58.0,31.0,28.0,14.0
+Central,WB,Fairlop,Barkingside,184.0,17.0,36.0,58.0,31.0,28.0,14.0
+Central,WB,Barkingside,Newbury Park,184.0,16.0,36.0,59.0,31.0,27.0,15.0
+Central,WB,Newbury Park,Gants Hill,224.0,16.0,42.0,76.0,41.0,33.0,16.0
+Central,WB,Gants Hill,Redbridge,224.0,15.0,43.0,76.0,41.0,33.0,16.0
+Central,WB,Redbridge,Wanstead,224.0,15.0,42.0,76.0,42.0,32.0,17.0
+Central,WB,Wanstead,Leytonstone,224.0,15.0,42.0,76.0,41.0,33.0,17.0
+Central,WB,Leytonstone,Leyton,450.0,27.0,85.0,147.0,81.0,73.0,37.0
+Central,WB,Leyton,Stratford,450.0,26.0,85.0,147.0,81.0,73.0,38.0
+Central,WB,Stratford,Mile End,450.0,25.0,85.0,147.0,81.0,73.0,39.0
+Central,WB,Mile End,Bethnal Green LU,450.0,24.0,84.0,147.0,81.0,73.0,41.0
+Central,WB,Bethnal Green LU,Liverpool Street LU,450.0,22.0,85.0,147.0,81.0,73.0,42.0
+Central,WB,Liverpool Street LU,Bank and Monument,450.0,21.0,85.0,147.0,81.0,73.0,43.0
+Central,WB,Bank and Monument,St. Paul's,450.0,20.0,85.0,147.0,81.0,73.0,44.0
+Central,WB,St. Paul's,Chancery Lane,450.0,20.0,84.0,147.0,81.0,73.0,45.0
+Central,WB,Chancery Lane,Holborn,450.0,19.0,84.0,147.0,81.0,74.0,45.0
+Central,WB,Holborn,Tottenham Court Road,450.0,19.0,84.0,147.0,81.0,73.0,46.0
+Central,WB,Tottenham Court Road,Oxford Circus,450.0,18.0,84.0,147.0,81.0,73.0,47.0
+Central,WB,Oxford Circus,Bond Street,450.0,18.0,84.0,146.0,81.0,74.0,47.0
+Central,WB,Bond Street,Marble Arch,450.0,17.0,84.0,147.0,81.0,73.0,48.0
+Central,WB,Marble Arch,Lancaster Gate,450.0,17.0,84.0,146.0,81.0,74.0,48.0
+Central,WB,Lancaster Gate,Queensway,450.0,16.0,84.0,146.0,81.0,74.0,49.0
+Central,WB,Queensway,Notting Hill Gate,450.0,15.0,84.0,146.0,81.0,74.0,50.0
+Central,WB,Notting Hill Gate,Holland Park,450.0,15.0,83.0,147.0,80.0,75.0,50.0
+Central,WB,Holland Park,Shepherd's Bush LU,450.0,14.0,84.0,146.0,81.0,74.0,51.0
+Central,WB,Shepherd's Bush LU,White City,450.0,14.0,83.0,146.0,81.0,74.0,52.0
+Central,WB,White City,East Acton,403.0,22.0,72.0,127.0,70.0,66.0,46.0
+Central,WB,East Acton,North Acton,403.0,21.0,71.0,128.0,70.0,66.0,47.0
+Central,WB,North Acton,Hanger Lane,198.0,6.0,35.0,72.0,32.0,30.0,23.0
+Central,WB,Hanger Lane,Perivale,198.0,5.0,35.0,72.0,33.0,29.0,24.0
+Central,WB,Perivale,Greenford,198.0,5.0,34.0,73.0,32.0,30.0,24.0
+Central,WB,Greenford,Northolt,198.0,5.0,34.0,72.0,33.0,30.0,24.0
+Central,WB,Northolt,South Ruislip,166.0,4.0,28.0,54.0,25.0,30.0,25.0
+Central,WB,South Ruislip,Ruislip Gardens,166.0,4.0,28.0,54.0,25.0,30.0,25.0
+Central,WB,Ruislip Gardens,West Ruislip,156.0,4.0,23.0,54.0,25.0,27.0,23.0
+Central,WB,North Acton,West Acton,174.0,13.0,28.0,54.0,31.0,26.0,22.0
+Central,WB,West Acton,Ealing Broadway,174.0,13.0,28.0,54.0,30.0,27.0,22.0
+District,EB,Ealing Broadway,Ealing Common,115.0,11.0,19.0,36.0,17.0,18.0,14.0
+District,EB,Ealing Common,Acton Town,115.0,11.0,18.0,36.0,18.0,17.0,15.0
+District,EB,Acton Town,Chiswick Park,132.0,21.0,19.0,38.0,22.0,17.0,15.0
+District,EB,Chiswick Park,Turnham Green,132.0,22.0,18.0,39.0,21.0,18.0,14.0
+District,EB,Richmond,Kew Gardens,116.0,8.0,18.0,36.0,19.0,19.0,16.0
+District,EB,Kew Gardens,Gunnersbury,116.0,7.0,19.0,36.0,18.0,20.0,16.0
+District,EB,Gunnersbury,Turnham Green,116.0,7.0,19.0,36.0,18.0,19.0,17.0
+District,EB,Turnham Green,Stamford Brook,248.0,29.0,37.0,74.0,40.0,37.0,31.0
+District,EB,Stamford Brook,Ravenscourt Park,248.0,29.0,36.0,74.0,41.0,36.0,32.0
+District,EB,Ravenscourt Park,Hammersmith (DIS),248.0,28.0,37.0,74.0,40.0,37.0,32.0
+District,EB,Hammersmith (DIS),Barons Court,245.0,28.0,37.0,73.0,41.0,36.0,30.0
+District,EB,Barons Court,West Kensington,245.0,27.0,37.0,74.0,40.0,37.0,30.0
+District,EB,West Kensington,Earl's Court,245.0,27.0,37.0,73.0,41.0,37.0,30.0
+District,EB,Wimbledon,Wimbledon Park,246.0,14.0,44.0,72.0,43.0,41.0,32.0
+District,EB,Wimbledon Park,Southfields,246.0,13.0,45.0,72.0,43.0,41.0,32.0
+District,EB,Southfields,East Putney,246.0,13.0,45.0,72.0,43.0,41.0,32.0
+District,EB,East Putney,Putney Bridge,246.0,13.0,45.0,72.0,42.0,42.0,32.0
+District,EB,Putney Bridge,Parsons Green,246.0,12.0,45.0,72.0,43.0,41.0,33.0
+District,EB,Parsons Green,Fulham Broadway,247.0,13.0,45.0,72.0,42.0,42.0,33.0
+District,EB,Fulham Broadway,West Brompton,247.0,12.0,46.0,72.0,42.0,42.0,33.0
+District,EB,West Brompton,Earl's Court,247.0,12.0,45.0,72.0,43.0,41.0,34.0
+District,EB,Kensington (Olympia),Earl's Court,8.0,5.0,1.0,0.0,0.0,2.0,0.0
+District,EB,Earl's Court,High Street Kensington,141.0,20.0,19.0,36.0,18.0,25.0,23.0
+District,EB,High Street Kensington,Notting Hill Gate,111.0,8.0,18.0,36.0,18.0,18.0,13.0
+District,EB,Notting Hill Gate,Bayswater,111.0,8.0,18.0,36.0,18.0,18.0,13.0
+District,EB,Bayswater,Paddington TfL,111.0,8.0,18.0,36.0,18.0,18.0,13.0
+District,EB,Paddington TfL,Edgware Road (DIS),111.0,8.0,18.0,36.0,18.0,18.0,13.0
+District,EB,Earl's Court,Gloucester Road,357.0,23.0,65.0,109.0,65.0,56.0,39.0
+District,EB,Gloucester Road,South Kensington,357.0,23.0,65.0,109.0,65.0,56.0,39.0
+District,EB,South Kensington,Sloane Square,357.0,23.0,64.0,110.0,64.0,57.0,39.0
+District,EB,Sloane Square,Victoria LU,357.0,22.0,64.0,110.0,64.0,57.0,40.0
+District,EB,Victoria LU,St. James's Park,357.0,21.0,64.0,110.0,64.0,57.0,41.0
+District,EB,St. James's Park,Westminster,357.0,20.0,65.0,109.0,64.0,57.0,42.0
+District,EB,Westminster,Embankment,357.0,20.0,64.0,110.0,64.0,57.0,42.0
+District,EB,Embankment,Temple,357.0,19.0,65.0,109.0,65.0,57.0,42.0
+District,EB,Temple,Blackfriars LU,357.0,19.0,64.0,110.0,64.0,57.0,43.0
+District,EB,Blackfriars LU,Mansion House,357.0,18.0,64.0,110.0,64.0,58.0,43.0
+District,EB,Mansion House,Cannon Street LU,357.0,17.0,64.0,110.0,64.0,58.0,44.0
+District,EB,Cannon Street LU,Bank and Monument,357.0,17.0,64.0,109.0,64.0,58.0,45.0
+District,EB,Bank and Monument,Tower Hill,357.0,17.0,63.0,110.0,64.0,58.0,45.0
+District,EB,Tower Hill,Aldgate East,289.0,14.0,55.0,92.0,55.0,40.0,33.0
+District,EB,Aldgate East,Whitechapel,289.0,13.0,55.0,92.0,54.0,41.0,34.0
+District,EB,Whitechapel,Stepney Green,289.0,12.0,55.0,92.0,54.0,42.0,34.0
+District,EB,Stepney Green,Mile End,289.0,11.0,55.0,92.0,54.0,42.0,35.0
+District,EB,Mile End,Bow Road,289.0,11.0,55.0,92.0,54.0,42.0,35.0
+District,EB,Bow Road,Bromley-by-Bow,289.0,10.0,55.0,93.0,53.0,43.0,35.0
+District,EB,Bromley-by-Bow,West Ham,289.0,10.0,55.0,92.0,54.0,42.0,36.0
+District,EB,West Ham,Plaistow,289.0,10.0,54.0,93.0,53.0,43.0,36.0
+District,EB,Plaistow,Upton Park,289.0,9.0,55.0,92.0,53.0,43.0,37.0
+District,EB,Upton Park,East Ham,289.0,9.0,54.0,93.0,53.0,43.0,37.0
+District,EB,East Ham,Barking,289.0,8.0,55.0,93.0,52.0,44.0,37.0
+District,EB,Barking,Upney,243.0,7.0,45.0,76.0,43.0,44.0,28.0
+District,EB,Upney,Becontree,243.0,6.0,46.0,75.0,44.0,43.0,29.0
+District,EB,Becontree,Dagenham Heathway,243.0,6.0,45.0,76.0,43.0,44.0,29.0
+District,EB,Dagenham Heathway,Dagenham East,243.0,6.0,45.0,75.0,44.0,43.0,30.0
+District,EB,Dagenham East,Elm Park,231.0,6.0,37.0,76.0,38.0,44.0,30.0
+District,EB,Elm Park,Hornchurch,231.0,5.0,38.0,75.0,39.0,43.0,31.0
+District,EB,Hornchurch,Upminster Bridge,231.0,5.0,37.0,76.0,38.0,44.0,31.0
+District,EB,Upminster Bridge,Upminster,231.0,5.0,37.0,76.0,37.0,45.0,31.0
+District,WB,Upminster,Upminster Bridge,231.0,29.0,38.0,75.0,41.0,35.0,13.0
+District,WB,Upminster Bridge,Hornchurch,231.0,28.0,39.0,74.0,41.0,36.0,13.0
+District,WB,Hornchurch,Elm Park,231.0,28.0,38.0,75.0,41.0,36.0,13.0
+District,WB,Elm Park,Dagenham East,231.0,28.0,39.0,75.0,40.0,37.0,12.0
+District,WB,Dagenham East,Dagenham Heathway,243.0,27.0,46.0,75.0,46.0,36.0,13.0
+District,WB,Dagenham Heathway,Becontree,243.0,26.0,47.0,74.0,46.0,37.0,13.0
+District,WB,Becontree,Upney,243.0,26.0,46.0,75.0,46.0,36.0,14.0
+District,WB,Upney,Barking,243.0,26.0,46.0,74.0,46.0,37.0,14.0
+District,WB,Barking,East Ham,289.0,25.0,54.0,92.0,56.0,38.0,24.0
+District,WB,East Ham,Upton Park,289.0,23.0,55.0,92.0,56.0,38.0,25.0
+District,WB,Upton Park,Plaistow,289.0,23.0,55.0,92.0,56.0,38.0,25.0
+District,WB,Plaistow,West Ham,289.0,23.0,55.0,91.0,56.0,39.0,25.0
+District,WB,West Ham,Bromley-by-Bow,289.0,22.0,55.0,91.0,56.0,39.0,26.0
+District,WB,Bromley-by-Bow,Bow Road,289.0,20.0,56.0,91.0,57.0,39.0,26.0
+District,WB,Bow Road,Mile End,289.0,20.0,55.0,91.0,57.0,39.0,27.0
+District,WB,Mile End,Stepney Green,289.0,20.0,55.0,91.0,57.0,39.0,27.0
+District,WB,Stepney Green,Whitechapel,289.0,19.0,55.0,92.0,56.0,40.0,27.0
+District,WB,Whitechapel,Aldgate East,289.0,18.0,55.0,92.0,56.0,40.0,28.0
+District,WB,Aldgate East,Tower Hill,289.0,18.0,55.0,91.0,56.0,41.0,28.0
+District,WB,Tower Hill,Bank and Monument,357.0,19.0,63.0,110.0,66.0,57.0,42.0
+District,WB,Bank and Monument,Cannon Street LU,357.0,18.0,64.0,110.0,65.0,58.0,42.0
+District,WB,Cannon Street LU,Mansion House,357.0,17.0,64.0,110.0,66.0,58.0,42.0
+District,WB,Mansion House,Blackfriars LU,357.0,17.0,64.0,110.0,65.0,58.0,43.0
+District,WB,Blackfriars LU,Temple,357.0,16.0,64.0,110.0,65.0,59.0,43.0
+District,WB,Temple,Embankment,357.0,15.0,64.0,110.0,65.0,59.0,44.0
+District,WB,Embankment,Westminster,357.0,15.0,64.0,109.0,66.0,58.0,45.0
+District,WB,Westminster,St. James's Park,357.0,15.0,64.0,109.0,66.0,58.0,45.0
+District,WB,St. James's Park,Victoria LU,357.0,14.0,64.0,110.0,65.0,59.0,45.0
+District,WB,Victoria LU,Sloane Square,357.0,13.0,64.0,110.0,65.0,59.0,46.0
+District,WB,Sloane Square,South Kensington,357.0,13.0,63.0,110.0,65.0,60.0,46.0
+District,WB,South Kensington,Gloucester Road,357.0,12.0,63.0,110.0,65.0,60.0,47.0
+District,WB,Gloucester Road,Earl's Court,357.0,12.0,63.0,110.0,64.0,60.0,48.0
+District,WB,Edgware Road (DIS),Paddington TfL,111.0,7.0,18.0,36.0,18.0,18.0,14.0
+District,WB,Paddington TfL,Bayswater,111.0,7.0,18.0,36.0,18.0,18.0,14.0
+District,WB,Bayswater,Notting Hill Gate,111.0,7.0,18.0,36.0,18.0,18.0,14.0
+District,WB,Notting Hill Gate,High Street Kensington,111.0,6.0,18.0,36.0,19.0,17.0,15.0
+District,WB,High Street Kensington,Earl's Court,134.0,19.0,19.0,36.0,18.0,23.0,19.0
+District,WB,Earl's Court,Kensington (Olympia),2.0,0.0,0.0,0.0,0.0,2.0,0.0
+District,WB,Earl's Court,West Brompton,244.0,17.0,42.0,72.0,46.0,38.0,29.0
+District,WB,West Brompton,Fulham Broadway,244.0,16.0,43.0,72.0,45.0,39.0,29.0
+District,WB,Fulham Broadway,Parsons Green,244.0,15.0,43.0,72.0,46.0,38.0,30.0
+District,WB,Parsons Green,Putney Bridge,248.0,19.0,43.0,72.0,45.0,39.0,30.0
+District,WB,Putney Bridge,East Putney,248.0,19.0,43.0,72.0,45.0,39.0,30.0
+District,WB,East Putney,Southfields,248.0,18.0,43.0,72.0,45.0,39.0,31.0
+District,WB,Southfields,Wimbledon Park,248.0,18.0,43.0,72.0,44.0,40.0,31.0
+District,WB,Wimbledon Park,Wimbledon,248.0,17.0,43.0,72.0,45.0,39.0,32.0
+District,WB,Earl's Court,West Kensington,247.0,14.0,40.0,74.0,37.0,42.0,40.0
+District,WB,West Kensington,Barons Court,247.0,14.0,39.0,75.0,37.0,42.0,40.0
+District,WB,Barons Court,Hammersmith (DIS),251.0,17.0,39.0,75.0,38.0,42.0,40.0
+District,WB,Hammersmith (DIS),Ravenscourt Park,251.0,17.0,39.0,75.0,37.0,42.0,41.0
+District,WB,Ravenscourt Park,Stamford Brook,251.0,16.0,40.0,75.0,37.0,42.0,41.0
+District,WB,Stamford Brook,Turnham Green,251.0,16.0,39.0,75.0,38.0,41.0,42.0
+District,WB,Turnham Green,Gunnersbury,118.0,9.0,18.0,36.0,19.0,19.0,17.0
+District,WB,Gunnersbury,Kew Gardens,118.0,9.0,18.0,36.0,19.0,19.0,17.0
+District,WB,Kew Gardens,Richmond,118.0,9.0,18.0,36.0,19.0,19.0,17.0
+District,WB,Turnham Green,Chiswick Park,133.0,7.0,20.0,40.0,18.0,23.0,25.0
+District,WB,Chiswick Park,Acton Town,133.0,7.0,20.0,40.0,18.0,23.0,25.0
+District,WB,Acton Town,Ealing Common,133.0,6.0,20.0,40.0,18.0,23.0,26.0
+District,WB,Ealing Common,Ealing Broadway,141.0,12.0,20.0,40.0,18.0,23.0,28.0
+DLR,IB,Woolwich Arsenal,King George V,242.0,21.0,40.0,71.0,40.0,37.0,33.0
+DLR,IB,King George V,London City Airport,242.0,20.0,40.0,72.0,39.0,37.0,34.0
+DLR,IB,London City Airport,Pontoon Dock,242.0,19.0,40.0,72.0,40.0,36.0,35.0
+DLR,IB,Pontoon Dock,West Silvertown,242.0,19.0,40.0,71.0,40.0,37.0,35.0
+DLR,IB,West Silvertown,Canning Town (Stratford),120.0,8.0,20.0,36.0,20.0,18.0,18.0
+DLR,IB,West Silvertown,Canning Town,122.0,11.0,20.0,35.0,20.0,19.0,17.0
+DLR,IB,Beckton,Gallions Reach,224.0,15.0,40.0,73.0,40.0,36.0,20.0
+DLR,IB,Gallions Reach,Cyprus,224.0,15.0,39.0,73.0,40.0,36.0,21.0
+DLR,IB,Cyprus,Beckton Park,224.0,14.0,40.0,73.0,40.0,36.0,21.0
+DLR,IB,Beckton Park,Royal Albert,224.0,14.0,40.0,72.0,40.0,37.0,21.0
+DLR,IB,Royal Albert,Prince Regent,224.0,14.0,40.0,72.0,40.0,36.0,22.0
+DLR,IB,Prince Regent,Custom House,224.0,13.0,40.0,72.0,40.0,37.0,22.0
+DLR,IB,Custom House,Royal Victoria,224.0,13.0,40.0,72.0,40.0,37.0,22.0
+DLR,IB,Royal Victoria,Canning Town (Stratford),102.0,3.0,20.0,34.0,20.0,18.0,7.0
+DLR,IB,Royal Victoria,Canning Town,122.0,10.0,20.0,38.0,20.0,18.0,16.0
+DLR,IB,Canning Town (Stratford),Star Lane,176.0,12.0,20.0,68.0,20.0,34.0,22.0
+DLR,IB,Star Lane,West Ham,176.0,11.0,20.0,69.0,20.0,33.0,23.0
+DLR,IB,West Ham,Abbey Road,176.0,11.0,20.0,69.0,20.0,33.0,23.0
+DLR,IB,Abbey Road,Stratford High Street,176.0,11.0,20.0,69.0,20.0,33.0,23.0
+DLR,IB,Stratford High Street,Stratford,176.0,11.0,20.0,69.0,20.0,33.0,23.0
+DLR,IB,Stratford,Stratford International DLR,176.0,11.0,20.0,69.0,19.0,33.0,24.0
+DLR,IB,Canning Town,East India,246.0,22.0,40.0,73.0,40.0,37.0,34.0
+DLR,IB,East India,Blackwall,246.0,21.0,40.0,74.0,40.0,36.0,35.0
+DLR,IB,Blackwall,Poplar,245.0,21.0,40.0,72.0,40.0,37.0,35.0
+DLR,IB,Poplar,Westferry,242.0,21.0,40.0,72.0,40.0,37.0,32.0
+DLR,IB,Lewisham DLR,Elverson Road,278.0,14.0,58.0,76.0,60.0,40.0,30.0
+DLR,IB,Elverson Road,Deptford Bridge,278.0,14.0,58.0,75.0,60.0,41.0,30.0
+DLR,IB,Deptford Bridge,Greenwich,278.0,13.0,58.0,76.0,60.0,40.0,31.0
+DLR,IB,Greenwich,Cutty Sark,278.0,13.0,58.0,75.0,60.0,41.0,31.0
+DLR,IB,Cutty Sark,Island Gardens,278.0,13.0,58.0,74.0,60.0,41.0,32.0
+DLR,IB,Island Gardens,Mudchute,278.0,12.0,58.0,75.0,60.0,41.0,32.0
+DLR,IB,Mudchute,Crossharbour,279.0,13.0,57.0,75.0,60.0,42.0,32.0
+DLR,IB,Crossharbour,South Quay,279.0,13.0,57.0,75.0,60.0,42.0,32.0
+DLR,IB,South Quay,Heron Quays,279.0,12.0,57.0,76.0,60.0,41.0,33.0
+DLR,IB,Heron Quays,Canary Wharf DLR,234.0,12.0,40.0,72.0,40.0,37.0,33.0
+DLR,IB,Heron Quays,Canary Wharf DLR (Stratford),45.0,0.0,16.0,4.0,20.0,5.0,0.0
+DLR,IB,Canary Wharf DLR,West India Quay,226.0,11.0,40.0,73.0,40.0,36.0,26.0
+DLR,IB,Canary Wharf DLR (Stratford),West India Quay,223.0,10.0,36.0,74.0,41.0,37.0,25.0
+DLR,IB,West India Quay,Westferry,226.0,11.0,40.0,72.0,40.0,37.0,26.0
+DLR,IB,Westferry,Limehouse DLR,468.0,31.0,80.0,144.0,80.0,74.0,59.0
+DLR,IB,Limehouse DLR,Shadwell DLR,468.0,30.0,80.0,145.0,80.0,73.0,60.0
+DLR,IB,Shadwell DLR,Tower Gateway,121.0,9.0,20.0,36.0,21.0,18.0,17.0
+DLR,IB,Shadwell DLR,Bank and Monument,346.0,20.0,60.0,108.0,60.0,55.0,43.0
+DLR,IB,West India Quay,Poplar,223.0,10.0,36.0,74.0,41.0,37.0,25.0
+DLR,IB,Poplar,All Saints,221.0,11.0,36.0,72.0,40.0,37.0,25.0
+DLR,IB,All Saints,Langdon Park,229.0,14.0,40.0,72.0,41.0,36.0,26.0
+DLR,IB,Langdon Park,Devons Road,229.0,14.0,40.0,72.0,41.0,36.0,26.0
+DLR,IB,Devons Road,Bow Church,229.0,14.0,40.0,72.0,40.0,37.0,26.0
+DLR,IB,Bow Church,Pudding Mill Lane,229.0,13.0,40.0,72.0,41.0,36.0,27.0
+DLR,IB,Pudding Mill Lane,Stratford,220.0,13.0,39.0,68.0,39.0,34.0,27.0
+DLR,OB,Stratford,Pudding Mill Lane,230.0,12.0,40.0,73.0,40.0,36.0,29.0
+DLR,OB,Pudding Mill Lane,Bow Church,230.0,12.0,40.0,72.0,40.0,37.0,29.0
+DLR,OB,Bow Church,Devons Road,230.0,11.0,40.0,73.0,40.0,37.0,29.0
+DLR,OB,Devons Road,Langdon Park,230.0,11.0,40.0,72.0,40.0,37.0,30.0
+DLR,OB,Langdon Park,All Saints,230.0,11.0,40.0,72.0,40.0,37.0,30.0
+DLR,OB,All Saints,Poplar,230.0,10.0,40.0,73.0,40.0,37.0,30.0
+DLR,OB,Bank and Monument,Shadwell DLR,347.0,22.0,60.0,108.0,60.0,55.0,42.0
+DLR,OB,Tower Gateway,Shadwell DLR,122.0,10.0,20.0,37.0,20.0,19.0,16.0
+DLR,OB,Shadwell DLR,Limehouse DLR,470.0,32.0,80.0,145.0,79.0,75.0,59.0
+DLR,OB,Limehouse DLR,Westferry,470.0,31.0,80.0,145.0,79.0,75.0,60.0
+DLR,OB,Westferry,Canary Wharf DLR,228.0,11.0,40.0,73.0,40.0,37.0,27.0
+DLR,OB,Poplar,West India Quay,235.0,11.0,40.0,76.0,40.0,37.0,31.0
+DLR,OB,West India Quay,Canary Wharf DLR (Stratford),235.0,10.0,41.0,76.0,40.0,37.0,31.0
+DLR,OB,Canary Wharf DLR (Stratford),Heron Quays,51.0,1.0,20.0,5.0,19.0,6.0,0.0
+DLR,OB,Canary Wharf DLR,Heron Quays,235.0,18.0,40.0,72.0,40.0,37.0,28.0
+DLR,OB,Heron Quays,South Quay,286.0,18.0,60.0,78.0,59.0,43.0,28.0
+DLR,OB,South Quay,Crossharbour,286.0,17.0,60.0,78.0,59.0,44.0,28.0
+DLR,OB,Crossharbour,Mudchute,286.0,16.0,60.0,78.0,60.0,43.0,29.0
+DLR,OB,Mudchute,Island Gardens,286.0,16.0,60.0,78.0,59.0,44.0,29.0
+DLR,OB,Island Gardens,Cutty Sark,286.0,16.0,60.0,77.0,60.0,44.0,29.0
+DLR,OB,Cutty Sark,Greenwich,286.0,15.0,61.0,76.0,60.0,44.0,30.0
+DLR,OB,Greenwich,Deptford Bridge,286.0,15.0,59.0,78.0,59.0,45.0,30.0
+DLR,OB,Deptford Bridge,Elverson Road,286.0,15.0,59.0,78.0,59.0,45.0,30.0
+DLR,OB,Elverson Road,Lewisham DLR,282.0,14.0,57.0,78.0,58.0,44.0,31.0
+DLR,OB,Westferry,Poplar,242.0,19.0,40.0,72.0,40.0,37.0,34.0
+DLR,OB,Poplar,Blackwall,244.0,20.0,40.0,73.0,40.0,37.0,34.0
+DLR,OB,Blackwall,East India,247.0,20.0,40.0,75.0,39.0,39.0,34.0
+DLR,OB,East India,Canning Town,247.0,20.0,40.0,74.0,40.0,38.0,35.0
+DLR,OB,Stratford International DLR,Stratford,177.0,11.0,20.0,69.0,21.0,32.0,24.0
+DLR,OB,Stratford,Stratford High Street,177.0,11.0,20.0,69.0,20.0,32.0,25.0
+DLR,OB,Stratford High Street,Abbey Road,177.0,11.0,20.0,69.0,20.0,32.0,25.0
+DLR,OB,Abbey Road,West Ham,177.0,10.0,20.0,70.0,20.0,32.0,25.0
+DLR,OB,West Ham,Star Lane,177.0,10.0,20.0,69.0,21.0,31.0,26.0
+DLR,OB,Star Lane,Canning Town (Stratford),177.0,10.0,20.0,69.0,21.0,31.0,26.0
+DLR,OB,Canning Town,Royal Victoria,126.0,10.0,20.0,38.0,20.0,20.0,18.0
+DLR,OB,Canning Town (Stratford),Royal Victoria,101.0,2.0,20.0,35.0,20.0,16.0,8.0
+DLR,OB,Royal Victoria,Custom House,227.0,11.0,40.0,74.0,40.0,35.0,27.0
+DLR,OB,Custom House,Prince Regent,227.0,11.0,40.0,73.0,40.0,36.0,27.0
+DLR,OB,Prince Regent,Royal Albert,227.0,11.0,40.0,73.0,40.0,36.0,27.0
+DLR,OB,Royal Albert,Beckton Park,227.0,10.0,40.0,72.0,42.0,35.0,28.0
+DLR,OB,Beckton Park,Cyprus,227.0,10.0,40.0,72.0,41.0,36.0,28.0
+DLR,OB,Cyprus,Gallions Reach,227.0,10.0,40.0,72.0,41.0,36.0,28.0
+DLR,OB,Gallions Reach,Beckton,200.0,9.0,38.0,57.0,38.0,29.0,29.0
+DLR,OB,Canning Town,West Silvertown,121.0,9.0,20.0,37.0,19.0,19.0,17.0
+DLR,OB,Canning Town (Stratford),West Silvertown,121.0,11.0,20.0,36.0,20.0,19.0,15.0
+DLR,OB,West Silvertown,Pontoon Dock,242.0,19.0,40.0,72.0,41.0,37.0,33.0
+DLR,OB,Pontoon Dock,London City Airport,242.0,19.0,40.0,72.0,40.0,38.0,33.0
+DLR,OB,London City Airport,King George V,242.0,18.0,40.0,73.0,40.0,37.0,34.0
+DLR,OB,King George V,Woolwich Arsenal,241.0,18.0,40.0,73.0,38.0,38.0,34.0
+Elizabeth Line,EB,Reading,Twyford,49.0,5.0,11.0,12.0,12.0,6.0,3.0
+Elizabeth Line,EB,Twyford,Maidenhead,49.0,5.0,10.0,12.0,12.0,6.0,4.0
+Elizabeth Line,EB,Maidenhead,Taplow,78.0,9.0,16.0,23.0,13.0,12.0,5.0
+Elizabeth Line,EB,Taplow,Burnham,78.0,8.0,16.0,24.0,12.0,12.0,6.0
+Elizabeth Line,EB,Burnham,Slough,78.0,8.0,16.0,24.0,12.0,12.0,6.0
+Elizabeth Line,EB,Slough,Langley,78.0,8.0,16.0,24.0,12.0,12.0,6.0
+Elizabeth Line,EB,Langley,Iver,78.0,8.0,16.0,24.0,12.0,12.0,6.0
+Elizabeth Line,EB,Iver,West Drayton,78.0,8.0,16.0,24.0,12.0,12.0,6.0
+Elizabeth Line,EB,West Drayton,Hayes & Harlington,78.0,7.0,16.0,24.0,12.0,12.0,7.0
+Elizabeth Line,EB,Heathrow Terminal 5 EL,Heathrow Terminals 2 & 3 EL,38.0,4.0,6.0,12.0,6.0,6.0,4.0
+Elizabeth Line,EB,Heathrow Terminal 4 EL,Heathrow Terminals 2 & 3 EL,71.0,5.0,12.0,24.0,12.0,12.0,6.0
+Elizabeth Line,EB,Heathrow Terminals 2 & 3 EL,Hayes & Harlington,109.0,9.0,18.0,36.0,18.0,18.0,10.0
+Elizabeth Line,EB,Hayes & Harlington,Southall,187.0,15.0,34.0,60.0,30.0,30.0,18.0
+Elizabeth Line,EB,Southall,Hanwell,187.0,14.0,34.0,60.0,30.0,30.0,19.0
+Elizabeth Line,EB,Hanwell,West Ealing,187.0,14.0,34.0,60.0,30.0,30.0,19.0
+Elizabeth Line,EB,West Ealing,Ealing Broadway,187.0,14.0,34.0,60.0,30.0,30.0,19.0
+Elizabeth Line,EB,Ealing Broadway,Acton Main Line,187.0,13.0,35.0,59.0,30.0,30.0,20.0
+Elizabeth Line,EB,Acton Main Line,Paddington NR,5.0,0.0,0.0,0.0,0.0,0.0,5.0
+Elizabeth Line,EB,Acton Main Line,Paddington TfL,182.0,12.0,35.0,60.0,30.0,30.0,15.0
+Elizabeth Line,EB,Paddington TfL,Bond Street,332.0,23.0,66.0,96.0,66.0,50.0,31.0
+Elizabeth Line,EB,Bond Street,Tottenham Court Road,332.0,22.0,66.0,97.0,65.0,51.0,31.0
+Elizabeth Line,EB,Tottenham Court Road,Farringdon,332.0,22.0,66.0,96.0,66.0,50.0,32.0
+Elizabeth Line,EB,Farringdon,Liverpool Street LU,332.0,21.0,66.0,96.0,66.0,50.0,33.0
+Elizabeth Line,EB,Liverpool Street LU,Whitechapel,332.0,20.0,66.0,96.0,66.0,50.0,34.0
+Elizabeth Line,EB,Whitechapel,Canary Wharf EL,165.0,10.0,33.0,48.0,33.0,25.0,16.0
+Elizabeth Line,EB,Canary Wharf EL,Custom House EL,165.0,9.0,33.0,49.0,32.0,26.0,16.0
+Elizabeth Line,EB,Custom House EL,Woolwich EL,165.0,8.0,33.0,49.0,32.0,26.0,17.0
+Elizabeth Line,EB,Woolwich EL,Abbey Wood,165.0,8.0,32.0,49.0,33.0,25.0,18.0
+Elizabeth Line,EB,Whitechapel,Stratford,166.0,9.0,33.0,49.0,32.0,26.0,17.0
+Elizabeth Line,EB,Liverpool Street NR,Stratford,10.0,3.0,0.0,0.0,6.0,0.0,1.0
+Elizabeth Line,EB,Stratford,Maryland,176.0,11.0,33.0,49.0,38.0,26.0,19.0
+Elizabeth Line,EB,Maryland,Forest Gate,176.0,11.0,33.0,49.0,38.0,26.0,19.0
+Elizabeth Line,EB,Forest Gate,Manor Park,176.0,11.0,33.0,48.0,39.0,25.0,20.0
+Elizabeth Line,EB,Manor Park,Ilford,176.0,10.0,33.0,49.0,38.0,26.0,20.0
+Elizabeth Line,EB,Ilford,Seven Kings,176.0,10.0,33.0,49.0,37.0,27.0,20.0
+Elizabeth Line,EB,Seven Kings,Goodmayes,176.0,9.0,33.0,49.0,38.0,26.0,21.0
+Elizabeth Line,EB,Goodmayes,Chadwell Heath,176.0,9.0,33.0,49.0,37.0,27.0,21.0
+Elizabeth Line,EB,Chadwell Heath,Romford,176.0,9.0,33.0,49.0,37.0,27.0,21.0
+Elizabeth Line,EB,Romford,Gidea Park,176.0,8.0,33.0,49.0,37.0,27.0,22.0
+Elizabeth Line,EB,Gidea Park,Harold Wood,170.0,7.0,33.0,50.0,31.0,27.0,22.0
+Elizabeth Line,EB,Harold Wood,Brentwood,170.0,7.0,33.0,49.0,32.0,26.0,23.0
+Elizabeth Line,EB,Brentwood,Shenfield,170.0,6.0,33.0,50.0,31.0,27.0,23.0
+Elizabeth Line,WB,Shenfield,Brentwood,166.0,17.0,31.0,49.0,33.0,24.0,12.0
+Elizabeth Line,WB,Brentwood,Harold Wood,166.0,16.0,31.0,49.0,33.0,24.0,13.0
+Elizabeth Line,WB,Harold Wood,Gidea Park,166.0,15.0,32.0,49.0,33.0,24.0,13.0
+Elizabeth Line,WB,Gidea Park,Romford,174.0,17.0,38.0,48.0,33.0,25.0,13.0
+Elizabeth Line,WB,Romford,Chadwell Heath,174.0,17.0,37.0,49.0,33.0,24.0,14.0
+Elizabeth Line,WB,Chadwell Heath,Goodmayes,174.0,17.0,38.0,48.0,33.0,25.0,13.0
+Elizabeth Line,WB,Goodmayes,Seven Kings,174.0,17.0,37.0,49.0,33.0,24.0,14.0
+Elizabeth Line,WB,Seven Kings,Ilford,174.0,17.0,37.0,49.0,33.0,24.0,14.0
+Elizabeth Line,WB,Ilford,Manor Park,174.0,16.0,38.0,48.0,33.0,25.0,14.0
+Elizabeth Line,WB,Manor Park,Forest Gate,174.0,15.0,38.0,49.0,33.0,24.0,15.0
+Elizabeth Line,WB,Forest Gate,Maryland,174.0,14.0,39.0,48.0,33.0,25.0,15.0
+Elizabeth Line,WB,Maryland,Stratford,174.0,14.0,39.0,48.0,33.0,25.0,15.0
+Elizabeth Line,WB,Stratford,Liverpool Street NR,8.0,2.0,5.0,0.0,0.0,0.0,1.0
+Elizabeth Line,WB,Stratford,Whitechapel,167.0,12.0,34.0,48.0,33.0,25.0,15.0
+Elizabeth Line,WB,Abbey Wood,Woolwich EL,165.0,12.0,33.0,48.0,33.0,25.0,14.0
+Elizabeth Line,WB,Woolwich EL,Custom House EL,165.0,12.0,33.0,48.0,33.0,25.0,14.0
+Elizabeth Line,WB,Custom House EL,Canary Wharf EL,165.0,11.0,33.0,48.0,33.0,25.0,15.0
+Elizabeth Line,WB,Canary Wharf EL,Whitechapel,165.0,11.0,33.0,48.0,33.0,25.0,15.0
+Elizabeth Line,WB,Whitechapel,Liverpool Street LU,332.0,21.0,67.0,97.0,65.0,51.0,31.0
+Elizabeth Line,WB,Liverpool Street LU,Farringdon,332.0,20.0,67.0,97.0,65.0,51.0,32.0
+Elizabeth Line,WB,Farringdon,Tottenham Court Road,332.0,19.0,67.0,97.0,65.0,51.0,33.0
+Elizabeth Line,WB,Tottenham Court Road,Bond Street,332.0,18.0,67.0,97.0,65.0,51.0,34.0
+Elizabeth Line,WB,Bond Street,Paddington TfL,332.0,18.0,67.0,97.0,65.0,51.0,34.0
+Elizabeth Line,WB,Paddington TfL,Acton Main Line,178.0,9.0,30.0,60.0,35.0,30.0,14.0
+Elizabeth Line,WB,Paddington NR,Acton Main Line,11.0,8.0,0.0,0.0,0.0,0.0,3.0
+Elizabeth Line,WB,Acton Main Line,Ealing Broadway,189.0,16.0,30.0,60.0,35.0,30.0,18.0
+Elizabeth Line,WB,Ealing Broadway,West Ealing,189.0,17.0,30.0,60.0,35.0,30.0,17.0
+Elizabeth Line,WB,West Ealing,Hanwell,189.0,17.0,30.0,60.0,35.0,30.0,17.0
+Elizabeth Line,WB,Hanwell,Southall,189.0,17.0,30.0,60.0,35.0,30.0,17.0
+Elizabeth Line,WB,Southall,Hayes & Harlington,189.0,16.0,30.0,60.0,35.0,30.0,18.0
+Elizabeth Line,WB,Hayes & Harlington,Heathrow Terminals 2 & 3 EL,111.0,10.0,19.0,36.0,18.0,18.0,10.0
+Elizabeth Line,WB,Heathrow Terminals 2 & 3 EL,Heathrow Terminal 4 EL,73.0,7.0,12.0,24.0,12.0,12.0,6.0
+Elizabeth Line,WB,Heathrow Terminals 2 & 3 EL,Heathrow Terminal 5 EL,38.0,4.0,6.0,12.0,6.0,6.0,4.0
+Elizabeth Line,WB,Hayes & Harlington,West Drayton,77.0,5.0,12.0,24.0,16.0,13.0,7.0
+Elizabeth Line,WB,West Drayton,Iver,77.0,5.0,12.0,24.0,16.0,13.0,7.0
+Elizabeth Line,WB,Iver,Langley,77.0,5.0,12.0,24.0,16.0,13.0,7.0
+Elizabeth Line,WB,Langley,Slough,77.0,5.0,12.0,24.0,16.0,13.0,7.0
+Elizabeth Line,WB,Slough,Burnham,77.0,4.0,12.0,24.0,16.0,13.0,8.0
+Elizabeth Line,WB,Burnham,Taplow,77.0,4.0,12.0,24.0,16.0,13.0,8.0
+Elizabeth Line,WB,Taplow,Maidenhead,77.0,4.0,12.0,24.0,16.0,13.0,8.0
+Elizabeth Line,WB,Maidenhead,Twyford,49.0,4.0,11.0,12.0,12.0,7.0,3.0
+Elizabeth Line,WB,Twyford,Reading,49.0,3.0,11.0,12.0,12.0,7.0,4.0
+H&C and Circle,IR,Barking,East Ham,118.0,16.0,18.0,36.0,18.0,18.0,12.0
+H&C and Circle,IR,East Ham,Upton Park,118.0,16.0,18.0,36.0,18.0,18.0,12.0
+H&C and Circle,IR,Upton Park,Plaistow,118.0,16.0,17.0,36.0,18.0,18.0,13.0
+H&C and Circle,IR,Plaistow,West Ham,119.0,15.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,West Ham,Bromley-by-Bow,119.0,15.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Bromley-by-Bow,Bow Road,119.0,15.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Bow Road,Mile End,119.0,14.0,19.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Mile End,Stepney Green,119.0,14.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Stepney Green,Whitechapel,119.0,14.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Whitechapel,Aldgate East,119.0,14.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Aldgate East,Liverpool Street LU,117.0,11.0,19.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Liverpool Street LU,Moorgate,233.0,20.0,36.0,72.0,36.0,36.0,33.0
+H&C and Circle,IR,Moorgate,Barbican,233.0,19.0,37.0,72.0,35.0,37.0,33.0
+H&C and Circle,IR,Barbican,Farringdon,233.0,19.0,36.0,72.0,36.0,36.0,34.0
+H&C and Circle,IR,Farringdon,King's Cross St. Pancras,233.0,19.0,36.0,72.0,36.0,36.0,34.0
+H&C and Circle,IR,King's Cross St. Pancras,Euston Square,234.0,19.0,36.0,72.0,36.0,36.0,35.0
+H&C and Circle,IR,Euston Square,Great Portland Street,234.0,18.0,37.0,72.0,36.0,36.0,35.0
+H&C and Circle,IR,Great Portland Street,Baker Street,234.0,18.0,37.0,72.0,35.0,37.0,35.0
+H&C and Circle,IR,Baker Street,Edgware Road (DIS),234.0,18.0,36.0,72.0,36.0,36.0,36.0
+H&C and Circle,IR,Edgware Road (DIS),Paddington TfL,113.0,10.0,18.0,35.0,19.0,17.0,14.0
+H&C and Circle,IR,Paddington TfL,Royal Oak,234.0,18.0,36.0,72.0,36.0,36.0,36.0
+H&C and Circle,IR,Royal Oak,Westbourne Park,234.0,17.0,36.0,73.0,36.0,36.0,36.0
+H&C and Circle,IR,Westbourne Park,Ladbroke Grove,234.0,17.0,36.0,73.0,35.0,37.0,36.0
+H&C and Circle,IR,Ladbroke Grove,Latimer Road,234.0,17.0,36.0,72.0,36.0,36.0,37.0
+H&C and Circle,IR,Latimer Road,Wood Lane,234.0,16.0,36.0,73.0,36.0,36.0,37.0
+H&C and Circle,IR,Wood Lane,Shepherd's Bush Market,234.0,16.0,36.0,73.0,35.0,37.0,37.0
+H&C and Circle,IR,Shepherd's Bush Market,Goldhawk Road,234.0,16.0,36.0,72.0,36.0,36.0,38.0
+H&C and Circle,IR,Goldhawk Road,Hammersmith (H&C),234.0,15.0,37.0,72.0,35.0,37.0,38.0
+H&C and Circle,IR,Edgware Road (DIS),Paddington TfL,234.0,18.0,36.0,73.0,35.0,37.0,35.0
+H&C and Circle,IR,Paddington TfL,Bayswater,114.0,10.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Bayswater,Notting Hill Gate,114.0,10.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Notting Hill Gate,High Street Kensington,114.0,10.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,High Street Kensington,Gloucester Road,113.0,10.0,18.0,36.0,18.0,18.0,13.0
+H&C and Circle,IR,Gloucester Road,South Kensington,112.0,8.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,South Kensington,Sloane Square,112.0,8.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Sloane Square,Victoria LU,112.0,8.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Victoria LU,St. James's Park,112.0,8.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,St. James's Park,Westminster,112.0,8.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,IR,Westminster,Embankment,112.0,7.0,19.0,35.0,18.0,19.0,14.0
+H&C and Circle,IR,Embankment,Temple,112.0,7.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Temple,Blackfriars LU,112.0,7.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Blackfriars LU,Mansion House,112.0,7.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Mansion House,Cannon Street LU,112.0,7.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Cannon Street LU,Bank and Monument,112.0,7.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Bank and Monument,Tower Hill,112.0,6.0,19.0,36.0,18.0,18.0,15.0
+H&C and Circle,IR,Tower Hill,Aldgate,112.0,6.0,18.0,36.0,18.0,18.0,16.0
+H&C and Circle,IR,Aldgate,Liverpool Street LU,116.0,9.0,18.0,36.0,18.0,18.0,17.0
+H&C and Circle,OR,Liverpool Street LU,Aldgate,115.0,11.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,OR,Aldgate,Tower Hill,111.0,8.0,18.0,36.0,18.0,18.0,13.0
+H&C and Circle,OR,Tower Hill,Bank and Monument,113.0,9.0,19.0,36.0,17.0,19.0,13.0
+H&C and Circle,OR,Bank and Monument,Cannon Street LU,113.0,9.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,OR,Cannon Street LU,Mansion House,113.0,9.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,OR,Mansion House,Blackfriars LU,113.0,9.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,OR,Blackfriars LU,Temple,113.0,9.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,OR,Temple,Embankment,113.0,9.0,18.0,36.0,18.0,18.0,14.0
+H&C and Circle,OR,Embankment,Westminster,113.0,9.0,17.0,37.0,18.0,18.0,14.0
+H&C and Circle,OR,Westminster,St. James's Park,113.0,8.0,18.0,37.0,17.0,19.0,14.0
+H&C and Circle,OR,St. James's Park,Victoria LU,113.0,8.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,OR,Victoria LU,Sloane Square,113.0,8.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,OR,Sloane Square,South Kensington,113.0,8.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,OR,South Kensington,Gloucester Road,114.0,9.0,18.0,36.0,18.0,18.0,15.0
+H&C and Circle,OR,Gloucester Road,High Street Kensington,115.0,9.0,18.0,36.0,18.0,18.0,16.0
+H&C and Circle,OR,High Street Kensington,Notting Hill Gate,119.0,13.0,18.0,36.0,18.0,18.0,16.0
+H&C and Circle,OR,Notting Hill Gate,Bayswater,119.0,13.0,18.0,36.0,18.0,18.0,16.0
+H&C and Circle,OR,Bayswater,Paddington TfL,119.0,13.0,17.0,37.0,18.0,18.0,16.0
+H&C and Circle,OR,Paddington TfL,Edgware Road (DIS),119.0,12.0,18.0,36.0,18.0,18.0,17.0
+H&C and Circle,OR,Hammersmith (H&C),Goldhawk Road,231.0,20.0,36.0,72.0,36.0,36.0,31.0
+H&C and Circle,OR,Goldhawk Road,Shepherd's Bush Market,233.0,20.0,36.0,72.0,36.0,36.0,33.0
+H&C and Circle,OR,Shepherd's Bush Market,Wood Lane,233.0,20.0,36.0,71.0,36.0,37.0,33.0
+H&C and Circle,OR,Wood Lane,Latimer Road,233.0,19.0,36.0,72.0,36.0,36.0,34.0
+H&C and Circle,OR,Latimer Road,Ladbroke Grove,233.0,20.0,36.0,72.0,36.0,36.0,33.0
+H&C and Circle,OR,Ladbroke Grove,Westbourne Park,233.0,20.0,36.0,72.0,36.0,36.0,33.0
+H&C and Circle,OR,Westbourne Park,Royal Oak,233.0,21.0,36.0,71.0,36.0,36.0,33.0
+H&C and Circle,OR,Royal Oak,Paddington TfL,233.0,21.0,36.0,72.0,36.0,36.0,32.0
+H&C and Circle,OR,Paddington TfL,Edgware Road (DIS),233.0,21.0,36.0,72.0,35.0,37.0,32.0
+H&C and Circle,OR,Edgware Road (DIS),Baker Street,236.0,21.0,36.0,72.0,36.0,36.0,35.0
+H&C and Circle,OR,Baker Street,Great Portland Street,237.0,22.0,36.0,71.0,36.0,37.0,35.0
+H&C and Circle,OR,Great Portland Street,Euston Square,237.0,21.0,36.0,72.0,36.0,36.0,36.0
+H&C and Circle,OR,Euston Square,King's Cross St. Pancras,237.0,22.0,36.0,72.0,36.0,36.0,35.0
+H&C and Circle,OR,King's Cross St. Pancras,Farringdon,235.0,21.0,35.0,72.0,36.0,37.0,34.0
+H&C and Circle,OR,Farringdon,Barbican,235.0,20.0,36.0,72.0,36.0,36.0,35.0
+H&C and Circle,OR,Barbican,Moorgate,235.0,20.0,35.0,73.0,35.0,37.0,35.0
+H&C and Circle,OR,Moorgate,Liverpool Street LU,234.0,19.0,36.0,72.0,36.0,36.0,35.0
+H&C and Circle,OR,Liverpool Street LU,Aldgate East,119.0,8.0,18.0,36.0,17.0,19.0,21.0
+H&C and Circle,OR,Aldgate East,Whitechapel,119.0,7.0,18.0,36.0,18.0,18.0,22.0
+H&C and Circle,OR,Whitechapel,Stepney Green,119.0,7.0,18.0,36.0,18.0,18.0,22.0
+H&C and Circle,OR,Stepney Green,Mile End,119.0,7.0,18.0,36.0,18.0,18.0,22.0
+H&C and Circle,OR,Mile End,Bow Road,119.0,7.0,18.0,36.0,17.0,19.0,22.0
+H&C and Circle,OR,Bow Road,Bromley-by-Bow,119.0,7.0,18.0,35.0,18.0,18.0,23.0
+H&C and Circle,OR,Bromley-by-Bow,West Ham,119.0,7.0,17.0,36.0,18.0,18.0,23.0
+H&C and Circle,OR,West Ham,Plaistow,119.0,6.0,18.0,36.0,18.0,18.0,23.0
+H&C and Circle,OR,Plaistow,Upton Park,118.0,6.0,18.0,36.0,18.0,18.0,22.0
+H&C and Circle,OR,Upton Park,East Ham,118.0,6.0,18.0,36.0,17.0,19.0,22.0
+H&C and Circle,OR,East Ham,Barking,118.0,6.0,17.0,36.0,18.0,18.0,23.0
+Jubilee,NB,Stratford,West Ham,431.0,29.0,79.0,132.0,83.0,66.0,42.0
+Jubilee,NB,West Ham,Canning Town,443.0,32.0,82.0,134.0,86.0,66.0,43.0
+Jubilee,NB,Canning Town,North Greenwich,443.0,31.0,82.0,135.0,85.0,66.0,44.0
+Jubilee,NB,North Greenwich,Canary Wharf LU,475.0,31.0,88.0,149.0,90.0,72.0,45.0
+Jubilee,NB,Canary Wharf LU,Canada Water,475.0,30.0,88.0,148.0,90.0,74.0,45.0
+Jubilee,NB,Canada Water,Bermondsey,475.0,29.0,88.0,148.0,90.0,74.0,46.0
+Jubilee,NB,Bermondsey,London Bridge LU,475.0,28.0,88.0,148.0,90.0,74.0,47.0
+Jubilee,NB,London Bridge LU,Southwark,475.0,27.0,88.0,148.0,90.0,74.0,48.0
+Jubilee,NB,Southwark,Waterloo LU,475.0,26.0,88.0,149.0,89.0,74.0,49.0
+Jubilee,NB,Waterloo LU,Westminster,475.0,26.0,88.0,148.0,90.0,74.0,49.0
+Jubilee,NB,Westminster,Green Park,475.0,25.0,88.0,148.0,90.0,74.0,50.0
+Jubilee,NB,Green Park,Bond Street,475.0,24.0,88.0,148.0,90.0,74.0,51.0
+Jubilee,NB,Bond Street,Baker Street,475.0,23.0,88.0,148.0,90.0,74.0,52.0
+Jubilee,NB,Baker Street,St. John's Wood,475.0,23.0,87.0,148.0,89.0,76.0,52.0
+Jubilee,NB,St. John's Wood,Swiss Cottage,475.0,22.0,87.0,148.0,89.0,75.0,54.0
+Jubilee,NB,Swiss Cottage,Finchley Road,475.0,21.0,87.0,148.0,89.0,76.0,54.0
+Jubilee,NB,Finchley Road,West Hampstead LU,475.0,20.0,87.0,148.0,89.0,76.0,55.0
+Jubilee,NB,West Hampstead LU,Kilburn,424.0,20.0,73.0,124.0,78.0,74.0,55.0
+Jubilee,NB,Kilburn,Willesden Green,424.0,19.0,74.0,124.0,77.0,74.0,56.0
+Jubilee,NB,Willesden Green,Dollis Hill,366.0,16.0,61.0,101.0,64.0,71.0,53.0
+Jubilee,NB,Dollis Hill,Neasden,366.0,16.0,60.0,101.0,64.0,71.0,54.0
+Jubilee,NB,Neasden,Wembley Park,366.0,15.0,61.0,100.0,65.0,70.0,55.0
+Jubilee,NB,Wembley Park,Kingsbury,299.0,18.0,53.0,76.0,54.0,55.0,43.0
+Jubilee,NB,Kingsbury,Queensbury,299.0,17.0,53.0,77.0,53.0,56.0,43.0
+Jubilee,NB,Queensbury,Canons Park,299.0,17.0,53.0,76.0,53.0,56.0,44.0
+Jubilee,NB,Canons Park,Stanmore,299.0,16.0,53.0,76.0,54.0,55.0,45.0
+Jubilee,SB,Stanmore,Canons Park,287.0,20.0,53.0,76.0,54.0,54.0,30.0
+Jubilee,SB,Canons Park,Queensbury,290.0,22.0,54.0,76.0,53.0,54.0,31.0
+Jubilee,SB,Queensbury,Kingsbury,290.0,22.0,53.0,76.0,54.0,53.0,32.0
+Jubilee,SB,Kingsbury,Wembley Park,290.0,21.0,53.0,77.0,53.0,53.0,33.0
+Jubilee,SB,Wembley Park,Neasden,363.0,27.0,65.0,99.0,66.0,67.0,39.0
+Jubilee,SB,Neasden,Dollis Hill,366.0,29.0,65.0,100.0,65.0,67.0,40.0
+Jubilee,SB,Dollis Hill,Willesden Green,366.0,28.0,65.0,101.0,64.0,67.0,41.0
+Jubilee,SB,Willesden Green,Kilburn,424.0,29.0,77.0,125.0,76.0,71.0,46.0
+Jubilee,SB,Kilburn,West Hampstead LU,424.0,28.0,77.0,125.0,76.0,71.0,47.0
+Jubilee,SB,West Hampstead LU,Finchley Road,475.0,27.0,89.0,149.0,88.0,75.0,47.0
+Jubilee,SB,Finchley Road,Swiss Cottage,475.0,26.0,90.0,149.0,88.0,74.0,48.0
+Jubilee,SB,Swiss Cottage,St. John's Wood,475.0,26.0,89.0,149.0,88.0,74.0,49.0
+Jubilee,SB,St. John's Wood,Baker Street,475.0,25.0,89.0,149.0,88.0,75.0,49.0
+Jubilee,SB,Baker Street,Bond Street,475.0,24.0,89.0,149.0,88.0,75.0,50.0
+Jubilee,SB,Bond Street,Green Park,475.0,23.0,89.0,149.0,88.0,75.0,51.0
+Jubilee,SB,Green Park,Westminster,475.0,22.0,89.0,150.0,87.0,75.0,52.0
+Jubilee,SB,Westminster,Waterloo LU,475.0,21.0,89.0,150.0,86.0,76.0,53.0
+Jubilee,SB,Waterloo LU,Southwark,475.0,20.0,89.0,150.0,87.0,76.0,53.0
+Jubilee,SB,Southwark,London Bridge LU,475.0,20.0,88.0,151.0,86.0,76.0,54.0
+Jubilee,SB,London Bridge LU,Bermondsey,475.0,19.0,88.0,151.0,86.0,76.0,55.0
+Jubilee,SB,Bermondsey,Canada Water,475.0,18.0,88.0,151.0,86.0,76.0,56.0
+Jubilee,SB,Canada Water,Canary Wharf LU,475.0,17.0,88.0,151.0,86.0,77.0,56.0
+Jubilee,SB,Canary Wharf LU,North Greenwich,475.0,16.0,88.0,151.0,85.0,78.0,57.0
+Jubilee,SB,North Greenwich,Canning Town,445.0,16.0,80.0,137.0,81.0,72.0,59.0
+Jubilee,SB,Canning Town,West Ham,445.0,15.0,80.0,137.0,81.0,72.0,60.0
+Jubilee,SB,West Ham,Stratford,421.0,14.0,77.0,130.0,80.0,66.0,54.0
+LO Windrush,NB,Clapham Junction,Wandsworth Road,70.0,3.0,12.0,24.0,12.0,12.0,7.0
+LO Windrush,NB,Wandsworth Road,Clapham High Street,72.0,4.0,12.0,24.0,12.0,12.0,8.0
+LO Windrush,NB,Clapham High Street,Denmark Hill,72.0,4.0,12.0,24.0,12.0,12.0,8.0
+LO Windrush,NB,Denmark Hill,Peckham Rye,72.0,4.0,12.0,24.0,12.0,12.0,8.0
+LO Windrush,NB,Peckham Rye,Queens Road Peckham,72.0,3.0,12.0,24.0,12.0,12.0,9.0
+LO Windrush,NB,Queens Road Peckham,Surrey Quays,72.0,3.0,12.0,24.0,12.0,12.0,9.0
+LO Windrush,NB,Crystal Palace,Sydenham,77.0,6.0,12.0,24.0,12.0,12.0,11.0
+LO Windrush,NB,West Croydon NR,Norwood Junction,70.0,6.0,12.0,24.0,12.0,12.0,4.0
+LO Windrush,NB,Norwood Junction,Anerley,70.0,6.0,12.0,24.0,12.0,12.0,4.0
+LO Windrush,NB,Anerley,Penge West,70.0,6.0,12.0,24.0,12.0,12.0,4.0
+LO Windrush,NB,Penge West,Sydenham,70.0,6.0,12.0,24.0,12.0,12.0,4.0
+LO Windrush,NB,Sydenham,Forest Hill,147.0,12.0,24.0,48.0,24.0,24.0,15.0
+LO Windrush,NB,Forest Hill,Honor Oak Park,147.0,11.0,24.0,48.0,24.0,24.0,16.0
+LO Windrush,NB,Honor Oak Park,Brockley,147.0,11.0,24.0,48.0,24.0,24.0,16.0
+LO Windrush,NB,Brockley,New Cross Gate,147.0,11.0,24.0,48.0,24.0,24.0,16.0
+LO Windrush,NB,New Cross Gate,Surrey Quays,147.0,10.0,24.0,48.0,24.0,24.0,17.0
+LO Windrush,NB,New Cross,Surrey Quays,72.0,5.0,12.0,24.0,12.0,12.0,7.0
+LO Windrush,NB,Surrey Quays,Canada Water,291.0,17.0,48.0,96.0,48.0,48.0,34.0
+LO Windrush,NB,Canada Water,Rotherhithe,291.0,16.0,48.0,96.0,48.0,48.0,35.0
+LO Windrush,NB,Rotherhithe,Wapping,291.0,16.0,48.0,96.0,48.0,48.0,35.0
+LO Windrush,NB,Wapping,Shadwell LO,291.0,16.0,48.0,96.0,48.0,48.0,35.0
+LO Windrush,NB,Shadwell LO,Whitechapel,291.0,15.0,48.0,96.0,48.0,48.0,36.0
+LO Windrush,NB,Whitechapel,Shoreditch High Street,291.0,14.0,48.0,96.0,48.0,48.0,37.0
+LO Windrush,NB,Shoreditch High Street,Hoxton,291.0,14.0,48.0,96.0,48.0,48.0,37.0
+LO Windrush,NB,Hoxton,Haggerston,291.0,13.0,48.0,96.0,48.0,48.0,38.0
+LO Windrush,NB,Haggerston,Dalston Junction,291.0,12.0,48.0,96.0,48.0,48.0,39.0
+LO Windrush,NB,Dalston Junction,Canonbury,147.0,7.0,24.0,48.0,24.0,24.0,20.0
+LO Windrush,NB,Canonbury,Highbury & Islington,147.0,7.0,24.0,48.0,24.0,24.0,20.0
+LO Windrush,SB,Highbury & Islington,Canonbury,149.0,12.0,24.0,48.0,24.0,24.0,17.0
+LO Windrush,SB,Canonbury,Dalston Junction,149.0,12.0,24.0,48.0,24.0,24.0,17.0
+LO Windrush,SB,Dalston Junction,Haggerston,293.0,20.0,48.0,96.0,48.0,48.0,33.0
+LO Windrush,SB,Haggerston,Hoxton,293.0,19.0,48.0,96.0,48.0,48.0,34.0
+LO Windrush,SB,Hoxton,Shoreditch High Street,293.0,19.0,48.0,96.0,48.0,48.0,34.0
+LO Windrush,SB,Shoreditch High Street,Whitechapel,293.0,19.0,48.0,96.0,48.0,48.0,34.0
+LO Windrush,SB,Whitechapel,Shadwell LO,293.0,18.0,48.0,96.0,48.0,48.0,35.0
+LO Windrush,SB,Shadwell LO,Wapping,293.0,17.0,48.0,96.0,48.0,48.0,36.0
+LO Windrush,SB,Wapping,Rotherhithe,293.0,17.0,48.0,96.0,48.0,48.0,36.0
+LO Windrush,SB,Rotherhithe,Canada Water,293.0,16.0,48.0,96.0,48.0,48.0,37.0
+LO Windrush,SB,Canada Water,Surrey Quays,293.0,16.0,48.0,96.0,48.0,48.0,37.0
+LO Windrush,SB,Surrey Quays,New Cross,72.0,3.0,12.0,24.0,12.0,12.0,9.0
+LO Windrush,SB,Surrey Quays,New Cross Gate,148.0,9.0,24.0,48.0,24.0,24.0,19.0
+LO Windrush,SB,New Cross Gate,Brockley,148.0,10.0,24.0,48.0,24.0,24.0,18.0
+LO Windrush,SB,Brockley,Honor Oak Park,148.0,10.0,24.0,48.0,24.0,24.0,18.0
+LO Windrush,SB,Honor Oak Park,Forest Hill,148.0,10.0,24.0,48.0,24.0,24.0,18.0
+LO Windrush,SB,Forest Hill,Sydenham,148.0,9.0,24.0,48.0,24.0,24.0,19.0
+LO Windrush,SB,Sydenham,Penge West,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Windrush,SB,Penge West,Anerley,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Windrush,SB,Anerley,Norwood Junction,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Windrush,SB,Norwood Junction,West Croydon NR,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Windrush,SB,Sydenham,Crystal Palace,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Windrush,SB,Surrey Quays,Queens Road Peckham,73.0,3.0,12.0,24.0,12.0,12.0,10.0
+LO Windrush,SB,Queens Road Peckham,Peckham Rye,73.0,3.0,12.0,24.0,12.0,12.0,10.0
+LO Windrush,SB,Peckham Rye,Denmark Hill,73.0,2.0,12.0,24.0,12.0,12.0,11.0
+LO Windrush,SB,Denmark Hill,Clapham High Street,73.0,2.0,12.0,24.0,12.0,12.0,11.0
+LO Windrush,SB,Clapham High Street,Wandsworth Road,73.0,2.0,12.0,24.0,12.0,12.0,11.0
+LO Windrush,SB,Wandsworth Road,Clapham Junction,72.0,2.0,12.0,24.0,12.0,12.0,10.0
+LO Suffragette,EB,Gospel Oak,Upper Holloway,69.0,4.0,12.0,24.0,12.0,12.0,5.0
+LO Suffragette,EB,Upper Holloway,Crouch Hill,69.0,4.0,12.0,24.0,12.0,12.0,5.0
+LO Suffragette,EB,Crouch Hill,Harringay Green Lanes,69.0,3.0,13.0,24.0,11.0,13.0,5.0
+LO Suffragette,EB,Harringay Green Lanes,South Tottenham,69.0,3.0,12.0,24.0,12.0,12.0,6.0
+LO Suffragette,EB,South Tottenham,Blackhorse Road,69.0,3.0,12.0,24.0,12.0,12.0,6.0
+LO Suffragette,EB,Blackhorse Road,Walthamstow Queen's Road,69.0,3.0,12.0,24.0,12.0,12.0,6.0
+LO Suffragette,EB,Walthamstow Queen's Road,Leyton Midland Road,69.0,3.0,12.0,24.0,12.0,12.0,6.0
+LO Suffragette,EB,Leyton Midland Road,Leytonstone High Road,69.0,2.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,EB,Leytonstone High Road,Wanstead Park,69.0,2.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,EB,Wanstead Park,Woodgrange Park,69.0,2.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,EB,Woodgrange Park,Barking,69.0,2.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,EB,Barking,Barking Riverside,69.0,2.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,WB,Barking Riverside,Barking,71.0,5.0,12.0,24.0,12.0,12.0,6.0
+LO Suffragette,WB,Barking,Woodgrange Park,72.0,6.0,12.0,24.0,12.0,12.0,6.0
+LO Suffragette,WB,Woodgrange Park,Wanstead Park,72.0,6.0,12.0,24.0,12.0,12.0,6.0
+LO Suffragette,WB,Wanstead Park,Leytonstone High Road,72.0,5.0,12.0,24.0,12.0,13.0,6.0
+LO Suffragette,WB,Leytonstone High Road,Leyton Midland Road,72.0,5.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,WB,Leyton Midland Road,Walthamstow Queen's Road,72.0,5.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,WB,Walthamstow Queen's Road,Blackhorse Road,72.0,5.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,WB,Blackhorse Road,South Tottenham,72.0,5.0,12.0,24.0,12.0,12.0,7.0
+LO Suffragette,WB,South Tottenham,Harringay Green Lanes,72.0,5.0,12.0,24.0,11.0,13.0,7.0
+LO Suffragette,WB,Harringay Green Lanes,Crouch Hill,72.0,4.0,12.0,24.0,12.0,12.0,8.0
+LO Suffragette,WB,Crouch Hill,Upper Holloway,72.0,4.0,12.0,24.0,12.0,12.0,8.0
+LO Suffragette,WB,Upper Holloway,Gospel Oak,72.0,4.0,12.0,24.0,12.0,12.0,8.0
+LO Mildmay,EB,Clapham Junction,Imperial Wharf,81.0,6.0,15.0,24.0,16.0,12.0,8.0
+LO Mildmay,EB,Imperial Wharf,West Brompton,81.0,5.0,15.0,25.0,15.0,13.0,8.0
+LO Mildmay,EB,West Brompton,Kensington (Olympia),81.0,5.0,15.0,25.0,15.0,13.0,8.0
+LO Mildmay,EB,Kensington (Olympia),Shepherd's Bush NR,81.0,5.0,15.0,25.0,15.0,13.0,8.0
+LO Mildmay,EB,Shepherd's Bush NR,Willesden Junction,81.0,4.0,15.0,26.0,15.0,12.0,9.0
+LO Mildmay,EB,Richmond,Kew Gardens,80.0,6.0,14.0,26.0,15.0,12.0,7.0
+LO Mildmay,EB,Kew Gardens,Gunnersbury,80.0,5.0,15.0,26.0,14.0,13.0,7.0
+LO Mildmay,EB,Gunnersbury,South Acton,80.0,5.0,15.0,25.0,15.0,13.0,7.0
+LO Mildmay,EB,South Acton,Acton Central,80.0,5.0,15.0,25.0,15.0,13.0,7.0
+LO Mildmay,EB,Acton Central,Willesden Junction,80.0,5.0,15.0,25.0,15.0,13.0,7.0
+LO Mildmay,EB,Willesden Junction,Kensal Rise,156.0,9.0,30.0,50.0,30.0,26.0,11.0
+LO Mildmay,EB,Kensal Rise,Brondesbury Park,156.0,9.0,30.0,50.0,30.0,26.0,11.0
+LO Mildmay,EB,Brondesbury Park,Brondesbury,156.0,9.0,29.0,51.0,30.0,25.0,12.0
+LO Mildmay,EB,Brondesbury,West Hampstead LO,156.0,8.0,30.0,50.0,30.0,26.0,12.0
+LO Mildmay,EB,West Hampstead LO,Finchley Road & Frognal,156.0,8.0,29.0,51.0,30.0,25.0,13.0
+LO Mildmay,EB,Finchley Road & Frognal,Hampstead Heath,156.0,8.0,29.0,51.0,30.0,25.0,13.0
+LO Mildmay,EB,Hampstead Heath,Gospel Oak,156.0,7.0,30.0,50.0,30.0,26.0,13.0
+LO Mildmay,EB,Gospel Oak,Kentish Town West,156.0,7.0,29.0,50.0,30.0,27.0,13.0
+LO Mildmay,EB,Kentish Town West,Camden Road,156.0,6.0,30.0,50.0,30.0,26.0,14.0
+LO Mildmay,EB,Camden Road,Caledonian Road & Barnsbury,157.0,6.0,31.0,50.0,29.0,27.0,14.0
+LO Mildmay,EB,Caledonian Road & Barnsbury,Highbury & Islington,157.0,6.0,30.0,50.0,30.0,26.0,15.0
+LO Mildmay,EB,Highbury & Islington,Canonbury,157.0,6.0,29.0,51.0,30.0,26.0,15.0
+LO Mildmay,EB,Canonbury,Dalston Kingsland,157.0,6.0,29.0,50.0,31.0,26.0,15.0
+LO Mildmay,EB,Dalston Kingsland,Hackney Central,157.0,5.0,30.0,50.0,30.0,27.0,15.0
+LO Mildmay,EB,Hackney Central,Homerton,157.0,5.0,30.0,50.0,30.0,26.0,16.0
+LO Mildmay,EB,Homerton,Hackney Wick,157.0,4.0,30.0,50.0,30.0,27.0,16.0
+LO Mildmay,EB,Hackney Wick,Stratford,157.0,4.0,29.0,51.0,30.0,27.0,16.0
+LO Mildmay,WB,Stratford,Hackney Wick,162.0,13.0,30.0,49.0,30.0,28.0,12.0
+LO Mildmay,WB,Hackney Wick,Homerton,162.0,12.0,30.0,50.0,30.0,27.0,13.0
+LO Mildmay,WB,Homerton,Hackney Central,162.0,11.0,31.0,50.0,30.0,27.0,13.0
+LO Mildmay,WB,Hackney Central,Dalston Kingsland,162.0,11.0,30.0,50.0,30.0,28.0,13.0
+LO Mildmay,WB,Dalston Kingsland,Canonbury,162.0,11.0,30.0,50.0,30.0,28.0,13.0
+LO Mildmay,WB,Canonbury,Highbury & Islington,162.0,11.0,30.0,49.0,31.0,27.0,14.0
+LO Mildmay,WB,Highbury & Islington,Caledonian Road & Barnsbury,162.0,10.0,30.0,50.0,30.0,28.0,14.0
+LO Mildmay,WB,Caledonian Road & Barnsbury,Camden Road,162.0,10.0,30.0,49.0,31.0,27.0,15.0
+LO Mildmay,WB,Camden Road,Kentish Town West,161.0,9.0,30.0,50.0,30.0,27.0,15.0
+LO Mildmay,WB,Kentish Town West,Gospel Oak,161.0,9.0,29.0,50.0,30.0,28.0,15.0
+LO Mildmay,WB,Gospel Oak,Hampstead Heath,161.0,8.0,30.0,50.0,30.0,27.0,16.0
+LO Mildmay,WB,Hampstead Heath,Finchley Road & Frognal,161.0,8.0,29.0,51.0,30.0,27.0,16.0
+LO Mildmay,WB,Finchley Road & Frognal,West Hampstead LO,161.0,8.0,29.0,51.0,29.0,28.0,16.0
+LO Mildmay,WB,West Hampstead LO,Brondesbury,161.0,7.0,30.0,50.0,30.0,27.0,17.0
+LO Mildmay,WB,Brondesbury,Brondesbury Park,161.0,7.0,29.0,51.0,29.0,28.0,17.0
+LO Mildmay,WB,Brondesbury Park,Kensal Rise,161.0,6.0,30.0,50.0,30.0,28.0,17.0
+LO Mildmay,WB,Kensal Rise,Willesden Junction,161.0,6.0,30.0,50.0,30.0,28.0,17.0
+LO Mildmay,WB,Willesden Junction,Acton Central,82.0,6.0,15.0,24.0,15.0,14.0,8.0
+LO Mildmay,WB,Acton Central,South Acton,82.0,5.0,15.0,25.0,15.0,13.0,9.0
+LO Mildmay,WB,South Acton,Gunnersbury,82.0,5.0,15.0,25.0,15.0,13.0,9.0
+LO Mildmay,WB,Gunnersbury,Kew Gardens,82.0,4.0,15.0,26.0,14.0,14.0,9.0
+LO Mildmay,WB,Kew Gardens,Richmond,82.0,4.0,15.0,26.0,14.0,14.0,9.0
+LO Mildmay,WB,Willesden Junction,Shepherd's Bush NR,84.0,6.0,15.0,25.0,15.0,14.0,9.0
+LO Mildmay,WB,Shepherd's Bush NR,Kensington (Olympia),84.0,5.0,15.0,26.0,14.0,15.0,9.0
+LO Mildmay,WB,Kensington (Olympia),West Brompton,84.0,5.0,15.0,25.0,15.0,15.0,9.0
+LO Mildmay,WB,West Brompton,Imperial Wharf,84.0,5.0,15.0,25.0,15.0,15.0,9.0
+LO Mildmay,WB,Imperial Wharf,Clapham Junction,84.0,5.0,15.0,25.0,15.0,14.0,10.0
+LO Liberty,EB,Romford,Emerson Park,32.0,2.0,6.0,12.0,6.0,6.0,0.0
+LO Liberty,EB,Emerson Park,Upminster,32.0,2.0,6.0,12.0,6.0,6.0,0.0
+LO Liberty,WB,Emerson Park,Romford,32.0,2.0,6.0,12.0,6.0,6.0,0.0
+LO Liberty,WB,Upminster,Emerson Park,32.0,2.0,6.0,12.0,6.0,6.0,0.0
+LO Lioness,NB,Euston NR,South Hampstead,74.0,6.0,11.0,25.0,11.0,12.0,9.0
+LO Lioness,NB,South Hampstead,Kilburn High Road,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,NB,Kilburn High Road,Queen's Park,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,NB,Queen's Park,Kensal Green,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,NB,Kensal Green,Willesden Junction,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,NB,Willesden Junction,Harlesden,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,NB,Harlesden,Stonebridge Park,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Lioness,NB,Stonebridge Park,Wembley Central,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Lioness,NB,Wembley Central,North Wembley,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Lioness,NB,North Wembley,South Kenton,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Lioness,NB,South Kenton,Kenton,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Lioness,NB,Kenton,Harrow & Wealdstone,74.0,4.0,12.0,24.0,12.0,12.0,10.0
+LO Lioness,NB,Harrow & Wealdstone,Headstone Lane,74.0,4.0,11.0,24.0,13.0,11.0,11.0
+LO Lioness,NB,Headstone Lane,Hatch End,74.0,3.0,12.0,24.0,12.0,12.0,11.0
+LO Lioness,NB,Hatch End,Carpenders Park,74.0,3.0,12.0,24.0,12.0,12.0,11.0
+LO Lioness,NB,Carpenders Park,Bushey,74.0,3.0,12.0,24.0,12.0,12.0,11.0
+LO Lioness,NB,Bushey,Watford High Street,74.0,3.0,12.0,24.0,12.0,12.0,11.0
+LO Lioness,NB,Watford High Street,Watford Junction,74.0,3.0,12.0,24.0,12.0,12.0,11.0
+LO Lioness,SB,Watford Junction,Watford High Street,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Lioness,SB,Watford High Street,Bushey,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Lioness,SB,Bushey,Carpenders Park,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Lioness,SB,Carpenders Park,Hatch End,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Lioness,SB,Hatch End,Headstone Lane,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Lioness,SB,Headstone Lane,Harrow & Wealdstone,74.0,7.0,12.0,24.0,11.0,13.0,7.0
+LO Lioness,SB,Harrow & Wealdstone,Kenton,74.0,6.0,12.0,24.0,12.0,12.0,8.0
+LO Lioness,SB,Kenton,South Kenton,74.0,6.0,12.0,24.0,12.0,12.0,8.0
+LO Lioness,SB,South Kenton,North Wembley,74.0,6.0,12.0,24.0,12.0,12.0,8.0
+LO Lioness,SB,North Wembley,Wembley Central,74.0,6.0,12.0,24.0,12.0,12.0,8.0
+LO Lioness,SB,Wembley Central,Stonebridge Park,74.0,6.0,12.0,24.0,12.0,12.0,8.0
+LO Lioness,SB,Stonebridge Park,Harlesden,74.0,6.0,12.0,24.0,12.0,12.0,8.0
+LO Lioness,SB,Harlesden,Willesden Junction,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,SB,Willesden Junction,Kensal Green,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,SB,Kensal Green,Queen's Park,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,SB,Queen's Park,Kilburn High Road,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,SB,Kilburn High Road,South Hampstead,74.0,5.0,12.0,24.0,12.0,12.0,9.0
+LO Lioness,SB,South Hampstead,Euston NR,74.0,5.0,12.0,24.0,11.0,13.0,9.0
+LO Weaver,NB,Liverpool Street NR (Chingford),Bethnal Green LO,76.0,3.0,12.0,24.0,12.0,12.0,13.0
+LO Weaver,NB,Liverpool Street NR,Bethnal Green LO,86.0,7.0,16.0,24.0,17.0,13.0,9.0
+LO Weaver,NB,Bethnal Green LO,Cambridge Heath,162.0,10.0,28.0,48.0,29.0,25.0,22.0
+LO Weaver,NB,Bethnal Green LO,Hackney Downs (Chingford Branch),0.0,0.0,0.0,0.0,0.0,0.0,0.0
+LO Weaver,NB,Cambridge Heath,London Fields,162.0,10.0,28.0,48.0,29.0,25.0,22.0
+LO Weaver,NB,London Fields,Hackney Downs (Enfield / Chesthunt),86.0,7.0,16.0,24.0,17.0,13.0,9.0
+LO Weaver,NB,London Fields,Hackney Downs (Chingford Branch),76.0,3.0,12.0,24.0,12.0,12.0,13.0
+LO Weaver,NB,Hackney Downs,Clapton,76.0,3.0,12.0,24.0,12.0,12.0,13.0
+LO Weaver,NB,Clapton,St James Street,76.0,3.0,12.0,24.0,12.0,12.0,13.0
+LO Weaver,NB,St James Street,Walthamstow Central,76.0,2.0,12.0,24.0,12.0,12.0,14.0
+LO Weaver,NB,Walthamstow Central,Wood Street,76.0,2.0,12.0,24.0,12.0,12.0,14.0
+LO Weaver,NB,Wood Street,Highams Park,76.0,2.0,12.0,24.0,12.0,12.0,14.0
+LO Weaver,NB,Highams Park,Chingford,76.0,2.0,12.0,24.0,12.0,12.0,14.0
+LO Weaver,NB,Hackney Downs,Rectory Road,86.0,6.0,17.0,24.0,17.0,13.0,9.0
+LO Weaver,NB,Rectory Road,Stoke Newington,86.0,6.0,17.0,24.0,17.0,13.0,9.0
+LO Weaver,NB,Stoke Newington,Stamford Hill,86.0,6.0,17.0,24.0,17.0,13.0,9.0
+LO Weaver,NB,Stamford Hill,Seven Sisters,86.0,5.0,17.0,24.0,17.0,13.0,10.0
+LO Weaver,NB,Seven Sisters,Bruce Grove,86.0,5.0,17.0,24.0,17.0,13.0,10.0
+LO Weaver,NB,Bruce Grove,White Hart Lane,86.0,5.0,17.0,24.0,17.0,13.0,10.0
+LO Weaver,NB,White Hart Lane,Silver Street,86.0,5.0,17.0,24.0,17.0,13.0,10.0
+LO Weaver,NB,Silver Street,Edmonton Green,86.0,4.0,18.0,24.0,17.0,13.0,10.0
+LO Weaver,NB,Edmonton Green,Bush Hill Park,48.0,2.0,11.0,12.0,11.0,7.0,5.0
+LO Weaver,NB,Bush Hill Park,Enfield Town,48.0,2.0,10.0,13.0,11.0,7.0,5.0
+LO Weaver,NB,Edmonton Green,Southbury,38.0,2.0,7.0,12.0,6.0,6.0,5.0
+LO Weaver,NB,Southbury,Turkey Street,38.0,2.0,7.0,12.0,6.0,6.0,5.0
+LO Weaver,NB,Turkey Street,Theobalds Grove,38.0,2.0,7.0,12.0,6.0,6.0,5.0
+LO Weaver,NB,Theobalds Grove,Cheshunt,38.0,2.0,7.0,12.0,6.0,6.0,5.0
+LO Weaver,SB,Cheshunt,Theobalds Grove,38.0,4.0,6.0,12.0,6.0,6.0,4.0
+LO Weaver,SB,Theobalds Grove,Turkey Street,38.0,4.0,6.0,12.0,6.0,6.0,4.0
+LO Weaver,SB,Turkey Street,Southbury,38.0,4.0,6.0,12.0,6.0,6.0,4.0
+LO Weaver,SB,Southbury,Edmonton Green,38.0,3.0,7.0,12.0,6.0,6.0,4.0
+LO Weaver,SB,Enfield Town,Bush Hill Park,47.0,4.0,11.0,12.0,10.0,7.0,3.0
+LO Weaver,SB,Bush Hill Park,Edmonton Green,47.0,4.0,11.0,12.0,10.0,7.0,3.0
+LO Weaver,SB,Edmonton Green,Silver Street,85.0,6.0,19.0,24.0,16.0,13.0,7.0
+LO Weaver,SB,Silver Street,White Hart Lane,85.0,6.0,18.0,24.0,17.0,12.0,8.0
+LO Weaver,SB,White Hart Lane,Bruce Grove,85.0,6.0,18.0,24.0,16.0,13.0,8.0
+LO Weaver,SB,Bruce Grove,Seven Sisters,85.0,6.0,18.0,24.0,16.0,13.0,8.0
+LO Weaver,SB,Seven Sisters,Stamford Hill,85.0,6.0,18.0,24.0,16.0,13.0,8.0
+LO Weaver,SB,Stamford Hill,Stoke Newington,85.0,6.0,18.0,24.0,16.0,13.0,8.0
+LO Weaver,SB,Stoke Newington,Rectory Road,85.0,6.0,18.0,24.0,15.0,14.0,8.0
+LO Weaver,SB,Rectory Road,Hackney Downs,85.0,5.0,19.0,24.0,15.0,14.0,8.0
+LO Weaver,SB,Chingford,Highams Park,74.0,8.0,12.0,24.0,12.0,12.0,6.0
+LO Weaver,SB,Highams Park,Wood Street,74.0,7.0,13.0,24.0,12.0,12.0,6.0
+LO Weaver,SB,Wood Street,Walthamstow Central,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Weaver,SB,Walthamstow Central,St James Street,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Weaver,SB,St James Street,Clapton,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Weaver,SB,Clapton,Hackney Downs,74.0,7.0,12.0,24.0,12.0,12.0,7.0
+LO Weaver,SB,Hackney Downs (Enfield / Chesthunt),London Fields,85.0,5.0,18.0,24.0,16.0,13.0,9.0
+LO Weaver,SB,Hackney Downs (Chingford Branch),London Fields,74.0,6.0,13.0,24.0,12.0,12.0,7.0
+LO Weaver,SB,Hackney Downs (Chingford Branch),Bethnal Green LO,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+LO Weaver,SB,London Fields,Cambridge Heath,159.0,10.0,32.0,48.0,27.0,26.0,16.0
+LO Weaver,SB,Cambridge Heath,Bethnal Green LO,159.0,10.0,31.0,48.0,27.0,26.0,17.0
+LO Weaver,SB,Bethnal Green LO,Hackney Downs (Chingford Branch),74.0,6.0,12.0,24.0,12.0,12.0,8.0
+LO Weaver,SB,Bethnal Green LO,Liverpool Street NR,85.0,4.0,19.0,24.0,15.0,14.0,9.0
+London Trams,EB,Wimbledon Trams,Dundonald Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Dundonald Road,Merton Park,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Merton Park,Morden Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Morden Road,Phipps Bridge,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Phipps Bridge,Belgrave Walk,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Belgrave Walk,Mitcham,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Mitcham,Mitcham Junction,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Mitcham Junction,Beddington Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Beddington Lane,Therapia Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Therapia Lane,Ampere Way,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Ampere Way,Waddon Marsh,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Waddon Marsh,Wandle Park,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Wandle Park,Reeves Corner,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Reeves Corner,Centrale,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Centrale,West Croydon Trams,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,West Croydon Trams,Wellesley Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Wellesley Road,East Croydon Trams,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,East Croydon Trams,Lebanon Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Lebanon Road,Sandilands,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Sandilands,Addiscombe,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Addiscombe,Blackhorse Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Blackhorse Lane,Woodside,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Woodside,Arena,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Arena,Elmers End,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Arena,Harrington Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Harrington Road,Birkbeck Trams,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Birkbeck Trams,Avenue Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Avenue Road,Beckenham Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Beckenham Road,Beckenham Junction Trams,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Sandilands,Lloyd Park,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Lloyd Park,Coombe Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Coombe Lane,Gravel Hill,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Gravel Hill,Addington Village,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Addington Village,Fieldway,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,Fieldway,King Henry's Drive,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,EB,King Henry's Drive,New Addington,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,New Addington,King Henry's Drive,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,King Henry's Drive,Fieldway,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Fieldway,Addington Village,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Addington Village,Gravel Hill,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Gravel Hill,Coombe Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Coombe Lane,Lloyd Park,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Beckenham Junction Trams,Beckenham Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Beckenham Road,Avenue Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Avenue Road,Birkbeck Trams,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Birkbeck Trams,Harrington Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Harrington Road,Arena,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Elmers End,Arena,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Arena,Woodside,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Woodside,Blackhorse Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Blackhorse Lane,Addiscombe,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Lloyd Park,Sandilands,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Addiscombe,Sandilands,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Sandilands,Lebanon Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Lebanon Road,East Croydon Trams,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,East Croydon Trams,George Street,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,George Street,Church Street,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Church Street,Centrale,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Church Street,Wandle Park,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Wandle Park,Waddon Marsh,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Waddon Marsh,Ampere Way,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Ampere Way,Therapia Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Therapia Lane,Beddington Lane,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Beddington Lane,Mitcham Junction,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Mitcham Junction,Mitcham,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Mitcham,Belgrave Walk,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Belgrave Walk,Phipps Bridge,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Phipps Bridge,Morden Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Morden Road,Merton Park,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Merton Park,Dundonald Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+London Trams,WB,Dundonald Road,Wimbledon Trams,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,NB,Aldgate,Liverpool Street LU,235.0,7.0,47.0,73.0,46.0,40.0,22.0
+Metropolitan,NB,Liverpool Street LU,Moorgate,235.0,7.0,47.0,72.0,46.0,40.0,23.0
+Metropolitan,NB,Moorgate,Barbican,235.0,7.0,46.0,73.0,46.0,40.0,23.0
+Metropolitan,NB,Barbican,Farringdon,235.0,6.0,47.0,73.0,46.0,40.0,23.0
+Metropolitan,NB,Farringdon,King's Cross St. Pancras,235.0,6.0,47.0,72.0,46.0,41.0,23.0
+Metropolitan,NB,King's Cross St. Pancras,Euston Square,235.0,5.0,47.0,73.0,46.0,40.0,24.0
+Metropolitan,NB,Euston Square,Great Portland Street,235.0,5.0,46.0,74.0,45.0,41.0,24.0
+Metropolitan,NB,Great Portland Street,Baker Street,235.0,5.0,46.0,73.0,46.0,40.0,25.0
+Metropolitan,NB,Baker Street,Finchley Road,358.0,20.0,67.0,100.0,66.0,58.0,47.0
+Metropolitan,NB,Finchley Road,Wembley Park,358.0,18.0,66.0,102.0,64.0,60.0,48.0
+Metropolitan,NB,Finchley Road,Wembley Park (Fast),0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,NB,Finchley Road,Harrow-on-the-Hill,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,NB,Wembley Park,Preston Road,361.0,25.0,64.0,102.0,64.0,59.0,47.0
+Metropolitan,NB,Wembley Park (Fast),Harrow-on-the-Hill,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,NB,Preston Road,Northwick Park,361.0,25.0,64.0,101.0,65.0,58.0,48.0
+Metropolitan,NB,Northwick Park,Harrow-on-the-Hill,361.0,24.0,65.0,101.0,64.0,59.0,48.0
+Metropolitan,NB,Harrow-on-the-Hill,North Harrow,190.0,15.0,34.0,48.0,37.0,33.0,23.0
+Metropolitan,NB,Harrow-on-the-Hill,Moor Park,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,NB,North Harrow,Pinner,190.0,14.0,35.0,48.0,36.0,34.0,23.0
+Metropolitan,NB,Pinner,Northwood Hills,190.0,14.0,34.0,48.0,37.0,33.0,24.0
+Metropolitan,NB,Northwood Hills,Northwood,190.0,13.0,35.0,48.0,37.0,33.0,24.0
+Metropolitan,NB,Northwood,Moor Park,190.0,13.0,35.0,48.0,36.0,34.0,24.0
+Metropolitan,NB,Moor Park,Croxley,102.0,7.0,20.0,24.0,21.0,18.0,12.0
+Metropolitan,NB,Croxley,Watford,102.0,7.0,20.0,24.0,20.0,19.0,12.0
+Metropolitan,NB,Moor Park,Rickmansworth,88.0,5.0,15.0,24.0,16.0,15.0,13.0
+Metropolitan,NB,Rickmansworth,Chorleywood,93.0,10.0,16.0,24.0,15.0,16.0,12.0
+Metropolitan,NB,Chorleywood,Chalfont & Latimer,93.0,10.0,15.0,24.0,15.0,16.0,13.0
+Metropolitan,NB,Chalfont & Latimer,Chesham,40.0,3.0,6.0,12.0,6.0,6.0,7.0
+Metropolitan,NB,Chalfont & Latimer,Amersham,53.0,7.0,9.0,12.0,9.0,10.0,6.0
+Metropolitan,NB,Harrow-on-the-Hill,West Harrow,161.0,9.0,27.0,48.0,26.0,27.0,24.0
+Metropolitan,NB,West Harrow,Rayners Lane,161.0,9.0,26.0,48.0,27.0,26.0,25.0
+Metropolitan,NB,Rayners Lane,Eastcote,161.0,8.0,27.0,48.0,27.0,26.0,25.0
+Metropolitan,NB,Eastcote,Ruislip Manor,161.0,8.0,26.0,49.0,26.0,27.0,25.0
+Metropolitan,NB,Ruislip Manor,Ruislip,161.0,8.0,26.0,48.0,27.0,26.0,26.0
+Metropolitan,NB,Ruislip,Ickenham,161.0,7.0,27.0,48.0,27.0,26.0,26.0
+Metropolitan,NB,Ickenham,Hillingdon,161.0,7.0,27.0,48.0,27.0,26.0,26.0
+Metropolitan,NB,Hillingdon,Uxbridge,161.0,7.0,26.0,49.0,26.0,27.0,26.0
+Metropolitan,SB,Uxbridge,Hillingdon,160.0,13.0,29.0,48.0,26.0,27.0,17.0
+Metropolitan,SB,Hillingdon,Ickenham,161.0,14.0,28.0,49.0,25.0,27.0,18.0
+Metropolitan,SB,Ickenham,Ruislip,161.0,14.0,28.0,48.0,26.0,27.0,18.0
+Metropolitan,SB,Ruislip,Ruislip Manor,161.0,14.0,27.0,49.0,26.0,27.0,18.0
+Metropolitan,SB,Ruislip Manor,Eastcote,161.0,14.0,27.0,49.0,25.0,28.0,18.0
+Metropolitan,SB,Eastcote,Rayners Lane,161.0,13.0,28.0,49.0,25.0,27.0,19.0
+Metropolitan,SB,Rayners Lane,West Harrow,161.0,13.0,27.0,49.0,26.0,27.0,19.0
+Metropolitan,SB,West Harrow,Harrow-on-the-Hill,161.0,12.0,28.0,49.0,26.0,27.0,19.0
+Metropolitan,SB,Amersham,Chalfont & Latimer,51.0,6.0,10.0,12.0,9.0,8.0,6.0
+Metropolitan,SB,Chesham,Chalfont & Latimer,39.0,2.0,6.0,12.0,7.0,5.0,7.0
+Metropolitan,SB,Chalfont & Latimer,Chorleywood,90.0,8.0,16.0,24.0,15.0,14.0,13.0
+Metropolitan,SB,Chorleywood,Rickmansworth,90.0,8.0,16.0,24.0,14.0,15.0,13.0
+Metropolitan,SB,Rickmansworth,Moor Park,88.0,8.0,16.0,24.0,15.0,14.0,11.0
+Metropolitan,SB,Watford,Croxley,103.0,9.0,22.0,24.0,20.0,17.0,11.0
+Metropolitan,SB,Croxley,Moor Park,103.0,9.0,22.0,24.0,19.0,18.0,11.0
+Metropolitan,SB,Moor Park,Northwood,191.0,16.0,38.0,48.0,34.0,32.0,23.0
+Metropolitan,SB,Moor Park,Harrow-on-the-Hill,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,SB,Northwood,Northwood Hills,191.0,16.0,38.0,48.0,33.0,33.0,23.0
+Metropolitan,SB,Northwood Hills,Pinner,191.0,15.0,38.0,49.0,33.0,33.0,23.0
+Metropolitan,SB,Pinner,North Harrow,191.0,15.0,38.0,49.0,33.0,32.0,24.0
+Metropolitan,SB,North Harrow,Harrow-on-the-Hill,191.0,15.0,38.0,48.0,33.0,33.0,24.0
+Metropolitan,SB,Harrow-on-the-Hill,Northwick Park,338.0,25.0,67.0,97.0,58.0,53.0,38.0
+Metropolitan,SB,Harrow-on-the-Hill,Wembley Park (Fast),0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,SB,Harrow-on-the-Hill,Finchley Road,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Metropolitan,SB,Northwick Park,Preston Road,338.0,24.0,67.0,97.0,58.0,53.0,39.0
+Metropolitan,SB,Preston Road,Wembley Park,338.0,24.0,66.0,97.0,58.0,54.0,39.0
+Metropolitan,SB,Wembley Park,Finchley Road,337.0,28.0,66.0,98.0,57.0,54.0,34.0
+Metropolitan,SB,Finchley Road,Baker Street,357.0,32.0,67.0,100.0,67.0,55.0,36.0
+Metropolitan,SB,Baker Street,Great Portland Street,235.0,12.0,47.0,73.0,46.0,39.0,18.0
+Metropolitan,SB,Great Portland Street,Euston Square,235.0,12.0,47.0,73.0,45.0,40.0,18.0
+Metropolitan,SB,Euston Square,King's Cross St. Pancras,235.0,11.0,47.0,73.0,46.0,39.0,19.0
+Metropolitan,SB,King's Cross St. Pancras,Farringdon,235.0,11.0,47.0,73.0,46.0,39.0,19.0
+Metropolitan,SB,Farringdon,Barbican,235.0,10.0,47.0,73.0,46.0,39.0,20.0
+Metropolitan,SB,Barbican,Moorgate,235.0,10.0,47.0,72.0,47.0,39.0,20.0
+Metropolitan,SB,Moorgate,Liverpool Street LU,235.0,10.0,47.0,72.0,46.0,40.0,20.0
+Metropolitan,SB,Liverpool Street LU,Aldgate,235.0,9.0,47.0,72.0,47.0,39.0,21.0
+Northern,NB,Morden,South Wimbledon,422.0,38.0,83.0,120.0,86.0,62.0,33.0
+Northern,NB,South Wimbledon,Colliers Wood,422.0,37.0,83.0,120.0,86.0,62.0,34.0
+Northern,NB,Colliers Wood,Tooting Broadway,422.0,36.0,83.0,120.0,86.0,62.0,35.0
+Northern,NB,Tooting Broadway,Tooting Bec,422.0,35.0,84.0,120.0,85.0,63.0,35.0
+Northern,NB,Tooting Bec,Balham LU,422.0,35.0,83.0,120.0,85.0,63.0,36.0
+Northern,NB,Balham LU,Clapham South,422.0,34.0,84.0,120.0,84.0,64.0,36.0
+Northern,NB,Clapham South,Clapham Common,422.0,33.0,84.0,120.0,84.0,64.0,37.0
+Northern,NB,Clapham Common,Clapham North,422.0,32.0,84.0,120.0,84.0,64.0,38.0
+Northern,NB,Clapham North,Stockwell,422.0,32.0,84.0,120.0,84.0,64.0,38.0
+Northern,NB,Stockwell,Oval,422.0,31.0,84.0,120.0,84.0,64.0,39.0
+Northern,NB,Oval,Kennington,44.0,10.0,15.0,0.0,15.0,4.0,0.0
+Northern,NB,Oval,Kennington,378.0,20.0,69.0,121.0,68.0,61.0,39.0
+Northern,NB,Battersea Power Station,Nine Elms,196.0,12.0,34.0,60.0,35.0,31.0,24.0
+Northern,NB,Nine Elms,Kennington,196.0,12.0,34.0,60.0,34.0,32.0,24.0
+Northern,NB,Nine Elms,Kennington,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Northern,NB,Kennington,Waterloo LU,376.0,20.0,64.0,120.0,68.0,61.0,43.0
+Northern,NB,Waterloo LU,Embankment,376.0,19.0,64.0,120.0,68.0,61.0,44.0
+Northern,NB,Embankment,Charing Cross LU,376.0,18.0,65.0,120.0,67.0,62.0,44.0
+Northern,NB,Charing Cross LU,Leicester Square,376.0,18.0,64.0,120.0,68.0,61.0,45.0
+Northern,NB,Leicester Square,Tottenham Court Road,376.0,17.0,65.0,120.0,67.0,62.0,45.0
+Northern,NB,Tottenham Court Road,Goodge Street,376.0,17.0,65.0,120.0,67.0,62.0,45.0
+Northern,NB,Goodge Street,Warren Street,376.0,17.0,64.0,120.0,67.0,62.0,46.0
+Northern,NB,Warren Street,Euston LU,376.0,16.0,65.0,120.0,67.0,62.0,46.0
+Northern,NB,Euston LU,Mornington Crescent,376.0,16.0,64.0,120.0,67.0,62.0,47.0
+Northern,NB,Mornington Crescent,Camden Town,234.0,11.0,64.0,72.0,33.0,32.0,22.0
+Northern,NB,Mornington Crescent,Camden Town,142.0,4.0,0.0,49.0,33.0,31.0,25.0
+Northern,NB,Kennington,Elephant & Castle LU,378.0,19.0,70.0,120.0,68.0,61.0,40.0
+Northern,NB,Elephant & Castle LU,Borough,378.0,18.0,70.0,120.0,68.0,61.0,41.0
+Northern,NB,Borough,London Bridge LU,378.0,18.0,69.0,120.0,69.0,60.0,42.0
+Northern,NB,London Bridge LU,Bank and Monument,378.0,17.0,70.0,120.0,68.0,61.0,42.0
+Northern,NB,Bank and Monument,Moorgate,378.0,16.0,70.0,120.0,68.0,61.0,43.0
+Northern,NB,Moorgate,Old Street,378.0,16.0,69.0,121.0,67.0,62.0,43.0
+Northern,NB,Old Street,Angel,378.0,15.0,69.0,121.0,68.0,61.0,44.0
+Northern,NB,Angel,King's Cross St. Pancras,378.0,15.0,68.0,121.0,68.0,61.0,45.0
+Northern,NB,King's Cross St. Pancras,Euston LU,378.0,14.0,69.0,121.0,67.0,62.0,45.0
+Northern,NB,Euston LU,Camden Town,141.0,3.0,2.0,49.0,33.0,31.0,23.0
+Northern,NB,Euston LU,Camden Town,237.0,11.0,66.0,72.0,34.0,31.0,23.0
+Northern,NB,Camden Town (High Barnet),Kentish Town,375.0,14.0,66.0,120.0,66.0,63.0,46.0
+Northern,NB,Kentish Town,Tufnell Park,375.0,13.0,66.0,120.0,67.0,62.0,47.0
+Northern,NB,Tufnell Park,Archway,375.0,13.0,66.0,120.0,66.0,63.0,47.0
+Northern,NB,Archway,Highgate,375.0,12.0,66.0,120.0,66.0,63.0,48.0
+Northern,NB,Highgate,East Finchley,375.0,12.0,65.0,120.0,66.0,63.0,49.0
+Northern,NB,East Finchley,Finchley Central,395.0,23.0,69.0,120.0,70.0,63.0,50.0
+Northern,NB,Finchley Central,Mill Hill East,86.0,8.0,15.0,24.0,14.0,12.0,13.0
+Northern,NB,Finchley Central,West Finchley,304.0,15.0,53.0,96.0,50.0,49.0,41.0
+Northern,NB,West Finchley,Woodside Park,304.0,14.0,53.0,96.0,50.0,49.0,42.0
+Northern,NB,Woodside Park,Totteridge & Whetstone,304.0,14.0,53.0,96.0,50.0,49.0,42.0
+Northern,NB,Totteridge & Whetstone,High Barnet,304.0,13.0,53.0,96.0,50.0,49.0,43.0
+Northern,NB,Camden Town (Edgware),Chalk Farm,379.0,14.0,65.0,122.0,66.0,63.0,49.0
+Northern,NB,Chalk Farm,Belsize Park,379.0,13.0,66.0,121.0,67.0,62.0,50.0
+Northern,NB,Belsize Park,Hampstead,379.0,13.0,65.0,122.0,66.0,63.0,50.0
+Northern,NB,Hampstead,Golders Green,379.0,12.0,65.0,122.0,66.0,63.0,51.0
+Northern,NB,Golders Green,Brent Cross,359.0,18.0,58.0,119.0,58.0,60.0,46.0
+Northern,NB,Brent Cross,Hendon Central,359.0,17.0,58.0,120.0,57.0,61.0,46.0
+Northern,NB,Hendon Central,Colindale,359.0,17.0,58.0,119.0,58.0,60.0,47.0
+Northern,NB,Colindale,Burnt Oak,359.0,16.0,57.0,120.0,58.0,60.0,48.0
+Northern,NB,Burnt Oak,Edgware,359.0,15.0,58.0,119.0,58.0,60.0,49.0
+Northern,SB,Edgware,Burnt Oak,359.0,21.0,61.0,120.0,58.0,60.0,39.0
+Northern,SB,Burnt Oak,Colindale,359.0,20.0,62.0,120.0,57.0,61.0,39.0
+Northern,SB,Colindale,Hendon Central,359.0,19.0,62.0,120.0,57.0,61.0,40.0
+Northern,SB,Hendon Central,Brent Cross,359.0,19.0,61.0,120.0,57.0,61.0,41.0
+Northern,SB,Brent Cross,Golders Green,359.0,18.0,61.0,120.0,58.0,60.0,42.0
+Northern,SB,Golders Green,Hampstead,365.0,20.0,62.0,120.0,63.0,60.0,40.0
+Northern,SB,Hampstead,Belsize Park,379.0,23.0,65.0,120.0,70.0,60.0,41.0
+Northern,SB,Belsize Park,Chalk Farm,379.0,23.0,64.0,120.0,71.0,59.0,42.0
+Northern,SB,Chalk Farm,Camden Town,379.0,22.0,65.0,120.0,70.0,60.0,42.0
+Northern,SB,High Barnet,Totteridge & Whetstone,305.0,18.0,52.0,97.0,50.0,49.0,39.0
+Northern,SB,Totteridge & Whetstone,Woodside Park,305.0,17.0,52.0,97.0,50.0,49.0,40.0
+Northern,SB,Woodside Park,West Finchley,305.0,17.0,51.0,97.0,50.0,49.0,41.0
+Northern,SB,West Finchley,Finchley Central,305.0,17.0,50.0,98.0,50.0,49.0,41.0
+Northern,SB,Mill Hill East,Finchley Central,86.0,7.0,16.0,24.0,13.0,13.0,13.0
+Northern,SB,Finchley Central,East Finchley,395.0,22.0,67.0,122.0,69.0,63.0,52.0
+Northern,SB,East Finchley,Highgate,376.0,21.0,65.0,120.0,69.0,61.0,40.0
+Northern,SB,Highgate,Archway,376.0,20.0,65.0,120.0,69.0,61.0,41.0
+Northern,SB,Archway,Tufnell Park,376.0,19.0,65.0,120.0,69.0,61.0,42.0
+Northern,SB,Tufnell Park,Kentish Town,376.0,19.0,65.0,120.0,69.0,61.0,42.0
+Northern,SB,Kentish Town,Camden Town,376.0,18.0,65.0,120.0,69.0,61.0,43.0
+Northern,SB,Camden Town (Edgware),Mornington Crescent,191.0,12.0,32.0,60.0,35.0,30.0,22.0
+Northern,SB,Camden Town (High Barnet),Mornington Crescent,186.0,7.0,33.0,60.0,34.0,30.0,22.0
+Northern,SB,Mornington Crescent,Euston LU,377.0,19.0,65.0,120.0,68.0,61.0,44.0
+Northern,SB,Euston LU,Warren Street,377.0,18.0,65.0,120.0,69.0,60.0,45.0
+Northern,SB,Warren Street,Goodge Street,377.0,18.0,65.0,120.0,68.0,61.0,45.0
+Northern,SB,Goodge Street,Tottenham Court Road,377.0,17.0,65.0,120.0,69.0,60.0,46.0
+Northern,SB,Tottenham Court Road,Leicester Square,377.0,17.0,65.0,120.0,68.0,61.0,46.0
+Northern,SB,Leicester Square,Charing Cross LU,377.0,16.0,65.0,120.0,69.0,60.0,47.0
+Northern,SB,Charing Cross LU,Embankment,377.0,16.0,65.0,120.0,68.0,61.0,47.0
+Northern,SB,Embankment,Waterloo LU,377.0,16.0,64.0,121.0,67.0,62.0,47.0
+Northern,SB,Waterloo LU,Kennington,377.0,15.0,65.0,120.0,68.0,61.0,48.0
+Northern,SB,Kennington,Oval,378.0,12.0,65.0,120.0,68.0,63.0,50.0
+Northern,SB,Kennington,Oval,44.0,3.0,15.0,0.0,14.0,5.0,7.0
+Northern,SB,Camden Town (Edgware),Euston LU,188.0,9.0,33.0,60.0,35.0,30.0,21.0
+Northern,SB,Camden Town (High Barnet),Euston LU,190.0,10.0,32.0,60.0,35.0,31.0,22.0
+Northern,SB,Euston LU,King's Cross St. Pancras,378.0,18.0,65.0,120.0,70.0,61.0,44.0
+Northern,SB,King's Cross St. Pancras,Angel,378.0,18.0,64.0,121.0,69.0,62.0,44.0
+Northern,SB,Angel,Old Street,378.0,17.0,65.0,120.0,69.0,62.0,45.0
+Northern,SB,Old Street,Moorgate,378.0,16.0,65.0,120.0,69.0,62.0,46.0
+Northern,SB,Moorgate,Bank and Monument,378.0,16.0,64.0,120.0,70.0,62.0,46.0
+Northern,SB,Bank and Monument,London Bridge LU,378.0,15.0,65.0,120.0,69.0,62.0,47.0
+Northern,SB,London Bridge LU,Borough,378.0,14.0,65.0,120.0,69.0,62.0,48.0
+Northern,SB,Borough,Elephant & Castle LU,378.0,14.0,64.0,121.0,68.0,63.0,48.0
+Northern,SB,Elephant & Castle LU,Kennington,378.0,13.0,65.0,120.0,68.0,63.0,49.0
+Northern,SB,Kennington,Nine Elms,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Northern,SB,Kennington,Nine Elms,196.0,8.0,35.0,60.0,35.0,31.0,27.0
+Northern,SB,Nine Elms,Battersea Power Station,196.0,8.0,35.0,60.0,34.0,32.0,27.0
+Northern,SB,Oval,Stockwell,422.0,14.0,80.0,121.0,81.0,69.0,57.0
+Northern,SB,Stockwell,Clapham North,422.0,13.0,80.0,121.0,81.0,69.0,58.0
+Northern,SB,Clapham North,Clapham Common,422.0,13.0,80.0,121.0,80.0,70.0,58.0
+Northern,SB,Clapham Common,Clapham South,422.0,12.0,80.0,121.0,81.0,69.0,59.0
+Northern,SB,Clapham South,Balham LU,422.0,11.0,80.0,121.0,81.0,69.0,60.0
+Northern,SB,Balham LU,Tooting Bec,422.0,10.0,80.0,122.0,80.0,70.0,60.0
+Northern,SB,Tooting Bec,Tooting Broadway,422.0,10.0,80.0,121.0,80.0,70.0,61.0
+Northern,SB,Tooting Broadway,Colliers Wood,422.0,9.0,80.0,121.0,80.0,70.0,62.0
+Northern,SB,Colliers Wood,South Wimbledon,422.0,8.0,80.0,122.0,79.0,71.0,62.0
+Northern,SB,South Wimbledon,Morden,422.0,7.0,81.0,121.0,78.0,72.0,63.0
+Piccadilly,EB,Uxbridge,Hillingdon,78.0,6.0,19.0,18.0,14.0,13.0,8.0
+Piccadilly,EB,Hillingdon,Ickenham,78.0,5.0,20.0,18.0,14.0,13.0,8.0
+Piccadilly,EB,Ickenham,Ruislip,78.0,5.0,20.0,18.0,14.0,13.0,8.0
+Piccadilly,EB,Ruislip,Ruislip Manor,79.0,5.0,20.0,19.0,13.0,14.0,8.0
+Piccadilly,EB,Ruislip Manor,Eastcote,79.0,5.0,20.0,19.0,13.0,14.0,8.0
+Piccadilly,EB,Eastcote,Rayners Lane,79.0,5.0,20.0,19.0,13.0,14.0,8.0
+Piccadilly,EB,Rayners Lane,South Harrow,140.0,11.0,32.0,38.0,24.0,22.0,13.0
+Piccadilly,EB,South Harrow,Sudbury Hill,141.0,11.0,33.0,37.0,24.0,22.0,14.0
+Piccadilly,EB,Sudbury Hill,Sudbury Town,141.0,11.0,32.0,38.0,24.0,22.0,14.0
+Piccadilly,EB,Sudbury Town,Alperton,141.0,10.0,33.0,38.0,23.0,23.0,14.0
+Piccadilly,EB,Alperton,Park Royal,141.0,10.0,33.0,38.0,23.0,23.0,14.0
+Piccadilly,EB,Park Royal,North Ealing,141.0,9.0,33.0,38.0,23.0,23.0,15.0
+Piccadilly,EB,North Ealing,Ealing Common,141.0,9.0,33.0,38.0,23.0,23.0,15.0
+Piccadilly,EB,Ealing Common,Acton Town,141.0,8.0,34.0,38.0,22.0,24.0,15.0
+Piccadilly,EB,Heathrow Terminal 5 LU,Heathrow Terminals 123 LU,112.0,8.0,18.0,36.0,18.0,18.0,14.0
+Piccadilly,EB,Heathrow Terminal 4 LU,Heathrow Terminals 123 LU,112.0,9.0,18.0,36.0,18.0,18.0,13.0
+Piccadilly,EB,Heathrow Terminals 123 LU,Hatton Cross,224.0,16.0,36.0,72.0,36.0,36.0,28.0
+Piccadilly,EB,Hatton Cross,Hounslow West,224.0,15.0,36.0,72.0,36.0,36.0,29.0
+Piccadilly,EB,Hounslow West,Hounslow Central,224.0,15.0,36.0,72.0,36.0,36.0,29.0
+Piccadilly,EB,Hounslow Central,Hounslow East,224.0,14.0,36.0,72.0,36.0,36.0,30.0
+Piccadilly,EB,Hounslow East,Osterley,224.0,14.0,36.0,72.0,36.0,36.0,30.0
+Piccadilly,EB,Osterley,Boston Manor,224.0,13.0,36.0,72.0,37.0,35.0,31.0
+Piccadilly,EB,Boston Manor,Northfields,225.0,14.0,36.0,72.0,36.0,36.0,31.0
+Piccadilly,EB,Northfields,South Ealing,264.0,14.0,39.0,91.0,48.0,40.0,32.0
+Piccadilly,EB,South Ealing,Acton Town,264.0,14.0,39.0,90.0,49.0,40.0,32.0
+Piccadilly,EB,Acton Town,Turnham Green,399.0,20.0,72.0,128.0,72.0,64.0,43.0
+Piccadilly,EB,Turnham Green,Hammersmith (DIS),399.0,19.0,72.0,128.0,72.0,64.0,44.0
+Piccadilly,EB,Hammersmith (DIS),Barons Court,398.0,17.0,72.0,129.0,72.0,64.0,44.0
+Piccadilly,EB,Barons Court,Earl's Court,398.0,17.0,72.0,128.0,72.0,65.0,44.0
+Piccadilly,EB,Earl's Court,Gloucester Road,398.0,16.0,71.0,129.0,72.0,64.0,46.0
+Piccadilly,EB,Gloucester Road,South Kensington,398.0,15.0,72.0,128.0,72.0,65.0,46.0
+Piccadilly,EB,South Kensington,Knightsbridge,398.0,14.0,72.0,129.0,71.0,65.0,47.0
+Piccadilly,EB,Knightsbridge,Hyde Park Corner,398.0,13.0,72.0,128.0,72.0,65.0,48.0
+Piccadilly,EB,Hyde Park Corner,Green Park,398.0,13.0,71.0,129.0,72.0,65.0,48.0
+Piccadilly,EB,Green Park,Piccadilly Circus,399.0,12.0,71.0,129.0,72.0,65.0,50.0
+Piccadilly,EB,Piccadilly Circus,Leicester Square,399.0,12.0,71.0,128.0,72.0,65.0,51.0
+Piccadilly,EB,Leicester Square,Covent Garden,399.0,12.0,70.0,129.0,71.0,66.0,51.0
+Piccadilly,EB,Covent Garden,Holborn,399.0,12.0,70.0,128.0,72.0,65.0,52.0
+Piccadilly,EB,Holborn,Russell Square,399.0,11.0,70.0,129.0,71.0,66.0,52.0
+Piccadilly,EB,Russell Square,King's Cross St. Pancras,399.0,11.0,69.0,129.0,71.0,66.0,53.0
+Piccadilly,EB,King's Cross St. Pancras,Caledonian Road,399.0,10.0,69.0,129.0,71.0,66.0,54.0
+Piccadilly,EB,Caledonian Road,Holloway Road,399.0,10.0,68.0,129.0,71.0,66.0,55.0
+Piccadilly,EB,Holloway Road,Arsenal,399.0,9.0,68.0,130.0,70.0,67.0,55.0
+Piccadilly,EB,Arsenal,Finsbury Park LU,399.0,9.0,68.0,129.0,71.0,66.0,56.0
+Piccadilly,EB,Finsbury Park LU,Manor House,399.0,9.0,67.0,130.0,70.0,67.0,56.0
+Piccadilly,EB,Manor House,Turnpike Lane,399.0,8.0,67.0,130.0,70.0,67.0,57.0
+Piccadilly,EB,Turnpike Lane,Wood Green,399.0,8.0,66.0,130.0,70.0,67.0,58.0
+Piccadilly,EB,Wood Green,Bounds Green,398.0,6.0,66.0,130.0,70.0,67.0,59.0
+Piccadilly,EB,Bounds Green,Arnos Grove,398.0,6.0,65.0,130.0,70.0,67.0,60.0
+Piccadilly,EB,Arnos Grove,Southgate,315.0,5.0,48.0,106.0,51.0,54.0,51.0
+Piccadilly,EB,Southgate,Oakwood,315.0,5.0,47.0,106.0,52.0,53.0,52.0
+Piccadilly,EB,Oakwood,Cockfosters,300.0,4.0,47.0,103.0,51.0,53.0,42.0
+Piccadilly,WB,Cockfosters,Oakwood,298.0,18.0,52.0,102.0,52.0,48.0,26.0
+Piccadilly,WB,Oakwood,Southgate,316.0,27.0,55.0,105.0,54.0,48.0,27.0
+Piccadilly,WB,Southgate,Arnos Grove,316.0,26.0,55.0,105.0,54.0,48.0,28.0
+Piccadilly,WB,Arnos Grove,Bounds Green,397.0,29.0,72.0,129.0,72.0,63.0,32.0
+Piccadilly,WB,Bounds Green,Wood Green,397.0,29.0,71.0,129.0,72.0,63.0,33.0
+Piccadilly,WB,Wood Green,Turnpike Lane,398.0,28.0,72.0,129.0,72.0,63.0,34.0
+Piccadilly,WB,Turnpike Lane,Manor House,398.0,28.0,72.0,128.0,72.0,64.0,34.0
+Piccadilly,WB,Manor House,Finsbury Park LU,398.0,26.0,72.0,129.0,72.0,64.0,35.0
+Piccadilly,WB,Finsbury Park LU,Arsenal,398.0,25.0,72.0,129.0,72.0,64.0,36.0
+Piccadilly,WB,Arsenal,Holloway Road,398.0,25.0,72.0,128.0,72.0,65.0,36.0
+Piccadilly,WB,Holloway Road,Caledonian Road,398.0,24.0,72.0,129.0,72.0,64.0,37.0
+Piccadilly,WB,Caledonian Road,King's Cross St. Pancras,398.0,24.0,71.0,129.0,72.0,65.0,37.0
+Piccadilly,WB,King's Cross St. Pancras,Russell Square,398.0,22.0,72.0,129.0,72.0,65.0,38.0
+Piccadilly,WB,Russell Square,Holborn,398.0,22.0,71.0,129.0,72.0,65.0,39.0
+Piccadilly,WB,Holborn,Covent Garden,398.0,21.0,71.0,129.0,72.0,65.0,40.0
+Piccadilly,WB,Covent Garden,Leicester Square,398.0,20.0,72.0,129.0,72.0,65.0,40.0
+Piccadilly,WB,Leicester Square,Piccadilly Circus,398.0,20.0,71.0,129.0,72.0,65.0,41.0
+Piccadilly,WB,Piccadilly Circus,Green Park,398.0,19.0,72.0,129.0,72.0,65.0,41.0
+Piccadilly,WB,Green Park,Hyde Park Corner,398.0,18.0,72.0,129.0,72.0,65.0,42.0
+Piccadilly,WB,Hyde Park Corner,Knightsbridge,398.0,18.0,71.0,129.0,72.0,65.0,43.0
+Piccadilly,WB,Knightsbridge,South Kensington,398.0,17.0,72.0,128.0,72.0,66.0,43.0
+Piccadilly,WB,South Kensington,Gloucester Road,398.0,16.0,72.0,128.0,72.0,66.0,44.0
+Piccadilly,WB,Gloucester Road,Earl's Court,398.0,15.0,72.0,129.0,71.0,66.0,45.0
+Piccadilly,WB,Earl's Court,Barons Court,398.0,15.0,71.0,129.0,72.0,66.0,45.0
+Piccadilly,WB,Barons Court,Hammersmith (DIS),398.0,13.0,72.0,129.0,71.0,67.0,46.0
+Piccadilly,WB,Hammersmith (DIS),Turnham Green,403.0,18.0,71.0,129.0,71.0,67.0,47.0
+Piccadilly,WB,Turnham Green,Acton Town,403.0,17.0,71.0,129.0,71.0,67.0,48.0
+Piccadilly,WB,Acton Town,Ealing Common,142.0,10.0,29.0,36.0,28.0,21.0,18.0
+Piccadilly,WB,Ealing Common,North Ealing,142.0,10.0,28.0,36.0,29.0,20.0,19.0
+Piccadilly,WB,North Ealing,Park Royal,142.0,10.0,28.0,36.0,29.0,20.0,19.0
+Piccadilly,WB,Park Royal,Alperton,142.0,9.0,29.0,36.0,28.0,21.0,19.0
+Piccadilly,WB,Alperton,Sudbury Town,142.0,9.0,28.0,37.0,28.0,21.0,19.0
+Piccadilly,WB,Sudbury Town,Sudbury Hill,142.0,8.0,29.0,36.0,29.0,20.0,20.0
+Piccadilly,WB,Sudbury Hill,South Harrow,142.0,8.0,28.0,37.0,28.0,21.0,20.0
+Piccadilly,WB,South Harrow,Rayners Lane,144.0,9.0,29.0,37.0,27.0,22.0,20.0
+Piccadilly,WB,Rayners Lane,Eastcote,79.0,7.0,18.0,20.0,15.0,12.0,7.0
+Piccadilly,WB,Eastcote,Ruislip Manor,79.0,7.0,18.0,19.0,16.0,11.0,8.0
+Piccadilly,WB,Ruislip Manor,Ruislip,79.0,6.0,19.0,19.0,16.0,11.0,8.0
+Piccadilly,WB,Ruislip,Ickenham,79.0,6.0,19.0,19.0,15.0,12.0,8.0
+Piccadilly,WB,Ickenham,Hillingdon,79.0,6.0,19.0,19.0,15.0,12.0,8.0
+Piccadilly,WB,Hillingdon,Uxbridge,79.0,6.0,19.0,19.0,15.0,12.0,8.0
+Piccadilly,WB,Acton Town,South Ealing,272.0,16.0,41.0,93.0,44.0,45.0,33.0
+Piccadilly,WB,South Ealing,Northfields,272.0,15.0,42.0,93.0,42.0,47.0,33.0
+Piccadilly,WB,Northfields,Boston Manor,225.0,16.0,36.0,72.0,37.0,35.0,29.0
+Piccadilly,WB,Boston Manor,Osterley,225.0,16.0,36.0,72.0,36.0,36.0,29.0
+Piccadilly,WB,Osterley,Hounslow East,232.0,20.0,36.0,72.0,37.0,35.0,32.0
+Piccadilly,WB,Hounslow East,Hounslow Central,232.0,20.0,36.0,72.0,36.0,36.0,32.0
+Piccadilly,WB,Hounslow Central,Hounslow West,232.0,19.0,37.0,72.0,36.0,36.0,32.0
+Piccadilly,WB,Hounslow West,Hatton Cross,232.0,20.0,36.0,72.0,36.0,36.0,32.0
+Piccadilly,WB,Hatton Cross,Heathrow Terminal 4 LU,112.0,9.0,18.0,36.0,18.0,18.0,13.0
+Piccadilly,WB,Hatton Cross,Heathrow Terminals 123 LU,120.0,10.0,18.0,36.0,18.0,18.0,20.0
+Piccadilly,WB,Heathrow Terminals 123 LU,Heathrow Terminal 5 LU,119.0,10.0,18.0,36.0,18.0,18.0,19.0
+Victoria,NB,Brixton LU,Stockwell,549.0,30.0,106.0,166.0,108.0,85.0,54.0
+Victoria,NB,Stockwell,Vauxhall LU,549.0,29.0,106.0,166.0,107.0,87.0,54.0
+Victoria,NB,Vauxhall LU,Pimlico,549.0,28.0,105.0,167.0,107.0,87.0,55.0
+Victoria,NB,Pimlico,Victoria LU,549.0,28.0,105.0,167.0,106.0,87.0,56.0
+Victoria,NB,Victoria LU,Green Park,550.0,28.0,104.0,168.0,106.0,87.0,57.0
+Victoria,NB,Green Park,Oxford Circus,550.0,27.0,104.0,168.0,106.0,87.0,58.0
+Victoria,NB,Oxford Circus,Warren Street,550.0,26.0,104.0,168.0,105.0,88.0,59.0
+Victoria,NB,Warren Street,Euston LU,550.0,25.0,104.0,168.0,105.0,89.0,59.0
+Victoria,NB,Euston LU,King's Cross St. Pancras,550.0,25.0,103.0,168.0,105.0,89.0,60.0
+Victoria,NB,King's Cross St. Pancras,Highbury & Islington,550.0,24.0,103.0,168.0,105.0,89.0,61.0
+Victoria,NB,Highbury & Islington,Finsbury Park LU,550.0,23.0,102.0,169.0,105.0,89.0,62.0
+Victoria,NB,Finsbury Park LU,Seven Sisters,550.0,22.0,102.0,169.0,104.0,90.0,63.0
+Victoria,NB,Seven Sisters,Tottenham Hale LU,506.0,23.0,99.0,160.0,103.0,77.0,44.0
+Victoria,NB,Tottenham Hale LU,Blackhorse Road,506.0,22.0,99.0,160.0,103.0,77.0,45.0
+Victoria,NB,Blackhorse Road,Walthamstow Central,506.0,21.0,99.0,160.0,103.0,78.0,45.0
+Victoria,SB,Walthamstow Central,Blackhorse Road,504.0,19.0,98.0,160.0,103.0,77.0,47.0
+Victoria,SB,Blackhorse Road,Tottenham Hale LU,504.0,18.0,98.0,160.0,103.0,78.0,47.0
+Victoria,SB,Tottenham Hale LU,Seven Sisters,504.0,17.0,98.0,160.0,103.0,78.0,48.0
+Victoria,SB,Seven Sisters,Finsbury Park LU,547.0,39.0,107.0,166.0,108.0,82.0,45.0
+Victoria,SB,Finsbury Park LU,Highbury & Islington,547.0,37.0,108.0,165.0,108.0,82.0,47.0
+Victoria,SB,Highbury & Islington,King's Cross St. Pancras,547.0,36.0,107.0,165.0,108.0,83.0,48.0
+Victoria,SB,King's Cross St. Pancras,Euston LU,547.0,34.0,108.0,165.0,108.0,83.0,49.0
+Victoria,SB,Euston LU,Warren Street,547.0,33.0,107.0,166.0,108.0,83.0,50.0
+Victoria,SB,Warren Street,Oxford Circus,547.0,32.0,108.0,165.0,108.0,83.0,51.0
+Victoria,SB,Oxford Circus,Green Park,547.0,31.0,107.0,166.0,108.0,84.0,51.0
+Victoria,SB,Green Park,Victoria LU,547.0,30.0,107.0,166.0,108.0,84.0,52.0
+Victoria,SB,Victoria LU,Pimlico,547.0,29.0,107.0,166.0,107.0,85.0,53.0
+Victoria,SB,Pimlico,Vauxhall LU,547.0,28.0,107.0,166.0,107.0,85.0,54.0
+Victoria,SB,Vauxhall LU,Stockwell,547.0,27.0,107.0,166.0,107.0,86.0,54.0
+Victoria,SB,Stockwell,Brixton LU,547.0,26.0,106.0,167.0,107.0,86.0,55.0
+Waterloo & City,EB,Waterloo LU,Bank and Monument,301.0,21.0,64.0,74.0,64.0,51.0,27.0
+Waterloo & City,WB,Bank and Monument,Waterloo LU,304.0,21.0,64.0,75.0,63.0,52.0,29.0

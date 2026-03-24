@@ -1,0 +1,431 @@
+station,zone,daily_total,lambda_peak_15min,trains_peak_15min,mu_peak_15min,rho,lines
+Clapham Junction,2,43359.72,2068.0,2.25,1800.0,1.1489,LO Mildmay/LO Windrush
+Heathrow Terminal 5 EL,6,12571.03,271.7,0.5,400.0,0.6792,Elizabeth Line
+Abbey Wood,4,24309.28,1359.2,2.75,2200.0,0.6178,Elizabeth Line
+Crystal Palace,3/4,6616.84,461.4,1.0,800.0,0.5767,LO Windrush
+Watford Junction,10,12911.56,444.2,1.0,800.0,0.5552,LO Lioness
+Cheshunt,8,3764.9,217.5,0.5,400.0,0.5438,LO Weaver
+Euston NR,1,24534.39,396.8,0.92,733.3,0.5411,LO Lioness
+Richmond,4,24054.88,1072.3,2.67,2133.3,0.5027,District/LO Mildmay
+Wimbledon,3,34734.0,1455.6,3.67,2933.3,0.4962,District
+New Cross,2,7024.12,364.7,1.0,800.0,0.4558,LO Windrush
+West Croydon NR,5,9384.26,336.2,1.0,800.0,0.4202,LO Windrush
+Peckham Rye,2,12991.75,663.5,2.0,1600.0,0.4147,LO Windrush
+Liverpool Street NR,1,63530.75,406.0,1.33,1066.7,0.3806,Elizabeth Line/LO Weaver
+Amersham,9,3562.34,242.8,0.83,666.7,0.3642,Metropolitan
+Chingford,5,4606.08,288.7,1.0,800.0,0.3609,LO Weaver
+Reading,CPC,8253.54,257.0,0.92,733.3,0.3505,Elizabeth Line
+Maidenhead,CPC,10311.66,621.6,2.25,1800.0,0.3453,Elizabeth Line
+Chesham,9,1905.99,124.9,0.5,400.0,0.3123,Metropolitan
+Norwood Junction,4,8242.0,461.8,2.0,1600.0,0.2886,LO Windrush
+Denmark Hill,2,12966.9,458.7,2.0,1600.0,0.2867,LO Windrush
+Slough,CPC,10794.25,483.6,2.33,1866.7,0.2591,Elizabeth Line
+Twyford,CPC,6502.76,362.2,1.75,1400.0,0.2587,Elizabeth Line
+Enfield Town,5,4402.22,181.5,0.92,733.3,0.2476,LO Weaver
+Woolwich EL,4,23700.17,1018.9,5.42,4333.3,0.2351,Elizabeth Line
+Brixton LU,2,33492.57,1557.0,8.83,7066.7,0.2203,Victoria
+Hammersmith (H&C),2,17149.85,523.5,3.0,2400.0,0.2181,H&C and Circle
+Queens Road Peckham,2,6860.77,345.1,2.0,1600.0,0.2157,LO Windrush
+Epping,6,5579.96,286.9,1.83,1466.7,0.1956,Central
+Battersea Power Station,1,14637.88,437.4,2.83,2266.7,0.193,Northern
+Highams Park,4,5145.09,307.2,2.08,1666.7,0.1843,LO Weaver
+Waterloo LU,1,147569.64,5961.4,40.58,32466.7,0.1836,Bakerloo/Jubilee/Northern/Waterloo & City
+Mill Hill East,4,2945.75,195.7,1.33,1066.7,0.1835,Northern
+Forest Hill,3,9415.73,583.1,4.0,3200.0,0.1822,LO Windrush
+Shenfield,12,6285.08,370.9,2.58,2066.7,0.1794,Elizabeth Line
+Romford,6,23720.62,900.9,6.33,5066.7,0.1778,Elizabeth Line/LO Liberty
+Woolwich Arsenal,4,13257.7,468.2,3.33,2666.7,0.1756,DLR
+West Drayton,6,6528.58,304.5,2.33,1866.7,0.1631,Elizabeth Line
+Stratford International DLR,2/3,6763.03,213.0,1.67,1333.3,0.1598,DLR
+Heathrow Terminals 2 & 3 EL,6,17170.61,375.8,3.0,2400.0,0.1566,Elizabeth Line
+Canary Wharf EL,2,32987.48,680.4,5.5,4400.0,0.1546,Elizabeth Line
+Heathrow Terminal 4 EL,6,5179.19,121.8,1.0,800.0,0.1522,Elizabeth Line
+Upminster,6,7780.13,437.0,3.67,2933.3,0.149,District/LO Liberty
+Harrow & Wealdstone,5,8864.86,358.4,3.17,2533.3,0.1415,Bakerloo/LO Lioness
+Sydenham,3,7575.24,452.5,4.0,3200.0,0.1414,LO Windrush
+Ealing Broadway,3,26567.12,993.9,9.42,7533.3,0.1319,Central/District/Elizabeth Line
+Shepherd's Bush NR,2,14840.44,259.7,2.5,2000.0,0.1298,LO Mildmay
+Hayes & Harlington,5,15397.86,560.7,5.42,4333.3,0.1294,Elizabeth Line
+Clapton,2/3,4176.73,206.7,2.0,1600.0,0.1292,LO Weaver
+Morden,4,14468.91,682.0,6.92,5533.3,0.1232,Northern
+Bush Hill Park,5,3727.61,172.0,1.75,1400.0,0.1228,LO Weaver
+Barking Riverside,4,1969.74,94.5,1.0,800.0,0.1181,LO Suffragette
+Walthamstow Central,3,21926.47,957.2,10.17,8133.3,0.1177,LO Weaver/Victoria
+Lewisham DLR,2/3,11154.72,450.3,4.83,3866.7,0.1165,DLR
+Wood Street,4,3750.2,185.8,2.0,1600.0,0.1162,LO Weaver
+Watford,7,3048.83,170.3,1.83,1466.7,0.1161,Metropolitan
+Bushey,8,4058.32,184.6,2.0,1600.0,0.1154,LO Lioness
+Victoria LU,1,101890.61,2845.4,31.25,25000.0,0.1138,District/H&C and Circle/Victoria
+Ilford,4,17713.76,537.5,5.92,4733.3,0.1136,Elizabeth Line
+Turkey Street,6,2262.5,94.2,1.08,866.7,0.1087,LO Weaver
+Burnham,CPC,4175.55,202.5,2.33,1866.7,0.1085,Elizabeth Line
+Southall,4,13291.0,458.6,5.33,4266.7,0.1075,Elizabeth Line
+Paddington TfL,1,91185.33,2550.1,29.67,23733.3,0.1074,Bakerloo/District/Elizabeth Line/H&C and Circle
+London Bridge LU,1,98710.7,2200.0,25.92,20733.3,0.1061,Jubilee/Northern
+Edmonton Green,4,7173.37,259.9,3.08,2466.7,0.1053,LO Weaver
+Theobalds Grove,7,1577.81,89.9,1.08,866.7,0.1038,LO Weaver
+Custom House EL,3,16479.92,453.7,5.5,4400.0,0.1031,Elizabeth Line
+Brockley,2,7282.19,324.9,4.0,3200.0,0.1015,LO Windrush
+Barking,4,29721.09,937.7,11.75,9400.0,0.0998,District/H&C and Circle/LO Suffragette
+East Putney,2/3,10667.0,572.1,7.33,5866.7,0.0975,District
+Brentwood,9,6805.79,402.5,5.33,4266.7,0.0943,Elizabeth Line
+Vauxhall LU,1/2,37954.4,1318.6,17.67,14133.3,0.0933,Victoria
+Southfields,3,9521.29,541.0,7.33,5866.7,0.0922,District
+Hackney Downs,2,4414.22,178.1,2.42,1933.3,0.0921,LO Weaver
+Carpenders Park,7,2443.82,143.6,2.0,1600.0,0.0898,LO Lioness
+High Barnet,5,6484.57,307.0,4.33,3466.7,0.0886,Northern
+Emerson Park,6,949.74,70.1,1.0,800.0,0.0877,LO Liberty
+Hainault,4,5336.69,261.5,3.75,3000.0,0.0872,Central
+St James Street,3,2517.79,135.8,2.0,1600.0,0.0849,LO Weaver
+Honor Oak Park,3,4624.82,269.4,4.0,3200.0,0.0842,LO Windrush
+Rickmansworth,7,3437.85,176.0,2.67,2133.3,0.0825,Metropolitan
+Harold Wood,6,6869.2,351.6,5.42,4333.3,0.0811,Elizabeth Line
+Tooting Broadway,3,20941.67,886.2,13.67,10933.3,0.0811,Northern
+Gidea Park,6,6191.16,379.0,5.92,4733.3,0.0801,Elizabeth Line
+Uxbridge,6,9506.56,254.9,4.0,3200.0,0.0797,Metropolitan/Piccadilly
+Parsons Green,2,10255.67,457.8,7.33,5866.7,0.078,District
+Edgware,5,6749.63,315.9,5.08,4066.7,0.0777,Northern
+Liverpool Street LU,1,132385.88,2374.7,38.42,30733.3,0.0773,Central/Elizabeth Line/H&C and Circle/Metropolitan
+Stanmore,5,5357.89,273.1,4.42,3533.3,0.0773,Jubilee
+Rectory Road,2,3492.72,182.8,3.0,2400.0,0.0762,LO Weaver
+Northolt,5,7197.92,304.5,5.0,4000.0,0.0761,Central
+West Hampstead LO,2,7436.57,295.7,4.92,3933.3,0.0752,LO Mildmay
+Forest Gate,3,9872.72,357.4,6.0,4800.0,0.0745,Elizabeth Line
+Wembley Central,4,8221.42,268.1,4.5,3600.0,0.0745,Bakerloo/LO Lioness
+Balham LU,3,16629.32,813.3,13.67,10933.3,0.0744,Northern
+Southbury,5,2113.54,69.1,1.17,933.3,0.074,LO Weaver
+Chadwell Heath,5,8156.35,347.1,5.92,4733.3,0.0733,Elizabeth Line
+West Ruislip,6,2514.08,117.3,2.0,1600.0,0.0733,Central
+Chorleywood,7,2530.79,150.1,2.58,2066.7,0.0726,Metropolitan
+Chalfont & Latimer,8,2809.92,149.5,2.58,2066.7,0.0723,Metropolitan
+Anerley,4,2283.86,114.4,2.0,1600.0,0.0715,LO Windrush
+Leyton Midland Road,3,3347.09,113.2,2.0,1600.0,0.0707,LO Suffragette
+Tottenham Hale LU,3,22369.66,925.4,16.42,13133.3,0.0705,Victoria
+Marylebone LU,1,15151.27,545.8,9.75,7800.0,0.07,Bakerloo
+Gants Hill,4,8437.57,372.3,6.67,5333.3,0.0698,Central
+Homerton,2,7540.54,282.9,5.08,4066.7,0.0696,LO Mildmay
+Clapham High Street,2,2474.19,110.7,2.0,1600.0,0.0692,LO Windrush
+Penge West,4,2224.96,110.0,2.0,1600.0,0.0688,LO Windrush
+Stoke Newington,2,3727.73,159.9,2.92,2333.3,0.0685,LO Weaver
+Woodford,4,7814.29,391.0,7.25,5800.0,0.0674,Central
+Heathrow Terminal 5 LU,6,6491.35,80.5,1.5,1200.0,0.067,Piccadilly
+New Cross Gate,2,8539.54,212.5,4.0,3200.0,0.0664,LO Windrush
+West Ealing,3,5557.98,282.6,5.33,4266.7,0.0662,Elizabeth Line
+Silver Street,4,4829.84,158.3,3.0,2400.0,0.066,LO Weaver
+Pinner,5,4517.19,315.9,6.0,4800.0,0.0658,Metropolitan
+Dalston Junction,2,8200.77,315.6,6.0,4800.0,0.0657,LO Windrush
+Harrow-on-the-Hill,5,14106.71,555.7,10.67,8533.3,0.0651,Metropolitan
+Finsbury Park LU,2,34416.91,1484.4,29.08,23266.7,0.0638,Piccadilly/Victoria
+Upton Park,3,19634.59,612.2,12.0,9600.0,0.0638,District/H&C and Circle
+West Hampstead LU,2,15015.24,683.7,13.5,10800.0,0.0633,Jubilee
+Hackney Central,2,8778.92,252.2,5.0,4000.0,0.0631,LO Mildmay
+North Greenwich,2/3,35656.55,701.0,14.0,11200.0,0.0626,Jubilee
+Colindale,4,11039.92,494.9,9.92,7933.3,0.0624,Northern
+Stratford,2/3,85569.34,1736.2,35.17,28133.3,0.0617,Central/DLR/Elizabeth Line/Jubilee/LO Mildmay
+Nine Elms,1,6987.18,283.4,5.75,4600.0,0.0616,Northern
+South Woodford,4,6886.02,327.0,6.67,5333.3,0.0613,Central
+Loughton,6,4763.52,248.1,5.08,4066.7,0.061,Central
+Tooting Bec,3,11023.77,650.8,13.58,10866.7,0.0599,Northern
+Canary Wharf LU,2,59544.35,699.2,14.67,11733.3,0.0596,Jubilee
+Queen's Park,2,8836.52,433.2,9.08,7266.7,0.0596,Bakerloo/LO Lioness
+Seven Kings,4,7159.84,275.6,5.83,4666.7,0.059,Elizabeth Line
+Hatch End,6,1450.29,93.6,2.0,1600.0,0.0585,LO Lioness
+Goodmayes,4,7642.67,270.9,5.83,4666.7,0.0581,Elizabeth Line
+Chiswick Park,3,3794.54,146.8,3.17,2533.3,0.058,District
+Acton Main Line,3,5804.08,250.1,5.42,4333.3,0.0577,Elizabeth Line
+East Ham,3/4,18389.68,552.2,12.08,9666.7,0.0571,District/H&C and Circle
+Turnpike Lane,3,12919.26,523.0,11.5,9200.0,0.0568,Piccadilly
+King's Cross St. Pancras,1,122080.69,2444.9,54.17,43333.3,0.0564,H&C and Circle/Metropolitan/Northern/Piccadilly/Victoria
+Archway,2/3,12440.93,489.7,10.92,8733.3,0.0561,Northern
+Dalston Kingsland,2,8808.07,224.1,5.0,4000.0,0.056,LO Mildmay
+Clapham South,2/3,11173.54,608.6,13.67,10933.3,0.0557,Northern
+Newbury Park,4,5827.96,264.8,6.0,4800.0,0.0552,Central
+East Finchley,3,9686.06,491.7,11.17,8933.3,0.055,Northern
+Hanwell,4,4544.83,229.8,5.33,4266.7,0.0539,Elizabeth Line
+Wanstead Park,3,2885.03,84.7,2.0,1600.0,0.0529,LO Suffragette
+Golders Green,3,10329.61,420.9,10.0,8000.0,0.0526,Northern
+Tower Hill,1,23347.49,543.2,12.92,10333.3,0.0526,District/H&C and Circle
+Kensal Rise,2,5586.04,208.5,5.0,4000.0,0.0521,LO Mildmay
+Elephant & Castle LU,1/2,24998.82,661.2,16.0,12800.0,0.0517,Bakerloo/Northern
+West Kensington,2,6669.47,262.0,6.33,5066.7,0.0517,District
+Manor Park,3/4,6999.14,244.4,5.92,4733.3,0.0516,Elizabeth Line
+Blackhorse Road,3,16062.24,759.0,18.42,14733.3,0.0515,LO Suffragette/Victoria
+Blackfriars LU,1,21986.93,559.3,13.67,10933.3,0.0512,District/H&C and Circle
+Maryland,3,7132.28,245.4,6.0,4800.0,0.0511,Elizabeth Line
+Shepherd's Bush LU,2,21714.46,552.9,13.58,10866.7,0.0509,Central
+Leytonstone High Road,3,2382.92,81.3,2.0,1600.0,0.0508,LO Suffragette
+Acton Central,3,2761.33,99.9,2.5,2000.0,0.05,LO Mildmay
+Greenford,4,5598.1,223.4,5.58,4466.7,0.05,Central
+Elm Park,6,4742.62,254.0,6.42,5133.3,0.0495,District
+Wood Green,3,14566.65,452.4,11.5,9200.0,0.0492,Piccadilly
+Wembley Park,4,25824.08,811.1,20.67,16533.3,0.0491,Jubilee/Metropolitan
+Hammersmith (DIS),2,38906.19,713.8,18.25,14600.0,0.0489,District/Piccadilly
+Dagenham Heathway,5,8274.82,298.1,7.67,6133.3,0.0486,District
+Leyton,3,14441.14,521.5,13.42,10733.3,0.0486,Central
+Fulham Broadway,2,11924.12,287.6,7.42,5933.3,0.0485,District
+Kew Gardens,3/4,5321.72,214.9,5.58,4466.7,0.0481,District/LO Mildmay
+Debden,6,3556.94,148.8,3.92,3133.3,0.0475,Central
+Willesden Green,2/3,9432.83,436.2,11.5,9200.0,0.0474,Jubilee
+Langley,CPC,2897.82,88.4,2.33,1866.7,0.0473,Elizabeth Line
+Westbourne Park,2,6688.7,227.1,6.0,4800.0,0.0473,H&C and Circle
+South Tottenham,3,3181.17,74.8,2.0,1600.0,0.0467,LO Suffragette
+Putney Bridge,2,8285.39,273.3,7.33,5866.7,0.0466,District
+Ladbroke Grove,2,9167.41,223.3,6.0,4800.0,0.0465,H&C and Circle
+Euston LU,1,53190.19,1448.9,39.33,31466.7,0.046,Northern/Victoria
+Farringdon,1,80080.86,911.6,24.92,19933.3,0.0457,Elizabeth Line/H&C and Circle/Metropolitan
+Surrey Quays,2,7403.91,291.9,8.0,6400.0,0.0456,LO Windrush
+Highgate,3,7926.37,394.5,10.83,8666.7,0.0455,Northern
+Euston Square,1,21842.18,502.7,13.83,11066.7,0.0454,H&C and Circle/Metropolitan
+Harringay Green Lanes,3,3106.04,72.3,2.0,1600.0,0.0452,LO Suffragette
+Leytonstone,3/4,11969.67,485.1,13.42,10733.3,0.0452,Central
+Buckhurst Hill,5,3759.77,228.3,6.33,5066.7,0.0451,Central
+Greenwich,2/3,7231.84,350.9,9.75,7800.0,0.045,DLR
+Northfields,3,4295.73,223.8,6.25,5000.0,0.0448,Piccadilly
+Woodgrange Park,3/4,1982.01,70.8,2.0,1600.0,0.0443,LO Suffragette
+White Hart Lane,3,3172.59,102.8,2.92,2333.3,0.0441,LO Weaver
+Seven Sisters,3,20581.54,703.8,20.08,16066.7,0.0438,LO Weaver/Victoria
+Colliers Wood,3,9186.03,473.1,13.58,10866.7,0.0435,Northern
+Gunnersbury,3,7622.83,194.1,5.58,4466.7,0.0435,District/LO Mildmay
+Canning Town,2/3,19395.29,698.9,20.17,16133.3,0.0433,DLR/Jubilee
+Bethnal Green LU,2,16217.95,464.4,13.5,10800.0,0.043,Central
+Hackney Wick,2,5591.82,167.5,4.92,3933.3,0.0426,LO Mildmay
+Finchley Central,4,8710.43,382.1,11.25,9000.0,0.0425,Northern
+Limehouse DLR,2,8739.83,452.8,13.33,10666.7,0.0425,DLR
+Walthamstow Queen's Road,3,2395.0,68.0,2.0,1600.0,0.0425,LO Suffragette
+Hendon Central,3/4,9408.31,334.9,9.92,7933.3,0.0422,Northern
+High Street Kensington,1,16558.17,204.8,6.08,4866.7,0.0421,District/H&C and Circle
+Clapham Common,2,11677.48,456.0,13.67,10933.3,0.0417,Northern
+Hounslow East,4,5236.86,200.1,6.0,4800.0,0.0417,Piccadilly
+Imperial Wharf,2,6276.98,83.5,2.5,2000.0,0.0417,LO Mildmay
+South Ruislip,5,2776.11,150.0,4.5,3600.0,0.0417,Central
+Manor House,2/3,9584.42,382.6,11.58,9266.7,0.0413,Piccadilly
+Shepherd's Bush Market,2,5574.09,198.5,6.0,4800.0,0.0413,H&C and Circle
+Stonebridge Park,3,4648.43,181.1,5.5,4400.0,0.0412,Bakerloo/LO Lioness
+Southgate,4,6614.11,277.1,8.5,6800.0,0.0407,Piccadilly
+Croxley,7,1718.55,113.6,3.5,2800.0,0.0406,Metropolitan
+Old Street,1,30142.63,359.4,11.17,8933.3,0.0402,Northern
+Woodside Park,4,5788.32,277.9,8.67,6933.3,0.0401,Northern
+Wood Lane,2,8341.21,192.2,6.0,4800.0,0.04,H&C and Circle
+Taplow,CPC,1459.89,74.2,2.33,1866.7,0.0398,Elizabeth Line
+Hounslow Central,4,5215.04,192.2,6.08,4866.7,0.0395,Piccadilly
+Brondesbury,2,4087.91,153.6,4.92,3933.3,0.039,LO Mildmay
+Heathrow Terminals 123 LU,6,9164.18,140.1,4.5,3600.0,0.0389,Piccadilly
+Rayners Lane,5,5775.75,269.1,8.67,6933.3,0.0388,Metropolitan/Piccadilly
+Hanger Lane,3,4928.29,175.4,5.67,4533.3,0.0387,Central
+North Acton,2/3,10217.13,339.9,11.0,8800.0,0.0386,Central
+Bruce Grove,3,2197.03,89.5,2.92,2333.3,0.0383,LO Weaver
+Northwood,6,3884.9,186.5,6.08,4866.7,0.0383,Metropolitan
+East India,2/3,7521.42,201.8,6.67,5333.3,0.0378,DLR
+Sloane Square,1,23770.55,409.7,13.58,10866.7,0.0377,District/H&C and Circle
+Upper Holloway,2,3103.41,60.0,2.0,1600.0,0.0375,LO Suffragette
+Pontoon Dock,3,4432.58,199.6,6.67,5333.3,0.0374,DLR
+Grange Hill,4,623.27,49.8,1.67,1333.3,0.0373,Central
+Beckton,3,3518.19,97.2,3.33,2666.7,0.0364,DLR
+Earl's Court,1/2,26051.08,744.7,25.67,20533.3,0.0363,District/Piccadilly
+Kilburn,2,9037.87,365.0,12.58,10066.7,0.0363,Jubilee
+Aldgate East,1,20775.65,351.6,12.25,9800.0,0.0359,District/H&C and Circle
+Wandsworth Road,2,1450.52,57.3,2.0,1600.0,0.0358,LO Windrush
+Aldgate,1,13139.38,197.1,6.92,5533.3,0.0356,H&C and Circle/Metropolitan
+Bounds Green,3/4,7241.41,322.5,11.33,9066.7,0.0356,Piccadilly
+Alperton,4,4073.37,144.3,5.08,4066.7,0.0355,Piccadilly
+Angel,1,20044.35,312.4,11.08,8866.7,0.0352,Northern
+Crouch Hill,3,1762.11,58.5,2.08,1666.7,0.0351,LO Suffragette
+Stamford Brook,2,4013.46,174.8,6.25,5000.0,0.035,District
+Kingsbury,4,6758.92,244.8,8.83,7066.7,0.0346,Jubilee
+Canada Water,2,15374.16,625.4,22.67,18133.3,0.0345,Jubilee/LO Windrush
+North Harrow,5,2651.28,167.8,6.08,4866.7,0.0345,Metropolitan
+Chigwell,4,590.88,45.9,1.67,1333.3,0.0344,Central
+Bayswater,1,5792.35,161.7,5.92,4733.3,0.0342,District/H&C and Circle
+Kensal Green,2,3556.3,177.3,6.5,5200.0,0.0341,Bakerloo/LO Lioness
+Langdon Park,2,6956.26,181.1,6.67,5333.3,0.034,DLR
+Hornchurch,6,2968.46,168.7,6.25,5000.0,0.0337,District
+Hounslow West,5,4440.84,161.5,6.0,4800.0,0.0336,Piccadilly
+Watford High Street,8,2607.94,53.8,2.0,1600.0,0.0336,LO Lioness
+Becontree,5,5060.93,202.3,7.58,6066.7,0.0334,District
+Wimbledon Park,3,3526.86,196.0,7.33,5866.7,0.0334,District
+Bow Church,2,5955.84,177.1,6.67,5333.3,0.0332,DLR
+Eastcote,5,3935.68,203.8,7.67,6133.3,0.0332,Metropolitan/Piccadilly
+Dagenham East,5,4737.25,183.2,6.92,5533.3,0.0331,District
+Bermondsey,2,11876.54,386.9,14.67,11733.3,0.033,Jubilee
+Bow Road,2,7369.92,322.2,12.25,9800.0,0.0329,District/H&C and Circle
+Sudbury Town,4,2864.06,134.2,5.17,4133.3,0.0325,Piccadilly
+Wanstead,4,3289.47,174.8,6.75,5400.0,0.0324,Central
+Belsize Park,2,9219.27,277.5,10.75,8600.0,0.0323,Northern
+Queensbury,4,5362.23,226.8,8.83,7066.7,0.0321,Jubilee
+Willesden Junction,2/3,8592.65,294.1,11.5,9200.0,0.032,Bakerloo/LO Lioness/LO Mildmay
+Highbury & Islington,2,23456.37,621.8,24.33,19466.7,0.0319,LO Mildmay/LO Windrush/Victoria
+London Fields,2,3019.32,126.7,5.0,4000.0,0.0317,LO Weaver
+Headstone Lane,5,1122.01,50.6,2.0,1600.0,0.0316,LO Lioness
+Kensington (Olympia),2,4504.36,65.3,2.58,2066.7,0.0316,District/LO Mildmay
+Totteridge & Whetstone,4,3552.08,221.5,8.75,7000.0,0.0316,Northern
+South Harrow,5,3387.63,129.1,5.17,4133.3,0.0312,Piccadilly
+South Wimbledon,3/4,6492.87,339.0,13.67,10933.3,0.031,Northern
+Heathrow Terminal 4 LU,6,2432.08,37.1,1.5,1200.0,0.0309,Piccadilly
+Kentish Town,2,11327.32,267.1,10.92,8733.3,0.0306,Northern
+South Acton,3,1823.3,61.0,2.5,2000.0,0.0305,LO Mildmay
+Sudbury Hill,4,2845.82,121.9,5.0,4000.0,0.0305,Piccadilly
+Hatton Cross,5/6,4809.22,144.9,6.0,4800.0,0.0302,Piccadilly
+Southwark,1,16809.6,350.6,14.67,11733.3,0.0299,Jubilee
+Haggerston,2,5273.43,190.3,8.0,6400.0,0.0297,LO Windrush
+Canonbury,2,4696.27,211.3,8.92,7133.3,0.0296,LO Mildmay/LO Windrush
+Stockwell,2,13101.37,740.8,31.33,25066.7,0.0296,Northern/Victoria
+West Silvertown,3,4093.41,156.8,6.67,5333.3,0.0294,DLR
+Ravenscourt Park,2,4818.65,150.5,6.42,5133.3,0.0293,District
+South Ealing,3,3675.21,158.2,6.75,5400.0,0.0293,Piccadilly
+Canary Wharf DLR,2,18530.98,155.6,6.67,5333.3,0.0292,DLR
+Perivale,4,2972.72,128.6,5.5,4400.0,0.0292,Central
+Tower Gateway,1,3764.42,38.5,1.67,1333.3,0.0289,DLR
+Devons Road,2,3991.16,152.4,6.67,5333.3,0.0286,DLR
+Redbridge,4,3530.11,151.7,6.67,5333.3,0.0284,Central
+Plaistow,3,7930.9,275.4,12.17,9733.3,0.0283,District/H&C and Circle
+Harlesden,3,5102.97,146.6,6.5,5200.0,0.0282,Bakerloo/LO Lioness
+Holloway Road,2,9019.26,262.7,11.67,9333.3,0.0281,Piccadilly
+Finchley Road & Frognal,2,3903.39,108.3,4.83,3866.7,0.028,LO Mildmay
+Warwick Avenue,2,5237.38,212.2,9.58,7666.7,0.0277,Bakerloo
+Bromley-by-Bow,2/3,6586.2,268.5,12.17,9733.3,0.0276,District/H&C and Circle
+Chalk Farm,2,8541.01,240.8,10.92,8733.3,0.0276,Northern
+Shadwell DLR,2,10192.65,294.0,13.33,10666.7,0.0276,DLR
+Northwood Hills,6,2480.43,133.8,6.08,4866.7,0.0275,Metropolitan
+Burnt Oak,4,5466.63,218.8,10.0,8000.0,0.0274,Northern
+Acton Town,3,8221.41,329.6,15.08,12066.7,0.0273,District/Piccadilly
+Arnos Grove,4,5483.33,217.9,10.0,8000.0,0.0272,Piccadilly
+Goldhawk Road,2,3143.81,132.6,6.08,4866.7,0.0272,H&C and Circle
+South Quay,2,7317.27,212.4,9.75,7800.0,0.0272,DLR
+Mile End,2,18658.3,555.3,25.58,20466.7,0.0271,Central/District/H&C and Circle
+Swiss Cottage,2,9688.79,314.0,14.67,11733.3,0.0268,Jubilee
+Notting Hill Gate,1/2,18384.58,417.0,19.5,15600.0,0.0267,Central/District/H&C and Circle
+Abbey Road,2/3,2345.28,70.9,3.33,2666.7,0.0266,DLR
+Kenton,4,3339.0,95.7,4.5,3600.0,0.0266,Bakerloo/LO Lioness
+Maida Vale,2,4862.98,205.9,9.67,7733.3,0.0266,Bakerloo
+North Wembley,4,2614.38,97.7,4.58,3666.7,0.0266,Bakerloo/LO Lioness
+Tufnell Park,2,5393.87,232.6,10.92,8733.3,0.0266,Northern
+Iver,CPC,938.51,48.6,2.33,1866.7,0.0261,Elizabeth Line
+West Harrow,5,1962.21,93.9,4.5,3600.0,0.0261,Metropolitan
+Cannon Street LU,1,9749.03,284.5,13.67,10933.3,0.026,District/H&C and Circle
+Canons Park,5,3812.94,185.3,8.92,7133.3,0.026,Jubilee
+Oval,2,8903.93,283.1,13.67,10933.3,0.0259,Northern
+Dollis Hill,3,5489.59,214.1,10.42,8333.3,0.0257,Jubilee
+Osterley,4,2848.71,123.5,6.0,4800.0,0.0257,Piccadilly
+Crossharbour,2,4973.41,199.3,9.75,7800.0,0.0256,DLR
+Ruislip Gardens,5,1593.56,82.7,4.08,3266.7,0.0253,Central
+St. John's Wood,2,10267.57,297.4,14.67,11733.3,0.0253,Jubilee
+Clapham North,2,7515.75,274.2,13.67,10933.3,0.0251,Northern
+Shadwell LO,2,6084.5,159.4,8.0,6400.0,0.0249,LO Windrush
+Upney,4,4013.84,151.8,7.67,6133.3,0.0248,District
+Edgware Road (DIS),1,10210.57,177.9,9.0,7200.0,0.0247,District/H&C and Circle
+Theydon Bois,6,1271.77,72.4,3.67,2933.3,0.0247,Central
+Royal Oak,2,3759.06,117.7,6.0,4800.0,0.0245,H&C and Circle
+Barons Court,2,10254.67,358.3,18.33,14666.7,0.0244,District/Piccadilly
+Barkingside,4,2126.53,106.8,5.5,4400.0,0.0243,Central
+Cockfosters,5,2295.11,84.3,4.33,3466.7,0.0243,Piccadilly
+Gallions Reach,3,3267.78,124.9,6.42,5133.3,0.0243,DLR
+Snaresbrook,4,3185.56,126.1,6.5,5200.0,0.0242,Central
+Stamford Hill,3,1750.35,56.3,2.92,2333.3,0.0241,LO Weaver
+Charing Cross LU,1,28742.3,390.3,20.5,16400.0,0.0238,Bakerloo/Northern
+Kilburn Park,2,4498.42,182.8,9.58,7666.7,0.0238,Bakerloo
+Oakwood,5,3673.72,162.1,8.5,6800.0,0.0238,Piccadilly
+Stepney Green,2,9351.41,231.4,12.17,9733.3,0.0238,District/H&C and Circle
+West Finchley,4,2504.84,162.5,8.58,6866.7,0.0237,Northern
+Royal Victoria,3,4390.06,125.8,6.67,5333.3,0.0236,DLR
+Westferry,2,7001.81,251.3,13.33,10666.7,0.0236,DLR
+Cambridge Heath,2,2815.83,91.6,4.92,3933.3,0.0233,LO Weaver
+Turnham Green,2/3,8392.9,337.7,18.17,14533.3,0.0232,District/Piccadilly
+West Acton,3,1842.99,83.7,4.67,3733.3,0.0224,Central
+Camden Road,2,6572.74,90.5,5.08,4066.7,0.0222,LO Mildmay
+London City Airport,3,6204.76,118.3,6.67,5333.3,0.0222,DLR
+Neasden,3,4594.73,186.1,10.5,8400.0,0.0222,Jubilee
+Preston Road,4,4280.32,190.6,10.83,8666.7,0.022,Metropolitan
+Kilburn High Road,2,1227.49,35.1,2.0,1600.0,0.0219,LO Lioness
+Pimlico,1,13531.07,306.2,17.67,14133.3,0.0217,Victoria
+Deptford Bridge,2/3,4278.96,166.2,9.75,7800.0,0.0213,DLR
+East Acton,2,6208.27,199.0,11.67,9333.3,0.0213,Central
+South Kenton,4,1954.68,78.0,4.58,3666.7,0.0213,Bakerloo/LO Lioness
+Arsenal,2,3740.66,198.3,11.67,9333.3,0.0212,Piccadilly
+Hillingdon,6,2562.23,131.5,7.75,6200.0,0.0212,Metropolitan/Piccadilly
+Gospel Oak,2,4349.49,99.5,5.92,4733.3,0.021,LO Mildmay/LO Suffragette
+White City,2,14750.98,211.7,12.67,10133.3,0.0209,Central
+Baker Street,1,42176.89,658.2,39.83,31866.7,0.0207,Bakerloo/H&C and Circle/Jubilee/Metropolitan
+Hampstead,2/3,5999.39,179.0,10.83,8666.7,0.0207,Northern
+Roding Valley,4,305.93,27.6,1.67,1333.3,0.0207,Central
+Finchley Road,2,12897.23,426.2,25.83,20666.7,0.0206,Jubilee/Metropolitan
+Whitechapel,2,30979.51,515.2,31.25,25000.0,0.0206,District/Elizabeth Line/H&C and Circle/LO Windrush
+Gloucester Road,1,19834.32,419.7,25.67,20533.3,0.0204,District/H&C and Circle/Piccadilly
+Hampstead Heath,2,5596.25,79.6,4.92,3933.3,0.0202,LO Mildmay
+Kentish Town West,2,4383.35,78.6,4.92,3933.3,0.02,LO Mildmay
+Latimer Road,2,3951.08,94.6,6.0,4800.0,0.0197,H&C and Circle
+South Kensington,1,44265.42,404.0,25.58,20466.7,0.0197,District/H&C and Circle/Piccadilly
+Ealing Common,3,3217.48,128.8,8.33,6666.7,0.0193,District/Piccadilly
+Fairlop,4,1706.57,84.9,5.5,4400.0,0.0193,Central
+Heron Quays,2,8535.41,149.2,9.67,7733.3,0.0193,DLR
+Moor Park,6/7,1550.41,93.3,6.08,4866.7,0.0192,Metropolitan
+Rotherhithe,2,2697.13,122.3,8.0,6400.0,0.0191,LO Windrush
+Boston Manor,4,2310.37,90.1,6.0,4800.0,0.0188,Piccadilly
+Ruislip Manor,6,2433.97,115.5,7.67,6133.3,0.0188,Metropolitan/Piccadilly
+Hoxton,1/2,5729.27,119.5,8.0,6400.0,0.0187,LO Windrush
+Wapping,2,3606.3,120.0,8.0,6400.0,0.0187,LO Windrush
+Caledonian Road & Barnsbury,2,3370.27,74.5,5.0,4000.0,0.0186,LO Mildmay
+Kennington,2,7877.77,306.7,20.75,16600.0,0.0185,Northern
+Cutty Sark,2/3,8687.5,146.3,9.92,7933.3,0.0184,DLR
+Star Lane,2/3,2943.22,49.1,3.33,2666.7,0.0184,DLR
+Northwick Park,4,5816.13,160.6,11.0,8800.0,0.0183,Metropolitan
+King George V,3,2453.92,96.8,6.67,5333.3,0.0182,DLR
+West Brompton,2,8463.83,142.9,9.83,7866.7,0.0182,District/LO Mildmay
+Caledonian Road,2,5662.02,167.5,11.58,9266.7,0.0181,Piccadilly
+Queensway,1,8614.56,196.2,13.58,10866.7,0.0181,Central
+West Ham,2/3,9587.91,414.5,28.67,22933.3,0.0181,DLR/District/H&C and Circle/Jubilee
+Blackwall,2,2353.29,92.2,6.67,5333.3,0.0173,DLR
+Mudchute,2,2695.11,134.0,9.75,7800.0,0.0172,DLR
+Island Gardens,2,3801.63,134.2,9.83,7866.7,0.0171,DLR
+Brondesbury Park,2,2141.67,65.9,4.92,3933.3,0.0168,LO Mildmay
+Park Royal,3,2718.12,69.1,5.17,4133.3,0.0167,Piccadilly
+Ruislip,6,2481.24,102.8,7.75,6200.0,0.0166,Metropolitan/Piccadilly
+Brent Cross,3,3337.57,130.2,9.92,7933.3,0.0164,Northern
+Russell Square,1,14599.58,147.6,11.67,9333.3,0.0158,Piccadilly
+St. James's Park,1,19374.31,165.6,13.75,11000.0,0.0151,District/H&C and Circle
+South Hampstead,2,979.99,23.9,2.0,1600.0,0.0149,LO Lioness
+Pudding Mill Lane,2/3,2378.0,77.0,6.58,5266.7,0.0146,DLR
+Elverson Road,2/3,2370.59,109.7,9.58,7666.7,0.0143,DLR
+Tottenham Court Road,1,94897.54,392.5,35.42,28333.3,0.0139,Central/Elizabeth Line/Northern
+Upminster Bridge,6,1405.38,70.3,6.33,5066.7,0.0139,District
+All Saints,2,2866.36,73.4,6.67,5333.3,0.0138,DLR
+Borough,1,7036.83,120.2,11.08,8866.7,0.0136,Northern
+Moorgate,1,45089.49,259.9,24.92,19933.3,0.013,H&C and Circle/Metropolitan/Northern
+Holland Park,2,4764.97,140.2,13.58,10866.7,0.0129,Central
+Stratford High Street,2/3,2151.86,33.9,3.33,2666.7,0.0127,DLR
+Marble Arch,1,14310.94,137.0,13.58,10866.7,0.0126,Central
+Bank and Monument,1,85478.08,487.6,48.75,39000.0,0.0125,Central/DLR/District/H&C and Circle/Northern/Waterloo & City
+Lambeth North,1,4412.57,89.5,9.5,7600.0,0.0118,Bakerloo
+Royal Albert,3,2302.53,62.7,6.67,5333.3,0.0118,DLR
+Bethnal Green LO,2,2558.57,44.7,4.92,3933.3,0.0114,LO Weaver
+Lancaster Gate,1,4358.29,117.2,13.58,10866.7,0.0108,Central
+Embankment,1,29718.99,292.9,34.08,27266.7,0.0107,Bakerloo/District/H&C and Circle/Northern
+Shoreditch High Street,1,10583.66,66.7,8.0,6400.0,0.0104,LO Windrush
+North Ealing,3,1076.81,41.9,5.08,4066.7,0.0103,Piccadilly
+Ickenham,6,1550.13,63.2,7.83,6266.7,0.0101,Metropolitan/Piccadilly
+Great Portland Street,1,11183.3,110.1,13.83,11066.7,0.01,H&C and Circle/Metropolitan
+Prince Regent,3,2752.57,52.1,6.67,5333.3,0.0098,DLR
+Bond Street,1,70333.72,295.5,39.33,31466.7,0.0094,Central/Elizabeth Line/Jubilee
+Knightsbridge,1,21733.96,84.1,12.0,9600.0,0.0088,Piccadilly
+Oxford Circus,1,84335.69,285.4,40.92,32733.3,0.0087,Bakerloo/Central/Victoria
+Barbican,1,9993.65,95.0,13.75,11000.0,0.0086,H&C and Circle/Metropolitan
+Cyprus,3,3920.08,44.6,6.67,5333.3,0.0084,DLR
+Holborn,1,37340.55,155.9,25.25,20200.0,0.0077,Central/Piccadilly
+West India Quay,2,4034.87,57.1,9.75,7800.0,0.0073,DLR
+Mornington Crescent,2,5141.53,61.8,10.75,8600.0,0.0072,Northern
+Chancery Lane,1,17940.9,75.5,13.5,10800.0,0.007,Central
+St. Paul's,1,17697.91,74.8,13.5,10800.0,0.0069,Central
+Warren Street,1,27076.78,141.1,28.5,22800.0,0.0062,Northern/Victoria
+Poplar,2,3172.84,60.6,13.0,10400.0,0.0058,DLR
+Beckton Park,3,856.02,30.5,6.67,5333.3,0.0057,DLR
+Piccadilly Circus,1,43302.66,99.4,21.67,17333.3,0.0057,Bakerloo/Piccadilly
+Westminster,1,30915.06,126.1,28.5,22800.0,0.0055,District/H&C and Circle/Jubilee
+Goodge Street,1,10024.65,45.2,10.75,8600.0,0.0053,Northern
+Green Park,1,51295.03,181.0,44.25,35400.0,0.0051,Jubilee/Piccadilly/Victoria
+Covent Garden,1,19205.47,44.0,11.83,9466.7,0.0047,Piccadilly
+Leicester Square,1,40043.63,84.7,22.58,18066.7,0.0047,Northern/Piccadilly
+Regent's Park,1,3903.39,30.7,9.67,7733.3,0.004,Bakerloo
+Mansion House,1,8818.44,38.6,13.67,10933.3,0.0035,District/H&C and Circle
+Edgware Road (Bak),1,2596.48,26.6,9.67,7733.3,0.0034,Bakerloo
+Temple,1,15469.73,33.4,13.67,10933.3,0.0031,District/H&C and Circle
+Hyde Park Corner,1,5294.7,24.7,11.83,9466.7,0.0026,Piccadilly
+Paddington NR,1,8859.15,98.0,0.0,0.0,0,Elizabeth Line
