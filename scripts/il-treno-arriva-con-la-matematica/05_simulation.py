@@ -143,7 +143,7 @@ def simulate_priority_starvation():
     """
     rho_values = np.linspace(0.1, 0.95, 30)
     HIGH_FRACTION = 0.6  # 60% del traffico e' high priority
-    N_CUSTOMERS = 10_000
+    T_MAX = 20_000  # orizzonte temporale fisso per entrambe le classi
     SERVICE_RATE = 1.0
 
     high_waits = []
@@ -154,9 +154,11 @@ def simulate_priority_starvation():
         high_rate = arrival_rate * HIGH_FRACTION
         low_rate = arrival_rate * (1 - HIGH_FRACTION)
 
-        # Genera arrivi
-        high_arrivals = np.cumsum(np.random.exponential(1 / high_rate, N_CUSTOMERS))
-        low_arrivals = np.cumsum(np.random.exponential(1 / low_rate, N_CUSTOMERS))
+        # Genera arrivi sullo stesso orizzonte temporale
+        high_arrivals = np.cumsum(np.random.exponential(1 / high_rate, int(T_MAX * high_rate * 1.5)))
+        high_arrivals = high_arrivals[high_arrivals < T_MAX]
+        low_arrivals = np.cumsum(np.random.exponential(1 / low_rate, int(T_MAX * low_rate * 1.5)))
+        low_arrivals = low_arrivals[low_arrivals < T_MAX]
 
         # Merge e simula
         events = (
@@ -173,24 +175,26 @@ def simulate_priority_starvation():
         l_waits = []
 
         for arrival_time, priority, service_time in events:
-            if arrival_time >= server_free_at:
-                # Server libero
-                if priority == 'H':
-                    # Serve subito
-                    wait = 0
-                    server_free_at = arrival_time + service_time
-                    h_waits.append(wait)
+            # Drena code in ordine di priorita' finche' il server e' libero
+            while server_free_at <= arrival_time:
+                if high_queue:
+                    at, st = high_queue.pop(0)
+                    h_waits.append(server_free_at - at)
+                    server_free_at += st
+                elif low_queue:
+                    at, st = low_queue.pop(0)
+                    l_waits.append(server_free_at - at)
+                    server_free_at += st
                 else:
-                    # Controlla se ci sono high in attesa
-                    if high_queue:
-                        ht, hs = high_queue.pop(0)
-                        h_waits.append(arrival_time - ht)
-                        server_free_at = arrival_time + hs
-                        low_queue.append((arrival_time, service_time))
-                    else:
-                        wait = 0
-                        server_free_at = arrival_time + service_time
-                        l_waits.append(wait)
+                    break
+
+            if arrival_time >= server_free_at:
+                # Server libero, servi subito
+                if priority == 'H':
+                    h_waits.append(0)
+                else:
+                    l_waits.append(0)
+                server_free_at = arrival_time + service_time
             else:
                 # Server occupato, accoda
                 if priority == 'H':
@@ -198,18 +202,16 @@ def simulate_priority_starvation():
                 else:
                     low_queue.append((arrival_time, service_time))
 
-            # Drena code quando il server si libera
-            while server_free_at <= arrival_time:
-                if high_queue:
-                    ht, hs = high_queue.pop(0)
-                    h_waits.append(max(0, server_free_at - ht))
-                    server_free_at += hs
-                elif low_queue:
-                    lt, ls = low_queue.pop(0)
-                    l_waits.append(max(0, server_free_at - lt))
-                    server_free_at += ls
-                else:
-                    break
+        # Drena clienti rimasti in coda dopo l'ultimo arrivo
+        while high_queue or low_queue:
+            if high_queue:
+                at, st = high_queue.pop(0)
+                h_waits.append(server_free_at - at)
+                server_free_at += st
+            else:
+                at, st = low_queue.pop(0)
+                l_waits.append(server_free_at - at)
+                server_free_at += st
 
         high_waits.append(np.mean(h_waits) if h_waits else 0)
         low_waits.append(np.mean(l_waits) if l_waits else 0)
