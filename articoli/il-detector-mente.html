@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Detector Mente | Signal Pirate</title>
+  <meta name="description" content="Perche' i detector di testo AI non funzionano sul singolo testo, ma la model attribution tra modelli diversi si'. Claude vs ChatGPT vs Llama: 50 campioni, 16 feature stilometriche, clustering e Random Forest. 3 script Python, 6 grafici.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning/important */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: rgba(124,77,255,0.06);
+      border: 1px solid rgba(124,77,255,0.15);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .pipeline-step .step-num {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.3rem;
+    }
+    .pipeline-step .step-name {
+      color: var(--accent-highlight);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .pipeline-step .step-desc {
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      margin-top: 0.3rem;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-26 | Pinperepette</p>
+    <h1 class="article-page-title">Il Detector <span class="accent">Mente</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Perche' i detector di testo AI non funzionano sul singolo testo, ma la model attribution tra modelli diversi si'. Claude vs ChatGPT vs Llama: 146 campioni, 16 feature stilometriche, Random Forest al 93.8%. Test di robustezza su 3 temperature e 3 domini: la firma tiene. 5 script Python, 10 grafici.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">AI Detection</span>
+      <span class="tag tag-highlight">Model Attribution</span>
+      <span class="tag tag-reaction">Stilometria</span>
+      <span class="tag tag-amplification">Claude / GPT / Llama</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL DETECTOR
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Detector</h2>
+    <span class="section-number">Sezione 00. La bugia che tutti comprano</span>
+
+    <p>Primo esperimento. Prendo un paragrafo da <em>Se questo e' un uomo</em> di Primo Levi, lo incollo in un detector online. Quelli che promettono di dirti se un testo l'ha scritto un umano o una macchina.</p>
+
+    <p>Risultato: <strong>96% probabilita' AI-generated.</strong></p>
+
+    <p>Primo Levi. Uno che ha scritto quelle pagine in un campo di concentramento. Il detector dice che e' una macchina.</p>
+
+    <p>Secondo esperimento. Prendo un testo generato da GPT-4o, gli cambio tre parole, aggiungo un refuso. Risultato: <strong>12% probabilita' AI.</strong> Umano, dice il detector. Basta un errore di battitura per fregarlo.</p>
+
+    <p>Questi strumenti hanno un problema che nessun aggiornamento del modello puo' risolvere. Il problema e' nella domanda stessa.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - PERCHE' NON FUNZIONA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' Non Funziona</h2>
+    <span class="section-number">Sezione 01. Il problema formale</span>
+
+    <p>Un detector di testo AI cerca di rispondere a una domanda binaria: questo testo l'ha scritto un umano o una macchina? E la risponde guardando feature statistiche del testo: perplexity, distribuzione dei token, burstiness (varianza nella complessita' delle frasi).</p>
+
+    <p>Il problema e' che le distribuzioni si sovrappongono. Un umano che scrive in modo ordinato produce testo con perplexity bassa, uguale a quella di un LLM. Un LLM con temperature alta produce testo con perplexity alta, uguale a quella di un umano. La zona grigia non e' un'eccezione: e' la norma.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Il problema dell'overlap</span>
+      P(testo | umano) &cap; P(testo | macchina) &ne; &empty;
+    </div>
+
+    <p>In termini pratici: per ogni feature che scegli (perplexity, burstiness, type-token ratio, qualsiasi cosa) esistono testi umani che hanno lo stesso valore di testi generati. Le due distribuzioni non sono separabili nel caso generale. Non esiste un classificatore che generalizzi in modo affidabile su tutti i testi, in tutti i domini, con tutti i modelli. Funziona solo in condizioni ristrette. E le condizioni ristrette sono quelle del vendor che te lo vende, non le tue.</p>
+
+    <p>I detector commerciali aggirano il problema tarandosi per avere pochi falsi positivi (alta precisione, basso recall). In pratica: quando dicono "AI" hanno spesso ragione, ma lasciano passare la maggior parte dei testi generati. E quando sbagliano nella direzione opposta, marchiano un umano come macchina. In un contesto scolastico o legale, quel falso positivo rovina una persona.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il punto.</strong> Il rilevamento AI sul singolo testo e' un problema mal posto. Le distribuzioni si sovrappongono, la ground truth non esiste (non puoi dimostrare che un testo e' stato scritto senza assistenza AI), e qualsiasi soglia produce errori in entrambe le direzioni. I detector funzionano come i test antidoping con falsi positivi: quando distruggono la carriera di un atleta pulito, il 99% di accuratezza non lo consola.</p>
+    </div>
+
+    <p>Il watermarking e' l'unico approccio teoricamente solido: il provider inserisce un pattern statistico nel testo durante la generazione, e il detector lo cerca. Funziona perche' il segnale e' intenzionale, non inferito. Il limite e' che richiede la cooperazione del provider. Se il modello e' locale, o se il provider non implementa watermarking, non c'e' nulla da cercare.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LA DOMANDA GIUSTA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Domanda Giusta</h2>
+    <span class="section-number">Sezione 02. Non chi, ma quale</span>
+
+    <p>E se cambiassimo domanda?</p>
+
+    <p>Dimentica "umano o macchina". Chiediti: <em>quale</em> macchina. Se hai un corpus di testi e sai che sono stati generati da modelli diversi, riesci a distinguere chi ha scritto cosa?</p>
+
+    <p>La risposta e' si'. E il motivo e' sorprendentemente banale.</p>
+
+    <p>Ogni modello ha dei tic. Sono il prodotto del training data, dell'architettura, dell'RLHF, del tokenizer. I dati lo confermano: Claude produce frasi mediamente da 24.9 parole, ChatGPT da 20.7, Llama da 21.0. Il type-token ratio di Claude e' 0.53, quello di Llama 0.39. Llama si ripete molto di piu'. ChatGPT mette 6.2 virgole per 1000 caratteri, Claude 3.7. Sono differenze piccole sul singolo testo, ma su un corpus di 50 campioni diventano pattern stabili e misurabili.</p>
+
+    <p>Questa e' <strong>model attribution</strong>: non rilevamento, ma attribuzione. La stessa cosa che la stilometria fa con gli autori umani da due secoli. Cambia solo il soggetto.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La distinzione chiave.</strong> Il rilevamento AI (umano vs macchina) e' un problema di classificazione binaria con overlap distribuzionale, inaffidabile sul singolo campione. La model attribution (quale modello tra N) e' un problema di classificazione multiclasse su feature diverse e misurabili. Funziona, a patto di avere abbastanza campioni e le feature giuste.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - IL LABORATORIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Laboratorio</h2>
+    <span class="section-number">Sezione 03. Tre modelli, un prompt, 50 ripetizioni</span>
+
+    <p>Ho preso tre modelli: <strong>Claude</strong> (claude-sonnet-4-20250514, API Anthropic), <strong>ChatGPT</strong> (gpt-4o, API OpenAI), e un modello locale via <strong>Ollama</strong> (Llama 3.1, 8B parametri, quantizzato Q4_K_M, gira sulla mia macchina). Ho preparato 25 prompt tecnici, tutti sullo stesso dominio (informatica), tutti con lo stesso livello di dettaglio richiesto. Cose tipo "spiega come funziona il protocollo TCP" o "descrivi il funzionamento di una hash table".</p>
+
+    <p>Ogni prompt l'ho mandato a tutti e tre i modelli. Due passaggi per prompt, quindi 50 campioni per modello. 150 testi generati, 146 validi dopo aver scartato quelli troppo corti per un'analisi stilometrica decente. Stessa temperatura di default per tutti. Stessa lunghezza massima (1024 token).</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number purple">3</div>
+        <div class="stat-label">Modelli</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">146</div>
+        <div class="stat-label">Campioni validi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">16</div>
+        <div class="stat-label">Feature</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">25</div>
+        <div class="stat-label">Prompt distinti</div>
+      </div>
+    </div>
+
+    <p>Il primo script (<code>01_genera_campioni.py</code>) fa il lavoro sporco: chiama le tre API in sequenza, salva tutto in un JSON con il testo, il prompt, il tempo di risposta, la lunghezza.</p>
+
+    <div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># genera un campione con Claude</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">import</span> anthropic</td></tr>
+<tr><td class="ln">3</td><td class="code">client = anthropic.<span class="cf">Anthropic</span>()</td></tr>
+<tr><td class="ln">4</td><td class="code">resp = client.messages.<span class="cf">create</span>(</td></tr>
+<tr><td class="ln">5</td><td class="code">    model=<span class="cs">'claude-sonnet-4-20250514'</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">    max_tokens=<span class="cn">1024</span>,</td></tr>
+<tr><td class="ln">7</td><td class="code">    messages=[{<span class="cs">'role'</span>: <span class="cs">'user'</span>, <span class="cs">'content'</span>: prompt}],</td></tr>
+<tr><td class="ln">8</td><td class="code">)</td></tr>
+<tr><td class="ln">9</td><td class="code">testo = resp.content[<span class="cn">0</span>].text</td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cc"># genera un campione con ChatGPT</span></td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="ck">import</span> openai</td></tr>
+<tr><td class="ln">13</td><td class="code">client = openai.<span class="cf">OpenAI</span>()</td></tr>
+<tr><td class="ln">14</td><td class="code">resp = client.chat.completions.<span class="cf">create</span>(</td></tr>
+<tr><td class="ln">15</td><td class="code">    model=<span class="cs">'gpt-4o'</span>,</td></tr>
+<tr><td class="ln">16</td><td class="code">    max_tokens=<span class="cn">1024</span>,</td></tr>
+<tr><td class="ln">17</td><td class="code">    messages=[{<span class="cs">'role'</span>: <span class="cs">'user'</span>, <span class="cs">'content'</span>: prompt}],</td></tr>
+<tr><td class="ln">18</td><td class="code">)</td></tr>
+<tr><td class="ln">19</td><td class="code">testo = resp.choices[<span class="cn">0</span>].message.content</td></tr>
+<tr><td class="ln">20</td><td class="code"></td></tr>
+<tr><td class="ln">21</td><td class="code"><span class="cc"># genera un campione con Ollama (locale)</span></td></tr>
+<tr><td class="ln">22</td><td class="code"><span class="ck">import</span> requests</td></tr>
+<tr><td class="ln">23</td><td class="code">resp = requests.<span class="cf">post</span>(<span class="cs">'http://localhost:11434/api/generate'</span>, json={</td></tr>
+<tr><td class="ln">24</td><td class="code">    <span class="cs">'model'</span>: <span class="cs">'llama3.1'</span>,</td></tr>
+<tr><td class="ln">25</td><td class="code">    <span class="cs">'prompt'</span>: prompt,</td></tr>
+<tr><td class="ln">26</td><td class="code">    <span class="cs">'stream'</span>: <span class="ck">False</span>,</td></tr>
+<tr><td class="ln">27</td><td class="code">})</td></tr>
+<tr><td class="ln">28</td><td class="code">testo = resp.<span class="cf">json</span>()[<span class="cs">'response'</span>]</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>Zero configurazione speciale, zero system prompt, zero trucchi. Stessa domanda, tre risposte, vediamo chi scrive come.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - LE FEATURE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Feature</h2>
+    <span class="section-number">Sezione 04. 16 numeri per smontare un testo</span>
+
+    <p>Il secondo script (<code>02_estrai_features.py</code>) prende ogni testo e lo riduce a 16 numeri. Niente modelli neurali, niente embedding, niente magia. Solo statistica descrittiva su stringhe di caratteri.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Feature</th><th>Cosa misura</th><th>Perche' conta</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>media_len_frasi</code></td><td>Parole per frase, media</td><td>I modelli hanno lunghezze di frase caratteristiche</td></tr>
+        <tr><td><code>std_len_frasi</code></td><td>Deviazione standard lunghezza frasi</td><td>Quanto varia il ritmo della scrittura</td></tr>
+        <tr><td><code>ttr</code></td><td>Type-token ratio</td><td>Ricchezza del vocabolario: parole diverse / parole totali</td></tr>
+        <tr><td><code>hapax_ratio</code></td><td>Parole usate una sola volta / vocabolario</td><td>Tendenza a ripetere vs introdurre nuovi termini</td></tr>
+        <tr><td><code>entropia_char</code></td><td>Entropia di Shannon sui caratteri</td><td>Complessita' della distribuzione dei caratteri</td></tr>
+        <tr><td><code>virgole_1k</code></td><td>Virgole per 1000 caratteri</td><td>Stile di punteggiatura: ogni modello ha una frequenza diversa</td></tr>
+        <tr><td><code>punti_1k</code></td><td>Punti per 1000 caratteri</td><td>Frasi piu' corte = piu' punti</td></tr>
+        <tr><td><code>due_punti_1k</code></td><td>Due punti per 1000 caratteri</td><td>Stile enumerativo, spiegazioni</td></tr>
+        <tr><td><code>punto_virgola_1k</code></td><td>Punto e virgola per 1000 caratteri</td><td>Alcuni modelli li usano molto piu' di altri</td></tr>
+        <tr><td><code>trattini_1k</code></td><td>Trattini per 1000 caratteri</td><td>Incisi, parentetiche</td></tr>
+        <tr><td><code>ratio_parole_lunghe</code></td><td>% parole con 8+ caratteri</td><td>Tendenza a usare termini tecnici o complessi</td></tr>
+        <tr><td><code>media_len_parole</code></td><td>Lunghezza media delle parole</td><td>Correlato con il registro linguistico</td></tr>
+        <tr><td><code>ratio_bg_ripetuti</code></td><td>% bigrammi che compaiono piu' di una volta</td><td>Quanto il modello si ripete a livello di coppie di parole</td></tr>
+        <tr><td><code>ratio_conj_start</code></td><td>% frasi che iniziano con congiunzione</td><td>Pattern sintattico di apertura ("E", "Ma", "However"...)</td></tr>
+        <tr><td><code>freq_punct_1k</code></td><td>Punteggiatura totale per 1000 caratteri</td><td>Densita' complessiva di punteggiatura</td></tr>
+        <tr><td><code>n_paragrafi</code></td><td>Numero di paragrafi</td><td>Strutturazione del testo</td></tr>
+      </tbody>
+    </table>
+
+    <p>L'entropia di Shannon la calcolo sui singoli caratteri. E' la stessa formula del malware article, applicata a un problema diverso:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Entropia di Shannon (caratteri)</span>
+      H = &minus; &sum;<sub>i</sub> p(c<sub>i</sub>) &middot; log<sub>2</sub> p(c<sub>i</sub>)
+    </div>
+
+    <p>Dove p(c<sub>i</sub>) e' la frequenza relativa del carattere i-esimo nel testo. Un testo con vocabolario variegato ha entropia alta. Un testo che ripete le stesse strutture ha entropia bassa. I modelli hanno profili di entropia diversi perche' i tokenizer e il training producono distribuzioni di caratteri diverse.</p>
+
+    <p>Il type-token ratio (TTR) e' il rapporto tra parole distinte e parole totali. Se un testo di 500 parole usa 300 parole diverse, TTR = 0.6. Nei nostri dati Llama ha il TTR piu' basso (0.39): ripete molto. Claude il piu' alto (0.53). ChatGPT sta in mezzo (0.49). Il TTR cattura una differenza reale nel modo in cui i modelli gestiscono il vocabolario, e quella differenza e' stabile da un prompt all'altro.</p>
+
+    <div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">shannon_entropy</span>(testo):</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="cc">"""Entropia di Shannon sui caratteri."""</span></td></tr>
+<tr><td class="ln">3</td><td class="code">    freq = Counter(testo)</td></tr>
+<tr><td class="ln">4</td><td class="code">    n = <span class="cf">len</span>(testo)</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="ck">return</span> -<span class="cf">sum</span>((c / n) * math.<span class="cf">log2</span>(c / n) <span class="ck">for</span> c <span class="ck">in</span> freq.<span class="cf">values</span>())</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="ck">def</span> <span class="cf">bigrammi</span>(parole):</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cc">"""Coppie di parole consecutive."""</span></td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">return</span> [(parole[i], parole[i+<span class="cn">1</span>]) <span class="ck">for</span> i <span class="ck">in</span> <span class="cf">range</span>(<span class="cf">len</span>(parole) - <span class="cn">1</span>)]</td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cc"># il type-token ratio: parole diverse / parole totali</span></td></tr>
+<tr><td class="ln">12</td><td class="code">parole = re.<span class="cf">findall</span>(r<span class="cs">'\b\w+\b'</span>, testo.<span class="cf">lower</span>())</td></tr>
+<tr><td class="ln">13</td><td class="code">ttr = <span class="cf">len</span>(<span class="cf">set</span>(parole)) / <span class="cf">len</span>(parole)</td></tr>
+</tbody></table></div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - I CLUSTER
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Cluster</h2>
+    <span class="section-number">Sezione 05. Tre nuvole che non si toccano</span>
+
+    <p>Il terzo script (<code>03_clustering.py</code>) prende le 16 feature, le standardizza (z-score), e le proietta in 2D con t-SNE per la visualizzazione e PCA per la varianza spiegata.</p>
+
+    <p>Il risultato e' questo.</p>
+
+    <img src="../immagini/detector/01_scatter_tsne.png" alt="t-SNE dei campioni di testo: Claude, ChatGPT e Llama formano cluster separati" class="lab-screenshot fade-in">
+
+    <p>Tre nuvole. Separate. I punti viola sono Claude. I verdi sono ChatGPT. I rossi sono il modello locale. Qualche punto ai bordi si avvicina, ma i centroidi sono lontani. Attenzione pero': il t-SNE e' ottimo per visualizzare cluster, ma distorce le distanze globali e puo' creare separazioni apparenti dove non ci sono. Per questo serve la PCA come verifica.</p>
+
+    <p>La proiezione PCA racconta la stessa storia, e questa volta con numeri interpretabili:</p>
+
+    <img src="../immagini/detector/02_scatter_pca.png" alt="PCA 2D dei campioni: cluster separati con varianza spiegata" class="lab-screenshot fade-in">
+
+    <p>Le prime due componenti principali catturano il <strong>47.1%</strong> della varianza (PC1: 31.4%, PC2: 15.7%). La separazione e' visibile anche qui. La separazione osservata e' coerente tra proiezioni non lineari (t-SNE) e lineari (PCA), il che riduce il rischio di artefatti di visualizzazione. E' nel dato.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Perche' funziona.</strong> Ogni modello ha un profilo stilometrico stabile. Claude fa frasi da 25 parole in media con poca punteggiatura. ChatGPT ne fa da 21 ma con il 67% di virgole in piu'. Llama ripete il doppio dei bigrammi rispetto a Claude (0.21 vs 0.09). Queste differenze emergono dal training, dal tokenizer, dall'RLHF. Sono una firma.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - IL CLASSIFICATORE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Classificatore</h2>
+    <span class="section-number">Sezione 06. Random Forest, 5-fold cross-validation</span>
+
+    <p>Per quantificare la separazione uso un Random Forest con 200 alberi e validazione incrociata a 5 fold. Niente di esotico. Niente deep learning. Un classificatore che gira in meno di un secondo su un laptop.</p>
+
+    <img src="../immagini/detector/03_confusion_matrix.png" alt="Matrice di confusione: classificazione dei tre modelli" class="lab-screenshot fade-in">
+
+    <p>Accuracy: <strong>93.8%</strong> in cross-validation a 5 fold. Claude e' il piu' riconoscibile (f1 = 0.98). ChatGPT sta a 0.93. Llama a 0.90, con qualche confusione verso ChatGPT, probabilmente per convergenza stilistica nelle feature osservate. Nove campioni sbagliati su 146. Una logistic regression sulle stesse feature scende intorno all'85%, il che suggerisce che la separazione non e' puramente lineare e il Random Forest serve davvero. Su un problema di rilevamento binario umano/macchina questi numeri sarebbero fantascienza.</p>
+
+    <p>Le feature che contano di piu' le decide il Random Forest in base al Gini importance:</p>
+
+    <img src="../immagini/detector/04_feature_importance.png" alt="Feature importance: le feature piu' discriminanti per la model attribution" class="lab-screenshot fade-in">
+
+    <p>Nel nostro dataset, l'entropia dei caratteri risulta la feature piu' discriminante (importance 0.197), seguita dal rapporto di bigrammi ripetuti (0.133), dalla deviazione standard delle frasi (0.120) e dal type-token ratio (0.117). La punteggiatura che mi aspettavo dominante in realta' viene dopo. Il Gini importance del Random Forest e' instabile: cambiando il seed i pesi si rimescolano un po'. Ma le prime quattro feature restano sempre le stesse.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Non serve un modello neurale per risolvere questo problema.</strong> Un Random Forest su 16 feature numeriche basta. Il motivo e' che non stai cercando un segnale debole in un mare di rumore. Stai misurando distanze tra distribuzioni che sono realmente diverse. I cluster esistono nei dati. Il classificatore li trova perche' ci sono.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - I PROFILI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Profili</h2>
+    <span class="section-number">Sezione 07. L'impronta di ogni modello</span>
+
+    <p>Le distribuzioni delle feature chiave mostrano dove ogni modello si distingue.</p>
+
+    <img src="../immagini/detector/05_distribuzioni.png" alt="Box plot: distribuzione feature per modello" class="lab-screenshot fade-in">
+
+    <p>E il radar chart sintetizza i profili stilometrici medi dei tre modelli su un unico grafico:</p>
+
+    <img src="../immagini/detector/06_radar.png" alt="Radar chart: profilo stilometrico medio per modello" class="lab-screenshot fade-in">
+
+    <p>Ogni modello ha una forma diversa. Claude ha l'entropia dei caratteri piu' alta (4.85 vs 4.46 di ChatGPT e 4.37 di Llama): distribuzione di caratteri piu' variegata, meno pattern ripetitivi. Llama ha il tasso di bigrammi ripetuti piu' che doppio rispetto agli altri (0.21 vs 0.09 e 0.10). Si ripete molto. ChatGPT sta nel mezzo su quasi tutto, ma mette piu' virgole di tutti (6.2 per 1000 caratteri).</p>
+
+    <p>Il radar lo rende evidente: tre forme diverse, tre firme diverse. Sono le stesse differenze che un lettore attento noterebbe dopo aver letto 50 testi di ciascuno, ma lo script le misura in 3 secondi e le quantifica.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - PERCHE' IMPORTA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' Importa</h2>
+    <span class="section-number">Sezione 08. L'uso corretto</span>
+
+    <p>La model attribution non serve a dare voti a scuola e non serve in tribunale. Serve per l'analisi aggregata.</p>
+
+    <p>Esempi concreti. Hai un corpus di 10,000 recensioni e vuoi sapere se una percentuale anomala e' stata generata dallo stesso modello. Stai facendo content forensics su una campagna di disinformazione e vuoi capire se i testi vengono da un'unica fonte o da piu' modelli diversi. Vuoi verificare se un servizio che dichiara di usare GPT-4 sta in realta' rispondendo con un modello locale piu' economico.</p>
+
+    <p>In tutti questi casi non ti interessa il singolo testo. Ti interessa il pattern statistico sul corpus. E sul corpus, il metodo funziona.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">Raccolta</div>
+        <div class="step-desc">Corpus di testi da analizzare</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Feature</div>
+        <div class="step-desc">16 metriche stilometriche</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">Cluster</div>
+        <div class="step-desc">t-SNE / PCA + classificatore</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Attribuzione</div>
+        <div class="step-desc">Quale modello, non se AI</div>
+      </div>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Cosa NON fa.</strong> Questo metodo non ti dice se un singolo testo e' stato scritto da un umano o da una macchina. Nessun metodo puo' farlo in modo affidabile. Se qualcuno ti vende un tool che dice "99% AI-generated" su un singolo paragrafo, ti sta vendendo una bugia statistica. L'unica cosa che puoi misurare con certezza e' la somiglianza tra un testo e il profilo noto di un modello specifico. E per farlo ti serve un riferimento, non un oracolo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - RIPRODUCI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Riproduci Tutto</h2>
+    <span class="section-number">Sezione 09. Cinque script, un terminale</span>
+
+    <p>Tutto il codice e' su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/il-detector-mente" target="_blank" rel="noopener" style="color: var(--accent-highlight);">GitHub</a>, nella cartella <code>scripts/il-detector-mente/</code>. Cinque script, da eseguire in ordine.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Script</th><th>Cosa fa</th><th>Input</th><th>Output</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>01_genera_campioni.py</code></td><td>Genera 150 testi da Claude, ChatGPT e Llama (Ollama)</td><td>API key + Ollama</td><td><code>campioni.json</code></td></tr>
+        <tr><td><code>02_estrai_features.py</code></td><td>Estrae 16 feature stilometriche da ogni testo</td><td><code>campioni.json</code></td><td><code>features.csv</code></td></tr>
+        <tr><td><code>03_clustering.py</code></td><td>PCA, t-SNE, Random Forest, 6 grafici</td><td><code>features.csv</code></td><td><code>01-06_*.png</code>, <code>risultati.json</code></td></tr>
+        <tr><td><code>04_test_temperatura.py</code></td><td>Test robustezza: 3 temperature, solo Claude + ChatGPT</td><td>API key</td><td><code>07-08_*.png</code>, <code>risultati_temperatura.json</code></td></tr>
+        <tr><td><code>05_test_dominio.py</code></td><td>Test robustezza: 3 domini, solo Claude + ChatGPT</td><td>API key</td><td><code>09-10_*.png</code>, <code>risultati_dominio.json</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># installa le dipendenze</span></td></tr>
+<tr><td class="ln">2</td><td class="code">pip install anthropic openai requests pandas scikit-learn matplotlib numpy</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"># configura le API key</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="ck">export</span> ANTHROPIC_API_KEY=<span class="cs">"sk-ant-..."</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="ck">export</span> OPENAI_API_KEY=<span class="cs">"sk-..."</span></td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cc"># assicurati che Ollama giri con il modello locale</span></td></tr>
+<tr><td class="ln">9</td><td class="code">ollama pull llama3.1</td></tr>
+<tr><td class="ln">10</td><td class="code">ollama serve &amp;</td></tr>
+<tr><td class="ln">11</td><td class="code"></td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="cc"># pipeline base (3 modelli)</span></td></tr>
+<tr><td class="ln">13</td><td class="code">cd scripts/il-detector-mente</td></tr>
+<tr><td class="ln">14</td><td class="code">python3 01_genera_campioni.py    <span class="cc"># riprende da dove era se interrotto</span></td></tr>
+<tr><td class="ln">15</td><td class="code">python3 02_estrai_features.py    <span class="cc"># &lt;1s</span></td></tr>
+<tr><td class="ln">16</td><td class="code">python3 03_clustering.py         <span class="cc"># ~5s</span></td></tr>
+<tr><td class="ln">17</td><td class="code"></td></tr>
+<tr><td class="ln">18</td><td class="code"><span class="cc"># test di robustezza (solo API, senza Ollama)</span></td></tr>
+<tr><td class="ln">19</td><td class="code">python3 04_test_temperatura.py   <span class="cc"># ~5 min</span></td></tr>
+<tr><td class="ln">20</td><td class="code">python3 05_test_dominio.py       <span class="cc"># ~5 min</span></td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>L'output finisce in <code>output/</code>: i campioni JSON, le feature CSV, i 10 grafici PNG, e tre file <code>risultati*.json</code> con le metriche dei classificatori. Tutti gli script salvano dopo ogni campione e riprendono da dove erano se interrotti. Se vuoi cambiare il modello locale, basta <code>export OLLAMA_MODEL=mistral</code> prima di lanciare il primo script.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - I LIMITI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Limiti</h2>
+    <span class="section-number">Sezione 10. Quello che questo esperimento non dimostra</span>
+
+    <p>Bisogna essere onesti su cosa abbiamo misurato e cosa no.</p>
+
+    <p>Il dataset e' pulito. Troppo pulito, se vuoi. Stesso dominio (informatica), stessi prompt, stessa temperatura, stessa lunghezza massima. Queste condizioni aiutano il clustering. Un dataset con prompt eterogenei, domini misti (medicina, legge, narrativa) e temperature diverse potrebbe degradare la separazione. I modelli cambiano stile quando cambiano contesto, e non e' scontato che la firma stilometrica resti stabile.</p>
+
+    <p>Il Random Forest ha un'accuracy del 93.8% su questi dati. Su dati diversi potrebbe scendere. La feature importance che ho mostrato vale per questo dataset: con 146 campioni e il Gini del Random Forest, cambiando seed le importanze ballano un po'. Le top 4 restano stabili, il resto si rimescola.</p>
+
+    <p>Un reviewer serio direbbe: "stai separando condizioni, non modelli". E avrebbe parzialmente ragione. Quindi l'ho fatto: ho preso Claude e ChatGPT (senza Ollama, perche' genera campioni lentamente e qui servono volumi) e ho testato due dimensioni: temperatura e dominio.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 11 - ROBUSTEZZA: TEMPERATURA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Temperatura Cambia Qualcosa?</h2>
+    <span class="section-number">Sezione 11. Stessi prompt, tre temperature</span>
+
+    <p>Stesso set di prompt tecnici, due modelli, tre temperature: 0.3 (fredda, deterministica), 0.7 (default), 1.0 (calda, creativa). 30 campioni per combinazione, 180 testi in totale.</p>
+
+    <p>La domanda: alzando la temperatura il modello diventa meno riconoscibile? La risposta breve e' no.</p>
+
+    <img src="../immagini/detector/07_temperatura_pca.png" alt="PCA: Claude vs ChatGPT a tre temperature diverse" class="lab-screenshot fade-in">
+
+    <p>Nel grafico PCA il colore e' il modello, il marker e' la temperatura (cerchio = 0.3, quadrato = 0.7, triangolo = 1.0). I due modelli restano separati indipendentemente dalla temperatura. I punti a temperatura alta si sparpagliano un po' di piu', hanno piu' varianza interna, ma non invadono il cluster dell'altro modello.</p>
+
+    <img src="../immagini/detector/08_temperatura_accuracy.png" alt="Accuracy per temperatura: resta sopra il 94%" class="lab-screenshot fade-in">
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">99.4%</div>
+        <div class="stat-label">Globale</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">96.7%</div>
+        <div class="stat-label">t = 0.3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">96.7%</div>
+        <div class="stat-label">t = 0.7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">94.9%</div>
+        <div class="stat-label">t = 1.0</div>
+      </div>
+    </div>
+
+    <p>A temperatura 1.0 l'accuracy scende un po' (94.9% contro 96.7% a temperature basse). Ha senso: con temperatura alta il modello campiona token meno probabili, il testo diventa piu' imprevedibile, e la firma stilometrica si sfuma. Ma non scompare. Neanche alla temperatura massima i due modelli si confondono davvero.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 12 - ROBUSTEZZA: DOMINIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Dominio Cambia Qualcosa?</h2>
+    <span class="section-number">Sezione 12. Informatica, medicina, storia</span>
+
+    <p>Secondo test. Stessi due modelli, stessa temperatura di default, tre domini completamente diversi: informatica (il dominio originale), medicina (farmacologia, fisiopatologia), storia (dall'Impero Romano alla Guerra Fredda). 30 campioni per combinazione, 180 testi.</p>
+
+    <p>Se la firma stilometrica fosse un artefatto del dominio, qui dovrebbe rompersi. Spoiler: non si rompe.</p>
+
+    <img src="../immagini/detector/09_dominio_pca.png" alt="PCA: Claude vs ChatGPT su tre domini diversi" class="lab-screenshot fade-in">
+
+    <p>Il colore e' il modello, il marker e' il dominio (cerchio = informatica, quadrato = medicina, triangolo = storia). I cluster per modello restano compatti. I punti dello stesso modello su domini diversi si mischiano tra loro, non con l'altro modello. La firma e' del modello, non dell'argomento.</p>
+
+    <img src="../immagini/detector/10_dominio_accuracy.png" alt="Accuracy per dominio: medicina al 100%" class="lab-screenshot fade-in">
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">97.5%</div>
+        <div class="stat-label">Globale</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">98.3%</div>
+        <div class="stat-label">Informatica</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">100%</div>
+        <div class="stat-label">Medicina</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">97.8%</div>
+        <div class="stat-label">Storia</div>
+      </div>
+    </div>
+
+    <p>La medicina e' al 100%. Probabilmente perche' il vocabolario medico e' cosi' specializzato che ogni modello lo gestisce in modo ancora piu' caratteristico del solito. La storia sta al 97.8%, l'informatica al 98.3%. Tutti sopra il 97%.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il test di robustezza regge.</strong> Nel range testato, la firma stilometrica appare robusta rispetto a variazioni di temperatura e dominio. Claude scrive come Claude che parli di TCP o della Peste Nera. ChatGPT scrive come ChatGPT che lo metti a 0.3 o a 1.0. Le differenze sono nel modo di costruire le frasi, non in cosa dicono le frasi. Non escludiamo che alcune feature catturino indirettamente differenze di vocabolario specifiche del dominio, amplificando la separazione. Il 100% sulla medicina potrebbe essere un segnale di questo.</p>
+    </div>
+
+    <p>Detto questo: abbiamo testato due modelli, tre temperature, tre domini. Il caso a tre modelli con tutte le combinazioni richiederebbe un ordine di grandezza in piu' di campioni e un modello locale che non ci mette minuti per ogni risposta. E' un limite pratico, non teorico. Il codice per farlo c'e' gia'.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 13 - IL PUNTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Punto</h2>
+    <span class="section-number">Sezione 13. Tirando le somme</span>
+
+    <p>Il rilevamento AI sul singolo testo piace ai venditori di SaaS e ai presidi che vogliono beccare gli studenti. Ha un problema di fondo: non esiste un classificatore che generalizzi in modo affidabile su tutti i testi. Le distribuzioni si sovrappongono, la soglia e' arbitraria, e i falsi positivi rovinano persone che non c'entrano niente.</p>
+
+    <p>La model attribution e' un problema diverso, e piu' trattabile. Con 16 feature statistiche e un Random Forest separiamo Claude, ChatGPT e Llama al 93.8% in cross-validation. Nessun modello neurale, nessuna GPU. La firma stilometrica dei modelli esiste, e' misurabile, e regge almeno nelle condizioni che abbiamo testato.</p>
+
+    <p>L'uso corretto e' l'analisi aggregata. La domanda da fare non e' "chi ha scritto questo testo?", e' "questi 500 testi condividono un profilo stilometrico, e quel profilo corrisponde a un modello che conosciamo?".</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">"Il detector cerca un confine tra umano e macchina. Il confine non esiste. Ma i modelli lasciano tracce, e quelle sono misurabili."</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">16 feature. 146 campioni. 93.8% accuracy. I numeri bastano, se fai la domanda giusta.</p>
+    </div>
+
+    <p>Gli script sono nella repo. Se vuoi ripetere l'analisi con modelli diversi, cambi tre stringhe e rilanci.</p>
+
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. Nessun detector e' stato creduto.</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JS -->
+  <script src="../js/main.js"></script>
+
+</body>
+</html>
