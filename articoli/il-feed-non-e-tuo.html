@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X Feed: Anatomia In 71 Grafici | Signal Pirate</title>
+  <meta name="description" content="800 tweet 'Per Te' vs 800 'Seguiti' su X. Latenza mediana 11.85 ore vs 4.14. 70% dei post da account non seguiti. KL divergence, Gini, Snowflake ID, Hawkes, Kaplan-Meier, Power Law. 65 grafici, 14 script Python, dati reali.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Comparison Row === */
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .comparison-row .lab-screenshot { margin: 0; }
+    @media (max-width: 768px) {
+      .comparison-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Chart Caption === */
+    .chart-caption {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-28 | Pinperepette</p>
+    <h1 class="article-page-title">X Feed: Anatomia <span class="accent">In 71 Grafici</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      800 tweet "Per Te" contro 800 "Seguiti", catturati nello stesso scroll. Latenza mediana 11.85 ore contro 4.14. Il 70% dei post arriva da gente che non segui. KL divergence, coefficiente di Gini, Snowflake ID, entropia di Shannon. 71 grafici, 15 script Python, dati reali dal tuo feed.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Feed Analysis</span>
+      <span class="tag tag-highlight">Information Theory</span>
+      <span class="tag tag-reaction">KL Divergence</span>
+      <span class="tag tag-amplification">Snowflake ID</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - DAL CODICE AL CAMPO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dal Codice al Campo</h2>
+    <span class="section-number">Sezione 00. Teoria e pratica</span>
+
+    <p>Nell'articolo <a href="attenzione-invisibile.html" style="color: var(--accent-attention);">L'Attenzione Invisibile</a> abbiamo smontato l'algoritmo Phoenix guardando il codice sorgente. I 7 segnali nascosti, il dwell time, il peso negativo sui link esterni, la variabile latente che stima la tua attenzione prima che tu interagisca. Modelli bayesiani, processi di Hawkes, Fisher Information.</p>
+
+    <p>Sappiamo come funziona il motore. Ora accendiamo la macchina e vediamo dove va. Un test a campione, sul campo, con dati reali: cattura quello che l'algoritmo ti mostra davvero e misura.</p>
+
+    <p>L'esperimento e' semplice. Scrolli il feed "Per Te", scrolli il feed "Seguiti". 800 tweet per campione, stessa sessione, stesso account, stessa ora. Uno filtrato dall'algoritmo. L'altro presumibilmente cronologico. Confronta.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">1.600</div>
+        <div class="stat-label">Tweet catturati</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">800 + 800</div>
+        <div class="stat-label">Per Te vs Seguiti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">71</div>
+        <div class="stat-label">Grafici generati</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">11.85h</div>
+        <div class="stat-label">Latenza mediana "Per Te"</div>
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Metodo.</strong> Scroll del feed "Per Te", cattura dei primi 800 tweet. Stesso procedimento sul tab "Seguiti". Stessa sessione, stesso account, stessa ora. Sentiment analysis automatica in fase di raccolta. 9 script Python per l'analisi, tutti replicabili.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - CHI PARLA NEL TUO FEED
+         ============================================================ -->
+    <h2><span class="accent">//</span> Chi Parla nel Tuo Feed</h2>
+    <span class="section-number">Sezione 01. Struttura e autori</span>
+
+    <p>La prima domanda e' la piu' ovvia. Quanti dei tweet nel feed "Per Te" vengono da account che effettivamente segui?</p>
+
+    <img src="../immagini/feed-non-e-tuo/01_following_ratio.png" alt="Following ratio" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 1. Rapporto post da account seguiti vs non seguiti</div>
+
+    <p><strong>Il 70.4% dei tweet nel "Per Te" viene da gente che non segui.</strong> Il feed non e' tuo. L'algoritmo riempie 7 tweet su 10 con contenuti che ha scelto lui. Nel feed "Seguiti" il rapporto si inverte: 79.4% da account che segui, il 20.6% residuo sono retweet di gente che segui.</p>
+
+    <p>Ma non e' solo chi parla. E' quanti parlano. Il "Per Te" ha 505 autori unici su 800 tweet. I "Seguiti" ne hanno 266. Sembra che l'algoritmo ti esponga a piu' voci. Ma il dato di concentrazione racconta l'opposto.</p>
+
+    <img src="../immagini/feed-non-e-tuo/04_author_concentration.png" alt="Author concentration" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 2. Curva cumulativa: quanti autori servono per il 50% dei tweet</div>
+
+    <p>Nel feed "Seguiti" bastano <strong>25 autori per il 50% dei tweet</strong>. Nel "Per Te" ne servono 122. L'algoritmo diluisce. Prende la tua cerchia stretta e la annacqua con centinaia di voci estranee. La sensazione di "diversita'" e' un'illusione: non stai esplorando, stai venendo disperso.</p>
+
+    <img src="../immagini/feed-non-e-tuo/34_author_treemap.png" alt="Top 20 autori" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 3. Top 20 autori per numero di tweet in ciascun feed</div>
+
+    <p>Il top autore nel "Seguiti" e' QLexPipiens con 30 tweet. Nel "Per Te" e' elonmusk con 11. L'algoritmo non amplifica i tuoi interessi. Li sostituisce.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/03_verified_ratio.png" alt="Verified ratio" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/05_language_distribution.png" alt="Language distribution" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 4. Blue verified e distribuzione lingue</div>
+
+    <p>Il 37.2% dei tweet nel "Per Te" viene da account blue verified, contro il 21% nei "Seguiti". L'algoritmo premia chi paga. Sul fronte linguistico, il "Per Te" e' piu' italiano (75.5% vs 60%) su 19 lingue: l'algoritmo localizza, comprimendo il mix linguistico che hai scelto seguendo account internazionali.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - IL PREZZO DELLA RILEVANZA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Prezzo della Rilevanza</h2>
+    <span class="section-number">Sezione 02. Latenza temporale</span>
+
+    <p>L'algoritmo Phoenix usa il <code>dwellTimeMs</code> e i segnali di engagement per calcolare uno score di rilevanza. Ma la rilevanza ha un costo: il tempo. Quanto tempo passa tra il momento in cui un tweet viene scritto e il momento in cui te lo mostra?</p>
+
+    <p>Per rispondere serve un dato che quasi nessuno considera: il <code>timestamp_collected</code>, cioe' l'istante in cui il tuo browser ha ricevuto quel tweet dall'API. Il delta tra <code>created_at</code> e <code>timestamp_collected</code> e' la <strong>latenza dell'algoritmo</strong>.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">11.85h</div>
+        <div class="stat-label">Latenza mediana Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">4.14h</div>
+        <div class="stat-label">Latenza mediana Seguiti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">2.86x</div>
+        <div class="stat-label">Rapporto latenza</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">~3.7 min</div>
+        <div class="stat-label">Durata scroll Per Te</div>
+      </div>
+    </div>
+
+    <img src="../immagini/feed-non-e-tuo/41_latency_distribution.png" alt="Latency distribution" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 5. Distribuzione della latenza (scala logaritmica)</div>
+
+    <p>Un tweet nel "Per Te" ti arriva in media <strong>11 ore e 51 minuti</strong> dopo essere stato scritto. Nei "Seguiti" dopo 4 ore e 8 minuti. L'algoritmo trattiene il contenuto quasi tre volte piu' a lungo. Lo tiene in coda, aspetta che accumuli engagement, poi te lo serve quando lo score e' abbastanza alto.</p>
+
+    <img src="../immagini/feed-non-e-tuo/42_latency_cdf.png" alt="Latency CDF" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 6. CDF della latenza: a che punto hai visto il 50% dei tweet</div>
+
+    <p>La CDF mostra il quadro completo. Il 50% dei tweet "Seguiti" arriva entro 4 ore. Per il "Per Te" ci vogliono quasi 12. Al 90esimo percentile: 17.3 ore per i "Seguiti", 23.6 per il "Per Te". La coda lunga e' simile, ma il corpo della distribuzione e' spostato di mezza giornata.</p>
+
+    <img src="../immagini/feed-non-e-tuo/47_freshness_bars.png" alt="Freshness" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 7. Freshness: distribuzione per fascia di latenza</div>
+
+    <p>Meno di 1 ora: 17.2% nei "Seguiti", 10.4% nel "Per Te". Fascia 6-24 ore: <strong>47.2%</strong> del "Per Te" contro 33.2% dei "Seguiti". L'algoritmo concentra il feed nella zona tra le 6 e le 24 ore: abbastanza vecchio da avere metriche di engagement stabili, abbastanza fresco da sembrare attuale.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il paradosso della freschezza.</strong> Scrollando per 3.7 minuti il feed "Per Te", hai visto tweet che coprono 58 giorni di arco temporale. Nei "Seguiti" 144 giorni, ma con una mediana molto piu' vicina. L'algoritmo non ti mostra il "meglio di oggi". Ti mostra il meglio dell'ultima mezza giornata, piu' qualche picco virale dei giorni scorsi.</p>
+    </div>
+
+    <img src="../immagini/feed-non-e-tuo/43_chronological_order.png" alt="Chronological order" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 8. Ordine cronologico: posizione nello scroll vs eta' del tweet</div>
+
+    <p>E il feed "Seguiti" e' cronologico? <strong>No.</strong> Kendall &tau; = -0.054, praticamente zero. Nessuno dei due feed rispetta l'ordine temporale. Anche il tab "Seguiti" e' filtrato. La differenza e' solo di grado, non di natura.</p>
+
+    <img src="../immagini/feed-non-e-tuo/46_latency_decay.png" alt="Latency decay" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 9. Decadimento: come la latenza mediana cambia scrollando</div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - ENGAGEMENT: LA METRICA CHE GOVERNA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Engagement: la Metrica Che Governa</h2>
+    <span class="section-number">Sezione 03. Like, retweet, reply, bookmark</span>
+
+    <p>L'algoritmo Phoenix calcola uno score basato sui segnali nascosti. Ma i segnali nascosti sono guidati dall'engagement visibile. Piu' un tweet ha like, piu' gente ci si ferma sopra, piu' il dwell time sale, piu' lo score cresce. E' un feedback loop. Quanto e' forte?</p>
+
+    <img src="../immagini/feed-non-e-tuo/10_engagement_boxplot.png" alt="Engagement boxplot" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 10. Box plot engagement per metrica (scala log, senza outlier)</div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">48</div>
+        <div class="stat-label">Like mediano Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">0</div>
+        <div class="stat-label">Like mediano Seguiti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">3.487</div>
+        <div class="stat-label">Like medio Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">1.045</div>
+        <div class="stat-label">Like medio Seguiti</div>
+      </div>
+    </div>
+
+    <p>Il like mediano nel "Per Te" e' <strong>48</strong>. Nei "Seguiti" e' <strong>zero</strong>. Ma attenzione: il "Per Te" mostra tweet con una latenza mediana di quasi 12 ore, i "Seguiti" di 4. I tweet nel "Per Te" hanno avuto piu' tempo per accumulare engagement. Lo zero dei "Seguiti" non significa che siano tweet ignorati: significa che sono piu' freschi. Il dato conferma pero' che l'algoritmo seleziona tweet che hanno gia' accumulato metriche, e per farlo li trattiene piu' a lungo.</p>
+
+    <img src="../immagini/feed-non-e-tuo/32_engagement_score.png" alt="Engagement score" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 11. Score composito: like + 2&times;RT + 3&times;reply + 4&times;bookmark</div>
+
+    <p>Lo score composito (pesato per tipo di interazione) mostra mediana 124 nel "Per Te" contro 42 nei "Seguiti". Vale lo stesso caveat della latenza: i tweet del "Per Te" sono piu' vecchi, hanno avuto piu' tempo per accumulare metriche. Il dato interessante e' un altro: la distribuzione dello score nel "Per Te" e' piu' compressa. L'algoritmo scarta sia i tweet con engagement troppo basso sia quelli con picchi anomali, concentrando il feed in una fascia di viralita' media. I "Seguiti" hanno tutto lo spettro: zeri e picchi.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/12_controversy_ratio.png" alt="Controversy ratio" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/35_bookmark_ratio.png" alt="Bookmark ratio" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 12. Indice di controversialita' (reply/like) e rapporto bookmark/like</div>
+
+    <p>I rapporti reply/like e bookmark/like normalizzano il bias temporale: sono frazioni, non valori assoluti. L'indice di controversialita' nel "Per Te" ha mediana 0.048 contro 0.0 nei "Seguiti": l'algoritmo non evita i tweet controversi. Il rapporto bookmark/like e' 0.011 vs 0.0: il contenuto selezionato viene salvato proporzionalmente di piu'. Phoenix non filtra via la controversia. La seleziona.</p>
+
+    <img src="../immagini/feed-non-e-tuo/13_followers_vs_engagement.png" alt="Followers vs engagement" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 13. Scatter followers vs like (log-log)</div>
+
+    <p>La correlazione followers-like e' 0.558 nel "Per Te" e 0.495 nei "Seguiti". Nel "Per Te" la correlazione e' piu' stretta: l'algoritmo favorisce tweet dove engagement e reach si muovono insieme. Nei "Seguiti" trovi piu' varianza: account piccoli con molto engagement relativo, account grandi ignorati.</p>
+
+    <img src="../immagini/feed-non-e-tuo/37_engagement_cdf.png" alt="Engagement CDF" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 14. CDF dei like: la soglia implicita dell'algoritmo</div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - L'EMOZIONE NON CAMBIA
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Emozione Non Cambia</h2>
+    <span class="section-number">Sezione 04. Sentiment, emozioni, intensita'</span>
+
+    <p>La narrativa dominante dice che l'algoritmo amplifica la rabbia. I dati dicono altro.</p>
+
+    <img src="../immagini/feed-non-e-tuo/06_sentiment_comparison.png" alt="Sentiment comparison" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 15. Distribuzione sentiment per feed</div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">56.1%</div>
+        <div class="stat-label">Negativo Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">57.2%</div>
+        <div class="stat-label">Negativo Seguiti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">0.0008</div>
+        <div class="stat-label">KL sentiment (bit)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">Rabbia</div>
+        <div class="stat-label">Top emozione entrambi</div>
+      </div>
+    </div>
+
+    <p>Il sentiment e' <strong>quasi identico</strong> tra i due feed. 56.1% negativo nel "Per Te", 57.2% nei "Seguiti". La KL divergence sul sentiment e' 0.0008 bit: praticamente zero, nessuna deformazione misurabile. L'emozione top e' Rabbia in entrambi i feed. In questo campione non emerge una manipolazione misurabile del sentiment. L'emozione dominante e' la stessa in entrambi i feed, con la stessa distribuzione.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/07_emotions_comparison.png" alt="Emotions comparison" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/08_intensity_comparison.png" alt="Intensity comparison" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 16. Top emozioni e distribuzione intensita' emotiva</div>
+
+    <p>L'intensita' alta e' al 31.2% nel "Per Te" e 29.5% nei "Seguiti". Un delta di 1.7 punti percentuali. L'algoritmo spinge marginalmente di piu' i contenuti ad alta intensita', ma la differenza e' statistically insignificant rispetto alla varianza naturale del campione.</p>
+
+    <img src="../immagini/feed-non-e-tuo/09_emotion_intensity_heatmap.png" alt="Emotion intensity heatmap" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 17. Delta emozione &times; intensita': rosso = piu' nel "Per Te", blu = piu' nei "Seguiti"</div>
+
+    <p>La heatmap del delta mostra le differenze granulari. L'algoritmo amplifica leggermente Interesse e Ottimismo ad alta intensita'. Deprime la Preoccupazione a media intensita'. Ma nessuna cella supera il &plusmn;2%. La manipolazione emotiva, se esiste, e' sotto la soglia di rilevabilita' con questo campione.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il dato.</strong> In questo campione non emerge una deformazione emotiva misurabile tra i due feed. La deformazione che misuriamo e' strutturale: chi vedi, quanto e' vecchio, quanto engagement ha. Servirebbero campioni piu' ampi e ripetuti nel tempo per escludere del tutto una manipolazione emotiva, ma su questi dati la KL divergence sul sentiment e' indistinguibile da zero.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - TEORIA DELL'INFORMAZIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Matematica della Deformazione</h2>
+    <span class="section-number">Sezione 05. Entropia, KL divergence, Gini</span>
+
+    <p>Per quantificare <em>quanto</em> l'algoritmo deforma il feed servono strumenti precisi. L'entropia di Shannon misura la diversita'. La KL divergence misura la distanza tra due distribuzioni. Il coefficiente di Gini misura la disuguaglianza.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Entropia di Shannon</span>
+      H(X) = &minus; &sum;<sub>i</sub> p(x<sub>i</sub>) &middot; log<sub>2</sub> p(x<sub>i</sub>)
+    </div>
+
+    <div class="formula-box">
+      <span class="formula-name">Kullback-Leibler Divergence</span>
+      D<sub>KL</sub>(P || Q) = &sum;<sub>i</sub> P(i) &middot; log<sub>2</sub> ( P(i) / Q(i) )
+    </div>
+
+    <img src="../immagini/feed-non-e-tuo/14_entropy_comparison.png" alt="Entropy comparison" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 18. Entropia di Shannon per dimensione</div>
+
+    <p>L'entropia degli autori nel "Per Te" e' <strong>8.68 bit</strong> contro 7.04 nei "Seguiti". Piu' diverso, ma diverso artificialmente. L'algoritmo inietta voci che non hai scelto, aumentando l'entropia. L'entropia delle emozioni e' simile (3.69 vs 3.74): conferma che la deformazione non e' emotiva. La differenza piu' grande e' nella lingua: 1.27 bit nel "Per Te" contro 1.61 nei "Seguiti". L'algoritmo comprime la varieta' linguistica.</p>
+
+    <img src="../immagini/feed-non-e-tuo/15_kl_divergence.png" alt="KL divergence" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 19. KL divergence Per Te vs Seguiti: la deformazione per dimensione</div>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr>
+          <th>Dimensione</th>
+          <th>KL Divergence (bit)</th>
+          <th>Interpretazione</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lingua</td>
+          <td><strong>0.330</strong></td>
+          <td>Deformazione forte: l'algoritmo localizza, comprime il multilinguismo</td>
+        </tr>
+        <tr>
+          <td>Emozioni</td>
+          <td><strong>0.139</strong></td>
+          <td>Deformazione moderata: redistribuzione interna delle emozioni</td>
+        </tr>
+        <tr>
+          <td>Topic</td>
+          <td><strong>0.048</strong></td>
+          <td>Deformazione minima: gli argomenti sono simili</td>
+        </tr>
+        <tr>
+          <td>Intensita'</td>
+          <td><strong>0.002</strong></td>
+          <td>Nessuna deformazione rilevabile</td>
+        </tr>
+        <tr>
+          <td>Sentiment</td>
+          <td><strong>0.001</strong></td>
+          <td>Zero. Il sentiment e' identico.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>La deformazione piu' grande e' sulla <strong>lingua</strong>: 0.33 bit. L'algoritmo decide che se sei italiano vuoi contenuto in italiano, anche se segui account in inglese e francese. La seconda e' sulle <strong>emozioni</strong>: 0.14 bit, una redistribuzione interna (non un aumento di negativita'). Sentiment e intensita' sono a zero. La manipolazione emotiva e' un mito, almeno su questo campione.</p>
+
+    <img src="../immagini/feed-non-e-tuo/16_author_entropy.png" alt="Author entropy bootstrap" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 20. Entropia autori bootstrapped: il "Per Te" e' piu' entropic a tutti i sample size</div>
+
+    <img src="../immagini/feed-non-e-tuo/25_gini_followers.png" alt="Gini followers" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 21. Curva di Lorenz dei followers: Gini 0.98 in entrambi</div>
+
+    <p>Il coefficiente di Gini sui followers e' <strong>0.98</strong> nel "Per Te" e 0.99 nei "Seguiti". Disuguaglianza estrema in entrambi. Twitter e' un sistema dove l'1% degli account concentra quasi tutto il reach. L'algoritmo non crea questa disuguaglianza. La amplifica leggermente spostando il baricentro verso gli account piu' grandi.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - ARGOMENTI E RETE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Argomenti e Rete</h2>
+    <span class="section-number">Sezione 06. Topic, hashtag, grafo delle menzioni</span>
+
+    <img src="../immagini/feed-non-e-tuo/17_topic_clusters.png" alt="Topic clusters" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 22. Distribuzione topic (8 cluster KMeans su TF-IDF)</div>
+
+    <p>Il topic modeling con TF-IDF e KMeans su 8 cluster mostra una KL divergence di soli <strong>0.048 bit</strong>. I due feed parlano degli stessi argomenti. Ma le differenze nei cluster minori sono rivelatrici.</p>
+
+    <p>Il "Per Te" spinge piu' <strong>Italia/governo/Europa</strong> (cluster 3: 4.2% vs 2.1%) e <strong>commento forte</strong> (cluster 6: 5.2% vs 3.4%). I "Seguiti" hanno piu' <strong>Iran/FBI/Patel</strong> (cluster 4: 4.8% vs 1.9%): il tuo interesse geopolitico specifico che l'algoritmo diluisce a favore di contenuto generalista.</p>
+
+    <img src="../immagini/feed-non-e-tuo/19_top_terms.png" alt="Top terms" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 23. Top 20 termini pesati TF-IDF</div>
+
+    <p>I termini top del "Per Te" sono <code>piu'</code>, <code>perche'</code>, <code>italia</code>, <code>governo</code>. Nei "Seguiti": <code>iran</code>, <code>perche'</code>, <code>anni</code>. L'algoritmo ti porta verso il mainstream italiano. Tu avevi scelto altro.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/18_hashtag_comparison.png" alt="Hashtag comparison" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/20_topic_pca.png" alt="Topic PCA" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 24. Top hashtag e proiezione PCA dei topic</div>
+
+    <p>La Jaccard similarity sugli hashtag e' solo <strong>0.17</strong>: 41 hashtag in comune su 246. 137 esclusivi del "Per Te", 68 esclusivi dei "Seguiti". Due mondi quasi separati con appena il 17% di sovrapposizione.</p>
+
+    <img src="../immagini/feed-non-e-tuo/23_mention_network.png" alt="Mention network" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 25. Rete menzioni: top 30 nodi per degree</div>
+
+    <p>La rete delle menzioni racconta la differenza piu' netta. I "Seguiti" hanno <strong>525 archi</strong> contro 219 del "Per Te". Piu' del doppio. I top menzionati nei "Seguiti" (massimo_san, marcevann, signori_massimo, tutti a 25 menzioni) formano una community stretta. Nel "Per Te" la rete e' frammentata: il nodo piu' menzionato arriva a 10. L'algoritmo distrugge la rete. Ti mostra contenuto individuale, non conversazioni.</p>
+
+    <img src="../immagini/feed-non-e-tuo/24_network_stats.png" alt="Network stats" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 26. Distribuzione in-degree: Zipf nei "Seguiti", dispersione nel "Per Te"</div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - FOLLOWERS E INFRASTRUTTURA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Followers e Infrastruttura</h2>
+    <span class="section-number">Sezione 07. Chi ti mostra l'algoritmo, e da dove vengono</span>
+
+    <img src="../immagini/feed-non-e-tuo/21_followers_distribution.png" alt="Followers distribution" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 27. Distribuzione followers degli autori (log scale)</div>
+
+    <p>Il followers mediano degli autori nel "Per Te" e' <strong>6.868</strong>, nei "Seguiti" 3.406. L'algoritmo favorisce account il doppio piu' grandi. Il mean e' ancora piu' estremo: 4 milioni nel "Per Te" contro 784K nei "Seguiti". Gli outlier (i mega-account) dominano la distribuzione.</p>
+
+    <img src="../immagini/feed-non-e-tuo/22_followers_tiers.png" alt="Followers tiers" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 28. Tweet per fascia followers</div>
+
+    <p>Nella fascia 10K-100K il "Per Te" ha il 30.9% dei tweet, i "Seguiti" il 20.9%. Nella fascia mega (&gt;10M): <strong>2% nel "Per Te" contro 0.4%</strong> nei "Seguiti". L'algoritmo amplifica i grandi account di un fattore 5.</p>
+
+    <p>Ma i followers da soli raccontano meta' della storia. Il rapporto following/followers rivela la <em>natura</em> dell'account: chi ha ratio basso (&lt; 0.01) e' un broadcaster puro (media, politici, celebrity). Chi ha ratio vicino a 1 e' un utente normale. Chi ha ratio &gt; 1 e' un consumer: segue piu' di quanto e' seguito.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/68_ff_ratio.png" alt="FF ratio" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/70_ff_tiers.png" alt="FF tiers" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. X. Rapporto following/followers e tipologia account</div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">0.211</div>
+        <div class="stat-label">FF ratio mediano Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">0.365</div>
+        <div class="stat-label">FF ratio mediano Seguiti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">11.7%</div>
+        <div class="stat-label">Consumer Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">23.3%</div>
+        <div class="stat-label">Consumer Seguiti</div>
+      </div>
+    </div>
+
+    <p>Il rapporto mediano nel "Per Te" e' <strong>0.211</strong>, nei "Seguiti" <strong>0.365</strong>. Gli autori nel "Per Te" seguono proporzionalmente meno gente rispetto a quanti li seguono: sono piu' broadcaster, meno conversatori. I "Seguiti" hanno il doppio di account "consumer" (23.3% vs 11.7%): gente normale che segue piu' di quanto e' seguita. L'algoritmo favorisce chi trasmette, non chi partecipa.</p>
+
+    <img src="../immagini/feed-non-e-tuo/69_ff_scatter.png" alt="FF scatter" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. X. Scatter following vs followers: la diagonale e' il punto di equilibrio</div>
+
+    <p>Lo scatter log-log mostra la struttura. Nel "Per Te" i punti sotto la diagonale (piu' followers che following) dominano: account che trasmettono. La correlazione following-followers e' quasi zero (0.096): le due metriche sono indipendenti, perche' l'algoritmo seleziona per reach, non per reciprocita'. Nei "Seguiti" la nuvola e' piu' vicina alla diagonale: account piu' equilibrati.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/67_following_distribution.png" alt="Following distribution" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/71_activity_comparison.png" alt="Activity comparison" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. X. Distribuzione following e attivita' degli autori</div>
+
+    <p>Il following mediano e' simile (1.045 "Per Te" vs 1.173 "Seguiti") ma il significato cambia: nel "Per Te" 1.045 following con 6.820 followers mediani fa ratio 0.15. Nei "Seguiti" 1.173 following con 4.767 followers fa ratio 0.25. L'attivita' (tweet pubblicati e like messi) e' comparabile tra i due feed: non e' che l'algoritmo ti mostra gente piu' attiva. Ti mostra gente con piu' audience.</p>
+
+    <p>Ma da dove vengono questi account? Lo Snowflake ID di Twitter codifica nel user ID il timestamp di creazione, il datacenter e il worker node.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Twitter Snowflake ID (64 bit)</span>
+      [timestamp_ms - epoch] &lt;&lt; 22 | dc_id &lt;&lt; 17 | worker_id &lt;&lt; 12 | sequence_id
+    </div>
+
+    <p>Su 771 autori unici, 457 hanno Snowflake ID reali (post-2010), 314 sono pre-Snowflake. Il timestamp nel Snowflake restituisce la data di creazione reale dell'account, al millisecondo. Ma il dato forte e' un altro: il datacenter ID e il worker ID ti dicono <em>dove</em> fisicamente e' stato creato l'account. Tempo + luogo.</p>
+
+    <img src="../immagini/feed-non-e-tuo/27_dc_wk_heatmap.png" alt="DC WK heatmap" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 29. Heatmap Datacenter:Worker degli autori (Snowflake reali)</div>
+
+    <p>Il nodo piu' popolato in entrambi i feed e' <strong>DC:11:WK:29</strong> con 22 account nel "Per Te" e 10 nei "Seguiti". Ma la concentrazione su un nodo da sola non significa nulla: Twitter ha pochi datacenter e milioni di utenti. Il segnale che conta e' l'incrocio: account creati nello <strong>stesso minuto</strong> E sullo <strong>stesso datacenter</strong>.</p>
+
+    <img src="../immagini/feed-non-e-tuo/30_creation_clusters.png" alt="Creation clusters" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 30. Cluster temporali vs spazio-temporali (stesso minuto + stesso datacenter)</div>
+
+    <p>48 account creati nello stesso minuto nel "Per Te". Sembra sospetto. Ma se guardi solo il tempo, non dice niente: potrebbe essere un picco globale di iscrizioni. Quando filtri per stesso minuto <strong>e</strong> stesso datacenter, emergono <strong>15 cluster spazio-temporali</strong>: il piu' grande ha 4 account creati nello stesso minuto sullo stesso DC. Nei "Seguiti" sono 5 cluster, il piu' grande sempre da 4. Numeri piccoli, ma il metodo e' quello giusto: il segnale infrastrutturale c'e' solo quando tempo e luogo convergono.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/26_account_creation_timeline.png" alt="Account creation timeline" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/29_account_age.png" alt="Account age" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 31. Timeline di creazione account e distribuzione dell'eta'</div>
+
+    <p>L'eta' mediana degli account e' simile: ~5.4 anni in entrambi. L'algoritmo non preferisce account vecchi o nuovi. Ma la distribuzione nei "Seguiti" ha una coda piu' pesante verso account recenti: segui gente nuova, l'algoritmo no.</p>
+
+    <img src="../immagini/feed-non-e-tuo/28_sequence_distribution.png" alt="Sequence distribution" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 32. Distribuzione Sequence ID: valori alti = molti account creati nello stesso millisecondo</div>
+
+    <p>47 account nel "Per Te" con sequence ID &gt; 50, 27 nei "Seguiti". Il massimo e' 4001 in entrambi. Ma un sequence alto senza coincidenza sul nodo significa solo che Twitter aveva traffico in quel millisecondo. Il segnale infrastrutturale c'e' solo quando tempo, nodo e sequence convergono. In questo campione non convergono.</p>
+
+    <img src="../immagini/feed-non-e-tuo/31_age_vs_followers.png" alt="Age vs followers" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 33. Eta' account vs followers: bassa correlazione (0.25 Per Te, 0.15 Seguiti)</div>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - IL QUADRO COMPLETO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Quadro Completo</h2>
+    <span class="section-number">Sezione 08. Radar, correlazioni, pattern</span>
+
+    <img src="../immagini/feed-non-e-tuo/39_radar_comparison.png" alt="Radar comparison" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 33. Confronto multidimensionale normalizzato</div>
+
+    <p>Il radar chart riassume le 8 dimensioni. Il "Per Te" domina su engagement, followers, verificati. I "Seguiti" dominano su autori unici normalizzati per la cerchia, hashtag, menzioni per tweet. Due profili diversi: uno ottimizzato per metriche, l'altro per relazioni.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/33_correlation_matrix.png" alt="Correlation matrix" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/36_hourly_heatmap.png" alt="Hourly heatmap" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 34. Matrice correlazione metriche e heatmap giorno/ora</div>
+
+    <p>La matrice di correlazione nel "Per Te" e' piu' strutturata: like, retweet e reply sono piu' correlati tra loro. L'algoritmo seleziona tweet dove tutte le metriche si muovono insieme. Nei "Seguiti" la struttura e' piu' debole: trovi tweet con tanti like e zero reply, o tanti reply e zero like. Piu' varianza, meno pattern.</p>
+
+    <img src="../immagini/feed-non-e-tuo/38_followers_sentiment_violin.png" alt="Followers sentiment violin" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 35. Violin plot: followers per categoria di sentiment</div>
+
+    <img src="../immagini/feed-non-e-tuo/44_scroll_vs_age.png" alt="Scroll vs age" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 36. Posizione nello scroll vs latenza: la mediana mobile rivela il pattern</div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - SURVIVAL ANALYSIS
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Feed Come Filtro di Sopravvivenza</h2>
+    <span class="section-number">Sezione 09. Survival analysis</span>
+
+    <p>Se un tweet e' un organismo, il feed e' un ecosistema con un tasso di mortalita'. La maggior parte dei tweet muore prima di essere vista. Pochi sopravvivono abbastanza da comparire nel tuo scroll. La funzione di sopravvivenza S(t) misura la probabilita' che un tweet non sia ancora apparso dopo t ore.</p>
+
+    <img src="../immagini/feed-non-e-tuo/48_kaplan_meier.png" alt="Kaplan-Meier" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 37. Kaplan-Meier: curva di sopravvivenza dei tweet</div>
+
+    <p>La curva Kaplan-Meier dice tutto. Il tempo mediano di sopravvivenza nel "Per Te" e' <strong>11.92 ore</strong>, nei "Seguiti" <strong>4.14 ore</strong>. Ma la forma delle curve e' diversa: i "Seguiti" hanno un crollo rapido nelle prime ore (molti tweet freschi), poi una coda lenta. Il "Per Te" scende piu' gradualmente: l'algoritmo distribuisce la visibilita' nel tempo.</p>
+
+    <img src="../immagini/feed-non-e-tuo/49_cox_hazard_ratios.png" alt="Cox hazard ratios" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 38. Hazard Ratio: cosa accelera o rallenta la visibilita'</div>
+
+    <p>L'analisi tipo Cox (via regressione logistica sui quantili di latenza) rivela gli hazard ratio. Nel "Per Te": <strong>log(Followers) HR = 2.35</strong>.piu' follower hai, piu' velocemente il tuo tweet appare. <strong>log(Like) HR = 0.22</strong>.tweet con piu' like appaiono piu' tardi. Questo effetto riflette probabilmente il meccanismo di accumulo: i tweet ad alto engagement vengono trattenuti piu' a lungo prima di essere mostrati, e il numero di like al momento della cattura e' correlato con il tempo trascorso. <strong>Italiano HR = 1.30</strong>.contenuto italiano arriva leggermente prima.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/50_survival_by_followers.png" alt="Survival by followers" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/51_survival_by_verified.png" alt="Survival by verified" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 39. Sopravvivenza stratificata per followers e status verified</div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il feed non e' un ranking. E' un filtro di sopravvivenza.</strong> La maggior parte dei tweet non sopravvive. Quelli che sopravvivono nel "Per Te" devono avere followers alti, metriche solide e lingua giusta. Il "Seguiti" e' piu' democratico: la sopravvivenza dipende meno dalle feature.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - POWER LAWS
+         ============================================================ -->
+    <h2><span class="accent">//</span> Code Pesanti</h2>
+    <span class="section-number">Sezione 10. Power law e disuguaglianza</span>
+
+    <div class="formula-box">
+      <span class="formula-name">Distribuzione di Pareto (Power Law)</span>
+      P(X &ge; x) ~ x<sup>&minus;&alpha;</sup>
+    </div>
+
+    <p>Se l'engagement segue una power law, allora pochi tweet concentrano quasi tutto. L'esponente &alpha; dice quanto: piu' &alpha; e' basso, piu' la coda e' pesante, piu' la disuguaglianza e' estrema.</p>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/52_power_law_likes.png" alt="Power law likes" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/53_power_law_followers.png" alt="Power law followers" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 40. CCDF log-log con fit Pareto: like e followers</div>
+
+    <img src="../immagini/feed-non-e-tuo/54_alpha_comparison.png" alt="Alpha comparison" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 41. Confronto esponenti alpha per metrica</div>
+
+    <p>Tutti gli &alpha; sono sotto 0.5, compatibili con un regime heavy-tail (fit Pareto). Il "Per Te" ha &alpha; followers = <strong>0.358</strong> contro 0.433 dei "Seguiti". Coda piu' pesante: l'algoritmo concentra ulteriormente. Sui like la differenza e' simile: 0.316 vs 0.281. In entrambi i feed la distribuzione e' compatibile con una power law, ma l'algoritmo sposta il baricentro verso i valori estremi.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 11 - GRAPH THEORY
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Grafo Che Si Dissolve</h2>
+    <span class="section-number">Sezione 11. Betweenness, assortativity, Louvain</span>
+
+    <img src="../immagini/feed-non-e-tuo/55_betweenness_centrality.png" alt="Betweenness centrality" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 42. Betweenness centrality: chi controlla il flusso</div>
+
+    <p>La betweenness centrality misura chi sta al crocevia del flusso informativo. Nei "Seguiti" il nodo top e' marcevann. Nel "Per Te" e' ccpinachet. Ma il dato forte non e' chi, e' quanto: la betweenness media e' bassissima in entrambi (10<sup>-6</sup>), perche' le reti di menzioni su Twitter sono sparse. La differenza e' strutturale.</p>
+
+    <img src="../immagini/feed-non-e-tuo/56_assortativity.png" alt="Assortativity" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 43. Assortativity: community vs broadcast</div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">-0.042</div>
+        <div class="stat-label">Assortativity Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">+0.023</div>
+        <div class="stat-label">Assortativity Seguiti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">0.966</div>
+        <div class="stat-label">Modularita' Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">0.909</div>
+        <div class="stat-label">Modularita' Seguiti</div>
+      </div>
+    </div>
+
+    <p>L'assortativity rivela la natura delle due reti. I "Seguiti" hanno <strong>r = +0.023</strong>: positivo, assortativo. Account simili parlano con account simili. Community. Il "Per Te" ha <strong>r = -0.042</strong>: negativo, disassortativo. Account grandi parlano con account piccoli. Broadcast. L'algoritmo trasforma una rete di conversazione in una rete di trasmissione.</p>
+
+    <img src="../immagini/feed-non-e-tuo/57_modularity_communities.png" alt="Modularity communities" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 44. Community detection Louvain: dimensione delle community</div>
+
+    <p>La modularita' Louvain racconta un paradosso. Il "Per Te" ha <strong>Q = 0.966</strong> con 77 community su 292 nodi. I "Seguiti" hanno <strong>Q = 0.909</strong> con 68 community su 548 nodi. Il "Per Te" ha modularita' piu' alta? Si', ma perche' la rete e' frammentata in isole minuscole che non parlano tra loro. Nei "Seguiti" le community sono piu' grandi, piu' interconnesse, piu' vive. La modularita' alta del "Per Te" e' la modularita' della solitudine: tanti gruppi piccoli, nessuna conversazione.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 12 - MUTUAL INFORMATION
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Guida la Visibilita'</h2>
+    <span class="section-number">Sezione 12. Mutual Information</span>
+
+    <div class="formula-box">
+      <span class="formula-name">Mutual Information</span>
+      I(X;Y) = &sum; p(x,y) &middot; log<sub>2</sub>( p(x,y) / (p(x) &middot; p(y)) )
+    </div>
+
+    <p>La KL divergence misura la distanza tra distribuzioni. La Mutual Information misura quanto una variabile <em>spiega</em> un'altra. Piu' potente per capire cosa guida l'algoritmo.</p>
+
+    <img src="../immagini/feed-non-e-tuo/59_mi_feed_selection.png" alt="MI feed selection" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 45. MI(Feature, Feed): cosa determina se un tweet finisce nel "Per Te"</div>
+
+    <p>La feature che spiega di piu' la selezione nel "Per Te" e' <strong>favorite_count</strong> con MI = 0.173 bit. Seguono reply (0.082) e bookmark (0.073). Followers e' solo a 0.039. Blue verified a 0.023. URL e menzioni a zero. L'algoritmo seleziona per <strong>engagement</strong>, non per dimensione dell'account. I like sono il segnale dominante.</p>
+
+    <img src="../immagini/feed-non-e-tuo/60_mi_scroll_position.png" alt="MI scroll position" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 46. MI(Feature, Posizione Scroll): cosa guida l'ordinamento</div>
+
+    <p>Nel "Per Te" le feature che guidano la posizione nello scroll sono like (0.169) e followers (0.167), quasi alla pari. Nei "Seguiti" domina followers (0.186) e retweet (0.142), i like contano meno (0.096). Due logiche diverse: il "Per Te" ordina per engagement, i "Seguiti" per reach e propagazione.</p>
+
+    <img src="../immagini/feed-non-e-tuo/61_mi_heatmap.png" alt="MI heatmap" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 47. Heatmap MI tra coppie di feature: il "Per Te" e' piu' strutturato</div>
+
+
+    <!-- ============================================================
+         SEZIONE 13 - HAWKES
+         ============================================================ -->
+    <h2><span class="accent">//</span> Auto-Eccitazione</h2>
+    <span class="section-number">Sezione 13. Processi di Hawkes</span>
+
+    <p>Nell'<a href="attenzione-invisibile.html" style="color: var(--accent-attention);">Attenzione Invisibile</a> abbiamo usato i processi di Hawkes per modellare come un tweet attira attenzione nel tempo. Ora li usiamo sul campo: il flusso di tweet nel feed e' un processo che si auto-eccita?</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Processo di Hawkes (intensita' condizionale)</span>
+      &lambda;(t) = &mu; + &sum;<sub>t<sub>i</sub>&lt;t</sub> &alpha; &middot; e<sup>&minus;&beta;(t &minus; t<sub>i</sub>)</sup>
+    </div>
+
+    <p>Ogni evento (tweet mostrato) aumenta la probabilita' del successivo. &mu; e' il rate di base. &alpha; e' la forza dell'eccitazione. &beta; e' la velocita' di decadimento. Il rapporto critico e' il <strong>branching ratio</strong> n* = &alpha;/&beta;: se supera 1, il processo e' esplosivo.</p>
+
+    <img src="../immagini/feed-non-e-tuo/62_hawkes_intensity.png" alt="Hawkes intensity" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 48. Intensita' Hawkes: l'area colorata e' l'auto-eccitazione sopra il rate base</div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">0.969</div>
+        <div class="stat-label">n* Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">0.976</div>
+        <div class="stat-label">n* Seguiti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">5.55</div>
+        <div class="stat-label">CV inter-evento Per Te</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">5.17</div>
+        <div class="stat-label">CV inter-evento Seguiti</div>
+      </div>
+    </div>
+
+    <p>I branching ratio sono entrambi vicini a 1: <strong>0.969</strong> nel "Per Te", <strong>0.976</strong> nei "Seguiti". Entrambi i feed sono al limite critico: quasi esplosivi, ma stazionari. Il coefficiente di variazione dei tempi inter-evento e' 5.55 nel "Per Te" e 5.17 nei "Seguiti" (un processo Poisson avrebbe CV = 1). Entrambi mostrano clustering forte: i tweet arrivano a burst, non uniformemente.</p>
+
+    <img src="../immagini/feed-non-e-tuo/63_hawkes_branching_ratio.png" alt="Hawkes branching ratio" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 49. Branching ratio: entrambi i feed sono al limite critico</div>
+
+    <div class="comparison-row fade-in">
+      <img src="../immagini/feed-non-e-tuo/64_hawkes_interevent.png" alt="Hawkes interevent" class="lab-screenshot">
+      <img src="../immagini/feed-non-e-tuo/65_hawkes_qq_poisson.png" alt="Hawkes QQ Poisson" class="lab-screenshot">
+    </div>
+    <div class="chart-caption">Fig. 50. Tempi inter-evento vs Poisson e QQ plot</div>
+
+    <p>Il QQ plot contro l'esponenziale mostra la deviazione dalla Poissonianita'. Entrambi i feed deviano, ma in modo diverso: il "Per Te" ha piu' eventi ravvicinati (clustering piu' forte nella coda sinistra). Il "Seguiti" devia di piu' nella coda destra (pause piu' lunghe tra burst). L'auto-eccitazione c'e' in entrambi, ma il "Per Te" produce burst piu' compatti. Il processo osservato e' una proiezione del ranking algoritmico sulla sequenza di visualizzazione, non il processo generativo globale: misuriamo come l'algoritmo ti serve i contenuti, non come li produce.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il cerchio si chiude.</strong> Nell'Attenzione Invisibile abbiamo modellato l'attenzione come processo di Hawkes nel codice di Phoenix. Ora misuriamo lo stesso processo nel feed reale. I dati confermano la teoria: il feed opera al limite critico (n* ~ 1), auto-eccitandosi senza mai esplodere. Un sistema progettato per massimizzare il tempo che passi a scrollare.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 14 - SCRIPT E DATI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Script e Dati</h2>
+    <span class="section-number">Sezione 14. 15 script, un terminale</span>
+
+    <p>Tutto il codice e' su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/il-feed-non-e-tuo" target="_blank" rel="noopener" style="color: var(--accent-highlight);">GitHub</a>, nella cartella <code>scripts/il-feed-non-e-tuo/</code>. 15 script, da eseguire in ordine.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Script</th><th>Cosa fa</th><th>Output</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>00_extract.py</code></td><td>Estrae da MongoDB in CSV</td><td><code>data/per_te.csv</code>, <code>data/seguiti.csv</code></td></tr>
+        <tr><td><code>01_analisi_strutturale.py</code></td><td>Following ratio, temporale, verified, concentrazione, lingua</td><td><code>01-05_*.png</code></td></tr>
+        <tr><td><code>02_analisi_sentiment.py</code></td><td>Sentiment, emozioni, intensita', heatmap delta</td><td><code>06-09_*.png</code></td></tr>
+        <tr><td><code>03_analisi_engagement.py</code></td><td>Box plot, distribuzioni, controversialita', followers vs like</td><td><code>10-13_*.png</code></td></tr>
+        <tr><td><code>04_information_theory.py</code></td><td>Entropia Shannon, KL divergence, bootstrap autori</td><td><code>14-16_*.png</code></td></tr>
+        <tr><td><code>05_analisi_topic_hashtag.py</code></td><td>Topic clustering TF-IDF, hashtag, top termini, PCA</td><td><code>17-20_*.png</code></td></tr>
+        <tr><td><code>06_analisi_rete_followers.py</code></td><td>Distribuzione followers, fasce, rete menzioni, Gini</td><td><code>21-25_*.png</code></td></tr>
+        <tr><td><code>07_snowflake_analysis.py</code></td><td>Snowflake ID: timeline, heatmap DC:WK, sequence, cluster</td><td><code>26-31_*.png</code></td></tr>
+        <tr><td><code>08_grafici_extra.py</code></td><td>Score composito, correlazione, CDF, violin, radar</td><td><code>32-39_*.png</code></td></tr>
+        <tr><td><code>09_analisi_temporale.py</code></td><td>Latenza, freshness, ordine cronologico, decadimento</td><td><code>40-47_*.png</code></td></tr>
+        <tr><td><code>10_survival_analysis.py</code></td><td>Kaplan-Meier, Cox hazard ratios, stratificazione</td><td><code>48-51_*.png</code></td></tr>
+        <tr><td><code>11_power_laws.py</code></td><td>Fit Pareto, CCDF, confronto esponenti alpha</td><td><code>52-54_*.png</code></td></tr>
+        <tr><td><code>12_graph_theory.py</code></td><td>Betweenness, assortativity, Louvain modularity</td><td><code>55-58_*.png</code></td></tr>
+        <tr><td><code>13_mutual_information.py</code></td><td>MI feature-feed, MI feature-scroll, heatmap MI</td><td><code>59-61_*.png</code></td></tr>
+        <tr><td><code>14_hawkes_process.py</code></td><td>Fit Hawkes, branching ratio, QQ Poisson</td><td><code>62-65_*.png</code></td></tr>
+        <tr><td><code>15_followers_ratio.py</code></td><td>Rapporto following/followers, fasce, attivita'</td><td><code>66-71_*.png</code></td></tr>
+      </tbody>
+    </table>
+
+    <p>Lo script <code>00_extract.py</code> estrae i dati da MongoDB in CSV. Tutti gli altri leggono i CSV e non richiedono accesso al database. L'output finisce in <code>output/</code>: 71 grafici PNG e un JSON di statistiche per ogni script. Se vuoi replicare l'analisi sui tuoi dati, basta sostituire i CSV mantenendo lo stesso schema.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 15 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Abbiamo Misurato</h2>
+    <span class="section-number">Sezione 15. Il verdetto dei numeri</span>
+
+    <p>L'esperimento risponde a una domanda semplice: cosa fa l'algoritmo al tuo feed? La risposta e' nei numeri.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr>
+          <th>Cosa fa l'algoritmo</th>
+          <th>Misura</th>
+          <th>Impatto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Inietta contenuto non scelto</td>
+          <td>70.4% da non-followed</td>
+          <td>7 tweet su 10 non li hai chiesti</td>
+        </tr>
+        <tr>
+          <td>Trattiene il contenuto</td>
+          <td>Latenza 11.85h vs 4.14h</td>
+          <td>Quasi 3x piu' lento</td>
+        </tr>
+        <tr>
+          <td>Seleziona per engagement</td>
+          <td>Like mediano 48 vs 0</td>
+          <td>Meta' dei tuoi tweet ha 0 like</td>
+        </tr>
+        <tr>
+          <td>Amplifica i grandi account</td>
+          <td>Followers mediano 6.8K vs 3.4K</td>
+          <td>Chi paga e chi ha reach, vince</td>
+        </tr>
+        <tr>
+          <td>Localizza la lingua</td>
+          <td>KL lingua 0.33 bit</td>
+          <td>Comprime il multilinguismo scelto</td>
+        </tr>
+        <tr>
+          <td>Distrugge la rete</td>
+          <td>525 archi vs 219</td>
+          <td>Le conversazioni spariscono</td>
+        </tr>
+        <tr>
+          <td>Nessuna manipolazione sentiment misurabile</td>
+          <td>KL sentiment 0.001 bit</td>
+          <td>Distribuzione emotiva identica tra i due feed</td>
+        </tr>
+        <tr>
+          <td>Filtra per sopravvivenza</td>
+          <td>Kaplan-Meier: 11.92h vs 4.14h</td>
+          <td>Piu' followers = apparizione piu' rapida (HR 2.35)</td>
+        </tr>
+        <tr>
+          <td>Accentua le code pesanti</td>
+          <td>Pareto alpha 0.36 vs 0.43</td>
+          <td>Pochi dominano tutto, l'algoritmo amplifica</td>
+        </tr>
+        <tr>
+          <td>Trasforma community in broadcast</td>
+          <td>Assortativity -0.042 vs +0.023</td>
+          <td>Da rete di pari a rete di trasmissione</td>
+        </tr>
+        <tr>
+          <td>Opera al limite critico</td>
+          <td>Hawkes n* = 0.97</td>
+          <td>Auto-eccitazione massima senza esplosione</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>In questo campione la deformazione emotiva non e' misurabile. Quella strutturale si'. L'algoritmo prende la tua cerchia, la annacqua con estranei ad alto engagement, trattiene i contenuti per mezza giornata e dissolve le conversazioni in broadcast. La manipolazione non e' sulle emozioni. E' su chi vedi, quando lo vedi, e quanto e' grande chi parla.</p>
+
+    <p>Nell'<a href="attenzione-invisibile.html" style="color: var(--accent-attention);">Attenzione Invisibile</a> abbiamo visto i 7 segnali nascosti di Phoenix nel codice. Ora sappiamo cosa producono. Il <code>dwellTimeMs</code> e i segnali comportamentali finiscono per favorire contenuto virale e account verificati, non contenuto rilevante. Il peso negativo su <code>isOpenLinked</code> (i link esterni) si traduce in un feed che ti tiene dentro X. Le metriche di attenzione diventano un proxy per il reach, e il reach premia chi e' gia' grande.</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">Il feed "Per Te" non e' per te.<br>E' per le metriche di X.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+        1.600 tweet &middot; 71 grafici &middot; 15 script &middot; la deformazione e' strutturale, non emotiva<br>
+        <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/il-feed-non-e-tuo" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/pinperepette</a>
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. X Feed: 71 grafici, nessuna opinione.</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

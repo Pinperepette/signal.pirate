@@ -1,0 +1,18 @@
+{
+  "per_te_negativo_pct": 56.12,
+  "per_te_neutrale_pct": 27.12,
+  "per_te_positivo_pct": 16.75,
+  "seguiti_negativo_pct": 57.25,
+  "seguiti_neutrale_pct": 25.62,
+  "seguiti_positivo_pct": 17.12,
+  "per_te_top_emotion": "Rabbia",
+  "per_te_n_unique_emotions": 36,
+  "seguiti_top_emotion": "Rabbia",
+  "seguiti_n_unique_emotions": 41,
+  "per_te_bassa_pct": 26.75,
+  "per_te_media_pct": 42.0,
+  "per_te_alta_pct": 31.25,
+  "seguiti_bassa_pct": 28.88,
+  "seguiti_media_pct": 41.62,
+  "seguiti_alta_pct": 29.5
+}

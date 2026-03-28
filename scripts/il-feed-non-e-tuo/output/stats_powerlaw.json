@@ -1,0 +1,18 @@
+{
+  "per_te_favorite_count_alpha": 0.3156,
+  "per_te_favorite_count_xmin": 6.0,
+  "per_te_favorite_count_n_tail": 586,
+  "seguiti_favorite_count_alpha": 0.2809,
+  "seguiti_favorite_count_xmin": 1.0,
+  "seguiti_favorite_count_n_tail": 315,
+  "per_te_followers_count_alpha": 0.3582,
+  "per_te_followers_count_xmin": 827.0,
+  "per_te_followers_count_n_tail": 721,
+  "seguiti_followers_count_alpha": 0.4329,
+  "seguiti_followers_count_xmin": 572.0,
+  "seguiti_followers_count_n_tail": 721,
+  "per_te_retweet_count_alpha": 0.3634,
+  "seguiti_retweet_count_alpha": 0.2751,
+  "per_te_reply_count_alpha": 0.3937,
+  "seguiti_reply_count_alpha": 0.4055
+}

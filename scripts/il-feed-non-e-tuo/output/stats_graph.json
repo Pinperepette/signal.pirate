@@ -1,0 +1,18 @@
+{
+  "per_te_top_betweenness": "ccpinachet",
+  "per_te_top_betweenness_value": 0.0001,
+  "per_te_mean_betweenness": 1e-06,
+  "seguiti_top_betweenness": "marcevann",
+  "seguiti_top_betweenness_value": 0.0001,
+  "seguiti_mean_betweenness": 1e-06,
+  "per_te_assortativity": -0.0419,
+  "seguiti_assortativity": 0.0232,
+  "per_te_modularity": 0.9657,
+  "per_te_n_communities": 77,
+  "per_te_n_nodes": 292,
+  "per_te_n_edges": 219,
+  "seguiti_modularity": 0.9086,
+  "seguiti_n_communities": 68,
+  "seguiti_n_nodes": 548,
+  "seguiti_n_edges": 525
+}

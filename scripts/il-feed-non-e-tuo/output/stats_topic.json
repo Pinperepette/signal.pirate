@@ -1,0 +1,99 @@
+{
+  "kl_topic_pt_vs_sg": 0.047992,
+  "cluster_terms": {
+    "0": [
+      "più",
+      "one",
+      "sinistra",
+      "grazie",
+      "oggi"
+    ],
+    "1": [
+      "due",
+      "davvero",
+      "fanno",
+      "pare",
+      "bene"
+    ],
+    "2": [
+      "world",
+      "right",
+      "financial",
+      "time",
+      "look"
+    ],
+    "3": [
+      "italia",
+      "paese",
+      "forza",
+      "europa",
+      "più"
+    ],
+    "4": [
+      "iran",
+      "account",
+      "fbi",
+      "patel",
+      "kash"
+    ],
+    "5": [
+      "governo",
+      "può",
+      "meloni",
+      "internazionale",
+      "chiaro"
+    ],
+    "6": [
+      "perché",
+      "grande",
+      "cazzo",
+      "più",
+      "bene"
+    ],
+    "7": [
+      "anni",
+      "roba",
+      "oggi",
+      "pregare",
+      "ecco"
+    ]
+  },
+  "per_te_cluster_0_pct": 75.52,
+  "seguiti_cluster_0_pct": 77.72,
+  "per_te_cluster_1_pct": 3.39,
+  "seguiti_cluster_1_pct": 2.42,
+  "per_te_cluster_2_pct": 0.65,
+  "seguiti_cluster_2_pct": 2.01,
+  "per_te_cluster_3_pct": 4.17,
+  "seguiti_cluster_3_pct": 2.15,
+  "per_te_cluster_4_pct": 1.95,
+  "seguiti_cluster_4_pct": 4.83,
+  "per_te_cluster_5_pct": 5.08,
+  "seguiti_cluster_5_pct": 4.56,
+  "per_te_cluster_6_pct": 5.21,
+  "seguiti_cluster_6_pct": 3.36,
+  "per_te_cluster_7_pct": 4.04,
+  "seguiti_cluster_7_pct": 2.95,
+  "per_te_tweets_with_hashtags": 102,
+  "seguiti_tweets_with_hashtags": 74,
+  "per_te_unique_hashtags": 178,
+  "seguiti_unique_hashtags": 109,
+  "hashtag_jaccard_similarity": 0.1667,
+  "hashtag_common_count": 41,
+  "hashtag_only_per_te": 137,
+  "hashtag_only_seguiti": 68,
+  "per_te_top5_terms": [
+    "più",
+    "perché",
+    "anni",
+    "italia",
+    "governo"
+  ],
+  "seguiti_top5_terms": [
+    "iran",
+    "perché",
+    "anni",
+    "più",
+    "dell"
+  ]
+}

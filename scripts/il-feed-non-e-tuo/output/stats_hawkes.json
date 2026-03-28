@@ -1,0 +1,16 @@
+{
+  "per_te_mu": 0.124252,
+  "per_te_alpha": 437.224022,
+  "per_te_beta": 451.320986,
+  "per_te_branching_ratio": 0.968765,
+  "per_te_loglik": 4551.448671,
+  "per_te_success": true,
+  "seguiti_mu": 0.109322,
+  "seguiti_alpha": 433.136518,
+  "seguiti_beta": 443.643236,
+  "seguiti_branching_ratio": 0.976317,
+  "seguiti_loglik": 4637.184702,
+  "seguiti_success": true,
+  "per_te_cv_interevent": 5.552,
+  "seguiti_cv_interevent": 5.1689
+}

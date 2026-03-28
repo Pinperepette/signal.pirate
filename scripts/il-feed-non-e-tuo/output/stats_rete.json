@@ -1,0 +1,70 @@
+{
+  "per_te_followers_median": 6868,
+  "per_te_followers_mean": 4001718,
+  "per_te_followers_p90": 109369,
+  "seguiti_followers_median": 3406,
+  "seguiti_followers_mean": 784393,
+  "seguiti_followers_p90": 55341,
+  "per_te_nano_pct": 11.25,
+  "per_te_micro_pct": 46.5,
+  "per_te_piccoli_pct": 30.88,
+  "per_te_medi_pct": 7.62,
+  "per_te_grandi_pct": 1.75,
+  "per_te_mega_pct": 2.0,
+  "seguiti_nano_pct": 23.12,
+  "seguiti_micro_pct": 49.62,
+  "seguiti_piccoli_pct": 20.88,
+  "seguiti_medi_pct": 4.5,
+  "seguiti_grandi_pct": 1.5,
+  "seguiti_mega_pct": 0.38,
+  "per_te_n_edges": 219,
+  "per_te_n_nodes": 292,
+  "per_te_top_mentioned": [
+    [
+      "valeria__79",
+      10
+    ],
+    [
+      "publiedcloud",
+      9
+    ],
+    [
+      "ccpinachet",
+      8
+    ],
+    [
+      "massimo_san",
+      7
+    ],
+    [
+      "qlexpipiens",
+      7
+    ]
+  ],
+  "seguiti_n_edges": 525,
+  "seguiti_n_nodes": 548,
+  "seguiti_top_mentioned": [
+    [
+      "massimo_san",
+      25
+    ],
+    [
+      "marcevann",
+      25
+    ],
+    [
+      "signori_massimo",
+      25
+    ],
+    [
+      "kuball_reloaded",
+      25
+    ],
+    [
+      "gpturchi",
+      22
+    ]
+  ],
+  "per_te_gini_followers": 0.9805,
+  "seguiti_gini_followers": 0.9908
+}

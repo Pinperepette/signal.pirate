@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>X Feed: Anatomia In 71 Grafici</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-feed-non-e-tuo.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-feed-non-e-tuo.html</guid>
+    <pubDate>Sat, 28 Mar 2026 00:00:00 +0100</pubDate>
+    <description>800 tweet "Per Te" contro 800 "Seguiti" su X, catturati nello stesso scroll. Latenza mediana 11.85 ore contro 4.14. Il 70% dei post arriva da gente che non segui. KL divergence, Gini, Snowflake ID, Hawkes, Kaplan-Meier, Power Law. 71 grafici, 15 script Python, dati reali.</description>
+  </item>
+
+  <item>
     <title>Il CAPTCHA Muore Di Matematica</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-captcha-muore-di-matematica.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-captcha-muore-di-matematica.html</guid>

@@ -1,0 +1,129 @@
+{
+  "total_authors": 771,
+  "per_te_authors": 505,
+  "seguiti_authors": 266,
+  "snowflake_real": 457,
+  "pre_snowflake": 314,
+  "per_te_median_age_days": 1960.0,
+  "per_te_mean_age_days": 2361.0,
+  "per_te_oldest_account": "LucianoLibero",
+  "per_te_newest_account": "Xacmb90",
+  "seguiti_median_age_days": 1925.0,
+  "seguiti_mean_age_days": 2434.0,
+  "seguiti_oldest_account": "LucianoLibero",
+  "seguiti_newest_account": "Xacmb90",
+  "per_te_top_dc_wk": "DC:11:WK:29",
+  "per_te_top_dc_wk_count": 22,
+  "per_te_unique_dc": 24,
+  "per_te_unique_wk": 32,
+  "seguiti_top_dc_wk": "DC:11:WK:29",
+  "seguiti_top_dc_wk_count": 10,
+  "seguiti_unique_dc": 21,
+  "seguiti_unique_wk": 32,
+  "per_te_high_seq_50plus": 47,
+  "per_te_max_sequence": 4001,
+  "seguiti_high_seq_50plus": 27,
+  "seguiti_max_sequence": 4001,
+  "per_te_temporal_clusters_2plus": 1,
+  "per_te_max_temporal_cluster": 48,
+  "per_te_spatiotemporal_clusters": 15,
+  "per_te_top_st_clusters": [
+    {
+      "size": 4,
+      "dc": 16,
+      "users": [
+        "Dubbiosismo",
+        "jacko_cecilia",
+        "notiziestampafn",
+        "SimoKohonen"
+      ]
+    },
+    {
+      "size": 4,
+      "dc": 13,
+      "users": [
+        "RicasoliBarone",
+        "bertero_g",
+        "silvio_garofalo",
+        "pettymagpie"
+      ]
+    },
+    {
+      "size": 4,
+      "dc": 23,
+      "users": [
+        "Cambiacasacca",
+        "gr_grim",
+        "steal61",
+        "RaffaeleGianni4"
+      ]
+    },
+    {
+      "size": 3,
+      "dc": 11,
+      "users": [
+        "alde68",
+        "ChiodiDonatella",
+        "ImolaOggi"
+      ]
+    },
+    {
+      "size": 3,
+      "dc": 9,
+      "users": [
+        "LaPravdania",
+        "TELADOIOLANIUS",
+        "phd_stranameme"
+      ]
+    }
+  ],
+  "seguiti_temporal_clusters_2plus": 1,
+  "seguiti_max_temporal_cluster": 27,
+  "seguiti_spatiotemporal_clusters": 5,
+  "seguiti_top_st_clusters": [
+    {
+      "size": 4,
+      "dc": 11,
+      "users": [
+        "masnuccio",
+        "ImolaOggi",
+        "kmcnam1",
+        "ApeBastarda"
+      ]
+    },
+    {
+      "size": 2,
+      "dc": 2,
+      "users": [
+        "bl4ckh0l3z",
+        "berningman16"
+      ]
+    },
+    {
+      "size": 2,
+      "dc": 13,
+      "users": [
+        "pettymagpie",
+        "silvio_garofalo"
+      ]
+    },
+    {
+      "size": 2,
+      "dc": 16,
+      "users": [
+        "Dubbiosismo",
+        "a70199617"
+      ]
+    },
+    {
+      "size": 2,
+      "dc": 30,
+      "users": [
+        "Lana1Malta",
+        "LucianoLibero"
+      ]
+    }
+  ],
+  "per_te_age_followers_corr": 0.2524,
+  "seguiti_age_followers_corr": 0.1488
+}

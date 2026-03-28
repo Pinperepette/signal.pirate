@@ -1,0 +1,16 @@
+{
+  "entropy_emozioni_per_te": 3.6945,
+  "entropy_emozioni_seguiti": 3.7434,
+  "entropy_sentiment_per_te": 1.41,
+  "entropy_sentiment_seguiti": 1.4,
+  "entropy_intensita_per_te": 1.5589,
+  "entropy_intensita_seguiti": 1.5634,
+  "entropy_lingua_per_te": 1.2685,
+  "entropy_lingua_seguiti": 1.6124,
+  "entropy_autori_per_te": 8.6762,
+  "entropy_autori_seguiti": 7.0357,
+  "kl_emozioni_pt_vs_sg": 0.138678,
+  "kl_sentiment_pt_vs_sg": 0.000842,
+  "kl_intensita_pt_vs_sg": 0.001916,
+  "kl_lingua_pt_vs_sg": 0.330067
+}
