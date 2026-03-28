@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il CAPTCHA Muore Di Matematica | Signal Pirate</title>
+  <meta name="description" content="I CAPTCHA sono un test di Turing al contrario, e la matematica li sta uccidendo. CNN da zero che rompe CAPTCHA testuali al 99.9%. ResNet pre-trained che riconosce oggetti nelle griglie senza training aggiuntivo: truck 97.6%, ship 98.4%. 2 script Python, dati reali.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning/important */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Captcha Gallery === */
+    .captcha-gallery {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+    .captcha-gallery img {
+      border-radius: 8px;
+      border: 1px solid rgba(0,255,136,0.15);
+      height: 60px;
+    }
+
+    /* === Training Curve === */
+    .training-curve {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .training-curve .bar-row {
+      display: flex;
+      align-items: center;
+      margin: 0.2rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+    }
+    .training-curve .bar-label {
+      width: 2.5rem;
+      color: var(--text-secondary);
+      text-align: right;
+      margin-right: 0.6rem;
+      flex-shrink: 0;
+    }
+    .training-curve .bar {
+      height: 0.6rem;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    .training-curve .bar-value {
+      margin-left: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.65rem;
+      flex-shrink: 0;
+    }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: rgba(124,77,255,0.06);
+      border: 1px solid rgba(124,77,255,0.15);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .pipeline-step .step-num {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.3rem;
+    }
+    .pipeline-step .step-name {
+      color: var(--accent-highlight);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .pipeline-step .step-desc {
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      margin-top: 0.3rem;
+    }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .chart-container canvas {
+      max-height: 400px;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-28 | Pinperepette</p>
+    <h1 class="article-page-title">Il CAPTCHA Muore <span class="accent">Di Matematica</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      I CAPTCHA sono un test di Turing al contrario, e la matematica li sta uccidendo. CNN addestrata da zero che rompe CAPTCHA testuali al 99.9%. ResNet-50 pre-trained che riconosce oggetti nelle griglie senza alcun training aggiuntivo: truck 97.6%, ship 98.4% su foto reali a 96px. 2 script Python, dati reali, nessun trucco.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Pattern Recognition</span>
+      <span class="tag tag-highlight">CNN / ResNet</span>
+      <span class="tag tag-reaction">CAPTCHA Breaking</span>
+      <span class="tag tag-amplification">Universal Approximation</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL TEST DI TURING AL CONTRARIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Test di Turing al Contrario</h2>
+    <span class="section-number">Sezione 00. Un'idea nata morta</span>
+
+    <p>Nel 2000 un gruppo di ricercatori di Carnegie Mellon inventa il CAPTCHA. L'acronimo sta per Completely Automated Public Turing test to tell Computers and Humans Apart. L'idea e' semplice: crea una sfida che un umano risolve al volo ma che una macchina non riesce a decifrare.</p>
+
+    <p>Lettere distorte. Rumore visivo. Rotazione casuale. Il principio e' che il sistema visivo umano eccelle nel riconoscere pattern degradati, mentre un computer ci inciampa. Per qualche anno funziona. I bot si fermano davanti a sei lettere storte.</p>
+
+    <div class="captcha-gallery">
+      <img src="../immagini/captcha/01_captcha_esempio_1.png" alt="CAPTCHA esempio 1">
+      <img src="../immagini/captcha/01_captcha_esempio_2.png" alt="CAPTCHA esempio 2">
+      <img src="../immagini/captcha/01_captcha_esempio_3.png" alt="CAPTCHA esempio 3">
+      <img src="../immagini/captcha/01_captcha_esempio_4.png" alt="CAPTCHA esempio 4">
+    </div>
+
+    <p>Poi arrivano le reti convoluzionali. E il principio su cui si regge il CAPTCHA crolla.</p>
+
+    <p>Il problema e' che il CAPTCHA assume l'esistenza di un gap computazionale tra umani e macchine nel riconoscimento di pattern. Quell'assunzione era vera nel 2000, quando le macchine classificavano immagini con feature engineering manuale e SVM. Nel 2026 non lo e' piu'. Il gap si e' chiuso, e si e' chiuso nella direzione sbagliata: le macchine non sono arrivate al livello degli umani. Lo hanno superato.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il paradosso del CAPTCHA.</strong> Qualsiasi sfida visiva abbastanza semplice da essere risolta da un umano in pochi secondi e' abbastanza semplice da essere approssimata da una rete neurale. Le CNN non "vedono" come noi. Fanno qualcosa di meglio: approssimano la funzione che mappa pixel in etichette, senza bisogno di capire cosa stanno guardando.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - IL TEOREMA CHE LI UCCIDE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Teorema Che Li Uccide</h2>
+    <span class="section-number">Sezione 01. Approssimazione universale</span>
+
+    <p>Nel 1989 George Cybenko dimostra un risultato che sembra innocuo: una rete neurale con un singolo strato nascosto e un numero sufficiente di neuroni puo' approssimare qualsiasi funzione continua su un insieme compatto, con precisione arbitraria.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Teorema di approssimazione universale (Cybenko, 1989)</span>
+      &forall; f &isin; C(K), &forall; &epsilon; &gt; 0, &exist; N, w<sub>i</sub>, b<sub>i</sub>, v<sub>i</sub> :<br>
+      | f(x) &minus; &sum;<sub>i=1</sub><sup>N</sup> v<sub>i</sub> &middot; &sigma;(w<sub>i</sub> &middot; x + b<sub>i</sub>) | &lt; &epsilon;
+    </div>
+
+    <p>Obiezione: la funzione <code>immagine &rarr; testo</code> e' formalmente discreta, non continua. Un pixel in piu' di distorsione potrebbe trasformare una A in una R. Vero. Ma nella pratica il mapping e' approssimabile da una funzione continua nello spazio delle immagini, perche' piccole perturbazioni raramente cambiano la label. Se lo facessero, il CAPTCHA sarebbe illeggibile anche per gli umani. La rete non ha bisogno che la funzione sia continua ovunque. Le basta che lo sia quasi ovunque, nella regione della distribuzione dei CAPTCHA reali.</p>
+
+    <p>Il CAPTCHA e' una funzione <code>f: immagine &rarr; testo</code>. Una CNN e' un approssimatore universale. Ma Cybenko da solo e' un risultato di esistenza: ti dice che la rete esiste, non che la troverai. Il colpo reale e' un altro. Le reti neurali non solo possono approssimare la funzione: lo fanno con pochi dati, e generalizzano su esempi mai visti. Questa e' la proprieta' che uccide i CAPTCHA. Il teorema ti apre la porta, la generalizzazione la sfonda.</p>
+
+    <p>La difesa puo' rendere la funzione piu' complessa. Piu' distorsione, piu' rumore, piu' sovrapposizione. Ma ogni incremento di complessita' rende il CAPTCHA piu' difficile anche per gli umani. E le reti scalano meglio degli umani: aggiungi layer, aggiungi dati, l'accuratezza sale. L'umano invece si stufa, sbaglia, abbandona il sito.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il trade-off impossibile.</strong> Piu' rendi il CAPTCHA difficile per le macchine, piu' lo rendi difficile per gli umani. Ma le macchine migliorano con piu' dati e piu' parametri. Gli umani no. Il punto di incrocio e' gia' stato superato: esistono CAPTCHA che le macchine risolvono meglio degli umani.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LABORATORIO CAPTCHA TESTUALI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Laboratorio: CAPTCHA Testuali</h2>
+    <span class="section-number">Sezione 02. 50.000 CAPTCHA, una CNN, 2 ore</span>
+
+    <p>Ho generato 50.000 CAPTCHA sintetici. Cinque caratteri ciascuno, scelti tra 36 simboli (A-Z, 0-9). Distorsione: rotazione casuale fino a 25 gradi per carattere, rumore a punti, linee di disturbo, gaussian blur. Roba che assomiglia ai CAPTCHA reali che giravano fino a pochi anni fa.</p>
+
+    <p>Poi ho addestrato una CNN da zero. Nessun modello pre-trained, nessun transfer learning. Quattro strati convoluzionali, batch normalization, dropout. Una testa di classificazione separata per ognuna delle 5 posizioni. Il modello predice ogni carattere indipendentemente.</p>
+
+    <div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Architettura: 4 conv layers + 5 classification heads</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">class</span> <span class="cf">CaptchaCNN</span>(nn.Module):</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="ck">def</span> <span class="cf">__init__</span>(self):</td></tr>
+<tr><td class="ln">4</td><td class="code">        self.features = nn.<span class="cf">Sequential</span>(</td></tr>
+<tr><td class="ln">5</td><td class="code">            nn.<span class="cf">Conv2d</span>(<span class="cn">3</span>, <span class="cn">32</span>, <span class="cn">3</span>, padding=<span class="cn">1</span>),  <span class="cc"># 160x60 &rarr; 80x30</span></td></tr>
+<tr><td class="ln">6</td><td class="code">            nn.<span class="cf">BatchNorm2d</span>(<span class="cn">32</span>), nn.<span class="cf">ReLU</span>(), nn.<span class="cf">MaxPool2d</span>(<span class="cn">2</span>),</td></tr>
+<tr><td class="ln">7</td><td class="code">            nn.<span class="cf">Conv2d</span>(<span class="cn">32</span>, <span class="cn">64</span>, <span class="cn">3</span>, padding=<span class="cn">1</span>), <span class="cc"># 80x30 &rarr; 40x15</span></td></tr>
+<tr><td class="ln">8</td><td class="code">            nn.<span class="cf">BatchNorm2d</span>(<span class="cn">64</span>), nn.<span class="cf">ReLU</span>(), nn.<span class="cf">MaxPool2d</span>(<span class="cn">2</span>),</td></tr>
+<tr><td class="ln">9</td><td class="code">            nn.<span class="cf">Conv2d</span>(<span class="cn">64</span>, <span class="cn">128</span>, <span class="cn">3</span>, padding=<span class="cn">1</span>), <span class="cc"># 40x15 &rarr; 20x7</span></td></tr>
+<tr><td class="ln">10</td><td class="code">            nn.<span class="cf">BatchNorm2d</span>(<span class="cn">128</span>), nn.<span class="cf">ReLU</span>(), nn.<span class="cf">MaxPool2d</span>(<span class="cn">2</span>),</td></tr>
+<tr><td class="ln">11</td><td class="code">            nn.<span class="cf">Conv2d</span>(<span class="cn">128</span>, <span class="cn">256</span>, <span class="cn">3</span>, padding=<span class="cn">1</span>),</td></tr>
+<tr><td class="ln">12</td><td class="code">            nn.<span class="cf">BatchNorm2d</span>(<span class="cn">256</span>), nn.<span class="cf">ReLU</span>(),</td></tr>
+<tr><td class="ln">13</td><td class="code">            nn.<span class="cf">AdaptiveAvgPool2d</span>((<span class="cn">2</span>, <span class="cn">5</span>)),  <span class="cc"># fisso a 2x5</span></td></tr>
+<tr><td class="ln">14</td><td class="code">        )</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="cc"># una testa per ogni posizione del CAPTCHA</span></td></tr>
+<tr><td class="ln">16</td><td class="code">        self.heads = nn.<span class="cf">ModuleList</span>([</td></tr>
+<tr><td class="ln">17</td><td class="code">            nn.<span class="cf">Linear</span>(<span class="cn">512</span>, <span class="cn">36</span>) <span class="ck">for</span> _ <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">5</span>)</td></tr>
+<tr><td class="ln">18</td><td class="code">        ])</td></tr>
+</tbody></table></div>
+    </div>
+
+    <p>Training: 40 epoche, cosine annealing sul learning rate, batch size 256. Tutto su CPU, 24 core. 2 ore e 24 minuti.</p>
+
+    <p>La curva di apprendimento racconta la storia. Loss che crolla, accuracy che sale. 40 epoche, nessun plateau, nessun overfitting:</p>
+
+    <!-- Training Curve Chart -->
+    <div class="chart-container fade-in">
+      <canvas id="training-curve-chart"></canvas>
+    </div>
+
+    <p>91% di accuracy per carattere sul training set. E sul test set?</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">100%</div>
+        <div class="stat-label">Char accuracy (test)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">99.9%</div>
+        <div class="stat-label">CAPTCHA intero (test)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">50k</div>
+        <div class="stat-label">Campioni training</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">143 min</div>
+        <div class="stat-label">Tempo training</div>
+      </div>
+    </div>
+
+    <p>Il test set sono 2000 CAPTCHA mai visti durante il training. Il modello li legge tutti. 20 esempi, 20 corretti:</p>
+
+    <div class="terminal-output fade-in">
+      <span class="t-out">Reale: J6LI3 | Predetto: J6LI3 <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: GVDS1 | Predetto: GVDS1 <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: ARNV4 | Predetto: ARNV4 <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: 5DQT3 | Predetto: 5DQT3 <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: HZ7DP | Predetto: HZ7DP <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: 46Y3F | Predetto: 46Y3F <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: N5H2N | Predetto: N5H2N <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: HWLL8 | Predetto: HWLL8 <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: R9F9U | Predetto: R9F9U <span class="t-ok">&#x2713;</span></span>
+      <span class="t-out">Reale: OG59X | Predetto: OG59X <span class="t-ok">&#x2713;</span></span>
+    </div>
+
+    <p>Una rete neurale che ho addestrato sul mio laptop in due ore legge CAPTCHA distorti meglio di me. Senza trucchi. Senza OCR specializzato. Solo conv layers e backpropagation.</p>
+
+    <p>Obiezione legittima: il training set e il test set vengono dalla stessa distribuzione sintetica. Un critico potrebbe dire che il modello ha imparato il generatore, non i CAPTCHA in generale. La risposta e' nel vincolo del CAPTCHA stesso: i CAPTCHA reali non possono uscire da quella distribuzione senza diventare illeggibili per gli umani. Lettere distorte, rumore, blur:lo spazio delle trasformazioni possibili e' limitato dalla leggibilita' umana. La rete non deve generalizzare su qualsiasi immagine. Le basta coprire lo spazio ristretto di cio' che un umano riesce ancora a leggere.</p>
+
+    <p>La rete non "vede" le lettere come le vediamo noi. Non sa cos'e' una lettera. Ha imparato una funzione statistica che mappa configurazioni di pixel in classi. La distorsione, il rumore, le linee di disturbo:tutto quello che doveva fermare una macchina:sono rumore che la rete impara a filtrare. Per il CAPTCHA testuale, la partita e' finita.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - LABORATORIO CAPTCHA IMMAGINI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Laboratorio: CAPTCHA a Immagini</h2>
+    <span class="section-number">Sezione 03. "Seleziona tutti i semafori"</span>
+
+    <p>I CAPTCHA testuali sono stati abbandonati da anni. Il campo di battaglia attuale e' la griglia di immagini: "Seleziona tutte le immagini con autobus", "Clicca su tutti i semafori". reCAPTCHA v2 di Google e' il piu' diffuso. L'idea e' che il riconoscimento di oggetti in contesti naturali sia piu' difficile per una macchina del semplice OCR.</p>
+
+    <p>Per testare questa ipotesi ho fatto qualcosa di deliberatamente assurdo: ho preso ResNet-50, un modello di classificazione pre-trained su ImageNet nel 2015. Undici anni fa. Nessun fine-tuning, nessun training aggiuntivo, nessuna ottimizzazione per i CAPTCHA. Un modello addestrato per un altro scopo. L'ho puntato su due dataset di foto reali: CIFAR-10 (32x32 pixel, miniature) e STL-10 (96x96 pixel, piu' vicino alla risoluzione dei tile CAPTCHA).</p>
+
+    <p>Questo e' il punto: non ho costruito un attacco. Ho preso un modello generico di classificazione e l'ho usato cosi' com'e'. Se funziona, il problema non e' implementativo. E' strutturale.</p>
+
+    <p>Il test: prendi 500 foto reali per categoria, classificale, vedi se il modello riconosce l'oggetto tra le prime 5 predizioni. I risultati su STL-10:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Categoria</th><th>CIFAR-10 (32px)</th><th>STL-10 (96px)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Truck</td><td>90.8%</td><td><strong>97.6%</strong></td></tr>
+        <tr><td>Ship</td><td>75.2%</td><td><strong>98.4%</strong></td></tr>
+        <tr><td>Automobile</td><td>34.2%</td><td><strong>95.8%</strong></td></tr>
+        <tr><td>Airplane</td><td>55.6%</td><td><strong>87.2%</strong></td></tr>
+        <tr><td>Deer</td><td>55.4%</td><td><strong>92.4%</strong></td></tr>
+        <tr><td>Bird</td><td>34.0%</td><td><strong>79.0%</strong></td></tr>
+        <tr><td>Horse</td><td>55.8%</td><td><strong>77.6%</strong></td></tr>
+        <tr><td>Cat</td><td>30.0%</td><td><strong>58.8%</strong></td></tr>
+      </tbody>
+    </table>
+
+    <!-- Radar Chart: CIFAR-10 vs STL-10 -->
+    <div class="chart-container fade-in">
+      <canvas id="radar-chart"></canvas>
+    </div>
+
+    <p>Su immagini a 96 pixel, meno della meta' della risoluzione di un tile CAPTCHA tipico, un modello del 2015 riconosce camion nel 97.6% dei casi e navi nel 98.4%. Senza aver mai visto un CAPTCHA in vita sua.</p>
+
+    <p>La colonna CIFAR-10 e' altrettanto rivelatrice: su miniature 32x32, praticamente irriconoscibili a occhio nudo, il modello trova ancora i truck nel 90.8% dei casi. A quella risoluzione un umano fatica a distinguere un camion da un autobus.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il problema e' strutturale.</strong> I CAPTCHA a griglia chiedono di riconoscere semafori, autobus, strisce pedonali, idranti. Sono le stesse categorie su cui i modelli di visione vengono addestrati da anni, su dataset milioni di volte piu' grandi di qualsiasi training set CAPTCHA. ImageNet ha 14 milioni di immagini etichettate. COCO ne ha 330.000 con bounding box. Google chiede di riconoscere le cose che i modelli hanno gia' imparato a riconoscere meglio degli umani.</p>
+    </div>
+
+    <p>Per rendere il test piu' realistico ho simulato 200 griglie CAPTCHA per ognuna delle categorie. Ogni griglia: 9 tile, 2-4 target mescolati con non-target, proprio come reCAPTCHA. Il modello deve selezionare tutti i target e ignorare il resto.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Target</th><th>Precision</th><th>Recall</th><th>Griglie perfette</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Truck</td><td>71.6%</td><td>93.8%</td><td>27.5%</td></tr>
+        <tr><td>Ship</td><td>78.6%</td><td>86.2%</td><td>30.5%</td></tr>
+        <tr><td>Automobile</td><td>97.5%</td><td>50.0%</td><td>13.5%</td></tr>
+        <tr><td>Airplane</td><td>83.6%</td><td>63.3%</td><td>19.0%</td></tr>
+      </tbody>
+    </table>
+
+    <p>Le "griglie perfette" sono quelle dove il modello ha selezionato tutti i target corretti e zero falsi positivi. Con truck ci riesce il 27.5% delle volte, con ship il 30.5%.</p>
+
+    <p>Sembra basso? Un bot puo' riprovare. I CAPTCHA non limitano i tentativi perche' anche gli umani sbagliano, e quel margine di tolleranza e' esattamente cio' che il bot sfrutta.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Probabilita' di passare in N tentativi</span>
+      P(pass, N) = 1 &minus; (1 &minus; p)<sup>N</sup>
+    </div>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Target</th><th>1 tentativo</th><th>3 tentativi</th><th>5 tentativi</th><th>10 tentativi</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Truck</td><td>27.5%</td><td>61.9%</td><td><strong>80.0%</strong></td><td><strong>96.0%</strong></td></tr>
+        <tr><td>Ship</td><td>30.5%</td><td>66.4%</td><td><strong>83.8%</strong></td><td><strong>97.4%</strong></td></tr>
+        <tr><td>Airplane</td><td>19.0%</td><td>46.9%</td><td>65.1%</td><td><strong>87.8%</strong></td></tr>
+        <tr><td>Automobile</td><td>13.5%</td><td>35.3%</td><td>51.6%</td><td>76.5%</td></tr>
+      </tbody>
+    </table>
+
+    <p>Con 5 tentativi un modello del 2015 passa la griglia truck nell'80% dei casi e ship nell'83.8%. Con 10 tentativi siamo sopra il 96%. Un bot non si stufa, non si distrae, e puo' mandare richieste parallele. Il rate limiting e' l'unica difesa, e non ha nulla a che fare con il CAPTCHA in se'.</p>
+
+    <!-- Bypass Probability Chart -->
+    <div class="chart-container fade-in">
+      <canvas id="bypass-chart"></canvas>
+    </div>
+
+    <p>E ricorda: questo e' ResNet-50, un modello del 2015. I modelli attuali (YOLO, CLIP, modelli vision-language) sono ordini di grandezza piu' capaci su immagini a risoluzione piena. Un modello moderno su tile CAPTCHA reali supererebbe il 90% di griglie perfette al primo tentativo.</p>
+
+    <img src="../immagini/captcha/03_grid_truck.png" alt="Simulazione griglia CAPTCHA: seleziona i truck" class="lab-screenshot fade-in">
+
+
+    <!-- ============================================================
+         SEZIONE 04 - IL PARADOSSO DI GOOGLE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Paradosso di Google</h2>
+    <span class="section-number">Sezione 04. Chi risolve i CAPTCHA addestra chi li distrugge</span>
+
+    <p>C'e' un'ironia strutturale in tutto questo. Ogni volta che clicchi "seleziona tutti i semafori" su reCAPTCHA, stai etichettando dati per Google. Quei click sono finiti nel training di Google Street View, poi in Waymo (le auto a guida autonoma di Google). Milioni di utenti che lavorano gratis per addestrare modelli di visione che rendono i CAPTCHA stessi obsoleti.</p>
+
+    <p>Nel 2014 Google pubblica un paper in cui una rete neurale risolve reCAPTCHA con il 99.8% di accuratezza. Lo stesso anno, Google introduce reCAPTCHA v2 ("No CAPTCHA reCAPTCHA"), che sostituisce la sfida visiva con un checkbox "Non sono un robot". La sfida visiva resta come fallback, ma la difesa principale diventa un'altra cosa: l'analisi del comportamento.</p>
+
+    <p>Google ha capito prima di tutti che le sfide visive erano finite. L'ha capito perche' aveva i dati per dimostrarlo. Dati che gli utenti stessi avevano etichettato risolvendo i CAPTCHA precedenti.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il ciclo si chiude.</strong> Gli utenti risolvono CAPTCHA &rarr; i dati etichettati addestrano modelli di visione &rarr; i modelli di visione risolvono i CAPTCHA &rarr; servono CAPTCHA piu' difficili &rarr; gli utenti li risolvono &rarr; i dati addestrano modelli ancora migliori. E' un volano che accelera nella direzione opposta a quella che i CAPTCHA dovrebbero difendere.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - LA RESA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Resa</h2>
+    <span class="section-number">Sezione 05. Da sfida visiva ad analisi comportamentale</span>
+
+    <p>reCAPTCHA v3, rilasciato nel 2018, non mostra nessuna sfida all'utente. Zero semafori, zero strisce pedonali, zero lettere storte. Restituisce uno score tra 0 e 1 basato sull'analisi del comportamento: come muovi il mouse, quanto tempo stai sulla pagina, il pattern di scrolling, i cookie, il fingerprint del browser, la storia di navigazione.</p>
+
+    <p>E' la resa. Google ha abbandonato l'idea che una sfida visiva possa distinguere umani da macchine. Il CAPTCHA come test di Turing al contrario e' morto. Quello che resta e' sorveglianza comportamentale mascherata da misura di sicurezza.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">2000-2010</div>
+        <div class="step-name">Testo distorto</div>
+        <div class="step-desc">OCR non risolve</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2012-2018</div>
+        <div class="step-name">Griglie immagini</div>
+        <div class="step-desc">CNN non risolve (per un po')</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">2018-oggi</div>
+        <div class="step-name">Analisi comportamentale</div>
+        <div class="step-desc">Nessuna sfida visiva</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">Futuro?</div>
+        <div class="step-name">???</div>
+        <div class="step-desc">Proof-of-work? Biometria?</div>
+      </div>
+    </div>
+
+    <p>Le alternative proposte hanno tutte dei limiti. I proof-of-work (risolvi un puzzle crittografico) penalizzano i dispositivi mobili e a basse risorse. La verifica biometrica solleva problemi di privacy. L'attestazione hardware (come le passkey) richiede un ecosistema chiuso. Nessuna di queste soluzioni ha l'universalita' e la semplicita' del CAPTCHA originale, e nessuna risolve il problema fondamentale: se una macchina puo' simulare il comportamento umano, non c'e' test che tenga.</p>
+
+    <p>L'approssimazione universale non e' un bug. E' il teorema fondamentale del deep learning. E dice una cosa chiara: qualsiasi funzione che un umano puo' calcolare, una rete neurale puo' approssimarla. Inclusa la funzione "risolvi questo CAPTCHA".</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Numeri</h2>
+    <span class="section-number">Sezione 06. Quello che abbiamo misurato</span>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">99.9%</div>
+        <div class="stat-label">CAPTCHA testuale rotto</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">97.6%</div>
+        <div class="stat-label">Truck riconosciuto (96px)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">0</div>
+        <div class="stat-label">Training aggiuntivo (immagini)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">2015</div>
+        <div class="stat-label">Anno del modello usato</div>
+      </div>
+    </div>
+
+    <p>Tutto il codice e' su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/il-captcha-muore-di-matematica" target="_blank" rel="noopener" style="color: var(--accent-highlight);">GitHub</a>, nella cartella <code>scripts/il-captcha-muore-di-matematica/</code>. Due script: il primo genera CAPTCHA testuali e addestra la CNN, il secondo testa ResNet-50 su CIFAR-10 e STL-10 e simula le griglie. Puoi rieseguirli, modificare i parametri, verificare i risultati. I dati non mentono.</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">"I CAPTCHA non sono morti per un exploit. Sono morti perche' le reti neurali approssimano qualsiasi funzione risolvibile da un umano. E lo fanno con meno dati, meno tempo, e meno errori."</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+        Un modello del 2015. Zero training specifico. Il CAPTCHA era gia' finito.
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. Il CAPTCHA e' morto, lunga vita al teorema.</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/charts/captcha-charts.js"></script>
+</body>
+</html>
