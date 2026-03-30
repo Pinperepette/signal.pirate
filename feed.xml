@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Clima Ha Un Bug</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-clima-ha-un-bug.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-clima-ha-un-bug.html</guid>
+    <pubDate>Mon, 30 Mar 2026 00:00:00 +0200</pubDate>
+    <description>FaIR 2.2.4 smontato pezzo per pezzo. Il modello climatico usato dall'IPCC AR6: 2001 righe di Python, 2064 parametri calibrati, 4 formule dalla stessa radice. 10.000 run Monte Carlo, non-identificabilita', error compensation. 21 grafici, 3 script Python. Tutto riproducibile.</description>
+  </item>
+
+  <item>
     <title>X Feed: Anatomia In 71 Grafici</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-feed-non-e-tuo.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-feed-non-e-tuo.html</guid>

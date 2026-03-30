@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Clima Ha Un Bug | Signal Pirate</title>
+  <meta name="description" content="FaIR 2.2.4: il modello climatico usato dall'IPCC smontato pezzo per pezzo. 2001 righe di Python, 2064 parametri calibrati, 4 formule dalla stessa radice. Stesso scenario, risultati molto diversi. Codice, matematica, grafici. Tutto riproducibile.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    /* === Formula Box === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* === Accent / Bold === */
+    .accent { color: var(--accent-attention); }
+    .accent-yellow { color: var(--accent-rejection); }
+    .article-content strong { color: var(--accent-rejection); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Image figures === */
+    .article-content figure {
+      text-align: center;
+      margin: 2rem 0;
+    }
+    .article-content figure img {
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+    .article-content figcaption {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.8rem;
+    }
+
+    /* === Flow diagram === */
+    .flow-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 2rem 1rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .flow-container .warn { color: var(--accent-reaction); }
+    .flow-container .ok { color: var(--accent-attention); }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-03-30 | Pinperepette</p>
+  <h1 class="article-page-title">Il Clima <span class="accent">Ha Un Bug</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+    FaIR 2.2.4 smontato pezzo per pezzo. 2001 righe di Python, 2064 parametri calibrati, 4 formule dalla stessa radice. Tutto riproducibile.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">FaIR</span>
+    <span class="tag tag-highlight">IPCC</span>
+    <span class="tag tag-reaction">Climate Models</span>
+    <span class="tag tag-amplification">Sensitivity</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - LA CENA (HOOK)                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Cena</h2>
+<span class="section-number">Sezione 01. In cui un amico compra il futuro dell'umanit&agrave;</span>
+
+<p>
+  Cena a casa mia. L'amico (chiamiamolo Marco, che tanto ci si riconosce) arriva e annuncia che ha ordinato una macchina elettrica. Non una qualsiasi. Una che costa quanto un bilocale in provincia. &ldquo;Lo devo al pianeta&rdquo;, dice, mentre si siede. &ldquo;Il futuro dell'umanit&agrave; dipende da questo.&rdquo;
+</p>
+
+<p>
+  Annuisco. La iena mi guarda. Mi conosce. Sa che ho appena classificato mentalmente Marco nella categoria &ldquo;bruciati dalle droghe pesanti&rdquo;. Non le pesanti vere, quelle almeno ti lasciano delle storie interessanti. Parlo di quelle pi&ugrave; subdole: i titoli di giornale, i documentari con la musica triste, i grafici a hockey stick proiettati sullo schermo durante le conferenze TED. La droga del &ldquo;la scienza dice che&rdquo; senza aver mai aperto un paper.
+</p>
+
+<p>
+  Marco se ne va. La iena, che &egrave; una iena ma non &egrave; scema, mi dice: &ldquo;Lo hai declassato.&rdquo; Non era una domanda.
+</p>
+
+<p>
+  &ldquo;S&igrave;.&rdquo;
+</p>
+
+<p>
+  &ldquo;Spiega.&rdquo;
+</p>
+
+<p>
+  E qui parte il problema. Perch&eacute; non puoi spiegare a una iena che i modelli climatici sono fragili dicendo &ldquo;ho letto su internet che&rdquo;. La iena ti mangia vivo. La iena vuole prove. Codice. Numeri. Roba che gira. Roba che pu&ograve; verificare.
+</p>
+
+<p>
+  &ldquo;Ok&rdquo;, le dico. &ldquo;Facciamo una cosa. Apriamo il modello climatico che l'IPCC usa per calcolare quanto ci resta da vivere, e guardiamo dentro. Il codice, la matematica, i parametri. Tutto.&rdquo;
+</p>
+
+<p>
+  La iena alza un sopracciglio. &ldquo;Esiste un modello che puoi aprire?&rdquo;
+</p>
+
+<p>
+  S&igrave;. Si chiama <strong>FaIR</strong>. Finite Amplitude Impulse Response. Versione 2.2.4. Open source, su GitHub, scritto in Python. &Egrave; uno dei due modelli che l'IPCC usa nel Sesto Report (AR6, 2021) per calcolare le proiezioni di temperatura, i carbon budget residui, i numeri che finiscono negli accordi di Parigi. L'altro &egrave; MAGICC, ma quello &egrave; chiuso. FaIR &egrave; aperto. Possiamo smontarlo.
+</p>
+
+<p>
+  <code>pip install FaIR</code>. Tre secondi. Fatto.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="2001" data-suffix="">0</div>
+    <div class="stat-label">Righe di codice (fisica)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="2064" data-suffix="">0</div>
+    <div class="stat-label">Parametri scelti</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="64" data-suffix="">0</div>
+    <div class="stat-label">Specie chimiche</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="4" data-suffix="">0</div>
+    <div class="stat-label">Formule intercambiabili</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - L'ANATOMIA                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Anatomia</h2>
+<span class="section-number">Sezione 02. 30 file, 2001 righe, 2064 numeri</span>
+
+<p>
+  Come con il <a href="come-pensa-la-macchina.html">Mersenne Twister</a>, il primo passo &egrave; aprire e contare i pezzi. Il modello intero sta in 30 file Python. La &ldquo;fisica&rdquo;, le equazioni che simulano il clima terrestre, sta in 7 file:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Righe</th>
+      <th>Cosa fa</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>energy_balance_model.py</code></td><td>279</td><td>Il cuore: converte forcing in temperatura</td></tr>
+    <tr><td><code>fair.py</code></td><td>1380</td><td>Orchestratore (pi&ugrave; setup che fisica)</td></tr>
+    <tr><td><code>forcing/ghg.py</code></td><td>218</td><td>Forcing radiativo dei gas serra</td></tr>
+    <tr><td><code>forcing/aerosol/erfaci.py</code></td><td>43</td><td>Aerosol-nuvole (il grande jolly)</td></tr>
+    <tr><td><code>forcing/aerosol/erfari.py</code></td><td>25</td><td>Aerosol-radiazione</td></tr>
+    <tr><td><code>gas_cycle/__init__.py</code></td><td>26</td><td>Scaling dei tempi di vita</td></tr>
+    <tr><td><code>gas_cycle/forward.py</code></td><td>30</td><td>Il ciclo del carbonio</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Totale: <strong>2001 righe di codice</strong>. Il futuro del pianeta calcolato in meno righe di un e-commerce medio.
+</p>
+
+<p>
+  Ma il numero che conta &egrave; l'altro. Il file <code>species_configs_properties.csv</code> nella cartella <code>defaults/data/ar6/</code> contiene i parametri di default: 64 specie chimiche, 42 parametri ciascuna. Totale: <strong>2064 valori numerici</strong>. Pi&ugrave; parametri che righe di codice. Meno fisica, pi&ugrave; manopole.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il rapporto:</strong> 2001 righe di codice, 2064 valori calibrati. Non sono tutti indipendenti, molti sono correlati e vincolati. Ma il parco giochi &egrave; grande, e il risultato ci passeggia dentro.</p>
+</div>
+
+<p>
+  Uno potrebbe dire: &ldquo;quei parametri non sono scelti a caso, sono calibrati sui modelli complessi e sui dati osservativi.&rdquo; Vero. FaIR non &egrave; la fisica di base. &Egrave; un <strong>emulatore</strong>: una versione compressa dei modelli grossi. I 2064 numeri non sono inventati, sono ereditati.
+</p>
+
+<p>
+  Ma questo sposta il problema, non lo risolve. Le decisioni da trilioni si basano su una catena di modelli a complessit&agrave; decrescente: la fisica vera, il modello complesso che la simula, il modello semplice che simula il modello complesso. Ogni passaggio perde qualcosa. Quanto? Buona domanda. La iena la farebbe.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - IL CICLO DEL CARBONIO FITTIZIO                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Ciclo del Carbonio Fittizio</h2>
+<span class="section-number">Sezione 03. 4 box, nessuno fisico</span>
+
+<p>
+  La prima cosa che apro &egrave; <code>gas_cycle/forward.py</code>. Trenta righe. Qua dentro c'&egrave; il &ldquo;ciclo del carbonio&rdquo;, cio&egrave; la risposta alla domanda: quando emettiamo CO2, quanta resta in atmosfera e per quanto tempo?
+</p>
+
+<p>
+  La risposta di FaIR: la CO2 emessa viene divisa in 4 &ldquo;box&rdquo; matematici, ciascuno con un tempo di vita diverso:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Box</th>
+      <th>Lifetime</th>
+      <th>Frazione</th>
+      <th>Significato</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>0</td><td>1.000.000.000 anni</td><td>21.73%</td><td>Resta per sempre</td></tr>
+    <tr><td>1</td><td>394.4 anni</td><td>22.40%</td><td>Oceano profondo (lento)</td></tr>
+    <tr><td>2</td><td>36.54 anni</td><td>28.24%</td><td>Assorbimento medio</td></tr>
+    <tr><td>3</td><td>4.304 anni</td><td>27.63%</td><td>Biosfera (rapido)</td></tr>
+  </tbody>
+</table>
+
+<p>
+  La iena guarda lo schermo. &ldquo;Cosa sono questi box?&rdquo;
+</p>
+
+<p>
+  Non sono posti reali. Sono una scorciatoia matematica: quattro curve esponenziali che, sommate, approssimano come la CO2 viene assorbita. Non c'&egrave; un &ldquo;box 0&rdquo; in atmosfera dove la CO2 si mette comoda per un miliardo di anni. C'&egrave; una formula con parametri scelti per far tornare i conti. La formula nel codice &egrave; questa:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{box}_{\text{new}} = p_i \cdot (E - E_0) \cdot \frac{1 - e^{-\Delta t / (\alpha \cdot \tau_i)}}{\Delta t / (\alpha \cdot \tau_i)} \cdot \Delta t + \text{box}_{\text{old}} \cdot e^{-\Delta t / (\alpha \cdot \tau_i)}$$</div>
+  <p class="formula-label">gas_cycle/forward.py, righe 74-86. p = partition fraction, &tau; = lifetime, &alpha; = scaling factor.</p>
+</div>
+
+<p>
+  Il bello &egrave; quel parametro \(\alpha\). Da dove viene? Da un'altra formula:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{iirf} = \text{iirf}_0 + \text{iirf}_{\text{uptake}} \cdot (C_{\text{cum}} - C_{\text{air}}) + \text{iirf}_T \cdot T + \text{iirf}_{\text{air}} \cdot C_{\text{air}}$$</div>
+  <p class="formula-label">gas_cycle/__init__.py. Il tempo di permanenza della CO2 dipende dalla temperatura.</p>
+</div>
+
+<p>
+  Ecco la circolarit&agrave;: il tempo di vita della CO2 dipende dalla temperatura. Ma la temperatura dipende da quanta CO2 c'&egrave; in atmosfera. Che dipende dal tempo di vita. &Egrave; un serpente che si morde la coda, e tutti i coefficienti (&ldquo;iirf_0&rdquo;, &ldquo;iirf_uptake&rdquo;, &ldquo;iirf_temperature&rdquo;) sono <strong>fitting parameters</strong>. Numeri scelti per far tornare i conti con le osservazioni. Non derivati da chimica.
+</p>
+
+<div class="warning-box fade-in">
+  <p><strong>Nota:</strong> cambiando la &ldquo;partition fraction&rdquo; del box 0 dal 21.73% al 35%, la CO2 che &ldquo;resta per sempre&rdquo; aumenta di met&agrave;, e con essa le proiezioni di temperatura. Cambiandola al 10%, il problema quasi scompare. Entrambi i valori sono difendibili perch&eacute; i box non sono fisici. Sono scelte.</p>
+</div>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/05_ciclo_carbonio.png" alt="Curva di decadimento CO2: cambiando lifetime e partition fractions il risultato cambia drasticamente">
+  <figcaption>La CO2 in atmosfera nel tempo. A sinistra: lifetime &plusmn;30%. A destra: partition fraction dal 10% al 35%. Stesso modello, parametri diversi, curve diverse.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - 4 FORMULE PER LO STESSO FENOMENO             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Quattro Formule, Una Scelta</h2>
+<span class="section-number">Sezione 04. ghg.py: dimmi quale vuoi</span>
+
+<p>
+  Apro <code>forcing/ghg.py</code>. 478 righe. Qua dentro ci sono le formule che convertono le concentrazioni di gas serra in forcing radiativo, cio&egrave; in quanti watt per metro quadro in pi&ugrave; trattiene l'atmosfera. &Egrave; il passaggio cruciale: &egrave; da qui che viene il riscaldamento.
+</p>
+
+<p>
+  FaIR offre <strong>quattro formule</strong> per fare questo calcolo:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Formula</th>
+      <th>Anno</th>
+      <th>Coefficiente dominante</th>
+      <th>Relazione</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>myhre1998</code></td><td>1998</td><td>5.35</td><td>Originale</td></tr>
+    <tr><td><code>etminan2016</code></td><td>2016</td><td>5.36</td><td>Aggiornamento di Myhre</td></tr>
+    <tr><td><code>meinshausen2020</code></td><td>2020</td><td>5.25</td><td>&ldquo;Rescaled Etminan&rdquo;</td></tr>
+    <tr><td><code>leach2021</code></td><td>2021</td><td>4.57</td><td>&ldquo;Re-fit of Etminan&rdquo;</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Convergono? S&igrave;. Ma non per il motivo che pensi.
+</p>
+
+<p>
+  Il codice sorgente lo dice esplicitamente. Riga 162 di <code>ghg.py</code>: <em>&ldquo;This is a rescaled [Etminan2016] function.&rdquo;</em> Riga 399: <em>&ldquo;This is a re-fit of the [Etminan2016] formulation.&rdquo;</em> E Etminan2016 &egrave; un aggiornamento di Myhre1998.
+</p>
+
+<p>
+  <strong>Sono tutte la stessa formula riscritta.</strong> Non sono quattro misurazioni indipendenti che convergono sullo stesso risultato. Sono quattro versioni della stessa curva adattata agli stessi dati.
+</p>
+
+<p>
+  Uno potrebbe dire: &ldquo;non sono intercambiabili a piacere, ogni versione include spettri aggiornati, interazioni tra gas, miglioramenti di precisione fuori dal range base.&rdquo; Vero, non sono copie identiche. Ma condividono la stessa radice, gli stessi dati di calibrazione, la stessa struttura funzionale. La convergenza nella zona calibrata non &egrave; una conferma indipendente. &Egrave; una conseguenza della genealogia.
+</p>
+
+<p>
+  E c'&egrave; un dettaglio in pi&ugrave;. Le formule sono calibrate su concentrazioni di CO2 tra 280 e 420 ppm, i dati che abbiamo. Le previsioni per il 2100 richiedono concentrazioni di 500-1000 ppm. In quella zona le formule <strong>divergono</strong>. Ma nessuna ha dati reali per dire chi ha ragione, perch&eacute; nella storia umana non ci siamo mai stati.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>L'analogia:</strong> &egrave; come avere un GPS calibrato nella tua citt&agrave; e usarlo per navigare su Marte. Nella tua citt&agrave; funziona benissimo. Su Marte, non lo sai. E tutte le &ldquo;versioni aggiornate&rdquo; del GPS sono state calibrate nella stessa citt&agrave;.</p>
+</div>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/14b_convergenza_trucco.png" alt="Le 4 formule GHG convergono perch&eacute; derivano tutte da Myhre 1998 e sono calibrate sugli stessi dati">
+  <figcaption>In alto a sinistra: le 4 formule quasi sovrapposte. In alto a destra: nella zona calibrata (verde) sono identiche, nella zona di estrapolazione (rosso) divergono. In basso: la genealogia e i coefficienti quasi uguali.</figcaption>
+</figure>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/03_formule_diverse.png" alt="4 formule diverse producono temperature e forcing diversi">
+  <figcaption>Stessi dati di input, formula diversa. La temperatura (sinistra) varia poco, il forcing CO2 (destra) diverge significativamente ad alte concentrazioni.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - IL FORCING_SCALE                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Moltiplicatore</h2>
+<span class="section-number">Sezione 05. forcing_scale: il parametro che non dovresti vedere</span>
+
+<p>
+  In <em>ogni</em> formula di forcing c'&egrave; un parametro chiamato <code>forcing_scale</code>. Ecco cosa fa: moltiplica il risultato. Non rappresenta una grandezza direttamente osservabile, ma una <strong>parametrizzazione del forcing effettivo</strong>: la differenza tra forcing istantaneo e risposta reale del sistema. Di fatto, una manopola che scala l'output di qualsiasi specie.
+</p>
+
+<p>
+  Il default &egrave; 1.0 per tutte e 64 le specie. Ma nessuno ti impedisce di metterlo a 0.8, o a 1.2. &plusmn;20% su questo singolo numero cambia le proiezioni di temperatura di circa 0.7&deg;C nel 2100. La differenza tra &ldquo;ce la facciamo&rdquo; e &ldquo;non ce la facciamo&rdquo;.
+</p>
+
+<p>
+  La iena: &ldquo;Ma qualcuno lo cambia davvero?&rdquo;
+</p>
+
+<p>
+  &Egrave; previsto dal design. Il parametro esiste perch&eacute; il forcing &ldquo;effettivo&rdquo; (ERF) non &egrave; lo stesso del forcing &ldquo;istantaneo&rdquo;. La differenza tra i due viene gestita con un moltiplicatore. Quanto vale quel moltiplicatore? Dipende dalla stima. La stima dipende da altri modelli. Turtles all the way down.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/02_forcing_scaling.png" alt="Effetto del forcing_scale sulla temperatura: &plusmn;20% cambia tutto">
+  <figcaption>forcing_scale = 0.8, 1.0, 1.2. &plusmn;20% su un moltiplicatore, risultati completamente diversi. Stesso scenario SSP2-4.5.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - L'ENERGY BALANCE                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Energy Balance Model</h2>
+<span class="section-number">Sezione 06. energy_balance_model.py: la Terra in una matrice</span>
+
+<p>
+  L'ultimo pezzo. <code>energy_balance_model.py</code>, 279 righe di codice effettivo. Qui il forcing radiativo viene convertito in temperatura. La Terra viene rappresentata come <strong>strati di oceano impilati</strong> che scambiano calore. La matematica &egrave; un sistema di equazioni differenziali lineari, risolto con esponenziale di matrice:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{T}_{n+1} = e^{\mathbf{M}} \cdot \mathbf{T}_n + \mathbf{d} \cdot F_n$$</div>
+  <p class="formula-label">energy_balance_model.py, riga 309. M = matrice energy balance, d = forcing vector, F = forcing.</p>
+</div>
+
+<p>
+  Elegante. Compatta. E completamente governata da parametri:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><code>ocean_heat_capacity</code>: quanta energia assorbe ogni strato. Non misurata direttamente, stimata.</li>
+  <li><code>ocean_heat_transfer</code>: quanto calore passa tra strati. Non misurato, stimato.</li>
+  <li><code>deep_ocean_efficacy</code>: un fattore di &ldquo;efficacia&rdquo; dell'oceano profondo. Default: 1.28. Perch&eacute; 1.28? Perch&eacute; quel valore fa tornare i conti con le osservazioni.</li>
+  <li><code>forcing_4co2</code>: forcing da quadruplicamento della CO2. Default: 8.0 W/m&sup2;. Range nella letteratura: 6.5&ndash;9.5.</li>
+</ul>
+
+<p>
+  La <strong>Climate Sensitivity</strong>, quanto si scalda la Terra per un raddoppio di CO2, il numero pi&ugrave; citato nella scienza del clima, non &egrave; un input. &Egrave; una <em>propriet&agrave; emergente</em> di questi parametri. Cambi i parametri, cambi la sensitivity. E il range accettato dall'IPCC &egrave; enorme: da 2.0 a 5.0&deg;C.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - I LIMITI STRUTTURALI                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Limiti Strutturali</h2>
+<span class="section-number">Sezione 07. Non i parametri. La forma del modello.</span>
+
+<p>
+  La iena a questo punto dice: &ldquo;Ok, i numeri sono discutibili. Ma le equazioni? Quelle almeno sono giuste?&rdquo; Bella domanda. Guardiamo.
+</p>
+
+<p>
+  <strong>Linearit&agrave;.</strong> Raddoppi il forcing, raddoppi la temperatura. FaIR funziona cos&igrave;. Ho verificato: R&sup2; = 0.978 tra forcing e temperatura. Praticamente una retta. Ma il clima reale non &egrave; una retta. Le nuvole cambiano comportamento, il ghiaccio che si scioglie cambia l'albedo, la circolazione oceanica pu&ograve; saltare di regime. FaIR schiaccia tutto questo in coefficienti costanti. Come guidare con il navigatore che conosce solo le strade dritte.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/17_linearita.png" alt="FaIR ha risposta quasi perfettamente lineare, R²=0.978">
+  <figcaption>A sinistra: forcing vs temperatura, quasi perfettamente lineare (R&sup2; = 0.978). A destra: cosa manca. La zona rossa &egrave; dove feedback non lineari potrebbero amplificare la risposta. FaIR non li vede.</figcaption>
+</figure>
+
+<p>
+  <strong>Nessun tipping point.</strong> Ho fatto girare tutti e 5 gli scenari SSP. Le curve sono sempre lisce. Sempre. FaIR non pu&ograve; produrre salti di regime per costruzione. Ma il clima reale potrebbe avere punti di non ritorno: la circolazione atlantica che collassa, il permafrost che sgela di botto, le calotte che si staccano. FaIR non pu&ograve; nemmeno immaginare queste cose. Non perch&eacute; non esistano. Perch&eacute; le equazioni non le prevedono.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/18_tipping_points.png" alt="FaIR produce curve sempre lisce, nessun salto di regime possibile">
+  <figcaption>A sinistra: 5 scenari SSP, curve sempre lisce. A destra: cosa sarebbe un tipping point reale. FaIR non pu&ograve; generarlo.</figcaption>
+</figure>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/22_smooth.png" alt="Derivata seconda della temperatura sempre piccola">
+  <figcaption>L'accelerazione della temperatura (d&sup2;T/dt&sup2;) &egrave; sempre piccola e liscia. Un tipping point reale produrrebbe un picco improvviso. Il modello non pu&ograve; generarlo per costruzione.</figcaption>
+</figure>
+
+<p>
+  <strong>Il percorso non conta.</strong> Ho confrontato SSP2-4.5 e SSP5-8.5 quando raggiungono le stesse emissioni cumulative (5148 GtCO2). Uno ci arriva nel 2100, l'altro nel 2060. Differenza di temperatura: 0.13&deg;C. Per FaIR conta il totale, non come ci arrivi. Ma versare un litro d'acqua in una vasca in un minuto o in un'ora non &egrave; la stessa cosa. Specialmente se la vasca ha dei buchi che cambiano dimensione nel tempo.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/19_path_dependency.png" alt="Stesse emissioni cumulative, percorso diverso, temperatura quasi uguale">
+  <figcaption>Pannello destro: temperatura vs emissioni cumulative (TCRE). Se le due curve coincidono, il modello &egrave; path-independent. Quasi coincidono. Differenza: 0.13&deg;C.</figcaption>
+</figure>
+
+<p>
+  <strong>Zero dimensioni.</strong> FaIR produce un numero per anno. Uno. Nessuna latitudine, nessun oceano, nessuna stagione. &Egrave; come descrivere la temperatura di tutta Italia con un numero solo. &ldquo;In Italia fa 18 gradi.&rdquo; Dove? Boh. L'Artico si scalda 2-4 volte pi&ugrave; della media globale, ma FaIR non lo sa perch&eacute; non ha una mappa.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/20_zero_dimensioni.png" alt="FaIR: 0 dimensioni, 1 numero per anno, nessuna geografia">
+  <figcaption>FaIR: 0 dimensioni, 1 numero per anno. Un GCM: 3 dimensioni, ~100.000 valori per timestep. Amplificazione polare, correnti oceaniche, pattern regionali: tutto perso.</figcaption>
+</figure>
+
+<p>
+  <strong>Tutto in un numero.</strong> La Climate Sensitivity prende nuvole, vapore, ghiacci, lapse rate e li ficca in un unico valore. Tre configurazioni oceaniche diverse, con ECS simile, si scaldano in modi completamente diversi: una parte veloce e poi rallenta, un'altra parte piano e poi accelera. L'ECS non vede la differenza. &Egrave; come giudicare un pilota dal tempo sul giro senza guardare come guida.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/21_ecs_collapse.png" alt="Stessa ECS, dinamica transitoria diversa">
+  <figcaption>Tre configurazioni con fisica oceanica diversa. Temperature nel 2100 diverse, tassi di riscaldamento diversi. L'ECS (numero singolo) non cattura la differenza.</figcaption>
+</figure>
+
+<p>
+  <strong>La parte che non vedi.</strong> Cambiare i numeri sposta il risultato di 2.26&deg;C. Cambiare formula di 0.11&deg;C. Ma i tipping points, le dinamiche spaziali, i feedback non lineari? Non sono nemmeno nel modello. Non puoi quantificare quello che non rappresenti. &Egrave; il classico problema del lampione: cerchi dove c'&egrave; luce, non dove hai perso le chiavi.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/23_incertezza_strutturale.png" alt="Incertezza parametrica vs strutturale: la parte piu' grande non e' esplorata">
+  <figcaption>Blu: incertezza parametrica (esplorata, 2.26&deg;C). Rosso: strutturale tra formule (0.11&deg;C). Grigio con &ldquo;?&rdquo;: strutturale non esplorata. La parte pi&ugrave; grande non &egrave; nemmeno nel modello.</figcaption>
+</figure>
+
+<p>
+  <strong>Anche la probabilit&agrave; &egrave; una scelta.</strong> Stesso range di ECS (2&ndash;5&deg;C), quattro distribuzioni diverse. La probabilit&agrave; di superare una soglia cambia a seconda della forma che scegli. Le probabilit&agrave; non sono propriet&agrave; del clima. Sono propriet&agrave; del modello. Il pubblico le legge come &ldquo;certezza scientifica&rdquo;. I modellisti sanno che sono assunzioni propagate. La iena: &ldquo;Quindi quando dicono 66% di probabilit&agrave;...&rdquo; Quel 66% dipende dalla distribuzione che hai scelto, s&igrave;.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/24_distribuzioni.png" alt="La forma della distribuzione dei parametri cambia i percentili e le probabilita'">
+  <figcaption>Stesso range ECS (2&ndash;5&deg;C), forma diversa. In alto a destra: le distribuzioni di temperatura risultanti cambiano. In basso a destra: la probabilit&agrave; di superare una soglia dipende dalla distribuzione scelta. Anche la &ldquo;probabilit&agrave;&rdquo; &egrave; una scelta.</figcaption>
+</figure>
+
+<p>
+  <strong>Addestrare e testare sullo stesso dataset.</strong> Ho calibrato FaIR su tre periodi diversi. Tutte e tre le calibrazioni fittano il proprio periodo. Ma per il futuro divergono: da 2.2 a 3.9&deg;C. Stimi parametri lenti (oceano profondo, secoli) con dati corti (150 anni). Chiunque faccia machine learning sa che questo finisce male.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/25_hindcast_forecast.png" alt="Tre calibrazioni fittano il passato ma divergono nel futuro: da 2.2 a 3.9 gradi">
+  <figcaption>Sinistra: tre calibrazioni, tutte fittano i dati osservati (punti neri). Destra: per il futuro divergono da 2.2 a 3.9&deg;C. Calibrato sul freddo prevede meno. Calibrato sul caldo prevede di pi&ugrave;.</figcaption>
+</figure>
+
+<p>
+  <strong>Giusto per i motivi sbagliati.</strong> Questo &egrave; il colpo di grazia. Ho costruito tre configurazioni: una bilanciata, una con troppo CO2 compensato da troppi aerosol, una al contrario. Nel passato convergono tutte. Stessi dati, stesse curve, nessuno vede la differenza. Ma nel futuro, quando l'aria diventa pi&ugrave; pulita e gli aerosol calano, la compensazione salta. Divergono: da 2.4 a 3.3&deg;C. Il modello pu&ograve; passare l'esame copiando, e nessuno se ne accorge finch&eacute; non cambia la domanda.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/26_error_compensation.png" alt="Error compensation: convergono nel passato, divergono nel futuro">
+  <figcaption>Sinistra: nel passato tutte convergono (error compensation). Centro: nel futuro divergono, la compensazione CO2/aerosol salta. Destra: la relazione forcing CO2 vs non-CO2 che maschera l'errore.</figcaption>
+</figure>
+
+<p>
+  <strong>457 soluzioni, stessi dati.</strong> Ho generato 1000 configurazioni random e filtrato quelle che fittano le temperature al 2020 entro &plusmn;0.3&deg;C. Ne passano 457. Quasi la met&agrave;. Ma per il 2100 danno da 1.8 a 4.6&deg;C. In matematica questo si chiama <em>problema inverso mal posto</em>. In italiano: i dati che abbiamo non bastano a scegliere tra le soluzioni. Molte risposte diverse sono tutte compatibili con quello che sappiamo. Non stai modellando il clima. Stai modellando quanto non sai del clima.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/27_non_identificabilita.png" alt="457 configurazioni fittano il passato, range futuro 1.8-4.6 gradi">
+  <figcaption>Sinistra: 457 configurazioni fittano T(2020)&plusmn;0.3&deg;C, ma danno da 1.8 a 4.6&deg;C nel 2100. Destra: nello spazio dei parametri occupano regioni diverse. Stessi dati, soluzioni diverse.</figcaption>
+</figure>
+
+<div class="insight-box fade-in">
+  <p><strong>Il punto vero:</strong> FaIR non simula il clima. Simula quanto non sappiamo del clima. I parametri sono la nostra ignoranza compressa in numeri. Le distribuzioni sono le nostre ipotesi sull'ignoranza. L'output &egrave; l'ignoranza propagata attraverso le equazioni. Quello che esce non &egrave; una previsione del clima. &Egrave; una previsione di quello che il modello pensa del clima. Che &egrave; una cosa molto diversa.</p>
+</div>
+
+<div class="warning-box fade-in">
+  <p><strong>Il punto:</strong> alcune incertezze non riguardano i numeri. Riguardano la forma. Un modello lineare, senza geografia, che non pu&ograve; saltare di regime, calibrato su 150 anni per prevederne 100, con probabilit&agrave; scelte e non derivate. E soprattutto: FaIR non valida i modelli complessi. Li copia in formato compresso. Quando tre modelli &ldquo;convergono&rdquo;, non &egrave; indipendenza. &Egrave; genealogia.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - LO STRESS TEST                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Lo Stress Test</h2>
+<span class="section-number">Sezione 08. Stesso scenario, risultati molto diversi</span>
+
+<p>
+  Ok. Basta teoria. Facciamo girare il modello. Prendo lo scenario <strong>SSP2-4.5</strong>, quello &ldquo;intermedio&rdquo;, il pi&ugrave; citato, e cambio solo i parametri climatici. Tutti dentro il range accettato dalla letteratura. Stesse emissioni, stessa CO2, stessi aerosol. Solo le manopole dell'energy balance e del forcing.
+</p>
+
+<p>
+  Tre configurazioni: ottimista (tutti i parametri al bordo basso), default IPCC, pessimista (tutti al bordo alto).
+</p>
+
+<p>
+  Risultato:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Configurazione</th>
+      <th>T nel 2100</th>
+      <th>Rispetto a Parigi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Ottimista estremo</td><td>+1.71&deg;C</td><td>Sotto il target 2.0&deg;C</td></tr>
+    <tr><td>Default IPCC</td><td>+2.78&deg;C</td><td>Sopra entrambi i target</td></tr>
+    <tr><td>Pessimista estremo</td><td>+7.66&deg;C</td><td>Fine del mondo</td></tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>Range: 5.95&deg;C.</strong> Stesse emissioni. Stessa CO2 in atmosfera. Stessa fisica di base. Solo parametri diversi, tutti &ldquo;accettabili&rdquo;. La differenza tra &ldquo;nessun problema&rdquo; e &ldquo;catastrofe senza precedenti&rdquo; sta nella scelta dei numeri che metti nella matrice.
+</p>
+
+<p>
+  La iena: &ldquo;Aspetta. Come fanno a pubblicare previsioni se il range &egrave; cos&igrave;?&rdquo;
+</p>
+
+<p>
+  Scelgono un sottoinsieme di parametri &ldquo;best estimate&rdquo;. Ma il best estimate &egrave; una scelta, non una misura.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/06_stress_test.png" alt="Stress test: da 1.71 a 7.66 gradi con lo stesso scenario">
+  <figcaption>STRESS TEST. Stesso scenario SSP2-4.5. Ottimista: +1.71&deg;C. Default: +2.78&deg;C. Pessimista: +7.66&deg;C. Range di 5.95&deg;C. Tutti i parametri dentro i range pubblicati.</figcaption>
+</figure>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/01_sensibilita_ecs.png" alt="Sensibilit&agrave; alla Climate Sensitivity: da 2.38 a 4.76 gradi">
+  <figcaption>Stesso scenario, solo ECS diversa (da 2.0 a 5.0&deg;C, range IPCC AR6). La temperatura nel 2100 va da 2.38 a 4.76&deg;C. Il doppio.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - MONTE CARLO                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> 10.000 Futuri Possibili</h2>
+<span class="section-number">Sezione 09. Monte Carlo: il ventaglio reale</span>
+
+<p>
+  Per mostrare il ventaglio completo, faccio una cosa che qualsiasi ingegnere farebbe: un'analisi Monte Carlo. Genero 10.000 combinazioni di parametri, tutti estratti uniformemente dentro il range accettato. Climate sensitivity, forcing, aerosol, capacit&agrave; termica, trasferimento di calore. Tutti randomizzati. Tutte le 10.000 run usano lo stesso scenario SSP2-4.5.
+</p>
+
+<p>
+  Risultato:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Percentile</th>
+      <th>T nel 2100</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Minimo</td><td>+1.01&deg;C</td></tr>
+    <tr><td>5&deg; percentile</td><td>+1.48&deg;C</td></tr>
+    <tr><td>25&deg; percentile</td><td>+1.95&deg;C</td></tr>
+    <tr><td>Mediana</td><td>+2.42&deg;C</td></tr>
+    <tr><td>75&deg; percentile</td><td>+3.14&deg;C</td></tr>
+    <tr><td>95&deg; percentile</td><td>+4.54&deg;C</td></tr>
+    <tr><td>Massimo</td><td>+9.01&deg;C</td></tr>
+  </tbody>
+</table>
+
+<p>
+  <strong>Da 1 a 9 gradi.</strong> Con lo stesso scenario di emissioni. Solo il 5.5% delle combinazioni sta sotto 1.5&deg;C. Ma il 28% sta sotto 2.0&deg;C. Il default IPCC (2.78&deg;C) non &egrave; &ldquo;la previsione&rdquo;. &Egrave; un punto in una distribuzione enorme.
+</p>
+
+<p>
+  Uno potrebbe dire: &ldquo;il tuo Monte Carlo &egrave; libero, i parametri nella realt&agrave; sono correlati e vincolati. L'IPCC li filtra con temperature storiche, contenuto termico degli oceani, forcing osservati. Il range vincolato &egrave; 2&ndash;4&deg;C, non 1&ndash;9.&rdquo;
+</p>
+
+<p>
+  Giusto. Il nostro Monte Carlo sovrastima l'incertezza perch&eacute; tratta i parametri come indipendenti. Ma anche il range &ldquo;vincolato&rdquo; dell'IPCC merita attenzione. L'ECS &ldquo;likely&rdquo; va da 2.5 a 4.0&deg;C, la &ldquo;very likely&rdquo; da 2.0 a 5.0&deg;C. Su uno scenario intermedio come SSP2-4.5, questo si traduce comunque in una forchetta di oltre un grado nel 2100. Abbastanza per cambiare radicalmente le politiche necessarie. E il vincolo viene da osservazioni che coprono 170 anni su un sistema che risponde su scale di secoli.
+</p>
+
+<div class="warning-box fade-in">
+  <p><strong>Il punto:</strong> anche con vincoli, il range &egrave; enorme. E quando senti &ldquo;il modello prevede X gradi&rdquo;, la domanda giusta &egrave;: con quali parametri? Il Monte Carlo libero esagera, ma il numero singolo sui giornali sottostima l'incertezza reale. La verit&agrave; sta in mezzo, ed &egrave; comunque un ventaglio, non un punto.</p>
+</div>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/12_monte_carlo.png" alt="Monte Carlo: 10.000 run, da 1.0 a 9.0 gradi">
+  <figcaption>10.000 run con parametri random dentro il range accettato. A sinistra: distribuzione delle temperature nel 2100 (da 1.0 a 9.0&deg;C). A destra: anche conoscendo T nel 2050, il 2100 resta incerto.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - IL TRUCCO DEGLI AEROSOL                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Grande Jolly</h2>
+<span class="section-number">Sezione 10. Aerosol: la principale fonte di spread nelle proiezioni</span>
+
+<p>
+  La iena a questo punto ha capito il meccanismo. &ldquo;Qual &egrave; il parametro peggiore?&rdquo; Si chiama <code>aci_scale</code>. Quarantatr&eacute; righe di codice in <code>forcing/aerosol/erfaci.py</code>. Quarantatr&eacute; righe che pesano pi&ugrave; di tutto il resto messo assieme.
+</p>
+
+<p>
+  Gli aerosol (SO2, particolato, polveri) hanno un effetto <strong>raffreddante</strong>. Riflettono luce solare, modificano le nuvole. Ma quanto? L'IPCC AR6 dice tra -0.5 e -2.0 W/m&sup2;. Un range enorme.
+</p>
+
+<p>
+  Uno potrebbe dire: &ldquo;non &egrave; una manopola libera, &egrave; vincolato da osservazioni satellitari, forcing storico, pattern geografici.&rdquo; Vero, ci sono vincoli. Ma i satelliti misurano propriet&agrave; ottiche degli aerosol, non il forcing radiativo. La conversione da propriet&agrave; ottiche a watt per metro quadro richiede modelli. E quei modelli hanno le loro assunzioni. &Egrave; incertezza reale, non arbitraria, ma resta la pi&ugrave; grande incertezza del sistema.
+</p>
+
+<p>
+  Ecco perch&eacute; &egrave; il jolly. L'algebra &egrave; semplice:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$F_{\text{netto}} = F_{\text{GHG}} + F_{\text{aerosol}}$$</div>
+  <p class="formula-label">Il forcing netto &egrave; una somma. GHG scalda, aerosol raffredda. Il netto decide la temperatura.</p>
+</div>
+
+<p>
+  Se il forcing dei gas serra &egrave; +4.0 W/m&sup2; (ragionevolmente noto), allora:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li>Con aerosol = -0.5 W/m&sup2;: netto = +3.5 W/m&sup2; &rarr; <strong>tanto riscaldamento</strong></li>
+  <li>Con aerosol = -2.0 W/m&sup2;: netto = +2.0 W/m&sup2; &rarr; <strong>poco riscaldamento</strong></li>
+</ul>
+
+<p>
+  La differenza &egrave; 1.5 W/m&sup2;. Quasi il 50% del segnale. Una delle componenti che contribuiscono maggiormente allo spread delle proiezioni. E se la combini con l'incertezza sulla sensitivity, puoi ottenere risultati molto diversi restando dentro regioni di parametri considerate plausibili.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/15_trucco_aerosol.png" alt="Temperatura come funzione lineare del parametro aerosol">
+  <figcaption>A sinistra: la temperatura nel 2100 &egrave; una funzione quasi lineare di ERFaci. Una delle principali fonti di spread. A destra: il forcing netto = GHG + aerosol. La banda blu &egrave; l'incertezza sugli aerosol.</figcaption>
+</figure>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/08_aerosol_jolly.png" alt="Effetto degli aerosol su temperatura e forcing totale">
+  <figcaption>ERFaci da -0.3 a -2.0 W/m&sup2;. Stesso scenario, stesse emissioni. Gli aerosol da soli cambiano la temperatura di oltre 1.5&deg;C.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 - LA CIRCOLARIT&Agrave;                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Circolarit&agrave;</h2>
+<span class="section-number">Sezione 11. Calibrato per fittare il passato, usato per predire il futuro</span>
+
+<p>
+  La iena fa la domanda giusta: &ldquo;Ma il modello riproduce le temperature passate?&rdquo;
+</p>
+
+<p>
+  S&igrave;. Con i parametri default (quelli calibrati dall'IPCC), FaIR riproduce ragionevolmente bene le temperature dal 1850 al 2020. Fantastico. Solo che quei parametri <strong>sono stati scelti per riprodurre quelle temperature</strong>. &Egrave; come dire che una curva di best fit passa per i punti che hai usato per calcolarla. Non &egrave; una conferma. &Egrave; una tautologia.
+</p>
+
+<p>
+  La prova: prendo tre configurazioni di parametri diversi. Tutte &ldquo;ragionevoli&rdquo;. Tutte fittano ragionevolmente il passato. Ma per il futuro danno proiezioni diverse. Questo fenomeno ha un nome in modellistica: <strong>equifinalit&agrave;</strong>. Molte combinazioni di parametri possono produrre lo stesso output storico e divergere nel futuro.
+</p>
+
+<p>
+  &Egrave; il problema fondamentale di qualsiasi modello con pi&ugrave; parametri che vincoli. E FaIR ha 2064 parametri.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>L'analogia:</strong> hai 10 punti su un grafico. Puoi far passare infinite curve per quei 10 punti. Tutte &ldquo;fittano i dati&rdquo;. Ma estrapolate oltre il punto 10, vanno in direzioni completamente diverse. Quale &egrave; quella &ldquo;giusta&rdquo;? Non lo sai. E non puoi saperlo.</p>
+</div>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/07_circolarita.png" alt="Tre configurazioni fittano il passato ma divergono nel futuro">
+  <figcaption>A sinistra: tre configurazioni diverse fittano ragionevolmente le temperature osservate (punti neri). A destra: per il futuro divergono. La calibrazione non garantisce predizione.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 - REVERSE ENGINEERING                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Reverse Engineering</h2>
+<span class="section-number">Sezione 12. Risultati molto diversi, parametri tutti plausibili</span>
+
+<p>
+  A questo punto faccio l'esperimento definitivo. Prendo lo scenario SSP2-4.5 e cerco combinazioni di parametri che producano temperature specifiche nel 2100. Tutti dentro range difendibili.
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Target</th>
+      <th>Ottenuto</th>
+      <th>Parametri</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Nessun problema</td><td>+1.3&deg;C</td><td>Aerosol forte, sensitivity bassa, forcing basso</td></tr>
+    <tr><td>Target Parigi</td><td>+2.1&deg;C</td><td>Parametri moderatamente ottimisti</td></tr>
+    <tr><td>Default IPCC</td><td>+2.8&deg;C</td><td>Default AR6</td></tr>
+    <tr><td>Catastrofe</td><td>+6.3&deg;C</td><td>Sensitivity alta, aerosol debole</td></tr>
+    <tr><td>Apocalisse</td><td>+8.8&deg;C</td><td>Tutti i parametri al bordo alto</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Da 1.3 a 8.8 gradi. Stesse emissioni. Stesso scenario. Stesso modello. Stesse equazioni. Solo numeri diversi nelle celle di un CSV.
+</p>
+
+<p>
+  La iena mi guarda. &ldquo;Quindi il modello non prevede niente.&rdquo;
+</p>
+
+<p>
+  No. Il modello <em>calcola</em>. Prende i parametri che gli dai e produce un numero. Se gli dai parametri da catastrofe, produce catastrofe. Se gli dai parametri da &ldquo;nessun problema&rdquo;, produce nessun problema. <strong>La previsione la fa chi sceglie i parametri</strong>, non il modello.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/11_reverse_engineering.png" alt="Reverse engineering: da 1.3 a 8.8 gradi a scelta">
+  <figcaption>Risultati molto diversi, restando dentro regioni di parametri considerate plausibili. Da +1.3&deg;C a +8.8&deg;C. Stesso scenario SSP2-4.5.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 - IL FLUSSO                                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Flusso Completo</h2>
+<span class="section-number">Sezione 13. Dove entrano le scelte</span>
+
+<p>
+  Tutto insieme. Questo &egrave; FaIR 2.2.4 dall'input all'output, con ogni punto dove entra una <em>scelta</em> invece di una <em>misura</em>:
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Emissioni</div>
+    <div class="step-detail">Scenario SSP (ipotesi socioeconomica)</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Gas Cycle</div>
+    <div class="step-detail">4 box fittizi, partition fractions</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Concentrazioni</div>
+    <div class="step-detail">&alpha; dipende da T (circolare)</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Forcing</div>
+    <div class="step-detail">4 formule, fitting params, scale</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">05</div>
+    <div class="step-name">Aerosol</div>
+    <div class="step-detail">-0.5 a -2.0 W/m&sup2; (non misurato)</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">06</div>
+    <div class="step-name">E.B. Model</div>
+    <div class="step-detail">Capacit&agrave;, trasferimento, efficacia</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">07</div>
+    <div class="step-name">Temperatura</div>
+    <div class="step-detail">Il numero che finisce sui giornali</div>
+  </div>
+</div>
+
+<p>
+  Sette passaggi. In ciascuno entra almeno un parametro scelto, non misurato. L'incertezza si propaga e si moltiplica. Il numero finale, quello che finisce nel titolo di giornale, quello per cui Marco compra la macchina elettrica, porta con s&eacute; tutta questa catena di scelte.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/09_diagramma_flusso.png" alt="Diagramma di flusso di FaIR con tutti i punti di assunzione">
+  <figcaption>Il flusso completo di FaIR 2.2.4. Ogni box rosso a destra &egrave; un punto dove entra una scelta, non una misura. La freccia viola a sinistra &egrave; il feedback circolare.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 13 - IL MURO DELL'INCERTEZZA                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Muro dell'Incertezza</h2>
+<span class="section-number">Sezione 14. Ogni parametro sposta il risultato</span>
+
+<p>
+  Metto tutto in una tabella. Ogni riga &egrave; un parametro. Per ciascuno mostro il range accettato e quanto sposta la temperatura nel 2100:
+</p>
+
+<table class="strategy-table fade-in">
+  <thead>
+    <tr>
+      <th>Parametro</th>
+      <th>Default</th>
+      <th>Range</th>
+      <th>Effetto su T(2100)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Climate Sensitivity (ECS)</td><td>~3.0&deg;C</td><td>2.0&ndash;5.0&deg;C</td><td>&plusmn;2.4&deg;C</td></tr>
+    <tr><td>ERFaci (aerosol-nuvole)</td><td>~-1.0 W/m&sup2;</td><td>-0.5 a -2.0</td><td>&plusmn;1.5&deg;C</td></tr>
+    <tr><td>Forcing 4&times;CO2</td><td>8.0 W/m&sup2;</td><td>6.5&ndash;9.5</td><td>&plusmn;0.8&deg;C</td></tr>
+    <tr><td>forcing_scale CO2</td><td>1.0</td><td>0.75&ndash;1.25</td><td>&plusmn;0.7&deg;C</td></tr>
+    <tr><td>Ocean parameters</td><td>[8, 100, 300]</td><td>variabile</td><td>&plusmn;0.5&deg;C</td></tr>
+    <tr><td>CO2 partition + lifetimes</td><td>vedi sopra</td><td>variabile</td><td>&plusmn;0.4&deg;C</td></tr>
+    <tr><td>deep_ocean_efficacy</td><td>1.28</td><td>1.0&ndash;1.6</td><td>&plusmn;0.3&deg;C</td></tr>
+    <tr><td>iirf_temperature</td><td>4.0</td><td>0&ndash;8</td><td>&plusmn;0.3&deg;C</td></tr>
+    <tr><td>Formula GHG</td><td>meinshausen</td><td>4 opzioni</td><td>&plusmn;0.2&deg;C</td></tr>
+    <tr style="background: rgba(255,107,107,0.1);"><td><strong>TUTTI INSIEME</strong></td><td></td><td></td><td><strong>1.7 &ndash; 7.7&deg;C</strong></td></tr>
+  </tbody>
+</table>
+
+<p>
+  L'ultima riga &egrave; il muro. <strong>Da 1.7 a 7.7 gradi</strong> con lo stesso scenario di emissioni e parametri tutti dentro i range pubblicati nella letteratura peer-reviewed. Non &egrave; complottismo. &Egrave; matematica.
+</p>
+
+<figure class="fade-in">
+  <img src="../immagini/clima/16_muro_incertezza.png" alt="Il muro dell'incertezza: ogni parametro sposta il risultato, insieme lo rendono quasi arbitrario">
+  <figcaption>Il muro dell'incertezza. Ogni barra &egrave; un parametro. La barra rossa in basso &egrave; il range cumulativo: da 1.7 a 7.7&deg;C. Le linee tratteggiate sono i target di Parigi.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 14 - CONCLUSIONI                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Clima Ha Un Bug</h2>
+<span class="section-number">Sezione 15. Conclusione</span>
+
+<p>
+  Non sto dicendo che il riscaldamento globale non esiste. Il segnale c'&egrave;. Sto dicendo che attribuirne con precisione cause e magnitudine, CO&#8322;, variabilit&agrave; naturale, contributo solare, dipende in modo critico dalle assunzioni del modello. E che <strong>la precisione con cui vengono comunicate le previsioni non riflette l'incertezza reale del sistema</strong>.
+</p>
+
+<p>
+  Uno potrebbe dire: &ldquo;il modello non &egrave; pensato per dare previsioni puntuali. L'IPCC riporta sempre intervalli.&rdquo; E avrebbe ragione. I climatologi lo sanno. Ma poi succede una cosa: il report diventa comunicato stampa, il comunicato stampa diventa titolo, il titolo diventa tweet, il tweet diventa &ldquo;gli scienziati dicono che moriamo tutti nel 2050&rdquo;. L'intervallo scompare. Resta il numero. E dal numero al cinquantamila euro di macchina elettrica di Marco il passo &egrave; breve.
+</p>
+
+<p>
+  Il modello non ha un bug nel codice. Il codice funziona. Il bug &egrave; nel passaggio dal modello al giornale. Un ventaglio diventa un punto. Un punto diventa un titolo. Un titolo diventa politica. E la politica muove trilioni.
+</p>
+
+<p>
+  Marco ha comprato una macchina elettrica per salvare il pianeta. Basandosi su un numero che esce da 2001 righe di Python e 2064 parametri calibrati. Se lo sapesse, la comprerebbe lo stesso? Forse s&igrave;. Ma per ragioni diverse. E le ragioni contano.
+</p>
+
+<p>
+  La iena: &ldquo;Lo ripromuovi?&rdquo;
+</p>
+
+<p>
+  No. &Egrave; un completo imbecille.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">&ldquo;Il modello non ha un bug. Il bug &egrave; nella catena che trasforma una distribuzione in un numero.&rdquo;</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    FaIR 2.2.4. 2001 righe di codice. 2064 parametri calibrati. 4 formule dalla stessa radice.
+    Un emulatore, non la fisica. I climatologi lo sanno. I giornalisti no.
+    Il ventaglio diventa punto, il punto diventa titolo, il titolo diventa politica.
+    Il modello fa il suo lavoro. La comunicazione no.
+  </p>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0; font-size: 0.9rem;">
+    Tutto il codice di questa analisi &egrave; open source e riproducibile:
+    <a href="https://github.com/OMS-NetZero/FAIR" target="_blank" rel="noopener" style="color: var(--accent-attention);">FaIR su GitHub</a> |
+    <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/il-clima-ha-un-bug" target="_blank" rel="noopener" style="color: var(--accent-attention);">Script di analisi</a>
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+
+<script src="../js/main.js"></script>
+
+</body>
+</html>
