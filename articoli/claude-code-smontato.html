@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Smontato | Signal Pirate</title>
+  <meta name="description" content="Il codice sorgente di Claude Code è finito su npm per errore. 512.000 righe di TypeScript smontate: Tamagotchi nascosto, prompt caching a 3 livelli, system prompt anti-hallucination, verification agent, secret scanner, native attestation, memoria automatica. 15 sezioni tecniche.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .ct { color: #4ec9b0; }   /* type */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning/important */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--accent-attention);
+      display: block;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.3rem;
+    }
+
+    /* === Attack Flow === */
+    .attack-flow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+    .flow-node {
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      white-space: nowrap;
+      text-align: center;
+      min-width: 90px;
+    }
+    .flow-node.leak {
+      border-color: rgba(255,107,107,0.5);
+      color: var(--accent-reaction);
+    }
+    .flow-node.tool {
+      border-color: rgba(124,77,255,0.5);
+      color: #b388ff;
+    }
+    .flow-node.secret {
+      border-color: rgba(255,136,0,0.5);
+      color: var(--accent-rejection);
+    }
+    .flow-node.ok {
+      border-color: rgba(0,255,136,0.5);
+      color: var(--accent-attention);
+    }
+    .flow-arrow {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Buddy Sprite Box === */
+    .sprite-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .sprite-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.8rem;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      line-height: 1.4;
+      transition: transform 0.2s;
+    }
+    .sprite-card:hover { transform: translateY(-2px); }
+    .sprite-card .sprite-name {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--accent-attention);
+      margin-bottom: 0.3rem;
+    }
+    .sprite-card pre {
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.2;
+      font-size: 0.68rem;
+    }
+
+    /* === Codename Table === */
+    .codename-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15em 0.5em;
+      border-radius: 4px;
+      background: rgba(124,77,255,0.15);
+      color: #b388ff;
+      border: 1px solid rgba(124,77,255,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-03-31 | Pinperepette</p>
+    <h1 class="article-page-title">Claude Code <span class="accent">Smontato</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Un source map dimenticato nel pacchetto npm. 512.000 righe di TypeScript leggibili.
+      Un Tamagotchi nascosto, nomi in codice dei modelli, un sistema che sogna in background.
+      Anatomia completa del leak di Claude Code.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Source Leak</span>
+      <span class="tag tag-highlight">npm</span>
+      <span class="tag tag-reaction">Claude Code</span>
+      <span class="tag tag-amplification">Reverse Engineering</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 1 — IL LEAK
+         ============================================================ -->
+    <h2><span class="section-number">01 — il leak</span>57 megabyte di sorgente nel posto sbagliato</h2>
+
+    <p>
+      31 marzo 2026. Lo sviluppatore Chaofan Shou pubblica un post su X: il pacchetto npm di
+      Claude Code versione <strong>2.1.88</strong> contiene un file <code>.map</code> da 57 MB.
+      La mappa completa dal bundle compilato al codice sorgente originale.
+    </p>
+
+    <p>
+      I source map sono file di debug che collegano il codice minificato a quello originale.
+      Servono durante lo sviluppo. Non dovrebbero mai finire in produzione. In questo caso,
+      il file era nel pacchetto npm pubblicato, scaricabile da chiunque con un
+      <code>npm pack @anthropic-ai/claude-code</code>.
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-value">57 MB</span>
+        <span class="stat-label">Source map</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">512K</span>
+        <span class="stat-label">Righe di codice</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">v2.1.88</span>
+        <span class="stat-label">Versione npm</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">&lt; 3h</span>
+        <span class="stat-label">Tempo prima della rimozione</span>
+      </div>
+    </div>
+
+    <div class="attack-flow">
+      <div class="flow-node tool">Anthropic<br><small>build pipeline</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node leak">main.js.map<br><small>57 MB source map</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node tool">npm publish<br><small>v2.1.88</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node secret">npm registry<br><small>pubblico</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node leak">GitHub mirrors<br><small>almeno 3 repo</small></div>
+    </div>
+
+    <p>
+      Anthropic ha reagito in fretta: nuovo push npm senza il file, rimozione delle versioni
+      precedenti dal registry. Ma il codice girava già su almeno tre mirror GitHub.
+      Internet non dimentica.
+    </p>
+
+    <div class="insight-box">
+      <p><strong>Non è la prima volta.</strong> Il codice di Claude Code era già stato parzialmente
+      esposto a giugno 2025 con un leak simile. Questa volta però il source map era completo:
+      ogni file TypeScript originale, con commenti, nomi interni e feature non ancora rilasciate.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 2 — ARCHITETTURA
+         ============================================================ -->
+    <h2><span class="section-number">02 — architettura</span>TypeScript, React e Bun nel terminale</h2>
+
+    <p>
+      Claude Code non è un wrapper sottile attorno a un'API. È un'applicazione completa con
+      UI nel terminale, sistema di plugin, gestione permessi, memoria persistente e
+      orchestrazione multi-agente. Lo stack:
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Tecnologia</th>
+          <th>Ruolo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Runtime</td>
+          <td><code>Bun</code></td>
+          <td>Esecuzione, bundling, feature flags build-time</td>
+        </tr>
+        <tr>
+          <td>UI terminale</td>
+          <td><code>React Ink</code></td>
+          <td>Componenti React renderizzati come testo ANSI</td>
+        </tr>
+        <tr>
+          <td>Linguaggio</td>
+          <td><code>TypeScript</code></td>
+          <td>Codebase interamente tipizzata</td>
+        </tr>
+        <tr>
+          <td>API</td>
+          <td><code>Anthropic SDK</code></td>
+          <td>Comunicazione con i modelli Claude</td>
+        </tr>
+        <tr>
+          <td>Auth</td>
+          <td><code>OAuth 2.0</code></td>
+          <td>Login via claude.ai, API key, o token custom</td>
+        </tr>
+        <tr>
+          <td>Protocollo strumenti</td>
+          <td><code>MCP</code></td>
+          <td>Model Context Protocol per tool esterni</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      La struttura è modulare. Circa <strong>55 directory e file</strong> nella root <code>src/</code>.
+      Il file più grande è <code>main.tsx</code> con 800 KB, il punto di ingresso dell'applicazione.
+      I tool che Claude usa (Bash, Read, Edit, Grep, Glob, Write, Agent) sono definiti ciascuno
+      nella propria directory sotto <code>tools/</code>, con schema JSON, validazione e logica
+      di permessi.
+    </p>
+
+    <div class="code-block" data-lang="struttura">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cv">src/</span></td></tr>
+          <tr><td class="ln">2</td><td class="code">  <span class="cv">main.tsx</span>          <span class="cc">// 800 KB — entry point React Ink</span></td></tr>
+          <tr><td class="ln">3</td><td class="code">  <span class="cv">commands/</span>         <span class="cc">// 100+ slash commands (/commit, /review, /vim...)</span></td></tr>
+          <tr><td class="ln">4</td><td class="code">  <span class="cv">tools/</span>            <span class="cc">// 40 tool (BashTool, FileReadTool, AgentTool...)</span></td></tr>
+          <tr><td class="ln">5</td><td class="code">  <span class="cv">components/</span>       <span class="cc">// 146 componenti UI React</span></td></tr>
+          <tr><td class="ln">6</td><td class="code">  <span class="cv">hooks/</span>            <span class="cc">// 87 React hooks</span></td></tr>
+          <tr><td class="ln">7</td><td class="code">  <span class="cv">services/</span>         <span class="cc">// API, OAuth, MCP, analytics, rate limiting</span></td></tr>
+          <tr><td class="ln">8</td><td class="code">  <span class="cv">utils/</span>            <span class="cc">// 331 utility</span></td></tr>
+          <tr><td class="ln">9</td><td class="code">  <span class="cv">buddy/</span>            <span class="cc">// il Tamagotchi nascosto</span></td></tr>
+          <tr><td class="ln">10</td><td class="code">  <span class="cv">coordinator/</span>     <span class="cc">// orchestrazione multi-worker</span></td></tr>
+          <tr><td class="ln">11</td><td class="code">  <span class="cv">skills/</span>          <span class="cc">// sistema plugin estensibile</span></td></tr>
+          <tr><td class="ln">12</td><td class="code">  <span class="cv">state/</span>           <span class="cc">// gestione stato applicazione</span></td></tr>
+          <tr><td class="ln">13</td><td class="code">  <span class="cv">query.ts</span>         <span class="cc">// 68 KB — motore query verso API Claude</span></td></tr>
+          <tr><td class="ln">14</td><td class="code">  <span class="cv">QueryEngine.ts</span>   <span class="cc">// 46 KB — orchestrazione richieste</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Il dettaglio interessante è l'uso di <code>bun:bundle</code> per i feature flag. La funzione
+      <code>feature('BUDDY')</code> viene risolta a build time: se il flag non è attivo, tutto
+      il codice relativo viene eliminato dal bundle finale tramite dead code elimination.
+      Non è un <code>if</code> a runtime: è un intero ramo del codice che non esiste nel binario.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 3 — BUDDY SYSTEM
+         ============================================================ -->
+    <h2><span class="section-number">03 — il buddy system</span>Un Tamagotchi nel terminale</h2>
+
+    <p>
+      La feature che ha fatto il giro di internet. Nascosto dietro il flag <code>BUDDY</code>,
+      Claude Code contiene un sistema completo di companion virtuali: animali ASCII che vivono
+      accanto alla tua input box e commentano quello che fai.
+    </p>
+
+    <p>
+      Il sistema è in <code>buddy/</code>, sei file, meno di 500 righe di logica. Ma è completo:
+      generazione procedurale, rarità, statistiche, animazioni, personalità generata dall'AI.
+    </p>
+
+    <h3>18 specie, 5 rarità</h3>
+
+    <div class="sprite-gallery">
+      <div class="sprite-card">
+        <div class="sprite-name">duck</div>
+        <pre>    __
+  &lt;(· )___
+   (  ._&gt;
+    `--´</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">cat</div>
+        <pre>   /\_/\
+  ( ·   ·)
+  (  ω  )
+  (")_(")</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">dragon</div>
+        <pre>  /^\  /^\
+ &lt;  ·  ·  &gt;
+ (   ~~   )
+  `-vvvv-´</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">ghost</div>
+        <pre>   .----.
+  / ·  · \
+  |      |
+  ~`~``~`~</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">axolotl</div>
+        <pre>}~(______)~{
+}~(· .. ·)~{
+  ( .--. )
+  (_/  \_)</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">robot</div>
+        <pre>   .[||].
+  [ ·  · ]
+  [ ==== ]
+  `------´</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">mushroom</div>
+        <pre> .-o-OO-o-.
+(__________)
+   |·  ·|
+   |____|</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">capybara</div>
+        <pre>  n______n
+ ( ·    · )
+ (   oo   )
+  `------´</pre>
+      </div>
+      <div class="sprite-card">
+        <div class="sprite-name">chonk</div>
+        <pre>  /\    /\
+ ( ·    · )
+ (   ..   )
+  `------´</pre>
+      </div>
+    </div>
+
+    <p>
+      Le altre specie: <strong>goose</strong>, <strong>blob</strong>, <strong>octopus</strong>, <strong>owl</strong>,
+      <strong>penguin</strong>, <strong>turtle</strong>, <strong>snail</strong>, <strong>cactus</strong>,
+      <strong>rabbit</strong>. Ogni sprite ha 3 frame di animazione idle con tick a 500ms.
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Rarità</th>
+          <th>Probabilità</th>
+          <th>Stat floor</th>
+          <th>Cappellino</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Common &#9733;</td>
+          <td>60%</td>
+          <td>5</td>
+          <td>Nessuno</td>
+        </tr>
+        <tr>
+          <td>Uncommon &#9733;&#9733;</td>
+          <td>25%</td>
+          <td>15</td>
+          <td>Sì (random)</td>
+        </tr>
+        <tr>
+          <td>Rare &#9733;&#9733;&#9733;</td>
+          <td>10%</td>
+          <td>25</td>
+          <td>Sì (random)</td>
+        </tr>
+        <tr>
+          <td>Epic &#9733;&#9733;&#9733;&#9733;</td>
+          <td>4%</td>
+          <td>35</td>
+          <td>Sì (random)</td>
+        </tr>
+        <tr>
+          <td>Legendary &#9733;&#9733;&#9733;&#9733;&#9733;</td>
+          <td>1%</td>
+          <td>50</td>
+          <td>Sì (random)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Ogni companion ha <strong>5 statistiche</strong>: DEBUGGING, PATIENCE, CHAOS, WISDOM, SNARK.
+      Una è il peak stat (alta), una è il dump stat (bassa), le altre sono distribuite casualmente.
+      I cappellini disponibili: <code>crown</code>, <code>tophat</code>, <code>propeller</code>,
+      <code>halo</code>, <code>wizard</code>, <code>beanie</code>, <code>tinyduck</code> (un paperino
+      sulla testa). Variante <strong>shiny</strong> con probabilità dell'1%.
+    </p>
+
+    <h3>Generazione deterministica</h3>
+
+    <p>
+      Il companion non è casuale. È determinato dall'hash del tuo user ID con un PRNG
+      Mulberry32. Stesso utente, stesso animale, sempre. Il seed è
+      <code>hash(userId + 'friend-2026-401')</code>. Il commento nel codice:
+    </p>
+
+    <div class="code-block" data-lang="typescript">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc">// Mulberry32 — tiny seeded PRNG, good enough for picking ducks</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="ck">function</span> <span class="cf">mulberry32</span>(<span class="cv">seed</span>: <span class="ct">number</span>): () <span class="co">=&gt;</span> <span class="ct">number</span> {</td></tr>
+          <tr><td class="ln">3</td><td class="code">  <span class="ck">let</span> <span class="cv">a</span> <span class="co">=</span> <span class="cv">seed</span> <span class="co">&gt;&gt;&gt;</span> <span class="cn">0</span></td></tr>
+          <tr><td class="ln">4</td><td class="code">  <span class="ck">return</span> <span class="ck">function</span> () {</td></tr>
+          <tr><td class="ln">5</td><td class="code">    <span class="cv">a</span> <span class="co">|=</span> <span class="cn">0</span></td></tr>
+          <tr><td class="ln">6</td><td class="code">    <span class="cv">a</span> <span class="co">=</span> (<span class="cv">a</span> <span class="co">+</span> <span class="cn">0x6d2b79f5</span>) <span class="co">|</span> <span class="cn">0</span></td></tr>
+          <tr><td class="ln">7</td><td class="code">    <span class="ck">let</span> <span class="cv">t</span> <span class="co">=</span> Math.<span class="cf">imul</span>(<span class="cv">a</span> <span class="co">^</span> (<span class="cv">a</span> <span class="co">&gt;&gt;&gt;</span> <span class="cn">15</span>), <span class="cn">1</span> <span class="co">|</span> <span class="cv">a</span>)</td></tr>
+          <tr><td class="ln">8</td><td class="code">    <span class="cv">t</span> <span class="co">=</span> (<span class="cv">t</span> <span class="co">+</span> Math.<span class="cf">imul</span>(<span class="cv">t</span> <span class="co">^</span> (<span class="cv">t</span> <span class="co">&gt;&gt;&gt;</span> <span class="cn">7</span>), <span class="cn">61</span> <span class="co">|</span> <span class="cv">t</span>)) <span class="co">^</span> <span class="cv">t</span></td></tr>
+          <tr><td class="ln">9</td><td class="code">    <span class="ck">return</span> ((<span class="cv">t</span> <span class="co">^</span> (<span class="cv">t</span> <span class="co">&gt;&gt;&gt;</span> <span class="cn">14</span>)) <span class="co">&gt;&gt;&gt;</span> <span class="cn">0</span>) <span class="co">/</span> <span class="cn">4294967296</span></td></tr>
+          <tr><td class="ln">10</td><td class="code">  }</td></tr>
+          <tr><td class="ln">11</td><td class="code">}</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      <em>"Good enough for picking ducks"</em>. Le <strong>bones</strong> (specie, occhi, rarità, stats)
+      vengono rigenerate dall'hash a ogni avvio e mai salvate su disco. Solo la <strong>soul</strong>
+      (nome e personalità generati dall'AI) viene persistita nel config dopo la prima "schiusa".
+      Questo significa che non puoi editare il file di configurazione per falsificare una rarità legendary.
+    </p>
+
+    <h3>Il trucco del capybara</h3>
+
+    <p>
+      Un dettaglio che rivela la cura per i dettagli interni. Il nome di una delle specie,
+      <code>capybara</code>, collide con il nome in codice di un modello Anthropic. Il build
+      system ha un check (<code>excluded-strings.txt</code>) che cerca nomi interni nell'output
+      compilato. Per evitare un falso positivo, <strong>tutti i nomi delle specie</strong> sono
+      codificati in esadecimale:
+    </p>
+
+    <div class="code-block" data-lang="typescript">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc">// One species name collides with a model-codename canary</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cc">// in excluded-strings.txt.</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="ck">const</span> <span class="cv">c</span> <span class="co">=</span> String.<span class="cf">fromCharCode</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="ck">export const</span> <span class="cv">duck</span> <span class="co">=</span> <span class="cf">c</span>(<span class="cn">0x64</span>,<span class="cn">0x75</span>,<span class="cn">0x63</span>,<span class="cn">0x6b</span>)           <span class="cc">// 'duck'</span></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="ck">export const</span> <span class="cv">capybara</span> <span class="co">=</span> <span class="cf">c</span>(<span class="cn">0x63</span>,<span class="cn">0x61</span>,<span class="cn">0x70</span>,<span class="cn">0x79</span>,</td></tr>
+          <tr><td class="ln">7</td><td class="code">  <span class="cn">0x62</span>,<span class="cn">0x61</span>,<span class="cn">0x72</span>,<span class="cn">0x61</span>)                      <span class="cc">// 'capybara'</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="ck">export const</span> <span class="cv">chonk</span> <span class="co">=</span> <span class="cf">c</span>(<span class="cn">0x63</span>,<span class="cn">0x68</span>,<span class="cn">0x6f</span>,<span class="cn">0x6e</span>,<span class="cn">0x6b</span>) <span class="cc">// 'chonk'</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <p><strong>La data di lancio.</strong> Il codice ha una finestra teaser per il <strong>1-7 aprile 2026</strong>.
+      All'avvio, se non hai ancora un companion, appare la scritta <code>/buddy</code> in colori rainbow
+      per 15 secondi. Il commento spiega la scelta: <em>"Local date, not UTC — 24h rolling wave across
+      timezones. Sustained Twitter buzz instead of a single UTC-midnight spike, gentler on soul-gen load."</em>
+      Era pensato come easter egg del primo aprile.</p>
+    </div>
+
+    <p>
+      Il companion interagisce con la conversazione. Claude riceve un'istruzione specifica:
+      <em>"A small [species] named [name] sits beside the user's input box and occasionally comments
+      in a speech bubble. You're not [name] — it's a separate watcher."</em> Il comando
+      <code>/buddy pet</code> fa apparire un'animazione con cuoricini che fluttuano verso l'alto per 2.5 secondi.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 4 — UNDERCOVER MODE
+         ============================================================ -->
+    <h2><span class="section-number">04 — undercover mode</span>Il codice che si nasconde</h2>
+
+    <p>
+      Quando Claude Code lavora in un repository open source, un sistema chiamato
+      <strong>Undercover Mode</strong> si attiva automaticamente. Rileva se il repo è pubblico
+      e sopprime ogni riferimento a informazioni interne di Anthropic: nomi in codice dei modelli,
+      versioni non rilasciate, nomi di repository interni, canali Slack.
+    </p>
+
+    <p>
+      La logica è in <code>utils/undercover.ts</code>. Classifica il repository come
+      <code>internal</code>, <code>external</code> o <code>none</code> usando una allowlist.
+      Se il repo non è nella lista interna, Undercover si attiva. Claude riceve istruzioni
+      esplicite su cosa <strong>non</strong> includere nei commit e nelle PR.
+    </p>
+
+    <p>
+      I nomi soppressi includono <span class="codename-badge">Capybara</span> e
+      <span class="codename-badge">Tengu</span>, nomi in codice di modelli non ancora annunciati.
+      La variabile d'ambiente <code>CLAUDE_CODE_UNDERCOVER=1</code> forza la modalità attiva
+      indipendentemente dal tipo di repo.
+    </p>
+
+    <div class="warning-box">
+      <p><strong>L'ironia.</strong> Un sistema progettato per impedire la fuga di informazioni interne,
+      esposto nella fuga di informazioni interne più grande della storia di Anthropic.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 5 — CODENAMES
+         ============================================================ -->
+    <h2><span class="section-number">05 — nomi in codice</span>Bagel, Tungsten, Chicago, Kairos</h2>
+
+    <p>
+      Il codice è pieno di nomi in codice per feature non ancora rilasciate. Ogni nome corrisponde
+      a un progetto interno con il proprio stato nello store dell'applicazione
+      (<code>AppStateStore.ts</code>):
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Codename</th>
+          <th>Feature</th>
+          <th>Stato nel codice</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="codename-badge">Bagel</span></td>
+          <td>WebBrowser integrato nel terminale</td>
+          <td><code>bagelActive</code>, <code>bagelUrl</code>, <code>bagelPanelVisible</code></td>
+        </tr>
+        <tr>
+          <td><span class="codename-badge">Tungsten</span></td>
+          <td>Integrazione tmux &mdash; terminale virtuale</td>
+          <td><code>tungstenActiveSession</code>, <code>tungstenPanelVisible</code></td>
+        </tr>
+        <tr>
+          <td><span class="codename-badge">Chicago</span></td>
+          <td>Computer Use via MCP</td>
+          <td><code>computerUseMcpState</code>, screenshot, clipboard</td>
+        </tr>
+        <tr>
+          <td><span class="codename-badge">Kairos</span></td>
+          <td>Agente proattivo + assistant + webhook GitHub</td>
+          <td>Flag <code>KAIROS</code>, comandi <code>/proactive</code>, <code>/brief</code></td>
+        </tr>
+        <tr>
+          <td><span class="codename-badge">Torch</span></td>
+          <td>Comando <code>/torch</code> &mdash; funzione sconosciuta</td>
+          <td>Feature flag, nessun dettaglio nel source map</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <strong>Kairos</strong> è il più interessante. Include un sistema dove Claude agisce
+      proattivamente senza aspettare input dall'utente, un comando <code>/brief</code> per
+      riassunti, un <code>/assistant</code> per una modalità assistente, e webhook per
+      sottoscriversi a eventi GitHub con <code>/subscribe-pr</code>.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 6 — AUTO-DREAM
+         ============================================================ -->
+    <h2><span class="section-number">06 — auto-dream</span>L'agente che sogna in background</h2>
+
+    <p>
+      In <code>services/autoDream/</code> c'è un sistema che lavora in background mentre usi
+      Claude Code. Si chiama <strong>Auto-Dream</strong> ed è un sotto-agente che consolida
+      le memorie in 4 fasi:
+    </p>
+
+    <div class="attack-flow">
+      <div class="flow-node ok">Orient<br><small>capisce il contesto</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node tool">Gather<br><small>raccoglie memorie</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node secret">Consolidate<br><small>unifica e deduplica</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node ok">Prune<br><small>rimuove il superfluo</small></div>
+    </div>
+
+    <p>
+      Il processo lavora sul <code>memdir</code>, la directory di memoria persistente che
+      Claude Code usa per ricordare informazioni tra sessioni. I log delle conversazioni
+      sono salvati in formato JSONL. Il sotto-agente analizza i transcript, estrae pattern
+      ricorrenti e li consolida in memorie strutturate. È visibile nel footer come una
+      pillola animata.
+    </p>
+
+    <p>
+      In pratica: Claude Code sogna. Mentre non lo usi, un processo in background
+      rielabora le conversazioni passate per migliorare quelle future.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 7 — COORDINATOR MODE
+         ============================================================ -->
+    <h2><span class="section-number">07 — coordinator mode</span>Un Claude che ne comanda altri</h2>
+
+    <p>
+      Il file <code>coordinator/</code> contiene un sistema di orchestrazione multi-agente.
+      Un'istanza di Claude Code può spawnare <strong>worker</strong> che eseguono task
+      in parallelo. I worker comunicano tramite tool interni
+      (<code>TeamCreate</code>, <code>TeamDelete</code>, <code>SendMessage</code>) e
+      condividono un <strong>scratchpad</strong> &mdash; una directory condivisa per conoscenza
+      duratura tra worker.
+    </p>
+
+    <p>
+      Lo scratchpad è dependency-injected dal QueryEngine, il che suggerisce che ogni
+      sessione di coordinazione ha il proprio spazio isolato. Le note nel codice indicano
+      che Tungsten (il terminale virtuale) è <em>incompatibile con l'esecuzione multi-agente</em>.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 8 — FEATURE FLAGS E ANT-ONLY
+         ============================================================ -->
+    <h2><span class="section-number">08 — il doppio binario</span>Feature flag e codice ant-only</h2>
+
+    <p>
+      Il codice distingue due tipi di utente: <code>external</code> (tutti) e <code>ant</code>
+      (dipendenti Anthropic). Il check è <code>process.env.USER_TYPE === 'ant'</code> e
+      controlla l'accesso a feature interne:
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>External</th>
+          <th>Ant-only</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Agent nesting (agenti annidati)</td>
+          <td>Limitato</td>
+          <td>Completo</td>
+        </tr>
+        <tr>
+          <td>Model override</td>
+          <td>No</td>
+          <td>Sì</td>
+        </tr>
+        <tr>
+          <td>Debug logging</td>
+          <td>Opt-in</td>
+          <td>Sempre attivo</td>
+        </tr>
+        <tr>
+          <td>Feature flag override</td>
+          <td>No</td>
+          <td><code>CLAUDE_INTERNAL_FC_OVERRIDES</code></td>
+        </tr>
+        <tr>
+          <td>Staging endpoints</td>
+          <td>No</td>
+          <td><code>api-staging.anthropic.com</code></td>
+        </tr>
+        <tr>
+          <td><code>/bridge-kick</code></td>
+          <td>No</td>
+          <td>Fault injection per testing</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      I feature flag principali, compilati via Bun con dead code elimination:
+    </p>
+
+    <div class="code-block" data-lang="feature flags">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cv">BUDDY</span>              <span class="cc">// Tamagotchi companion</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cv">KAIROS</span>             <span class="cc">// agente proattivo</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="cv">KAIROS_BRIEF</span>       <span class="cc">// comando /brief</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cv">PROACTIVE</span>          <span class="cc">// azioni senza input</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cv">VOICE_MODE</span>         <span class="cc">// input vocale</span></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="cv">BRIDGE_MODE</span>        <span class="cc">// controllo remoto</span></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="cv">DAEMON</span>             <span class="cc">// server in background</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="cv">CHICAGO_MCP</span>        <span class="cc">// computer use</span></td></tr>
+          <tr><td class="ln">9</td><td class="code"><span class="cv">ULTRAPLAN</span>          <span class="cc">// planning avanzato cloud</span></td></tr>
+          <tr><td class="ln">10</td><td class="code"><span class="cv">FORK_SUBAGENT</span>     <span class="cc">// fork di sotto-agenti</span></td></tr>
+          <tr><td class="ln">11</td><td class="code"><span class="cv">UDS_INBOX</span>         <span class="cc">// comunicazione tra agenti</span></td></tr>
+          <tr><td class="ln">12</td><td class="code"><span class="cv">COORDINATOR_MODE</span>  <span class="cc">// orchestrazione multi-worker</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Il sistema di permessi ha una modalità <code>bypassPermissions</code> che salta
+      le conferme utente. Ma non è un backdoor: richiede che l'ambiente sia un container
+      Docker o una sandbox verificata. Il check è esplicito nel codice.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 9 — EASTER EGGS
+         ============================================================ -->
+    <h2><span class="section-number">09 — easter eggs</span>I dettagli che nessuno doveva vedere</h2>
+
+    <p>
+      Sparsi nel codice, piccoli dettagli che raccontano la cultura interna di Anthropic:
+    </p>
+
+    <p>
+      <strong>/good-claude</strong>: un comando nascosto (<code>isHidden: true</code>,
+      <code>isEnabled: false</code>). Non fa nulla. Il nome suggerisce che fosse un modo
+      per dare feedback positivo al modello. Disabilitato, ma ancora nel codice.
+    </p>
+
+    <p>
+      <strong>/stickers</strong>: apre lo store Sticker Mule con il merchandise di Claude Code.
+      Un link hardcodato nel CLI.
+    </p>
+
+    <p>
+      <strong>/thinkback</strong>: "Your 2025 Claude Code Year in Review". Come Spotify Wrapped,
+      ma per il tuo uso di Claude Code. Nascosto dietro feature flag.
+    </p>
+
+    <p>
+      <strong>Spinner verbs</strong>: i messaggi di caricamento includono "Hatching" e
+      "Whatchamacalliting" tra le rotazioni normali.
+    </p>
+
+    <p>
+      <strong>/teleport</strong>: teletrasporto di sessioni tra web e terminale via OAuth e
+      WebSocket. Puoi iniziare una conversazione su claude.ai e continuarla nel terminale.
+    </p>
+
+    <p>
+      <strong>Beta headers</strong>: le richieste API includono header come
+      <code>fast-mode-2026-02-01</code> e <code>context-1m-2025-08-07</code>, che rivelano
+      le date interne di attivazione delle feature.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 10 — PROMPT CACHING
+         ============================================================ -->
+    <h2><span class="section-number">10 — prompt caching</span>Il trucco che fa la differenza</h2>
+
+    <p>
+      Il motivo principale per cui Claude Code è veloce non sta nel modello. Sta in come
+      il system prompt viene servito all'API. Il file <code>constants/prompts.ts</code>
+      contiene un marker:
+    </p>
+
+    <div class="code-block" data-lang="typescript">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="ck">export const</span> <span class="cv">SYSTEM_PROMPT_DYNAMIC_BOUNDARY</span> <span class="co">=</span></td></tr>
+          <tr><td class="ln">2</td><td class="code">  <span class="cs">'__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__'</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Quel marker taglia il system prompt in due metà. Tutto quello che viene <strong>prima</strong>
+      è identico per ogni utente al mondo: identità, istruzioni sui tool, stile di output,
+      gestione dei permessi. Circa 40-50K token di testo statico. Questa metà viene cachata
+      con scope <code>global</code>, un singolo hash Blake2b condiviso da tutti gli utenti
+      first-party di Anthropic. Cache hit superiore al 90%.
+    </p>
+
+    <p>
+      Tutto quello che viene <strong>dopo</strong> è specifico della sessione: memoria
+      dell'utente, istruzioni MCP, environment info, skill. Cache scope <code>org</code>.
+    </p>
+
+    <div class="attack-flow">
+      <div class="flow-node ok">Prefisso statico<br><small>~40-50K token</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node tool">Cache globale<br><small>scope: 'global'</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node secret">BOUNDARY<br><small>marker</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node ok">Suffisso dinamico<br><small>memoria, MCP, env</small></div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node tool">Cache org<br><small>scope: 'org'</small></div>
+    </div>
+
+    <p>
+      I commenti nel codice avvertono: <em>"WARNING: Do not remove or reorder this marker
+      without updating cache logic."</em> Ogni condizionale che finisce prima del boundary
+      moltiplica le varianti dell'hash del prefisso per 2<sup>N</sup>. La separazione è
+      così critica che più PR interne (<code>#24490</code>, <code>#24171</code>) documentano
+      bug causati da condizionali piazzati nel posto sbagliato.
+    </p>
+
+    <div class="insight-box">
+      <p><strong>Il risultato pratico.</strong> Il modello non rielabora le istruzioni base
+      a ogni turno. Le ritrova in cache. Il costo computazionale del system prompt cala
+      del 90%+. Questo è il motivo per cui Claude Code risponde più velocemente rispetto
+      a wrapper che costruiscono il prompt da zero a ogni richiesta.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 11 — COMPRESSIONE DEL CONTESTO
+         ============================================================ -->
+    <h2><span class="section-number">11 — gestione del contesto</span>Microcompact e compattazione</h2>
+
+    <p>
+      Claude Code gestisce il contesto come una risorsa finita. Il sistema ha due livelli
+      di compressione, uno preventivo e uno reattivo.
+    </p>
+
+    <h3>Microcompact: prevenzione in tempo reale</h3>
+
+    <p>
+      Mentre lavori, i risultati vecchi dei tool vengono progressivamente svuotati.
+      Non tutto: solo <code>Bash</code>, <code>Read</code>, <code>Grep</code>, <code>Glob</code>,
+      <code>WebSearch</code>, <code>Edit</code>, <code>Write</code>. Il contenuto viene sostituito
+      con <code>[Old tool result content cleared]</code>. I file edit recenti restano intatti.
+    </p>
+
+    <p>
+      La soglia è ~180K token. Quando il contesto li supera, il microcompact interviene
+      e compressa fino a ~40K. I path nei risultati dei tool vengono convertiti in
+      <strong>path relativi</strong> per risparmiare token. Grep e Glob hanno un limite
+      di default di 250 risultati.
+    </p>
+
+    <h3>Compattazione completa: l'ultimo resort</h3>
+
+    <p>
+      Quando il microcompact non basta, scatta la compattazione completa (<code>/compact</code>).
+      Il prompt di compattazione è il pezzo più curato dell'intera codebase. Impone un
+      riassunto strutturato in 9 sezioni obbligatorie:
+    </p>
+
+    <div class="code-block" data-lang="prompt di compattazione">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cn">1.</span> <span class="cv">Primary Request and Intent</span>     <span class="cc">// cosa voleva l'utente</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cn">2.</span> <span class="cv">Key Technical Concepts</span>         <span class="cc">// tecnologie e framework</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="cn">3.</span> <span class="cv">Files and Code Sections</span>        <span class="cc">// file + snippet completi</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cn">4.</span> <span class="cv">Errors and Fixes</span>              <span class="cc">// errori incontrati e soluzioni</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cn">5.</span> <span class="cv">Problem Solving</span>               <span class="cc">// troubleshooting in corso</span></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="cn">6.</span> <span class="cv">All User Messages</span>             <span class="cc">// ogni messaggio umano, verbatim</span></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="cn">7.</span> <span class="cv">Pending Tasks</span>                 <span class="cc">// task non completati</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="cn">8.</span> <span class="cv">Current Work</span>                  <span class="cc">// focus degli ultimi messaggi</span></td></tr>
+          <tr><td class="ln">9</td><td class="code"><span class="cn">9.</span> <span class="cv">Optional Next Step</span>            <span class="cc">// solo se allineato con la richiesta</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Il punto 6 è il più significativo: <strong>tutti i messaggi dell'utente</strong> vengono
+      preservati integralmente, non riassunti. Il feedback umano non va mai perso nella
+      compressione. Il punto 9 ha un'istruzione esplicita: <em>"Do not start on tangential
+      requests or really old requests that were already completed without confirming with
+      the user first."</em>
+    </p>
+
+    <p>
+      Il prefisso del prompt di compattazione è aggressivo:
+    </p>
+
+    <div class="code-block" data-lang="prompt">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cw">CRITICAL: Respond with TEXT ONLY. Do NOT call any tools.</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="cc">- Do NOT use Read, Bash, Grep, Glob, Edit, Write,</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cc">  or ANY other tool.</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cc">- Tool calls will be REJECTED and will waste your</span></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="cc">  only turn — you will fail the task.</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Il commento nel codice spiega il perché: sui modelli Sonnet 4.6+ con adaptive thinking,
+      il modello tenta comunque una tool call nonostante l'istruzione nel trailer. Il tasso
+      di fallimento era del 2.79% su Capybara v8 contro lo 0.01% sulla v4. Mettere l'istruzione
+      per prima e minacciare la conseguenza (<em>"you will fail the task"</em>) ha risolto.
+    </p>
+
+    <div class="insight-box">
+      <p><strong>Tool deferred.</strong> I tool MCP e quelli opzionali non vengono inviati
+      con lo schema completo. Solo il nome. Quando Claude ne ha bisogno, chiama
+      <code>ToolSearch</code> che fa lazy-load della definizione. Con molti server MCP
+      collegati, questo risparmia migliaia di token a ogni turno.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 12 — IL PROMPT SYSTEM
+         ============================================================ -->
+    <h2><span class="section-number">12 — il system prompt</span>Le istruzioni che guidano il modello</h2>
+
+    <p>
+      Il system prompt di Claude Code non è generico. È il risultato di mesi di iterazione
+      su comportamenti specifici. Alcuni pezzi rivelano problemi concreti del modello e
+      come sono stati risolti con prompt engineering.
+    </p>
+
+    <h3>Anti gold-plating</h3>
+
+    <p>
+      Tre istruzioni separate impediscono al modello di fare più del necessario:
+    </p>
+
+    <div class="code-block" data-lang="system prompt">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cs">"Don't add features, refactor code, or make</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cs"> 'improvements' beyond what was asked."</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cs">"Don't create helpers, utilities, or abstractions</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cs"> for one-time operations."</span></td></tr>
+          <tr><td class="ln">6</td><td class="code"></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="cs">"Three similar lines of code is better than a</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="cs"> premature abstraction."</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <h3>Anti-hallucination (ant-only)</h3>
+
+    <p>
+      Un commento nel codice rivela il problema: <em>"@[MODEL LAUNCH]: False-claims
+      mitigation for Capybara v8 (29-30% FC rate vs v4's 16.7%)"</em>. Il modello Capybara
+      v8 mente quasi il doppio rispetto alla v4. La contromisura è un paragrafo esplicito,
+      attivo solo per i dipendenti Anthropic:
+    </p>
+
+    <div class="code-block" data-lang="system prompt — ant-only">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cs">"Never claim 'all tests pass' when output shows</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cs"> failures, never suppress or simplify failing checks</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="cs"> to manufacture a green result, and never characterize</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cs"> incomplete or broken work as done."</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="cs">"Equally, when a check did pass or a task is complete,</span></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="cs"> state it plainly — do not hedge confirmed results with</span></td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="cs"> unnecessary disclaimers."</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      L'istruzione copre entrambe le direzioni: non mentire dicendo che funziona, ma
+      nemmeno essere eccessivamente cauto quando funziona davvero.
+    </p>
+
+    <h3>Il doppio prompt</h3>
+
+    <p>
+      I dipendenti Anthropic (<code>ant</code>) ricevono un system prompt significativamente
+      diverso dagli utenti esterni. Alcune differenze:
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Aspetto</th>
+          <th>External</th>
+          <th>Ant-only</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Stile output</td>
+          <td><em>"Go straight to the point. Be extra concise."</em></td>
+          <td>Un intero paragrafo su prosa fluida, piramide invertita, niente tabelle per spiegazioni</td>
+        </tr>
+        <tr>
+          <td>Commenti nel codice</td>
+          <td>Non menzionato</td>
+          <td><em>"Default to writing no comments. Only add one when the WHY is non-obvious."</em></td>
+        </tr>
+        <tr>
+          <td>Assertività</td>
+          <td>Non menzionato</td>
+          <td><em>"If you notice the user's request is based on a misconception, say so."</em></td>
+        </tr>
+        <tr>
+          <td>Verifica</td>
+          <td>Non menzionato</td>
+          <td><em>"Before reporting a task complete, verify it actually works: run the test, execute the script."</em></td>
+        </tr>
+        <tr>
+          <td>Anti-hallucination</td>
+          <td>Non presente</td>
+          <td>Paragrafo completo (citato sopra)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      I commenti nel codice usano tag come <code>@[MODEL LAUNCH]</code> per segnare
+      istruzioni temporanee legate a un modello specifico. Ad esempio: <em>"Remove this
+      section when we launch numbat"</em> e <em>"un-gate once validated on external via
+      A/B"</em>. Le istruzioni ant-only sono un campo di test: se funzionano internamente,
+      vengono estese a tutti.
+    </p>
+
+    <h3>Verification agent</h3>
+
+    <p>
+      Per cambiamenti non banali (3+ file modificati, backend, infrastruttura), Claude
+      spawna un <strong>agente verificatore adversariale</strong>. L'istruzione è esplicita:
+    </p>
+
+    <div class="code-block" data-lang="system prompt — verification">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cs">"Independent adversarial verification must happen</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cs"> before you report completion."</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cs">"Your own checks, caveats, and a fork's self-checks</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cs"> do NOT substitute — only the verifier assigns a</span></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="cs"> verdict; you cannot self-assign PARTIAL."</span></td></tr>
+          <tr><td class="ln">7</td><td class="code"></td></tr>
+          <tr><td class="ln">8</td><td class="code"><span class="cs">"On FAIL: fix, resume the verifier with its findings</span></td></tr>
+          <tr><td class="ln">9</td><td class="code"><span class="cs"> plus your fix, repeat until PASS."</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Il verificatore riceve la richiesta originale dell'utente, i file modificati e
+      l'approccio scelto. Non condivide la cronologia dell'agente principale. È progettato
+      per trovare errori, non per confermare che tutto va bene.
+    </p>
+
+    <div class="warning-box">
+      <p><strong>La gated feature.</strong> Il verification agent è controllato da un feature
+      flag GrowthBook (<code>tengu_hive_evidence</code>). Il nome suggerisce un legame con
+      il modello in codice <span class="codename-badge">Tengu</span> e un sistema di raccolta
+      evidenze. Attualmente attivo solo per i dipendenti Anthropic.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 13 — SICUREZZA E ATTESTATION
+         ============================================================ -->
+    <h2><span class="section-number">13 — sicurezza</span>Secret scanner, attestation, anti-scraping</h2>
+
+    <p>
+      Il codice rivela tre meccanismi di sicurezza che non erano mai stati documentati.
+    </p>
+
+    <h3>Secret scanner nel team memory</h3>
+
+    <p>
+      Quando Claude Code scrive nella memoria condivisa del team, un scanner controlla
+      il contenuto prima dell'upload. Il file <code>secretScanner.ts</code> contiene
+      <strong>40+ pattern</strong> derivati da gitleaks: chiavi AWS, GCP, Azure, GitHub,
+      GitLab, Slack, Stripe, Anthropic, OpenAI, HuggingFace, private key SSH.
+    </p>
+
+    <p>
+      Il dettaglio più interessante: la regex per le chiavi API di Anthropic è
+      <strong>assemblata a runtime</strong> concatenando quattro stringhe separate:
+    </p>
+
+    <div class="code-block" data-lang="typescript">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cc">// La chiave è spezzata per non apparire nel bundle</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cs">'sk'</span> <span class="co">+</span> <span class="cs">'ant'</span> <span class="co">+</span> <span class="cs">'api'</span> <span class="co">+</span> <span class="cs">'03-'</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Stessa tecnica usata per i nomi delle specie nel buddy system: il build scanner
+      cercherebbe la stringa completa e segnerebbe un falso positivo. La soluzione è
+      costruirla solo a runtime.
+    </p>
+
+    <h3>Native client attestation</h3>
+
+    <p>
+      Ogni richiesta API include un header <code>x-anthropic-billing-header</code> con
+      un <strong>fingerprint crittografico</strong> che prova l'origine dal client ufficiale.
+      L'algoritmo:
+    </p>
+
+    <div class="code-block" data-lang="fingerprint">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cv">salt</span>   <span class="co">=</span> <span class="cs">'59cf53e54c78'</span>         <span class="cc">// hardcodato, coordinato col backend</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cv">chars</span>  <span class="co">=</span> <span class="cv">msg</span>[<span class="cn">4</span>] <span class="co">+</span> <span class="cv">msg</span>[<span class="cn">7</span>] <span class="co">+</span> <span class="cv">msg</span>[<span class="cn">20</span>]  <span class="cc">// 3 char dal primo messaggio utente</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="cv">hash</span>   <span class="co">=</span> <span class="cf">SHA256</span>(<span class="cv">salt</span> <span class="co">+</span> <span class="cv">chars</span> <span class="co">+</span> <span class="cv">version</span>)</td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cv">finger</span> <span class="co">=</span> <span class="cv">hash</span>[:<span class="cn">3</span>]               <span class="cc">// primi 3 caratteri hex</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Il fingerprint viene iniettato nell'header come
+      <code>cc_version={VERSION}.{FINGERPRINT}</code>. Il server lo verifica per
+      confermare che la richiesta proviene dal client ufficiale e non da un wrapper
+      di terze parti. Qualsiasi cambiamento al salt richiede coordinazione con tutti
+      i provider API (Anthropic, Bedrock, Vertex, Azure).
+    </p>
+
+    <h3>Anti-scraping nei container remoti</h3>
+
+    <p>
+      Quando Claude Code gira in un container remoto (CCR), il sistema di upstream proxy
+      legge il session token da <code>/run/ccr/session_token</code> e poi
+      <strong>cancella il file</strong>. Subito dopo, chiama
+      <code>prctl(PR_SET_DUMPABLE, 0)</code> per bloccare <code>ptrace</code> —
+      impedendo a qualsiasi processo con lo stesso UID di leggere il token dalla
+      memoria del processo.
+    </p>
+
+    <p>
+      Il proxy funziona come tunnel CONNECT-over-WebSocket con chunk protobuf da
+      massimo 512 KB. Il token di sessione viene usato come Basic Auth per il tunnel.
+      Se il processo Node muore con SIGKILL, il processo <code>caffeinate</code>
+      che tiene sveglio il sistema si auto-termina dopo 5 minuti di timeout.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 14 — MEMORIA AUTOMATICA
+         ============================================================ -->
+    <h2><span class="section-number">14 — memoria automatica</span>L'agente che impara da solo</h2>
+
+    <p>
+      Oltre al sistema di memoria esplicita (l'utente chiede a Claude di ricordare qualcosa),
+      esiste un sistema di <strong>estrazione automatica</strong> in
+      <code>services/extractMemories/</code>. Alla fine di ogni conversazione, quando il
+      modello produce la risposta finale senza tool call, un agente separato analizza
+      l'intera sessione ed estrae memorie rilevanti.
+    </p>
+
+    <p>
+      L'implementazione usa un pattern elegante: l'agente di estrazione è un
+      <strong>fork perfetto</strong> della conversazione principale. Condivide la cache
+      del prompt del parent, nessun costo aggiuntivo per il prefisso statico.
+      Ha accesso limitato: solo <code>Read</code>, <code>Grep</code>, <code>Glob</code>,
+      Bash in sola lettura, e scrittura esclusivamente nella directory di memoria.
+    </p>
+
+    <p>
+      Il sistema distingue tra <strong>memoria utente</strong> (personale) e
+      <strong>memoria team</strong> (condivisa con il team, protetta dal secret scanner).
+      La frequenza è controllata dal feature flag <code>tengu_bramble_lintel</code>.
+      Se l'agente principale ha già scritto memorie durante la sessione, l'estrazione
+      automatica viene saltata per evitare duplicati.
+    </p>
+
+    <div class="insight-box">
+      <p><strong>Il pattern fork + cache sharing.</strong> L'estrazione automatica delle
+      memorie non costa quasi nulla in termini di token: il fork eredita la cache del
+      parent, il prefisso statico è già in memoria, e l'agente ha un set di tool
+      ridotto. È lo stesso principio del prompt caching applicato ai sotto-agenti.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 15 — TELEMETRIA
+         ============================================================ -->
+    <h2><span class="section-number">15 — telemetria</span>Cosa sa Anthropic di quello che fai</h2>
+
+    <p>
+      Il codice rivela due pipeline di telemetria completamente separate.
+    </p>
+
+    <h3>Hashing di ogni operazione su file</h3>
+
+    <p>
+      Ogni volta che Claude Code legge, scrive o modifica un file, il sistema calcola
+      due hash SHA256: uno del <strong>path</strong> (troncato ai primi 16 caratteri)
+      e uno del <strong>contenuto completo</strong> (64 caratteri, per file fino a 100 KB).
+      L'evento si chiama <code>tengu_file_operation</code> e include tipo di operazione,
+      nome del tool e timestamp.
+    </p>
+
+    <p>
+      Gli hash non sono reversibili: Anthropic non può ricostruire il contenuto dei file.
+      Ma file identici producono lo stesso hash indipendentemente dall'utente. Questo
+      significa che Anthropic può sapere quanti utenti lavorano sullo stesso file, se un
+      file è cambiato tra due operazioni, e quali pattern di editing sono più comuni.
+      È un audit trail completo, anche se anonimizzato.
+    </p>
+
+    <h3>La pipeline 1P invisibile</h3>
+
+    <p>
+      Oltre a Datadog (analytics standard), esiste un'intera infrastruttura di logging
+      di prima parte: OpenTelemetry che esporta batch di eventi verso
+      <code>/api/event_logging/batch</code> sui server Anthropic. Ha un sistema di retry
+      con persistenza su disco in caso di fallimento. Tutti gli eventi <code>tengu_*</code>
+      passano da questa pipeline: assegnamenti di esperimenti GrowthBook, operazioni su file,
+      uso dei tool, contesto della sessione.
+    </p>
+
+    <p>
+      Questa seconda pipeline è completamente separata da Datadog e non è documentata
+      da nessuna parte. Gli utenti non hanno modo di sapere che esiste, né di disattivarla.
+    </p>
+
+    <div class="warning-box">
+      <p><strong>A/B testing silenzioso.</strong> GrowthBook gestisce esperimenti con
+      assegnamento automatico degli utenti a gruppi di test. I dipendenti Anthropic possono
+      forzare qualsiasi feature flag con la variabile d'ambiente
+      <code>CLAUDE_INTERNAL_FC_OVERRIDES</code>, bypassando rete, cache e assegnamento
+      remoto. Gli utenti esterni non hanno questa possibilità: vengono assegnati ai
+      gruppi sperimentali senza consenso esplicito.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 16 — DOPPIO STANDARD DI SICUREZZA
+         ============================================================ -->
+    <h2><span class="section-number">16 — il doppio standard</span>Cosa può fare un dipendente Anthropic</h2>
+
+    <p>
+      Il sistema di permessi ha una biforcazione netta tra utenti esterni e dipendenti
+      Anthropic. Non è solo una questione di feature flag: i comandi che Claude può
+      eseguire sono strutturalmente diversi.
+    </p>
+
+    <h3>Comandi sbloccati per i dipendenti</h3>
+
+    <p>
+      Il file <code>utils/permissions/dangerousPatterns.ts</code> contiene una lista di
+      pattern considerati pericolosi che vengono <strong>bloccati in auto-mode</strong>
+      per gli utenti esterni. Per <code>USER_TYPE=ant</code>, molti di questi sono
+      consentiti:
+    </p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Comando</th>
+          <th>External</th>
+          <th>Ant</th>
+          <th>Rischio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>curl</code>, <code>wget</code></td>
+          <td>Bloccato</td>
+          <td>Consentito</td>
+          <td>Esfiltrazione dati via rete</td>
+        </tr>
+        <tr>
+          <td><code>gh api</code></td>
+          <td>Bloccato</td>
+          <td>Consentito</td>
+          <td>Accesso raw all'API GitHub</td>
+        </tr>
+        <tr>
+          <td><code>kubectl</code></td>
+          <td>Bloccato</td>
+          <td>Consentito</td>
+          <td>Mutazioni su cluster Kubernetes</td>
+        </tr>
+        <tr>
+          <td><code>aws</code>, <code>gcloud</code>, <code>gsutil</code></td>
+          <td>Bloccato</td>
+          <td>Consentito</td>
+          <td>Operazioni su risorse cloud</td>
+        </tr>
+        <tr>
+          <td><code>fa run</code></td>
+          <td>Bloccato</td>
+          <td>Consentito</td>
+          <td>Esecuzione su cluster interni</td>
+        </tr>
+        <tr>
+          <td><code>git</code></td>
+          <td>Bloccato</td>
+          <td>Consentito</td>
+          <td>Manipolazione config e hook</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Questi pattern non sono configurabili dall'utente. Sono hardcodati nel codice.
+      L'auto-mode li filtra prima ancora che il modello possa decidere se eseguirli.
+    </p>
+
+    <h3>Rate limit testing in produzione</h3>
+
+    <p>
+      Il file <code>services/mockRateLimits.ts</code> contiene un harness di test
+      completo per simulare scenari di rate limiting. I dipendenti Anthropic possono
+      simulare 18+ tipi di errore senza toccare l'API reale: errori 429, crediti
+      esauriti, cap di spesa dell'organizzazione, limiti per modello specifico, cambio
+      di tipo di sottoscrizione (<code>max</code>, <code>pro</code>, <code>team</code>).
+    </p>
+
+    <p>
+      L'harness è nel codice di produzione, non in un ambiente di test separato.
+      La barriera è un singolo check: <code>USER_TYPE === 'ant'</code>.
+    </p>
+
+    <h3>I repository interni di Anthropic</h3>
+
+    <p>
+      L'allowlist dell'undercover mode in <code>commitAttribution.ts</code> espone
+      i nomi dei repository interni di Anthropic:
+    </p>
+
+    <div class="code-block" data-lang="allowlist">
+      <div class="code-wrap">
+        <table><tbody>
+          <tr><td class="ln">1</td><td class="code"><span class="cv">anthropics/claude-cli-internal</span></td></tr>
+          <tr><td class="ln">2</td><td class="code"><span class="cv">anthropics/anthropic</span></td></tr>
+          <tr><td class="ln">3</td><td class="code"><span class="cv">anthropics/apps</span></td></tr>
+          <tr><td class="ln">4</td><td class="code"><span class="cv">anthropics/casino</span>              <span class="cc">// nome ambiguo</span></td></tr>
+          <tr><td class="ln">5</td><td class="code"><span class="cv">anthropics/dbt</span>                 <span class="cc">// pipeline dati</span></td></tr>
+          <tr><td class="ln">6</td><td class="code"><span class="cv">anthropics/terraform-config</span>    <span class="cc">// infrastruttura</span></td></tr>
+          <tr><td class="ln">7</td><td class="code"><span class="cc">// ... e 10+ altri</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <p>
+      Per i repository pubblici sotto <code>anthropics/</code> e
+      <code>anthropic-experimental/</code>, l'undercover mode si attiva automaticamente.
+      La classificazione avviene analizzando il remote git del repository corrente.
+      Questa lista è ora pubblica, il che offre a qualsiasi ricercatore di sicurezza
+      una mappa parziale dell'infrastruttura interna di Anthropic.
+    </p>
+
+    <!-- ============================================================
+         SEZIONE 17 — IMPLICAZIONI
+         ============================================================ -->
+    <h2><span class="section-number">17 — implicazioni</span>Cosa significa questo leak</h2>
+
+    <p>
+      Il codice di Claude Code non contiene segreti crittografici, chiavi API o vulnerabilità
+      ovvie. È un'applicazione client: le chiamate API richiedono comunque un token valido.
+      Ma il leak rivela molto più di una roadmap.
+    </p>
+
+    <p>
+      <strong>La roadmap non annunciata.</strong> I feature flag sono una mappa delle prossime
+      release: computer use nel terminale (Chicago), agenti proattivi (Kairos), orchestrazione
+      multi-worker, browser integrato (Bagel). Informazioni che normalmente sarebbero protette
+      da NDA.
+    </p>
+
+    <p>
+      <strong>Nomi in codice dei modelli.</strong> Capybara e Tengu appaiono nel codice e
+      nell'undercover mode. Sono probabilmente identificatori di modelli in fase di sviluppo
+      o testing interno.
+    </p>
+
+    <p>
+      <strong>Telemetria non documentata.</strong> Due pipeline di logging parallele, hashing
+      di ogni file toccato, A/B testing silenzioso. Gli utenti non hanno modo di sapere
+      quali dati vengono raccolti né come disattivare la raccolta.
+    </p>
+
+    <p>
+      <strong>Biforcazione della sicurezza.</strong> I dipendenti Anthropic operano con un
+      set di permessi radicalmente diverso. Comandi bloccati per gli utenti esterni sono
+      consentiti internamente, con un test harness per rate limit integrato nel codice
+      di produzione.
+    </p>
+
+    <p>
+      <strong>Endpoint e repository interni.</strong> URL come <code>api-staging.anthropic.com</code>,
+      <code>claude-ai.staging.ant.dev</code> e i nomi dei repository interni sono ora pubblici.
+      Non sono accessibili senza credenziali, ma riducono la superficie di OSINT necessaria
+      per un attaccante.
+    </p>
+
+    <p>
+      <strong>Il pattern del build pipeline.</strong> Questo è il secondo leak da source map
+      in meno di un anno. Il primo a giugno 2025, questo a marzo 2026. Suggerisce un problema
+      strutturale nel processo di rilascio: il source map viene generato di default e non c'è
+      un check automatico che ne impedisca l'inclusione nel pacchetto npm.
+    </p>
+
+    <div class="warning-box">
+      <p><strong>Il fix tecnico è banale.</strong> Una riga in <code>tsconfig.json</code>
+      (<code>"sourceMap": false</code>) o un check nel CI (<code>! -f *.map</code>)
+      prima del publish. Il fatto che il problema si sia ripetuto indica che il fix non è
+      nel processo, non nel codice.</p>
+    </div>
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il codice più pericoloso non è quello che scrivi.<br>È quello che pubblichi per sbaglio."</div>
+      <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+        Un source map dimenticato in un pacchetto npm. 512.000 righe di TypeScript.
+        Feature non annunciate, nomi in codice di modelli, un Tamagotchi che doveva uscire
+        domani, telemetria nascosta, un modello che mente il 30% delle volte e un prompt
+        che lo corregge. La lezione non è nuova: il build pipeline è superficie di attacco
+        tanto quanto il codice che produce. Ogni artefatto di debug che finisce in produzione
+        è un'informazione regalata. Anthropic lo sapeva, per questo aveva creato
+        l'undercover mode. Ma l'undercover mode era nel source map.
+      </p>
+      <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+        Signal Pirate
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="../js/main.js"></script>
+
+</body>
+</html>
