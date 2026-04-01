@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cambiamo Paradigma | Signal Pirate</title>
+  <meta name="description" content="Programmare e' commoditizzato. Il valore e' nell'orchestrazione. Anatomia di un agent system reale: loop, tool, sub-agent, memoria, permessi. Codice sorgente di Claude Code come stato dell'arte.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .code-block td {
+      padding: 0;
+      vertical-align: top;
+      border: none;
+    }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code {
+      padding: 0.2em 0 0.2em 1em;
+      white-space: pre;
+    }
+    .code-block .code-wrap {
+      padding: 0.8rem 0;
+    }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    .arch-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .arch-diagram .accent-g { color: #00ff88; }
+    .arch-diagram .accent-p { color: #7c4dff; }
+    .arch-diagram .accent-y { color: #ff8800; }
+    .arch-diagram .accent-r { color: #ff6b6b; }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-04-01 | Pinperepette</p>
+  <h1 class="article-page-title">Cambiamo <span class="accent">Paradigma</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Il codice lo scrive la macchina. Il valore e' nell'orchestrazione. Anatomia di un agent system reale, dal sorgente di Claude Code.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Agent Systems</span>
+    <span class="tag tag-highlight">LLM</span>
+    <span class="tag tag-reaction">Orchestration</span>
+    <span class="tag tag-amplification">Claude Code</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - LA RESA DEI CONTI                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Resa dei Conti</h2>
+<span class="section-number">Sezione 00. Il mondo e' cambiato</span>
+
+<p>
+  Ok ragazzi, parliamoci chiaro. E' aprile 2026 e un LLM scrive codice funzionante in qualsiasi linguaggio. Non roba giocattolo. Codice di produzione vero. Moduli interi, test inclusi, in secondi. Per tutto il codice standard, il CRUD, il glue code, il boilerplate, le integrazioni, gli script, e' gia' piu' veloce e spesso migliore della mediana di noi sviluppatori.
+</p>
+
+<p>
+  Non tutto il codice, ovvio. Il debugging di una race condition in un sistema distribuito, l'ottimizzazione di un hot path che deve stare sotto i 100 microsecondi, il design di un protocollo di consenso. Li' ci serve ancora il cervello, e ci servira' per un bel po'. Ma quella roba e' il 10% del lavoro quotidiano. Il restante 90% e' commodity. E la commodity la fa la macchina.
+</p>
+
+<p>
+  Se state ancora spendendo il vostro tempo per diventare piu' veloci a scrivere quel 90%, state ottimizzando la metrica sbagliata. Il compilatore non ci ha sostituiti negli anni '50, ma ha reso irrilevanti quelli che scrivevano assembly a mano per campare. Stesso film, un livello sopra.
+</p>
+
+<p>
+  Il valore si e' spostato. Si e' spostato nell'orchestrazione. Nel saper costruire sistemi dove gli LLM lavorano come agenti autonomi: ricevono un obiettivo, scelgono gli strumenti, eseguono, guardano il risultato, iterano. Nel 2026 scriviamo meno codice a mano, ma validiamo, integriamo, correggiamo e vincoliamo. Soprattutto, progettiamo i sistemi che lo fanno al posto nostro.
+</p>
+
+<div class="warning-box">
+  <p><strong>Questo articolo non e' teoria.</strong> Tutto quello che segue viene dallo stato dell'arte dell'ingegneria degli agent: il codice sorgente di Claude Code, l'agent CLI di Anthropic. 512.000 righe di TypeScript. Non e' l'unica architettura possibile, ma ad oggi e' una delle piu' complete e leggibili che si possano studiare. L'abbiamo smontato nell'articolo precedente. Oggi lo usiamo come riferimento ingegneristico.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - IL LOOP                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Loop</h2>
+<span class="section-number">Sezione 01. Il cuore di ogni agent</span>
+
+<p>
+  Ogni agent system che si rispetti ha lo stesso cuore. Un ciclo infinito. Punto. L'LLM riceve un messaggio, decide cosa fare, esegue un'azione, guarda il risultato, e decide di nuovo. Ripete finche' l'obiettivo e' raggiunto o le risorse finiscono. E' cosi' semplice che fa quasi rabbia.
+</p>
+
+<p>
+  Il pattern si chiama <strong>ReAct</strong> (Reason + Act). In Claude Code vive dentro <code>query.ts</code>. Vi faccio vedere lo scheletro:
+</p>
+
+<div class="arch-diagram"><span class="accent-g">UTENTE</span> manda un messaggio
+       |
+       v
+  <span class="accent-p">while (true)</span> {
+       |
+       +---> Prepara il contesto (messaggi, system prompt, tool)
+       |
+       +---> Chiama l'LLM con <span class="accent-g">queryModelWithStreaming()</span>
+       |
+       +---> L'LLM risponde con testo e/o <span class="accent-y">tool_use</span> blocks
+       |
+       +---> Se ci sono tool_use: esegui con <span class="accent-r">runTools()</span>
+       |          |
+       |          +---> Risultato torna come messaggio
+       |          |
+       |          +---> Aggiungi alla conversazione
+       |
+       +---> Valuta: continuare o terminare?
+       |          |
+       |          +---> stop_reason == 'end_turn'? ---> <span class="accent-r">ESCI</span>
+       |          +---> Token esauriti? ---> compatta e continua
+       |          +---> Max turns? ---> <span class="accent-r">ESCI</span>
+       |
+       +---> Continua il loop
+  }
+</div>
+
+<p>
+  Pero' attenzione, nel codice reale il loop non e' un semplice <code>while</code>. E' un <code>AsyncGenerator</code>. Ogni iterazione <code>yield</code>-a eventi man mano che arrivano: lo streaming del testo, i progressi dei tool, i messaggi di sistema. Chi chiama riceve un flusso continuo senza aspettare che il turno finisca. Roba che se non l'avete usata vi cambia la prospettiva.
+</p>
+
+<div class="code-block" data-lang="TypeScript">
+<div class="code-wrap"><table><tr><td class="ln">1</td><td class="code"><span class="kw">async function*</span> <span class="fn">queryLoop</span>(</td></tr>
+<tr><td class="ln">2</td><td class="code">  params: <span class="nb">QueryParams</span>,</td></tr>
+<tr><td class="ln">3</td><td class="code">): <span class="nb">AsyncGenerator</span>&lt;<span class="nb">StreamEvent</span> | <span class="nb">Message</span>, <span class="nb">Terminal</span>&gt; {</td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code">  <span class="kw">let</span> state: <span class="nb">State</span> = {</td></tr>
+<tr><td class="ln">6</td><td class="code">    messages: params.messages,</td></tr>
+<tr><td class="ln">7</td><td class="code">    toolUseContext: params.toolUseContext,</td></tr>
+<tr><td class="ln">8</td><td class="code">    turnCount: <span class="nb">1</span>,</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="cm">// ... altro stato mutabile</span></td></tr>
+<tr><td class="ln">10</td><td class="code">  }</td></tr>
+<tr><td class="ln">11</td><td class="code"></td></tr>
+<tr><td class="ln">12</td><td class="code">  <span class="kw">while</span> (<span class="nb">true</span>) {</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="kw">let</span> { toolUseContext } = state</td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="kw">const</span> { messages, turnCount } = state</td></tr>
+<tr><td class="ln">15</td><td class="code"></td></tr>
+<tr><td class="ln">16</td><td class="code">    <span class="cm">// 1. Chiama l'LLM</span></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="kw">const</span> response = <span class="kw">yield*</span> <span class="fn">queryModelWithStreaming</span>({</td></tr>
+<tr><td class="ln">18</td><td class="code">      messages, systemPrompt, tools, maxTokens</td></tr>
+<tr><td class="ln">19</td><td class="code">    })</td></tr>
+<tr><td class="ln">20</td><td class="code"></td></tr>
+<tr><td class="ln">21</td><td class="code">    <span class="cm">// 2. Estrai i tool_use dalla risposta</span></td></tr>
+<tr><td class="ln">22</td><td class="code">    <span class="kw">const</span> toolUseBlocks = extractToolUse(response)</td></tr>
+<tr><td class="ln">23</td><td class="code"></td></tr>
+<tr><td class="ln">24</td><td class="code">    <span class="cm">// 3. Esegui i tool</span></td></tr>
+<tr><td class="ln">25</td><td class="code">    <span class="kw">for await</span> (<span class="kw">const</span> update <span class="kw">of</span> <span class="fn">runTools</span>(</td></tr>
+<tr><td class="ln">26</td><td class="code">      toolUseBlocks, canUseTool, toolUseContext</td></tr>
+<tr><td class="ln">27</td><td class="code">    )) {</td></tr>
+<tr><td class="ln">28</td><td class="code">      <span class="kw">yield</span> update.message  <span class="cm">// stream il risultato</span></td></tr>
+<tr><td class="ln">29</td><td class="code">    }</td></tr>
+<tr><td class="ln">30</td><td class="code"></td></tr>
+<tr><td class="ln">31</td><td class="code">    <span class="cm">// 4. Valuta se continuare</span></td></tr>
+<tr><td class="ln">32</td><td class="code">    <span class="kw">const</span> transition = <span class="fn">evaluateTransition</span>(response, state)</td></tr>
+<tr><td class="ln">33</td><td class="code">    <span class="kw">if</span> (transition.type === <span class="st">'terminal'</span>) <span class="kw">return</span> transition</td></tr>
+<tr><td class="ln">34</td><td class="code">    state = transition.nextState</td></tr>
+<tr><td class="ln">35</td><td class="code">  }</td></tr>
+<tr><td class="ln">36</td><td class="code">}</td></tr>
+</table></div></div>
+
+<div class="insight-box">
+  <p><strong>Perche' AsyncGenerator e non una Promise?</strong> Perche' l'agent deve comunicare mentre lavora. Se un tool ci mette 30 secondi, l'utente vede i progressi in tempo reale. Il generator <code>yield</code>-a eventi senza bloccare nessuno. Stesso pattern dello streaming HTTP, applicato all'orchestrazione. Elegante.</p>
+</div>
+
+<p>
+  Lo stato del loop e' tutto esplicito. Un oggetto <code>State</code> che porta i messaggi, il contesto dei tool, il contatore dei turni, i flag di recovery. A ogni iterazione lo destrutturi in cima e lo ricostruisci ai punti di <code>continue</code>. Niente variabili globali. Niente side effect nascosti. Il loop e' deterministico nell'orchestrazione, non deterministico nella decisione. L'infrastruttura e' prevedibile. Il motore no. Tenetevelo a mente, perche' e' la chiave di tutto.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - I TOOL                                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Tool</h2>
+<span class="section-number">Sezione 02. Le mani dell'agent</span>
+
+<p>
+  Un LLM senza tool e' un poeta. Scrive roba bellissima ma non puo' toccare niente nel mondo reale. I tool sono le mani. Ogni tool e' un'interfaccia tipizzata che l'agent puo' invocare per fare qualcosa di concreto: leggere un file, eseguire un comando, cercare nel codice, scrivere su disco.
+</p>
+
+<p>
+  In Claude Code, un tool e' un oggetto TypeScript con un contratto preciso. Il file <code>Tool.ts</code> definisce l'interfaccia. Guardatela bene:
+</p>
+
+<div class="code-block" data-lang="TypeScript">
+<div class="code-wrap"><table><tr><td class="ln">1</td><td class="code"><span class="kw">type</span> <span class="nb">Tool</span>&lt;<span class="nb">Input</span>, <span class="nb">Output</span>&gt; = {</td></tr>
+<tr><td class="ln">2</td><td class="code">  <span class="key">name</span>: <span class="nb">string</span>                          <span class="cm">// identificatore unico</span></td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="key">inputSchema</span>: <span class="nb">ZodType</span>                   <span class="cm">// schema dell'input (validazione)</span></td></tr>
+<tr><td class="ln">4</td><td class="code">  <span class="key">description</span>(): <span class="nb">Promise</span>&lt;<span class="nb">string</span>&gt;        <span class="cm">// descrizione per l'LLM</span></td></tr>
+<tr><td class="ln">5</td><td class="code">  <span class="key">call</span>(args, context): <span class="nb">Promise</span>&lt;<span class="nb">ToolResult</span>&gt;  <span class="cm">// esecuzione</span></td></tr>
+<tr><td class="ln">6</td><td class="code">  <span class="key">checkPermissions</span>(): <span class="nb">PermissionResult</span>    <span class="cm">// puo' eseguire?</span></td></tr>
+<tr><td class="ln">7</td><td class="code">  <span class="key">isReadOnly</span>(input): <span class="nb">boolean</span>              <span class="cm">// modifica lo stato?</span></td></tr>
+<tr><td class="ln">8</td><td class="code">  <span class="key">isConcurrencySafe</span>(input): <span class="nb">boolean</span>       <span class="cm">// esecuzione parallela?</span></td></tr>
+<tr><td class="ln">9</td><td class="code">  <span class="key">isDestructive</span>?(input): <span class="nb">boolean</span>          <span class="cm">// operazione irreversibile?</span></td></tr>
+<tr><td class="ln">10</td><td class="code">  <span class="key">maxResultSizeChars</span>: <span class="nb">number</span>             <span class="cm">// limite risultato</span></td></tr>
+<tr><td class="ln">11</td><td class="code">}</td></tr>
+</table></div></div>
+
+<p>
+  Ogni campo ha un motivo di esistere. Lo <code>inputSchema</code> usa Zod: l'input che arriva dall'LLM viene validato a runtime prima di eseguire qualsiasi cosa. Se l'LLM ti manda un JSON fatto male, il tool non parte nemmeno. L'errore torna nell'history e l'LLM si corregge al giro dopo. Meccanismo di self-healing gratis.
+</p>
+
+<p>
+  Il campo <code>isReadOnly</code> e' il discriminante critico per l'orchestrazione. Determina se il tool puo' girare in parallelo con altri o no. Un <code>Grep</code> e' read-only. Un <code>Write</code> no. Due <code>Grep</code> li fai partire insieme senza pensarci. Un <code>Write</code> deve aspettare da solo. Semplice, ma se non ce l'hai ti si corrompono i file.
+</p>
+
+<p>
+  <strong>La description e' dinamica.</strong> Non e' una stringa hardcoded. E' una funzione asincrona che riceve il contesto corrente e genera la descrizione al volo. La descrizione di <code>Bash</code> cambia in base al sistema operativo su cui giri. Quella di <code>Agent</code> cambia in base a quali agent sono disponibili in quel momento. L'LLM vede sempre una descrizione aggiornata, calibrata sulla situazione reale. Non e' un dettaglio, e' design.
+</p>
+
+<div class="insight-box">
+  <p><strong>Il pattern da portarvi a casa:</strong> un tool non e' una funzione. E' un contratto. Ha uno schema, ha permessi, ha metadati di concorrenza, ha limiti di output. Senza questo contratto, l'orchestratore non sa come comporre i tool tra loro. Il tool non e' la funzione che esegue. E' l'interfaccia che espone. E i contratti sono l'unica cosa che puoi comporre in modo affidabile.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - L'ORCHESTRAZIONE                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Orchestrazione dei Tool</h2>
+<span class="section-number">Sezione 03. Parallelo vs seriale</span>
+
+<p>
+  L'LLM in un singolo turno puo' chiedere di usare piu' tool contemporaneamente. "Leggimi questi tre file." Oppure: "Leggi questo file e scrivi quest'altro." La differenza e' enorme. I tre file li leggi in parallelo tranquillamente. Leggere e scrivere insieme no, perche' la scrittura potrebbe dipendere dalla lettura. Sembra ovvio, ma il diavolo e' nei dettagli.
+</p>
+
+<p>
+  Claude Code risolve con un partizionamento intelligente dentro <code>toolOrchestration.ts</code>:
+</p>
+
+<div class="code-block" data-lang="TypeScript">
+<div class="code-wrap"><table><tr><td class="ln">1</td><td class="code"><span class="kw">async function*</span> <span class="fn">runTools</span>(toolUseBlocks, canUseTool, context) {</td></tr>
+<tr><td class="ln">2</td><td class="code">  <span class="kw">for</span> (<span class="kw">const</span> { isConcurrencySafe, blocks } <span class="kw">of</span></td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="fn">partitionToolCalls</span>(toolUseBlocks, context)</td></tr>
+<tr><td class="ln">4</td><td class="code">  ) {</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="kw">if</span> (isConcurrencySafe) {</td></tr>
+<tr><td class="ln">6</td><td class="code">      <span class="cm">// Batch read-only: esegui in parallelo (max 10)</span></td></tr>
+<tr><td class="ln">7</td><td class="code">      <span class="kw">for await</span> (<span class="kw">const</span> update <span class="kw">of</span> <span class="fn">runToolsConcurrently</span>(blocks)) {</td></tr>
+<tr><td class="ln">8</td><td class="code">        <span class="kw">yield</span> update</td></tr>
+<tr><td class="ln">9</td><td class="code">      }</td></tr>
+<tr><td class="ln">10</td><td class="code">    } <span class="kw">else</span> {</td></tr>
+<tr><td class="ln">11</td><td class="code">      <span class="cm">// Batch non-read-only: esegui uno alla volta</span></td></tr>
+<tr><td class="ln">12</td><td class="code">      <span class="kw">for await</span> (<span class="kw">const</span> update <span class="kw">of</span> <span class="fn">runToolsSerially</span>(blocks)) {</td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="kw">yield</span> update</td></tr>
+<tr><td class="ln">14</td><td class="code">      }</td></tr>
+<tr><td class="ln">15</td><td class="code">    }</td></tr>
+<tr><td class="ln">16</td><td class="code">  }</td></tr>
+<tr><td class="ln">17</td><td class="code">}</td></tr>
+</table></div></div>
+
+<p>
+  <code>partitionToolCalls</code> scannerizza i tool_use blocks e li raggruppa. Tool consecutivi read-only finiscono in un batch concorrente. Appena appare un tool non-read-only, il batch precedente viene eseguito, poi il tool distruttivo gira da solo. Poi si ricomincia a raggruppare.
+</p>
+
+<p>
+  La concorrenza massima e' 10 per default, configurabile via <code>CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY</code>. Non e' un numero tirato a caso. E' il compromesso tra velocita' e risorse: ogni tool potrebbe leggere file, consumare file descriptor, allocare memoria. Dieci in parallelo, non cinquanta.
+</p>
+
+<div class="insight-box">
+  <p><strong>Il pattern:</strong> non far decidere all'LLM l'ordine di esecuzione. L'LLM dice "fai queste 5 cose". L'orchestratore decide come farle. L'LLM ragiona. L'orchestratore esegue. Tenere separate queste responsabilita' e' tutto. Se le mischi, hai il caos.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - I PERMESSI                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Permessi</h2>
+<span class="section-number">Sezione 04. La catena della fiducia</span>
+
+<p>
+  Un agent che puo' fare tutto e' una bomba a orologeria. Senza permessi, prima o poi ti cancella un file, ti esegue un comando folle, ti modifica il database. E' questione di quando, non di se. Il sistema di permessi e' il constraint che rende l'agent utilizzabile senza farsi venire l'ansia.
+</p>
+
+<p>
+  Claude Code implementa un modello a strati. Ogni tool call passa attraverso quattro livelli di controllo prima di eseguire qualsiasi cosa:
+</p>
+
+<div class="arch-diagram"><span class="accent-g">Tool call dall'LLM</span>
+       |
+       v
+  <span class="accent-p">[1] Regole statiche</span> (settings.json)
+       |  allow/deny/ask per tool e pattern
+       |
+       v
+  <span class="accent-y">[2] Hook pre-tool-use</span>
+       |  Script shell che ispezionano l'input
+       |  Possono bloccare, modificare, approvare
+       |
+       v
+  <span class="accent-r">[3] Classificatore ML</span>
+       |  Modello che valuta il rischio del comando
+       |  Auto-approva i comandi sicuri
+       |
+       v
+  <span class="accent-g">[4] Prompt utente</span>
+       |  Ultima risorsa: chiede conferma
+       |
+       v
+  <span class="accent-g">ESECUZIONE</span> o <span class="accent-r">RIFIUTO</span>
+</div>
+
+<p>
+  Primo livello: regole dichiarative. In <code>settings.json</code> scrivi roba tipo "il tool Bash puo' sempre eseguire <code>git status</code>" oppure "il tool Write non tocca niente dentro <code>/etc</code>". Pattern matching puro, zero ambiguita', zero sorprese.
+</p>
+
+<p>
+  Secondo livello: gli hook. Script che girano prima dell'esecuzione del tool. Ricevono l'input in JSON su stdin, restituiscono una decisione su stdout. Vuoi un hook che blocca qualsiasi <code>rm -rf</code>? Dieci righe di bash. Vuoi uno che logga ogni operazione di scrittura su un servizio esterno? Fattibile. Gli hook sono codice arbitrario, puoi metterci quello che vuoi.
+</p>
+
+<p>
+  Terzo livello: un classificatore machine learning. Analizza il comando Bash e decide se e' sicuro. Non e' pattern matching stupido. E' un modello che capisce il contesto. <code>rm -rf node_modules</code> e' diverso da <code>rm -rf /</code>. Uno lo fai dieci volte al giorno, l'altro ti manda in pensione anticipata.
+</p>
+
+<p>
+  Quarto livello: l'utente. Se tutti i livelli precedenti dicono "boh, non saprei", appare un prompt. Vedi esattamente cosa sta per eseguire e approvi o rifiuti. Puoi dire "approva sempre per questa classe di operazioni", e la regola si aggiunge al primo livello. Il sistema impara.
+</p>
+
+<div class="warning-box">
+  <p><strong>Principio di design.</strong> I permessi sono conservativi per default. Un tool nuovo, senza regole, richiede approvazione. Il sistema e' opt-in per la fiducia, opt-out per il controllo. L'opposto di come funziona la maggior parte del software. E per una buona ragione.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - I SUB-AGENT                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Sub-Agent</h2>
+<span class="section-number">Sezione 05. L'agent che spawna agent</span>
+
+<p>
+  Ecco il pattern piu' potente di tutto il sistema: la ricorsione. Un agent puo' creare altri agent. Ogni sub-agent ha il suo loop, i suoi tool, la sua history. Lavora su un sotto-problema e riporta il risultato al padre. Come un processo che fa fork, ma con un cervello LLM dentro.
+</p>
+
+<p>
+  In Claude Code, lo spawn avviene tramite il tool <code>Agent</code>. E' un tool come tutti gli altri. L'LLM decide di usarlo, l'orchestratore lo esegue. Ma l'esecuzione non e' una singola operazione. E' un intero ciclo di agent autonomo che parte, gira, e ritorna.
+</p>
+
+<div class="code-block" data-lang="TypeScript">
+<div class="code-wrap"><table><tr><td class="ln">1</td><td class="code"><span class="cm">// Schema dell'AgentTool. Questo e' quello che l'LLM vede.</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="kw">const</span> baseInputSchema = z.object({</td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="key">description</span>: z.string()  <span class="cm">// "Cerca i file di test"</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    .describe(<span class="st">'A short (3-5 word) description of the task'</span>),</td></tr>
+<tr><td class="ln">5</td><td class="code">  <span class="key">prompt</span>: z.string()       <span class="cm">// Il brief completo per il sub-agent</span></td></tr>
+<tr><td class="ln">6</td><td class="code">    .describe(<span class="st">'The task for the agent to perform'</span>),</td></tr>
+<tr><td class="ln">7</td><td class="code">  <span class="key">subagent_type</span>: z.string().optional()</td></tr>
+<tr><td class="ln">8</td><td class="code">    .describe(<span class="st">'The type of specialized agent to use'</span>),</td></tr>
+<tr><td class="ln">9</td><td class="code">  <span class="key">model</span>: z.enum([<span class="st">'sonnet'</span>, <span class="st">'opus'</span>, <span class="st">'haiku'</span>]).optional(),</td></tr>
+<tr><td class="ln">10</td><td class="code">  <span class="key">run_in_background</span>: z.boolean().optional(),</td></tr>
+<tr><td class="ln">11</td><td class="code">})</td></tr>
+</table></div></div>
+
+<p>
+  L'LLM non ha la minima idea di come funzioni il sub-agent sotto il cofano. Vede uno schema: dammi una descrizione, un prompt, opzionalmente un tipo e un modello. Tutto qui. Sotto, l'orchestratore crea un contesto isolato, clona lo stato dei file, lancia un nuovo <code>queryLoop()</code> e streama i risultati verso il padre. L'LLM sa fare il briefing, l'infrastruttura fa il resto.
+</p>
+
+<p>
+  La parte davvero interessante e' l'isolamento. Ogni sub-agent ha:
+</p>
+
+<p>
+  <strong>History separata.</strong> I messaggi del sub-agent non inquinano la conversazione del padre. Il padre vede solo il risultato finale. Niente rumore.
+</p>
+
+<p>
+  <strong>File state clonato.</strong> Il sub-agent parte con una fotografia dello stato dei file al momento dello spawn. Se il padre modifica un file dopo lo spawn, il sub-agent non lo vede. Zero race condition.
+</p>
+
+<p>
+  <strong>Permessi ereditati.</strong> Il sub-agent eredita le regole di permesso dal padre. Non puo' fare nulla che il padre non potrebbe fare. La catena di fiducia e' monotona: si restringe, non si espande mai. Principio del minimo privilegio applicato alla ricorsione.
+</p>
+
+<p>
+  <strong>Worktree opzionale.</strong> Con <code>isolation: 'worktree'</code>, il sub-agent lavora in una copia git separata del repository. Puo' modificare file senza toccare il working tree del padre. Le modifiche vengono integrate solo se il padre decide di farlo. Come un branch, ma per l'agent.
+</p>
+
+<div class="arch-diagram"><span class="accent-g">Agent Padre</span>
+  |
+  |---> <span class="accent-p">Sub-agent A</span> (Explore, Haiku)
+  |       |---> queryLoop() autonomo
+  |       |---> history isolata
+  |       |---> risultato --> padre
+  |
+  |---> <span class="accent-y">Sub-agent B</span> (Plan, Sonnet)
+  |       |---> queryLoop() autonomo
+  |       |---> worktree isolato
+  |       |---> risultato --> padre
+  |
+  |---> <span class="accent-r">Sub-agent C</span> (background)
+          |---> gira indipendente
+          |---> notifica al completamento
+</div>
+
+<div class="insight-box">
+  <p><strong>Perche' il sub-agent e' un tool?</strong> Perche' e' l'LLM a decidere quando usarlo. Non c'e' un orchestratore esterno che "smista" il lavoro dall'alto. L'agent stesso valuta: "questo task e' grosso, lo delego a un sotto-agente". E' auto-organizzazione pura. L'architettura non prescrive quando parallelizzare. L'agent lo scopre da solo.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - LA COMUNICAZIONE                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Comunicazione</h2>
+<span class="section-number">Sezione 06. Come parlano tra loro</span>
+
+<p>
+  Ok, avere agent che spawnano agent e' gia' potente. Ma la roba diventa seria quando gli agent si parlano tra loro. Non solo padre-figlio, ma peer-to-peer. E qui Claude Code fa una cosa che la maggior parte dei framework agent nemmeno contempla: ha un vero sistema di messaggistica inter-agent.
+</p>
+
+<p>
+  Il tool si chiama <code>SendMessage</code>. Un agent puo' mandare un messaggio a un altro agent per nome, per ID, o in broadcast a tutto il team. La sintassi e' semplice: <code>SendMessage(to: "researcher", message: "ho finito, ecco il risultato")</code>. Sotto il cofano, il messaggio finisce in una mailbox su file.
+</p>
+
+<p>
+  Si', avete letto bene. <strong>Mailbox su file.</strong> Ogni agent ha una inbox: <code>~/.claude/teams/{team}/inboxes/{agent}.json</code>. I messaggi sono JSON con timestamp, flag di lettura, e un campo summary per l'anteprima. File locking con retry e backoff per gestire le scritture concorrenti. Niente shared memory, niente socket complicati. File su disco. Funziona ovunque, e' debuggabile con <code>cat</code>, e non si rompe se un processo crasha. A volte la soluzione semplice e' quella giusta.
+</p>
+
+<p>
+  Ma non sono solo messaggi di testo. <code>SendMessage</code> supporta messaggi strutturati:
+</p>
+
+<p>
+  <strong>shutdown_request / shutdown_response.</strong> Un agent puo' chiedere a un altro di chiudersi con grazia. L'altro puo' accettare o rifiutare con una motivazione. Protocollo di spegnimento coordinato.
+</p>
+
+<p>
+  <strong>plan_approval_response.</strong> Il team lead puo' approvare o rifiutare il piano di un teammate con feedback. L'agent riceve il feedback e si adegua. Supervisione asincrona.
+</p>
+
+<p>
+  <strong>Broadcast.</strong> <code>to: "*"</code> manda a tutti i teammate del team. Utile per annunci tipo "ho modificato il file X, aggiornatevi".
+</p>
+
+<p>
+  La cosa bella e' che se mandi un messaggio a un agent che si era fermato, il sistema lo risveglia automaticamente. <code>resumeAgentBackground()</code> lo riprende con il messaggio come nuovo prompt. L'agent non deve stare in polling. Arriva il messaggio, si sveglia, lavora, risponde, si rimette in attesa. Come un servizio event-driven, ma fatto di LLM.
+</p>
+
+<div class="insight-box">
+  <p><strong>Il pattern da capire:</strong> la comunicazione inter-agent non e' sincrona tipo chiamata di funzione. E' asincrona tipo email. Ogni agent ha il suo loop indipendente, la sua inbox, il suo ritmo. Si coordinano scambiandosi messaggi, non condividendo stato. Se avete mai lavorato con Erlang o con gli actor model, riconoscerete il pattern. E non e' un caso.</p>
+</div>
+
+<p>
+  Per i permessi c'e' un meccanismo doppio. Se il team lead ha l'UI aperta, il teammate che ha bisogno di approvazione mette la richiesta in una coda condivisa e il leader la vede a schermo. Se il leader e' headless, la richiesta finisce nella mailbox e il teammate si mette in polling ogni 500ms finche' non arriva la risposta. Due path, stesso risultato. Resilienza.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - LA MEMORIA                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Memoria</h2>
+<span class="section-number">Sezione 07. Sopravvivere al context window</span>
+
+<p>
+  Il context window e' il collo di bottiglia di ogni agent. 200K token sembrano tanti finche' non hai letto 15 file, eseguito 30 comandi e fatto 10 turni di conversazione. A quel punto sei gia' a meta' finestra. I messaggi vecchi devono uscire. Ma non puoi buttarli via a caso: potresti perdere una decisione critica presa 20 turni fa che cambia tutto.
+</p>
+
+<p>
+  Claude Code gestisce la memoria su tre livelli. Ognuno risolve un problema diverso.
+</p>
+
+<p>
+  <strong>Primo livello: compaction automatica.</strong> Quando il contesto si avvicina al limite, parte un processo che riassume i messaggi vecchi. Non li cancella, li compatta. Un agent separato (un <code>runForkedAgent</code>) riceve l'history completa e produce un riassunto strutturato. Il riassunto sostituisce i messaggi originali con un <code>CompactBoundaryMessage</code>. I messaggi recenti restano intatti. Il vecchio diventa un riassunto, il nuovo resta com'era.
+</p>
+
+<p>
+  <strong>Secondo livello: file state cache.</strong> Una cache LRU dei file letti. Se l'agent legge lo stesso file due volte, la seconda volta il contenuto arriva dalla cache, senza consumare token per un nuovo tool_use. La cache viene clonata per i sub-agent e invalidata quando un file viene modificato. Semplice, ma ti salva un sacco di token.
+</p>
+
+<p>
+  <strong>Terzo livello: memoria persistente.</strong> I file <code>CLAUDE.md</code> nella directory del progetto. Markdown puro, caricati automaticamente nel system prompt a ogni sessione. L'agent ci puo' scrivere tramite il tool Edit. Questa memoria sopravvive tra sessioni. E' dove l'agent salva convenzioni, decisioni architetturali, le vostre preferenze. La memoria a lungo termine della bestia.
+</p>
+
+<div class="code-block" data-lang="pseudocode">
+<div class="code-wrap"><table><tr><td class="ln">1</td><td class="code"><span class="cm">// Strategia di gestione della memoria</span></td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="kw">if</span> (tokenCount > threshold) {</td></tr>
+<tr><td class="ln">4</td><td class="code">  <span class="cm">// Livello 1: compatta la history</span></td></tr>
+<tr><td class="ln">5</td><td class="code">  summary = <span class="kw">await</span> <span class="fn">runForkedAgent</span>(<span class="st">'summarize'</span>, messages)</td></tr>
+<tr><td class="ln">6</td><td class="code">  messages = [<span class="fn">CompactBoundary</span>(summary), ...recentMessages]</td></tr>
+<tr><td class="ln">7</td><td class="code">}</td></tr>
+<tr><td class="ln">8</td><td class="code"></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="kw">if</span> (fileAlreadyRead(path)) {</td></tr>
+<tr><td class="ln">10</td><td class="code">  <span class="cm">// Livello 2: usa la cache</span></td></tr>
+<tr><td class="ln">11</td><td class="code">  <span class="kw">return</span> fileStateCache.get(path)</td></tr>
+<tr><td class="ln">12</td><td class="code">}</td></tr>
+<tr><td class="ln">13</td><td class="code"></td></tr>
+<tr><td class="ln">14</td><td class="code"><span class="cm">// Livello 3: memoria persistente</span></td></tr>
+<tr><td class="ln">15</td><td class="code">systemPrompt += <span class="fn">loadCLAUDE_MD</span>(projectDir)</td></tr>
+</table></div></div>
+
+<p>
+  La compaction non e' un <code>truncate</code> stupido. E' un riassunto intelligente fatto da un LLM. Preserva le decisioni chiave, le istruzioni dell'utente, i vincoli scoperti durante l'esecuzione. E' lossy, ok, l'informazione si perde. Ma la perdita e' guidata dalla rilevanza, non dalla posizione cronologica. E questo fa tutta la differenza.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - IL RETRY                                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Retry</h2>
+<span class="section-number">Sezione 08. Fallire con grazia</span>
+
+<p>
+  Un agent che chiama un'API chiamera' un'API che fallisce. E' una certezza statistica. Rate limit, timeout, server sovraccarichi. Il retry e' l'ammortizzatore tra il mondo perfetto del loop e la realta' dell'infrastruttura che se ne frega dei tuoi piani.
+</p>
+
+<p>
+  Il modulo <code>withRetry.ts</code> implementa una strategia differenziata. Non tratta tutti gli errori allo stesso modo, e qui c'e' il bello.
+</p>
+
+<p>
+  <strong>429 (rate limit):</strong> fino a 10 retry con backoff esponenziale. Il delay parte da 500ms e raddoppia a ogni tentativo. Il rate limit e' temporaneo per definizione. Aspetti e riprovi. Fine.
+</p>
+
+<p>
+  <strong>529 (server sovraccarico):</strong> massimo 3 retry, e solo per query in foreground dove l'utente sta aspettando. Se e' una query di background (riassunti, suggerimenti, classificatori), il retry viene saltato completamente. Perche'? Ogni retry su un server sovraccarico amplifica il carico di 3-10x. Se non e' critico, non aggravare il problema. Questo e' pensiero da system engineer, non da tutorial.
+</p>
+
+<p>
+  <strong>Errori di connessione:</strong> un singolo retry. La connessione potrebbe essere andata stale. Un secondo tentativo basta per verificare.
+</p>
+
+<div class="warning-box">
+  <p><strong>Il dettaglio che fa la differenza.</strong> I retry sulle query di background sono disabilitati. Il commento nel codice lo spiega meglio di me: <em>"during a capacity cascade each retry is 3-10x gateway amplification, and the user never sees those fail anyway."</em> Non e' solo resilienza. E' responsabilita' verso l'infrastruttura condivisa. Se non avete mai ragionato cosi', iniziate adesso.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - IL PROTOCOLLO                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Protocollo dei Messaggi</h2>
+<span class="section-number">Sezione 09. La lingua franca</span>
+
+<p>
+  L'agent e l'LLM comunicano attraverso un protocollo strutturato. Non testo libero. Oggetti JSON tipizzati che seguono lo schema dell'Anthropic Messages API. Se pensate che sia "solo JSON", vi state perdendo il pezzo piu' importante.
+</p>
+
+<p>
+  Un messaggio dell'assistente contiene un array di <strong>content blocks</strong>. Guardate cosa ci puo' finire dentro:
+</p>
+
+<div class="code-block" data-lang="JSON">
+<div class="code-wrap"><table><tr><td class="ln">1</td><td class="code">{</td></tr>
+<tr><td class="ln">2</td><td class="code">  <span class="key">"role"</span>: <span class="st">"assistant"</span>,</td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="key">"content"</span>: [</td></tr>
+<tr><td class="ln">4</td><td class="code">    {</td></tr>
+<tr><td class="ln">5</td><td class="code">      <span class="key">"type"</span>: <span class="st">"thinking"</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">      <span class="key">"thinking"</span>: <span class="st">"Devo leggere il file prima di modificarlo..."</span></td></tr>
+<tr><td class="ln">7</td><td class="code">    },</td></tr>
+<tr><td class="ln">8</td><td class="code">    {</td></tr>
+<tr><td class="ln">9</td><td class="code">      <span class="key">"type"</span>: <span class="st">"text"</span>,</td></tr>
+<tr><td class="ln">10</td><td class="code">      <span class="key">"text"</span>: <span class="st">"Leggo il file di configurazione."</span></td></tr>
+<tr><td class="ln">11</td><td class="code">    },</td></tr>
+<tr><td class="ln">12</td><td class="code">    {</td></tr>
+<tr><td class="ln">13</td><td class="code">      <span class="key">"type"</span>: <span class="st">"tool_use"</span>,</td></tr>
+<tr><td class="ln">14</td><td class="code">      <span class="key">"id"</span>: <span class="st">"toolu_01ABC"</span>,</td></tr>
+<tr><td class="ln">15</td><td class="code">      <span class="key">"name"</span>: <span class="st">"Read"</span>,</td></tr>
+<tr><td class="ln">16</td><td class="code">      <span class="key">"input"</span>: { <span class="key">"file_path"</span>: <span class="st">"/src/config.ts"</span> }</td></tr>
+<tr><td class="ln">17</td><td class="code">    }</td></tr>
+<tr><td class="ln">18</td><td class="code">  ]</td></tr>
+<tr><td class="ln">19</td><td class="code">}</td></tr>
+</table></div></div>
+
+<p>
+  Tre tipi di content block in un singolo messaggio. Il <code>thinking</code> e' il ragionamento interno dell'LLM, il "pensiero ad alta voce" che normalmente non vedi. Il <code>text</code> e' quello che l'utente legge a schermo. Il <code>tool_use</code> e' l'istruzione per l'orchestratore: "esegui questo tool con questi parametri".
+</p>
+
+<p>
+  Dopo l'esecuzione, l'orchestratore aggiunge un messaggio con ruolo <code>user</code> contenente un <code>tool_result</code>:
+</p>
+
+<div class="code-block" data-lang="JSON">
+<div class="code-wrap"><table><tr><td class="ln">1</td><td class="code">{</td></tr>
+<tr><td class="ln">2</td><td class="code">  <span class="key">"role"</span>: <span class="st">"user"</span>,</td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="key">"content"</span>: [{</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="key">"type"</span>: <span class="st">"tool_result"</span>,</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="key">"tool_use_id"</span>: <span class="st">"toolu_01ABC"</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="key">"content"</span>: <span class="st">"export default { port: 3000, ... }"</span></td></tr>
+<tr><td class="ln">7</td><td class="code">  }]</td></tr>
+<tr><td class="ln">8</td><td class="code">}</td></tr>
+</table></div></div>
+
+<p>
+  Il <code>tool_use_id</code> lega il risultato alla richiesta. L'LLM vede la sua richiesta, poi il risultato, e decide il passo successivo. Il protocollo e' stateless dal punto di vista dell'LLM: l'intera history viene mandata a ogni turno. L'agent gestisce lo stato, l'LLM ragiona sulla foto completa.
+</p>
+
+<div class="insight-box">
+  <p><strong>Implicazione pesante:</strong> l'LLM non ha memoria. Ha contesto. La differenza e' che il contesto viene costruito dall'agent a ogni turno. L'agent decide cosa includere, cosa compattare, cosa buttare. L'LLM ragiona solo su quello che riceve. Il potere vero non e' nel modello. E' in chi costruisce il contesto che il modello vede.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - IL TOOL SEARCH                                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Tool Search</h2>
+<span class="section-number">Sezione 10. Tool on demand</span>
+
+<p>
+  Un agent con 100 tool ha un problema concreto: 100 descrizioni nel system prompt occupano token. Token che potrebbero servire per il lavoro vero. La soluzione di Claude Code e' il <strong>deferred loading</strong>, e vi spiego perche' e' geniale.
+</p>
+
+<p>
+  All'avvio, solo i tool essenziali vengono caricati nel prompt, quelli con <code>alwaysLoad: true</code>. I tool meno usati vengono registrati con <code>shouldDefer: true</code>: l'LLM vede solo il nome, non lo schema completo.
+</p>
+
+<p>
+  Quando l'LLM ha bisogno di un tool deferrito, usa il meta-tool <code>ToolSearch</code>. Cerca per keyword, riceve lo schema completo, e a quel punto puo' invocarlo normalmente. Due fasi: discovery e invocazione. Lazy loading applicato ai tool di un agent.
+</p>
+
+<p>
+  Ogni tool deferrito ha un <code>searchHint</code>: una frase di 3-10 parole che aiuta il matching. Per esempio, <code>NotebookEdit</code> ha come hint <code>"jupyter"</code>. L'LLM cerca "jupyter", trova NotebookEdit, ne riceve lo schema, lo usa. Zero token sprecati per tool che non servono nella sessione corrente. Se non vi serve il notebook, il notebook non vi costa niente.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 - METTERE TUTTO INSIEME                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Mettere Tutto Insieme</h2>
+<span class="section-number">Sezione 11. L'architettura completa</span>
+
+<p>
+  Ok, ricapitoliamo. Un agent system completo ha otto componenti:
+</p>
+
+<div class="arch-diagram">
+<span class="accent-g">1. IL LOOP</span>           while(true) { chiama LLM -> esegui tool -> valuta }
+<span class="accent-p">2. I TOOL</span>           Interfacce tipizzate con schema, permessi, metadati
+<span class="accent-y">3. L'ORCHESTRAZIONE</span>  Partiziona read-only/non-read-only, parallelo/seriale
+<span class="accent-r">4. I PERMESSI</span>        Catena a 4 livelli: regole, hook, classificatore, utente
+<span class="accent-g">5. I SUB-AGENT</span>      Agent che spawnano agent, con isolamento
+<span class="accent-p">6. LA COMUNICAZIONE</span>  Mailbox, broadcast, messaggi strutturati, actor model
+<span class="accent-y">7. LA MEMORIA</span>        Compaction, cache, persistenza cross-sessione
+<span class="accent-r">8. L'EVALUATION</span>      Feedback loop continuo, l'agent valuta il proprio output
+</div>
+
+<p>
+  L'ottavo lo abbiamo visto passare senza isolarlo, ma e' il pezzo che chiude il cerchio. Un agent senza evaluation e' un loop cieco. Esegue, ma non sa se ha fatto bene.
+</p>
+
+<p>
+  In Claude Code l'evaluation e' ovunque, ma non ha un modulo dedicato con la scritta "evaluation" sopra. E' distribuita. Quando il loop valuta <code>evaluateTransition()</code>, sta decidendo: il risultato e' sufficiente per fermarsi? L'LLM stesso, vedendo il tool_result nel contesto, valuta se il file letto contiene quello che cercava, se il comando ha restituito l'output atteso, se il codice scritto compila. I sub-agent di tipo "verification" rileggono il lavoro del padre e cercano errori. Gli hook post-tool-use ispezionano il risultato e possono forzare un rollback.
+</p>
+
+<p>
+  Il pattern e' questo: l'evaluation non e' un passo separato alla fine. E' un feedback loop continuo integrato in ogni iterazione. Il tool restituisce un risultato, l'LLM lo valuta, decide se e' soddisfacente o se serve un altro giro. Ogni turno del loop e' implicitamente un ciclo plan-execute-evaluate. Se togliete l'evaluation, avete un agent che scrive codice senza mai leggerlo. E sapete tutti come va a finire.
+</p>
+
+<p>
+  Nessuno di questi pezzi e' complesso da solo. Il <code>while(true)</code> e' banale. L'interfaccia di un tool sono 10 campi. La partizione parallelo/seriale e' un <code>if</code>. I permessi sono una catena di <code>if</code>. I sub-agent sono lo stesso loop in un contesto clonato. La comunicazione e' una mailbox su file JSON. La memoria e' una cache LRU piu' un riassunto. L'evaluation e' l'LLM che guarda il proprio output e decide se basta.
+</p>
+
+<p>
+  La complessita' vera e' nella composizione. Nel fatto che il loop gestisce lo streaming. Che i tool producono side effect che modificano il contesto del prossimo turno. Che i sub-agent ereditano permessi ma isolano lo stato. Che gli agent si parlano via mailbox senza condividere memoria. Che la compaction perde informazione ma la perde in modo controllato. Che il retry discrimina tra query critiche e background. Che l'evaluation e' distribuita in ogni turno invece che concentrata alla fine. Ogni pezzo e' semplice. Il sistema no.
+</p>
+
+<p>
+  Queste sono decisioni di design, non di codice. Non si tratta di scrivere TypeScript piu' veloce. Si tratta di sapere quando un tool e' read-only, quando un retry amplifica il carico, quando un sub-agent ha bisogno di un worktree isolato. Sono decisioni architetturali. E l'architettura non si genera con un prompt.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 - COSTRUISCI IL TUO                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Costruisci il Tuo</h2>
+<span class="section-number">Sezione 12. Lo stack reale</span>
+
+<p>
+  Ok, avete capito i pattern. Adesso la domanda e': con cosa li implemento? Vi do la mappa completa. Non i cinque passi da tutorial, ma lo stack vero con i trade-off veri.
+</p>
+
+<p>
+  <strong>Il runtime e il loop.</strong> Se partite da zero, l'Anthropic Agent SDK (<code>claude_agent_sdk</code> in Python) vi da' il loop ReAct gia' fatto con streaming, gestione dei tool_use, e retry integrato. In TypeScript c'e' <code>@anthropic-ai/sdk</code> che vi da' lo streaming nativo dei content block. Se volete il controllo totale, il loop e' un <code>while(true)</code> che chiama <code>messages.create()</code> con <code>stream=True</code>, parsea i <code>tool_use</code> blocks dalla risposta, esegue i tool, e appende i <code>tool_result</code> alla history. Cinquanta righe di codice. Il punto non e' la complessita' del loop, e' tutto quello che ci costruite attorno.
+</p>
+
+<p>
+  <strong>I tool e il protocollo.</strong> Qui avete due strade. La prima: definite i tool inline come JSON Schema nell'array <code>tools</code> della chiamata API. Funziona, e' veloce, avete il controllo. La seconda: usate MCP, il Model Context Protocol. MCP e' un protocollo aperto per esporre tool, risorse e prompt a qualsiasi agent. Un server MCP e' un processo separato che risponde via JSON-RPC su stdio o HTTP. Il vantaggio e' che lo stesso server MCP funziona con Claude Code, con Cursor, con qualsiasi client compatibile. Se costruite un tool per accedere al vostro database, con MCP lo scrivete una volta e lo usate ovunque. L'SDK ufficiale e' <code>@modelcontextprotocol/sdk</code> in TypeScript e <code>mcp</code> in Python.
+</p>
+
+<p>
+  <strong>L'orchestrazione.</strong> Se avete tool che possono girare in parallelo, vi serve il partizionamento che abbiamo visto. Il trucco e' taggare ogni tool con un flag <code>isReadOnly</code>. I read-only li sparate con <code>Promise.all()</code> o <code>asyncio.gather()</code>. I non-read-only li eseguite in serie. Mettete un cap sulla concorrenza (10 e' un buon default). Se non fate questo, il vostro agent sara' 3-5x piu' lento del necessario su qualsiasi task che coinvolga piu' file.
+</p>
+
+<p>
+  <strong>I permessi.</strong> Al minimo: un <code>if</code> che chiede conferma per i comandi distruttivi. Ma se fate le cose sul serio, vi serve una catena. Le regole statiche le mettete in un file di config (allow/deny per tool e pattern). Gli hook li implementate come script shell che ricevono JSON su stdin e rispondono su stdout: <code>{"decision": "allow"}</code> o <code>{"decision": "block", "reason": "..."}</code>. Per il classificatore ML, se non avete un modello vostro, potete fare una chiamata a un LLM economico (Haiku) con un prompt tipo "questo comando bash e' sicuro da eseguire in un ambiente di sviluppo?". Costa quasi niente e vi salva dai disastri.
+</p>
+
+<p>
+  <strong>La memoria.</strong> Livello zero: quando i token superano il 70% della finestra, troncate i messaggi piu' vecchi. Livello uno: invece di troncare, fate una chiamata a un modello piccolo con il prompt "riassumi questa conversazione preservando le decisioni chiave e i vincoli". Livello due: aggiungete un file di memoria persistente (un markdown nel progetto) che l'agent puo' leggere e scrivere. Livello tre: se volete la microcompact nativa, l'API di Anthropic supporta strategie come <code>clear_tool_uses</code> e <code>clear_thinking</code> che rimuovono blocchi vecchi lato server senza che voi dobbiate toccare la history.
+</p>
+
+<p>
+  <strong>La comunicazione.</strong> Se i vostri agent girano nello stesso processo, una coda in-memory (un array con push/shift) basta. Se girano in processi separati, il pattern mailbox su file che abbiamo visto funziona sorprendentemente bene: un JSON per agent, file locking, polling ogni 500ms. Se avete bisogno di scalare, Redis pub/sub o NATS. Ma non partite da li'. Il 90% dei sistemi agent multi-processo funziona benissimo con file su disco.
+</p>
+
+<p>
+  <strong>I sub-agent.</strong> Aggiungete un tool "Agent" al vostro loop che lancia una nuova istanza dello stesso loop con un prompt diverso. Il punto critico e' l'isolamento: clonate la cache dei file (non condividetela), date al figlio una history separata, e fate in modo che i permessi del figlio siano un sottoinsieme di quelli del padre. Se volete il worktree isolation, <code>git worktree add</code> vi crea una copia del repo in tre secondi. Il figlio lavora li', il padre non vede niente finche' non integra.
+</p>
+
+<div class="warning-box">
+  <p><strong>Sui framework.</strong> LangChain, CrewAI, AutoGen, Semantic Kernel. Li conoscete tutti. Il mio consiglio: usateli per prototipare, non per produzione. Vi danno il loop e i tool gratis, ma vi nascondono le decisioni critiche. Come gestisce la concorrenza? Come compatta il contesto? Come isola i sub-agent? Quando queste domande diventano importanti (e diventano importanti), il framework vi rema contro perche' dovete lottare con le sue astrazioni invece di risolvere il problema. Se avete capito i pattern di questo articolo, potete costruire il vostro stack con l'SDK del provider e 200 righe di orchestrazione. E avrete il controllo su ogni decisione.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 - DOVE FALLISCONO                               -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Dove Questi Sistemi Falliscono</h2>
+<span class="section-number">Sezione 13. Il lato oscuro</span>
+
+<p>
+  Sarebbe disonesto chiudere senza parlarvi dei modi in cui un agent system vi esplode in mano. Sono modi specifici, diversi dai bug tradizionali, e se non li conoscete vi colpiscono nel momento peggiore. Ve li elenco perche' ci sono passato.
+</p>
+
+<p>
+  <strong>Hallucination sui tool.</strong> L'LLM invoca un tool con input plausibile ma sbagliato. Chiede di leggere un file che non esiste. Passa un flag inventato a un comando. Scrive codice che chiama una funzione con la firma sbagliata. Lo schema Zod cattura gli errori di formato, ma non quelli semantici. L'agent riceve un errore, lo vede nel contesto, e spesso si corregge al giro dopo. Ma "spesso" non e' "sempre". A volte l'LLM entra in un loop dove ripete lo stesso errore con variazioni minime, convinto che il problema sia altrove. L'avete visto tutti, lo so.
+</p>
+
+<p>
+  <strong>Error propagation nei sub-agent.</strong> Un sub-agent fallisce silenziosamente. Restituisce un risultato parziale o sbagliato. Il padre lo usa come fatto acquisito e ci costruisce sopra. L'errore si propaga verso l'alto, amplificato a ogni livello. E' l'equivalente agent di un bug che passa i test unitari ma rompe il sistema in integrazione. Claude Code mitiga con i tipi di risultato e la validazione, ma il rischio e' strutturale: piu' livelli di agent, piu' superficie per errori composti.
+</p>
+
+<p>
+  <strong>Loop fuori controllo.</strong> L'agent decide che non ha finito. Continua a iterare. Legge file, esegue comandi, spawna sub-agent, compatta il contesto, ricomincia. Senza un limite di turni (<code>maxTurns</code> in Claude Code), un loop puo' girare per sempre. Con un limite, l'agent si ferma ma il lavoro potrebbe essere incompleto. Non c'e' una soluzione perfetta. C'e' il monitoraggio: quanti turni, quanti token, quante tool call. E c'e' il kill switch: voi che interrompete.
+</p>
+
+<p>
+  <strong>Cost explosion.</strong> Ogni turno del loop e' una chiamata API. Ogni sub-agent e' una serie di chiamate. La compaction stessa e' una chiamata. Un task ambiguo su un codebase grande puo' generare centinaia di turni, decine di sub-agent, migliaia di tool call. Il costo scala con (turni x sub-agent x tool call), non con le righe di codice prodotte. Un <code>maxTurns</code> di 200 con un modello grosso puo' costarvi piu' di quello che pensavate di spendere in un mese. Controllate la dashboard, gente.
+</p>
+
+<p>
+  <strong>Perdita di contesto dopo compaction.</strong> La compaction e' lossy. Il riassunto perde dettagli. Dopo 3-4 compaction in una sessione lunga, l'agent puo' dimenticare un vincolo stabilito 50 turni fa. "Non modificare quel file" diventa rumore nel riassunto di un riassunto. La memoria persistente (CLAUDE.md) aiuta, ma solo se l'agent ci ha scritto il vincolo. E non sempre lo fa.
+</p>
+
+<div class="warning-box">
+  <p><strong>La regola pratica.</strong> Un agent system e' affidabile in proporzione alla specificita' del task. "Leggi questo file e aggiungi un test per questa funzione" funziona. "Riscrivi il modulo di autenticazione" e' una scommessa. La differenza non e' nella capacita' dell'LLM. E' nella quantita' di decisioni ambigue che l'agent deve prendere senza che nessuno lo guardi.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 14 - COSA C'E' DI NUOVO QUI                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Cosa C'e' Di Nuovo Qui</h2>
+<span class="section-number">Sezione 14. Oltre ReAct</span>
+
+<p>
+  "Ok, ma un loop ReAct lo fanno tutti. Cosa porta di veramente nuovo Claude Code?" Domanda giusta. Ve lo dico io cosa c'e' che non avete visto altrove.
+</p>
+
+<p>
+  <strong>Tool loading lazy.</strong> Nessun framework agent carica i tool on-demand. AutoGen, CrewAI, LangChain: tutti mandano la lista completa dei tool nel system prompt a ogni turno. Se hai 100 tool MCP, sono 100 descrizioni che bruciano token. Claude Code ha il <code>ToolSearch</code>: i tool partono deferiti, l'LLM li scopre quando servono. E' lazy loading applicato all'intelligenza artificiale. Sembra niente, ma su sessioni lunghe vi risparmia migliaia di token a turno.
+</p>
+
+<p>
+  <strong>Microcompact nativa.</strong> La gestione del context window non e' fatta lato client tagliando messaggi. E' fatta lato API con strategie native: <code>clear_tool_uses</code> rimuove i blocchi tool_use vecchi preservando i metadati, <code>clear_thinking</code> toglie i blocchi di ragionamento mantenendo quelli recenti. Il server sa cosa puo' togliere senza rompere la coerenza. Il client non deve indovinare. Questo e' lo stato dell'arte nella gestione del contesto, e nessun altro framework ce l'ha perche' richiede integrazione col provider del modello.
+</p>
+
+<p>
+  <strong>Content replacement con prompt cache parity.</strong> Quando un tool restituisce un risultato enorme, Claude Code lo salva su disco e mette un'anteprima nel contesto. Fin qui niente di speciale. Il pezzo intelligente e' che il <code>ContentReplacementState</code> viene clonato ai sub-agent con le stesse decisioni di troncamento del padre. Se il padre ha messo un'anteprima per il file X, il figlio vede la stessa identica anteprima. Perche'? Per il prompt cache. Se il figlio vedesse un'anteprima diversa, il prefisso del prompt cambierebbe e la cache del modello andrebbe invalidata. Un dettaglio che vi fa risparmiare latenza e soldi su ogni singola chiamata API dei sub-agent.
+</p>
+
+<p>
+  <strong>Classificatore ML per i permessi.</strong> Nessun sistema agent che conosco usa un modello per decidere se un comando bash e' sicuro. Tutti usano pattern matching: se contiene <code>rm</code>, chiedi conferma. Claude Code ha un classificatore che capisce il contesto. <code>rm -rf node_modules</code> passa. <code>rm -rf /</code> no. <code>chmod 777 /tmp/build</code> passa. <code>chmod 777 /etc/shadow</code> no. Non e' regex. E' comprensione semantica del rischio. E se il classificatore non e' sicuro, fallback al prompt utente. Belt and suspenders.
+</p>
+
+<p>
+  <strong>Hook system estensibile.</strong> Pre-tool, post-tool, pre-compact, post-compact. Script shell, webhook HTTP, o prompt LLM che valutano l'input del tool. Potete agganciare qualsiasi logica esterna al ciclo di vita dell'agent senza toccare il codice. Un hook che manda un messaggio Slack ogni volta che l'agent fa un git push? Dieci righe. Un hook che blocca qualsiasi scrittura fuori dalla directory del progetto? Cinque righe. L'hook system trasforma l'agent da prodotto chiuso a piattaforma componibile.
+</p>
+
+<p>
+  <strong>AsyncLocalStorage per isolamento in-process.</strong> I teammate che girano nello stesso processo Node non usano variabili globali per distinguersi. Usano <code>AsyncLocalStorage</code>, lo stesso meccanismo che i framework web usano per il request context. Ogni agent ha il suo contesto isolato anche se condivide l'event loop con gli altri. Zero race condition sullo stato, zero mutex, zero shared memory. Concorrenza cooperativa senza i bug della concorrenza.
+</p>
+
+<p>
+  <strong>Fork semantics per sub-agent.</strong> Quando un sub-agent viene creato con il flag <code>fork</code>, eredita l'intera conversazione del padre. Non solo il prompt: tutta la history, tutti i tool_use, tutti i risultati. Parte sapendo tutto quello che sa il padre. Come un <code>fork()</code> Unix: il processo figlio e' una copia del padre e diverge da li'. Questo permette al sub-agent di continuare un ragionamento complesso senza ripartire da zero. Nessun altro sistema che conosco fa questo.
+</p>
+
+<div class="warning-box">
+  <p><strong>Il punto.</strong> Ognuna di queste innovazioni risolve un problema che trovate solo quando costruite agent system in produzione, non in demo. Token che finiscono, cache che si invalida, permessi che non scalano, agent che non si parlano. Se state progettando il vostro sistema, questa e' la lista dei problemi che vi aspettano. Claude Code li ha gia' risolti. Studiate le soluzioni.</p>
+</div>
+
+
+<!-- ============================================================
+     CONCLUSIONE
+     ============================================================ -->
+<div class="conclusion-box fade-in">
+  <div class="quote">"Il codice e' output. L'architettura e' leverage."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Un <code>while(true)</code>, un LLM, e una lista di tool. Questo e' un agent.
+    Il resto e' ingegneria: permessi per non distruggere, memoria per non dimenticare,
+    sub-agent per parallelizzare, retry per sopravvivere. Non servono 512.000 righe.
+    Servono i pattern giusti. E la capacita' di comporli.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- Scripts -->
+<script src="../js/main.js"></script>
+
+</body>
+</html>
