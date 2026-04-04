@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Codice Risorge</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-codice-risorge.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-codice-risorge.html</guid>
+    <pubDate>Sat, 04 Apr 2026 00:00:00 +0200</pubDate>
+    <description>Codice eliminato, rimosso, sepolto. Che torna in vita attraverso dipendenze transitive, supply chain avvelenate e rollback sbagliati. xz-utils smontato pezzo per pezzo: due anni di social engineering per una backdoor nei file di test. event-stream: maintainer burnout trasformato in vettore d'attacco. ua-parser-js: account hijacking su 8 milioni di download a settimana. 5 meccanismi di resurrezione, 3 case study, detection, difesa. Laboratorio pratico con 3 script per provare sulla vostra macchina.</description>
+  </item>
+
+  <item>
     <title>Cambiamo Paradigma</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/cambiamo-paradigma.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/cambiamo-paradigma.html</guid>

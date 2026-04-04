@@ -1,0 +1,8 @@
+{
+  "name": "totally-safe-package",
+  "version": "1.0.0",
+  "description": "Un pacchetto totalmente sicuro. Fidatevi.",
+  "scripts": {
+    "postinstall": "node postinstall.js"
+  }
+}

