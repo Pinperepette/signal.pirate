@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Benzina Ha Un Modello | Signal Pirate</title>
+  <meta name="description" content="Il prezzo della benzina non e' ne' la guerra ne' le accise. E' un sistema a feedback con memoria asimmetrica. 21 anni di dati veri, ECM asimmetrico con Newey-West HAC, poi VECM multivariato con test di Johansen. Rockets and feathers robusto (1.20x, Wald z=5.54). Ma sull'intervento Draghi 2022, stesso dato + cinque modelli = cinque risposte diverse: segno negativo con OLS, positivo con VECM, significativita' che si evapora cambiando il rank. Non puoi conoscere il segno di un effetto senza modellare il sistema completo.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box { background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05)); border-left: 3px solid var(--accent-highlight); border-radius: 0 10px 10px 0; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .warning-box { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05)); border-left: 3px solid var(--accent-reaction); border-radius: 0 10px 10px 0; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+    .warning-box p { margin: 0; line-height: 1.6; }
+    .section-number { display: block; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+    .terminal-output { background: #0d1117; border: 1px solid rgba(0,255,136,0.12); border-radius: 10px; padding: 1rem 1.2rem; margin: 1.5rem 0; font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.8; overflow-x: auto; color: #c8c8d8; }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .stat-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 1.2rem; text-align: center; }
+    .stat-number { font-family: var(--font-mono); font-weight: 800; font-size: 1.8rem; }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.3rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; }
+    .conclusion-box { background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08)); border: 1px solid rgba(0,255,136,0.2); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+    .conclusion-box .quote { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: var(--accent-attention); line-height: 1.4; }
+    .lab-screenshot { border-radius: 12px; border: 1px solid rgba(124,77,255,0.2); margin: 1.5rem 0; max-width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .formula-box { background: #0d1117; border: 1px solid rgba(124,77,255,0.3); border-radius: 10px; padding: 1.5rem 2rem; margin: 1.5rem 0; text-align: center; font-family: var(--font-mono); font-size: 1.05rem; color: var(--accent-highlight); line-height: 2; }
+    .formula-box .formula-name { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-secondary); display: block; margin-bottom: 0.5rem; }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: rgba(0,255,136,0.08); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent-attention); }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-04-05 | Pinperepette</p>
+    <h1 class="article-page-title">La Benzina <span class="accent">Ha Un Modello</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Il prezzo della benzina non e' ne' la guerra ne' le accise. E' un sistema a feedback con memoria asimmetrica. 21 anni di dati veri (EU Weekly Oil Bulletin Italia + Germania, FRED Brent daily), ECM asimmetrico con Newey-West HAC, poi VECM + Johansen. Rockets and feathers robusto a 1.20x (Wald z=5.54). Ma sul Draghi cut 2022, stesso dato + cinque modelli = cinque risposte. Non puoi sapere il segno senza modellare il sistema completo.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Econometria</span>
+      <span class="tag tag-highlight">ECM Asimmetrico</span>
+      <span class="tag tag-reaction">Dati Reali</span>
+      <span class="tag tag-amplification">Reality Simulator</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <h2><span class="accent">//</span> Raga, Ho Fatto Una Cosa</h2>
+    <span class="section-number">Sezione 00. Il trigger</span>
+
+    <p>La benzina e' tornata a salire. Come sempre, partono le solite tre spiegazioni: la guerra, le accise, la speculazione. Uno le ripete, l'altro le rigira, tutti d'accordo che <em>qualcuno</em> ci sta fregando. Fine della discussione.</p>
+
+    <p>Il fatto e' che mi sono rotto di sentire le stesse cose dette nello stesso ordine. Non perche' siano necessariamente false, ma perche' sono spiegazioni a una variabile. E quando qualcosa di complicato viene spiegato con una variabile, di solito vuol dire che chi parla non ha mai guardato i dati.</p>
+
+    <p>Allora ho fatto una cosa: ho scaricato 21 anni di serie storiche vere. Brent daily dal 1987 da FRED. EUR/USD daily. Prezzi benzina Italia settimanali dal 2005 dall'EU Weekly Oil Bulletin, quella tabella che nessuno apre mai dove trovi il prezzo <em>con tasse</em> e <em>senza tasse</em> per ogni settimana, per ogni paese. Totale: 1058 osservazioni settimanali per la benzina italiana, 9861 punti daily per il Brent. Poi ho scritto un modello econometrico e l'ho fatto girare. Il risultato mi ha fatto rivedere un paio di cose.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Tesi.</strong> La benzina non "segue" il greggio. Ci dialoga. E il dialogo e' asimmetrico: una parola in piu' quando il greggio sale, una parola in meno quando scende. Cinque cent/litro all'anno di asimmetria, pagata da te.</p>
+    </div>
+
+
+    <h2><span class="accent">//</span> La Benzina Non E' Un Numero, E' Un Layer Cake</h2>
+    <span class="section-number">Sezione 01. Decomposizione</span>
+
+    <p>Prima cosa: cosa stai pagando, esattamente, quando fai il pieno. La pompa ti dice 1.78 EUR al litro (dati 23 marzo 2026, benzina self Italia). Scomposto: 98.5 cent di netto industriale, 47.3 cent di accisa, 32.1 cent di IVA. La parte dello Stato e' il 44.6%, la parte del mercato e' il 55.4%. Lo "stacco fiscale" per gli amici del trading.</p>
+
+    <img src="../immagini/reality-simulator-benzina/01_decomposizione_reale.png" alt="Decomposizione prezzo benzina Italia" class="lab-screenshot">
+
+    <p>Solo che questo numero, 44.6%, non e' costante. Nel 2020, durante il COVID, quando il Brent e' crollato a 9 dollari al barile, la quota Stato sulla benzina italiana e' arrivata al 72%. Il netto si era asciugato e l'accisa era rimasta li' impilata sopra. Nel giugno 2022, dopo l'invasione e con Draghi che taglia le accise, la quota Stato e' scesa al 41%. Stesso paese, stesso prodotto, ventuno punti percentuali di differenza. Ecco perche' "colpa delle accise" e' una frase che dipende da che settimana la dici.</p>
+
+    <img src="../immagini/reality-simulator-benzina/02_stato_vs_mercato_storia.png" alt="Composizione Stato vs Mercato nel tempo" class="lab-screenshot">
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">72%</div>
+        <div class="stat-label">Quota Stato max (Covid 2020)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">41%</div>
+        <div class="stat-label">Quota Stato min (Giu 2022)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">2.51x</div>
+        <div class="stat-label">Pompa / Netto mediano</div>
+      </div>
+    </div>
+
+
+    <h2><span class="accent">//</span> I Rendimenti Sono Tutto Tranne Che Gaussiani</h2>
+    <span class="section-number">Sezione 02. Fatti stilizzati</span>
+
+    <p>Prima di mettere in piedi qualunque modello, guardi la forma dei dati. Settimana su settimana, la variazione percentuale del prezzo benzina alla pompa ha deviazione standard 1.21%. Sembra tranquillo. Solo che la kurtosis e' <strong>32.8</strong>. Per una gaussiana dovrebbe essere 3. Significa che le code della distribuzione sono enormemente piu' grosse di quelle di una campana normale: gli eventi estremi (+5%, +8% in una settimana) succedono molto piu' spesso di quanto la statistica "da libro di testo" ti farebbe credere.</p>
+
+    <img src="../immagini/reality-simulator-benzina/04_rendimenti_distribuzione.png" alt="Distribuzione rendimenti settimanali" class="lab-screenshot">
+
+    <p>Il Brent ha kurtosis 12.6, gia' alta. Il netto benzina 14.4. Ma la pompa 32.8. L'IVA e' un moltiplicatore lineare, l'accisa e' costante a quasi-tempo, eppure il prodotto finale e' il piu' "code pesanti" di tutti. Perche'? Perche' quando c'e' uno shock, si impilano in fase: greggio su, crack spread su, margini distributivi su, tutto in una settimana. Quando non c'e' shock, il sistema e' noioso. Pochi eventi fanno la gran parte della varianza.</p>
+
+    <p>Secondo dato interessante: lo skew della pompa e' <strong>+0.39</strong>. Positivo. Cioe' il prezzo ha piu' probabilita' di sorprenderti al rialzo che al ribasso. La distribuzione non e' simmetrica, e non e' un bug, e' una caratteristica. Ci arriviamo.</p>
+
+
+    <h2><span class="accent">//</span> Rockets And Feathers, E Non E' Una Metafora</h2>
+    <span class="section-number">Sezione 03. L'asimmetria esiste, ed e' misurabile</span>
+
+    <p>C'e' un paper del 1991 di Robert Bacon che per primo lo ha scritto nero su bianco: i prezzi dei carburanti al dettaglio salgono come razzi e scendono come piume. Dal 1991 ad oggi e' stato replicato in una ventina di paesi con metodi diversi. Io l'ho rifatto sui dati italiani, usando un Error Correction Model asimmetrico stimato con OLS.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">ECM asimmetrico</span>
+      &Delta;log(netto)<sub>t</sub> = &alpha; + &beta;<sub>up</sub>&middot;&Delta;log(brent)<sup>+</sup><sub>t</sub> + &beta;<sub>dn</sub>&middot;&Delta;log(brent)<sup>-</sup><sub>t</sub><br>
+      + &gamma;<sub>up</sub>&middot;ECM<sup>+</sup><sub>t-1</sub> + &gamma;<sub>dn</sub>&middot;ECM<sup>-</sup><sub>t-1</sub> + &epsilon;<sub>t</sub>
+    </div>
+
+    <p>In parole povere: prendi la variazione settimanale del netto benzina. La scomponi in quattro pezzi: <em>quanto reagisce al Brent quando sale</em> (&beta;<sub>up</sub>), <em>quanto reagisce quando scende</em> (&beta;<sub>dn</sub>), <em>quanto velocemente si aggiusta verso l'equilibrio quando e' troppo caro</em> (&gamma;<sub>dn</sub>), <em>quanto velocemente si aggiusta quando e' troppo economico</em> (&gamma;<sub>up</sub>). Stimi i coefficienti sui 1058 punti e vedi cosa viene fuori.</p>
+
+    <img src="../immagini/reality-simulator-benzina/06_rockets_feathers_reale.png" alt="Rockets and feathers su dati veri Italia" class="lab-screenshot">
+
+    <p>Viene fuori questo: <strong>&beta;<sub>up</sub> = 0.285, &beta;<sub>dn</sub> = 0.237</strong>. L'asimmetria e' <strong>1.20x</strong>: per ogni punto percentuale di rialzo del Brent, il netto benzina sale di 0.285. Per ogni punto di ribasso, scende di 0.237. OLS darebbe t-stat sopra 10 per entrambi, ma con rendimenti cosi' leptocurtici OLS e' troppo ottimista. Ho ricalcolato gli standard error con <strong>Newey-West HAC</strong> (lag=6), robusti a eteroschedasticita' e autocorrelazione: i t-stat scendono a <strong>3.62</strong> e <strong>3.86</strong>, ma restano entrambi ben oltre il 99%. Il test di Wald sull'ipotesi di simmetria (H0: &beta;<sub>up</sub> + &beta;<sub>dn</sub> = 0) da' <strong>z = 5.54</strong>. Simmetria rigettata al di la' di ogni ragionevole soglia.</p>
+
+    <p>L'aggiustamento verso l'equilibrio e' ancora piu' asimmetrico: <strong>&gamma;<sub>dn</sub> = -0.077</strong> (t_HAC=-2.99, quando il netto e' sotto l'equilibrio sale verso di esso al 7.7% a settimana) contro <strong>&gamma;<sub>up</sub> = -0.045</strong> (t_HAC=-2.18, quando e' sopra scende solo al 4.5%). Il rapporto e' <strong>1.71x</strong>. Tradotto: la benzina raggiunge rapidamente l'equilibrio quando deve salire, si prende comoda quando deve scendere. La metafora di Bacon era letterale.</p>
+
+    <p>La differenza di pass-through sembra piccola, ma accumulata su anni di oscillazioni diventa una rendita. L'ho simulata su uno shock sintetico simmetrico e fa circa mezzo centesimo al litro di extra costo per settimana di shock, che moltiplicato per 30 miliardi di litri di benzina all'anno fa numeri.</p>
+
+    <img src="../immagini/reality-simulator-benzina/07_pass_through_scatter.png" alt="Shock simulato con betas empirici" class="lab-screenshot">
+
+
+    <h2><span class="accent">//</span> Il Draghi Cut, Il Controfattuale, La Sorpresa</h2>
+    <span class="section-number">Sezione 04. Quando lo stato interviene</span>
+
+    <p>Marzo 2022. Draghi taglia le accise di 25 centesimi al litro per tamponare l'impennata post-Ucraina. Durata: otto mesi circa, esteso dal governo successivo. I dati EU Bulletin mi permettono di ricavare l'accisa <em>implicita</em> settimana per settimana: basta fare <code>pompa/(1+IVA) - netto</code> e ottieni l'accisa effettivamente applicata. Il taglio si vede benissimo: da 72.84 cent/L a circa 48 cent/L, per 39 settimane consecutive.</p>
+
+    <img src="../immagini/reality-simulator-benzina/10_intervento_2022.png" alt="Analisi controfattuale intervento accise 2022" class="lab-screenshot">
+
+    <p>Il calcolo banale, scolastico, e' questo: se tagli 24.2 cent di accisa, il consumatore risparmia <code>24.2 * 1.22 = 29.5 cent</code> perche' si risparmia anche l'IVA sul taglio. Mancato gettito stimato 4.4 miliardi, beneficio tot consumatore 4.4 miliardi. Suona bene. Troppo bene.</p>
+
+    <p>La domanda vera era un'altra: <em>i distributori hanno allargato i margini durante il taglio?</em> Se butti li' una media grezza, sembra di si': netto medio dentro il taglio 98.7 cent, fuori 71.6 cent. Ma questa media e' inutile, perche' dentro il periodo del taglio c'era anche lo shock Ucraina col Brent a 120 dollari. Il netto era alto perche' il greggio era alto, non necessariamente perche' i gestori approfittassero.</p>
+
+    <p>La prima risposta che mi ero dato era semplice: stima <code>log(netto) = a + b*log(brent)</code> usando solo i periodi senza taglio, e guarda il residuo durante il taglio. Risultato: residuo medio durante il cut <em>-2.85 cent/L</em>, t_HAC = -7.47. Cattura negativa. I distributori avrebbero rimesso soldi invece di guadagnarne. Risultato sorprendente, ma il modello e' debole: un solo regressore, niente controllo per il crack spread, niente regime di guerra. Facile da demolire.</p>
+
+    <p>Allora l'ho rafforzato. Ho aggiunto Brent ritardato, volatilita' rolling come proxy del crack spread, una dummy di guerra (20 feb - 31 dic 2022). HAC standard errors. R² sale a 0.901, i coefficienti sono piu' puliti, e la cut_dummy rimane negativa: -0.069 sul log-netto, circa <em>-4 cent/L</em>, t_HAC = -7.28. La war_dummy viene fuori enorme e positiva (+16.5%, t=5.84), che cattura esattamente lo stress del crack spread europeo. Sembra tutto bello. Ma c'e' ancora un buco grosso: la proxy vol20 non e' il crack spread vero, e soprattutto sto trattando il Brent come se fosse esogeno, senza che sia nel sistema di cointegrazione.</p>
+
+    <p>A questo punto mi sono detto: se vuoi davvero vedere se l'Italia ha fatto qualcosa di diverso, ti serve un <strong>controfattuale</strong>. Cioe' un paese europeo liquido, nello stesso dataset, con gli stessi shock di mercato, ma senza il taglio accise italiano. La scelta ovvia: la <strong>Germania</strong>. Netto benzina tedesco, settimanale, sempre dall'EU Weekly Oil Bulletin. Mercato wholesale dominato da ARA/Rotterdam, che e' il benchmark europeo.</p>
+
+    <p>Con tre variabili (IT_net, DE_net, brent) si puo' fare la cosa giusta: test di cointegrazione di <strong>Johansen</strong> e, se il rank e' almeno 1, modello <strong>VECM</strong> con war e cut come dummy esogene. Questo e' il modo serio di fare le cose.</p>
+
+    <img src="../immagini/reality-simulator-benzina/12_johansen_vecm.png" alt="Johansen cointegration test e VECM" class="lab-screenshot">
+
+    <div class="terminal-output">
+      <span class="t-out">    Johansen trace test:</span>
+      <span class="t-out">      H0: r=0  -> trace=78.43 (cv 95%=29.80) <span class="t-ok">rigetta</span></span>
+      <span class="t-out">      H0: r<=1 -> trace=25.33 (cv 95%=15.49) <span class="t-ok">rigetta</span></span>
+      <span class="t-out">      H0: r<=2 -> trace= 8.27 (cv 95%= 3.84) <span class="t-ok">rigetta</span></span>
+      <span class="t-out">    VECM rank=1, lag=1, Newey-West HAC:</span>
+      <span class="t-out">      CE: 1*log(IT) + -0.662*log(DE) + -0.217*log(brent) + const</span>
+      <span class="t-out">      alpha (IT): -0.0735 (correzione verso equilibrio)</span>
+      <span class="t-out">    Short-run effects (exog):</span>
+      <span class="t-out">      war_dummy  su Δlog(IT): <span class="t-warn">-0.0059</span>  t_HAC=<span class="t-warn">-1.01</span> (ns)</span>
+      <span class="t-out">      cut_dummy  su Δlog(IT): <span class="t-highlight">+0.0040</span>  t_HAC=<span class="t-highlight">+2.48</span> (sig. 5%)</span>
+      <span class="t-out">      cut_dummy  su Δlog(DE): -0.0007  t_HAC=-0.24 (ns, ok: controllo)</span>
+    </div>
+
+    <p>Johansen rigetta tutte le ipotesi di rank basso: il sistema ha almeno una relazione di equilibrio forte, anzi piu' d'una (il test rigetta r=0, r≤1, r≤2). Uso <strong>rank=1</strong> per interpretabilita' economica e stabilita' della stima, che e' la specifica benchmark della letteratura, e poi verifico la sensibilita' ai rank superiori come robustness check. Aggiungo le stesse dummy come variabili esogene short-run. Il vettore di cointegrazione dice che nel lungo periodo il netto italiano si muove come <code>0.66 * log(DE_netto) + 0.22 * log(brent)</code>. Tradotto: per ogni punto in cui sale il netto tedesco, sale di 0.66 punti anche quello italiano. E' il mercato europeo che fa da ancora.</p>
+
+    <p>E qui succede la cosa che vale il resto dell'articolo. La war_dummy, controllando per la Germania, diventa <strong>non significativa</strong> (t=-1.01): lo stress della guerra era nel mercato europeo tutto, e la Germania lo assorbe. La cut_dummy <strong>si inverte di segno</strong>: da -4 cent/L diventa positiva, +0.0040 sulla Δlog(IT_net), t_HAC=+2.48. Tradotto in cent/L di netto di equilibrio, circa +3.4 cent. Sulla Germania il cut_dummy e' zero (t=-0.24), che e' esattamente il comportamento che ti aspetti da un buon controllo: la Germania non ha visto il taglio italiano.</p>
+
+    <h3 style="color: var(--accent-attention); margin-top: 2rem;">Il vero risultato: stesso dato, cinque modelli, cinque risposte</h3>
+
+    <p>A questo punto serve metterci davanti tutte e cinque le stime una accanto all'altra. Stesso periodo, stesse settimane, stesso cut_dummy. Diverso solo il modello.</p>
+
+    <img src="../immagini/reality-simulator-benzina/14_model_comparison.png" alt="Confronto 5 modelli sulla stessa domanda" class="lab-screenshot">
+
+    <div class="terminal-output">
+      <span class="t-out">    specifica                 coef       se    t_HAC   cent/L</span>
+      <span class="t-out">    1. OLS solo Brent      <span class="t-warn">-0.0585</span>   0.0121  <span class="t-warn">-4.83</span>    <span class="t-warn">-3.5</span></span>
+      <span class="t-out">    2. OLS + controlli     <span class="t-warn">-0.0689</span>   0.0095  <span class="t-warn">-7.28</span>    <span class="t-warn">-4.1</span></span>
+      <span class="t-out">    3. VECM rank=1         <span class="t-highlight">+0.0040</span>   0.0016  <span class="t-highlight">+2.48</span>    <span class="t-highlight">+3.4</span></span>
+      <span class="t-out">    4. VECM rank=2         +0.0035   0.0024  +1.45    +3.0</span>
+      <span class="t-out">    5. VECM rank=3         +0.0030   0.0026  +1.14    +2.4</span>
+    </div>
+
+    <p>Il segno passa da negativo (-4 cent, t=-7) a positivo (+3 cent, t=+2.5) quando aggiungi il mercato tedesco come variabile endogena. La significativita' si evapora quando sposti il rank di cointegrazione. Tutti e cinque i numeri sono coerenti con la loro specifica: non sono sbagli, sono risposte diverse a domande che solo in apparenza sono uguali. Tutti derivano dagli stessi 1058 punti, dalle stesse settimane in cui il governo italiano ha tagliato le accise. Il modello scelto cambia la risposta che ottieni alla stessa identica domanda.</p>
+
+    <p><strong>Ed ecco il punto vero che mi sono portato a casa.</strong> Non e' che i distributori italiani abbiano guadagnato 5 cent, o perso 4 cent. E' che quella domanda, posta cosi', <em>non ha una risposta indipendente dal modello</em>. Puoi difendere una stima di -4 cent se il tuo modello e' un OLS semplice con dentro Brent, lag, volatilita' e war dummy. Puoi difendere +3 cent se ti prendi la fatica di stimare un sistema cointegrato con la Germania come benchmark. Entrambi sono legittimi, entrambi hanno dietro un ragionamento coerente, entrambi sparano numeri sensati. Non sono lo stesso numero.</p>
+
+    <p>Chiunque ti dica "i distributori hanno guadagnato X dal taglio" senza dirti <em>contro quale benchmark</em> e <em>con quale modello</em>, ti sta vendendo una certezza che nei dati non c'e'. Non perche' i dati siano sporchi o poveri. Perche' la domanda implica una controfattuale e il controfattuale va costruito esplicitamente. E c'e' una regola che esce fortissima da questo esercizio: <strong>piu' il modello e' semplice, piu' il risultato sembra certo; piu' il modello e' completo, piu' l'incertezza emerge</strong>. L'OLS con una variabile ti da' un t-stat di 7 e un segno netto. Il VECM con tre variabili e controlli ti da' un t di 2.5 che sparisce con un rank diverso. Non e' che il VECM sia peggio: e' che l'OLS ti stava mentendo con la faccia seria.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Limiti di cui devi sapere.</strong> La Germania non e' un controfattuale vero: struttura fiscale diversa, rete distributiva diversa, dinamiche retail diverse. E' un proxy forte del mercato wholesale europeo, non un gemello. Il crack spread "vero" sarebbe Platts, dati a pagamento. Con Brent daily aggregato a weekly perdi dinamica intraperiodo (soluzione corretta: MIDAS regression). E il coefficiente cut_dummy con t=2.48 nel VECM rank=1 e' borderline: sensibile a scelta del rank, sensibile ai lag. Nessuna di queste tre cose cambia il meta-punto. <em>Il segno della stima dipende dal modello, punto.</em> Chi vuole respecificare, il codice e i dati sono nel repo.</p>
+    </div>
+
+
+    <h2><span class="accent">//</span> Cosa Ti Resta In Mano</h2>
+    <span class="section-number">Sezione 05. Le osservazioni che contano</span>
+
+    <p>Il modello non predice il prezzo di martedi' prossimo. Quello non lo fa nessuno, nemmeno chi vende "modelli predittivi" a trenta euro al mese. Ma ti dice un paio di cose strutturali che la chiacchiera da bar manca sistematicamente.</p>
+
+    <p>Il sistema benzina ha memoria: i prezzi di oggi dipendono dai prezzi della settimana scorsa e dallo squilibrio rispetto a un equilibrio di lungo periodo col Brent. La memoria pero' e' asimmetrica: reagisce piu' in fretta quando deve salire. Da qui viene la sensazione che "la benzina non scende mai": in effetti scende, ma scende piu' lentamente di come sale. Non e' paranoia, e' microstruttura di mercato.</p>
+
+    <p>Il mercato anticipa. Quando succede un evento geopolitico, i futures si muovono PRIMA che il greggio fisico cambi di mano, e il netto italiano reagisce in parte ai futures. Il prezzo che paghi alla pompa oggi incorpora un evento che forse non e' nemmeno ancora successo.</p>
+
+    <p>E gli interventi: funzionano, ma raccontare <em>quanto</em> funzionano richiede il modello giusto. Nel 2022 il taglio nominale e' arrivato in gran parte al consumatore. Se i distributori abbiano spuntato qualche cent in piu' o in meno, dipende da cosa ci metti nel modello. OLS semplice dice negativo, VECM con benchmark tedesco dice positivo. Non e' che uno sia giusto e l'altro sbagliato: quella domanda, senza un controfattuale esplicito, non ha una risposta singola. La prossima volta che qualcuno ti dice "i distributori hanno catturato X del taglio", chiedigli contro quale benchmark, con quale modello, e con quale test di robustezza. Se non sa rispondere a una di queste tre, sta leggendo un numero senza dietro un sistema.</p>
+
+    <p>Il punto non e' la benzina. Il punto e' che ogni volta che qualcuno ti racconta un sistema complesso con una sola variabile, ti sta fregando. A volte volontariamente, a volte perche' non sa altro. Senza un modello, anche grezzo, stai solo reagendo alle narrazioni. E le narrazioni le scrive chi ha interesse.</p>
+
+    <h2><span class="accent">//</span> Riprodurlo a Casa</h2>
+    <span class="section-number">Sezione 06. Repo</span>
+
+    <p>Tutto il codice e' nella cartella <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/reality-simulator-benzina" target="_blank" rel="noopener">scripts/reality-simulator-benzina</a>. 7 script Python, i dati grezzi scaricati da FRED e dall'EU Weekly Oil Bulletin stanno dentro <code>data/</code> nello stesso folder. Servono <code>numpy</code>, <code>matplotlib</code>, <code>statsmodels</code>, <code>openpyxl</code>. Nessuna API key, nessun dato proprietario. Gli script si lanciano in ordine numerico e sputano fuori tutti i grafici dell'articolo piu' i log degli stimatori. Chi vuole cambiare specifica, aggiungere un paese di controllo, provare MIDAS o crack spread Platts, respecifica e apre una PR.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Non puoi conoscere il segno di un effetto<br>senza modellare il sistema completo.<br>Stesso dato, cinque modelli, cinque risposte."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Dati: EU Weekly Oil Bulletin 2005-2026 (1058 oss. settimanali Italia + Germania), FRED Brent daily, FRED EUR/USD. Tutto pubblico. 7 script Python, 14 grafici. ECM asimmetrico con Newey-West HAC, VECM + test Johansen, robustness check su rank di cointegrazione. Codice e dati nel repo.</p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

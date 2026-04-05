@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>La Benzina Ha Un Modello</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/la-benzina-ha-un-modello.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/la-benzina-ha-un-modello.html</guid>
+    <pubDate>Sun, 05 Apr 2026 00:00:00 +0200</pubDate>
+    <description>Il prezzo della benzina non e' ne' la guerra ne' le accise. E' un sistema a feedback con memoria asimmetrica. 21 anni di dati veri (EU Weekly Oil Bulletin Italia + Germania, FRED Brent daily), ECM asimmetrico con Newey-West HAC, poi VECM + Johansen con robustness check sul rank. Rockets and feathers robusto a 1.20x (t_HAC 3.6-3.9, Wald z=5.54). Ma sull'intervento Draghi 2022: stesso dato, cinque modelli, cinque risposte. Segno negativo con OLS, positivo con VECM, significativita' evaporata cambiando il rank. Non puoi conoscere il segno di un effetto senza modellare il sistema completo.</description>
+  </item>
+
+  <item>
     <title>Il Codice Risorge</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-codice-risorge.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-codice-risorge.html</guid>
