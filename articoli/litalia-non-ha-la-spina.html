@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Italia Non Ha La Spina | Signal Pirate</title>
+  <meta name="description" content="Quanto costerebbe davvero elettrificare 40.3 milioni di auto italiane? Energia (+24%) vs potenza (+47% picco). Cabine MT/BT che reggono 50 auto su 70 utenze. Stabilita' di frequenza: RoCoF nell'ordine di ~0.6 Hz/s. Erlang-C per le colonnine (rho=2.13, coda infinita). Sensitivity analysis: il problema resta in ogni scenario. 146 miliardi. 5 script Python, 16 grafici, 15 fonti istituzionali.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-04-07 | Pinperepette</p>
+    <h1 class="article-page-title">L'Italia Non Ha <span class="accent">La Spina</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Uno ha letto uno studio. Dice che possiamo avere tutti l'auto elettrica senza problemi. Ho fatto i conti. 40.3 milioni di auto, 74 TWh, 27 GW di picco, cabine MT/BT che esplodono, frequenza a 50 Hz che vacilla, code infinite alle colonnine, 146 miliardi. Sensitivity analysis: il problema resta in ogni scenario. 5 script Python, 16 grafici, 15 fonti istituzionali.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Energia</span>
+      <span class="tag tag-highlight">Queueing Theory</span>
+      <span class="tag tag-reaction">Rete Elettrica</span>
+      <span class="tag tag-amplification">Erlang-C</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - LO STUDIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Lo Studio</h2>
+    <span class="section-number">Sezione 00. L'amico che ha letto un articolo</span>
+
+    <p>Tutti ne conosciamo uno. Quello che a cena tira fuori il telefono e dice: <em>"ho letto uno studio, dice che se avessimo tutti l'auto elettrica non ci sarebbero problemi."</em></p>
+
+    <p>Lo studio esiste davvero. Ce ne sono diversi, e dicono tutti piu' o meno la stessa cosa: il fabbisogno energetico aggiuntivo sarebbe gestibile, intorno al 20-25% della produzione attuale. Che e' vero. Ma non e' la domanda giusta.</p>
+
+    <p>Quegli studi parlano di <strong>energia</strong>. Quanti TWh servono all'anno. Una grandezza annua, liscia, media. E su quella hanno ragione: 74 TWh in piu' su 312 non sono un dramma. Ce la fai.</p>
+
+    <p>Ma l'energia e' solo meta' della storia. L'altra meta' si chiama <strong>potenza</strong>. La potenza non si media: si picca. E' il momento preciso in cui 28 milioni di persone tornano a casa, attaccano la wallbox, e chiedono 7.4 kW ciascuna. Nello stesso quarto d'ora.</p>
+
+    <p>La differenza tra energia e potenza e' la differenza tra sapere che quest'anno pioveranno 800 mm di pioggia e averli tutti in un pomeriggio. Il volume d'acqua e' lo stesso. Il risultato no.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Premessa.</strong> Questo articolo non e' contro l'auto elettrica. E' contro l'idea che la transizione sia un non-problema. I numeri dicono che si puo' fare, ma il costo e la complessita' infrastrutturale sono enormi. Chi dice "basta la corrente che gia' abbiamo" non ha fatto i conti. Li facciamo noi.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - ENERGIA: IL PROBLEMA FACILE
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Energia: Il Problema Facile</h2>
+    <span class="section-number">Sezione 01. 74 TWh in piu', e fin qui siamo d'accordo</span>
+
+    <p>Partiamo dai numeri. Sono tutti pubblici e verificabili.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">40.3M</div>
+        <div class="stat-label">Auto circolanti<br>(ACI 2025)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">10.231</div>
+        <div class="stat-label">km/anno per auto<br>(ISTAT 2025)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">18</div>
+        <div class="stat-label">kWh / 100 km<br>(consumo reale EV)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">312</div>
+        <div class="stat-label">TWh/anno<br>(fabbisogno IT, Terna)</div>
+      </div>
+    </div>
+
+    <p>Il conto e' elementare:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Fabbisogno energetico aggiuntivo</span>
+      40.3M auto &times; 10.231 km &times; 18 kWh/100km = <strong style="color: #00ff88;">74.2 TWh/anno</strong>
+    </div>
+
+    <p>Il <strong>24%</strong> del fabbisogno attuale. Tanto? Si'. Impossibile? No. Con 34 GW di fotovoltaico e 10 GW di eolico aggiuntivo lo tiri fuori. Il punto non e' qui. Il punto e' che questo numero ti da' un falso senso di sicurezza. 74 TWh spalmati su un anno sono una cosa. 74 TWh concentrati tra le 18 e le 21 sono un'altra.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - POTENZA: IL MURO
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Potenza: Il Muro</h2>
+    <span class="section-number">Sezione 02. Non quanta energia, ma quanta tutta insieme</span>
+
+    <p>Ecco la variabile che gli studi ficcano in nota a pie' di pagina. La potenza non si media, si picca. E il picco dipende da quando la gente carica.</p>
+
+    <p>Il modello di ricarica:</p>
+
+    <ul>
+      <li>Ogni auto arriva a casa secondo una distribuzione normale: media 18:30, deviazione standard 1.5 ore</li>
+      <li>Chi arriva attacca subito (niente smart charging, scenario "dumb")</li>
+      <li>Consumo giornaliero medio: 5 kWh (28 km &times; 18 kWh/100km)</li>
+      <li>Wallbox: 7.4 kW (monofase 32A, la piu' comune)</li>
+      <li>Durata ricarica media: ~41 minuti</li>
+      <li>Frazione che carica ogni giorno: 70%</li>
+    </ul>
+
+    <p>Il profilo risultante, sovrapposto al carico base italiano (dati Terna), e' questo:</p>
+
+    <img src="../immagini/italia-elettrica/02_profilo_carico.png" alt="Profilo di carico giornaliero con EV" class="lab-screenshot">
+
+    <p>Il picco EV arriva a <strong>+27.6 GW</strong> e si piazza esattamente sopra il picco serale della rete. Totale: <strong>84.6 GW</strong>. Oggi il record e' 57.5 GW (18 luglio 2024, ore 15-16, Terna). Un <strong>+47%</strong> di potenza di picco. Sul punto piu' fragile della giornata.</p>
+
+    <img src="../immagini/italia-elettrica/01_energia_vs_potenza.png" alt="Energia vs potenza: due problemi diversi" class="lab-screenshot">
+
+    <div class="insight-box fade-in">
+      <p><strong>Tradotto.</strong> Lo "studio" del tuo amico parla della barra verde a sinistra: +24%, gestibile. Il problema reale e' la barra rossa a destra: +47% di picco. L'energia e' un problema di pianificazione. La potenza e' un problema di fisica. La fisica non aspetta.</p>
+    </div>
+
+    <p>Qualcuno dira': <em>"nessuno carica tutti insieme."</em> Corretto. Il grafico sopra e' un bound superiore. Ma il bound inferiore, carico perfettamente distribuito su 24 ore, e' un'utopia altrettanto irrealistica. Mettiamo i paletti.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Bounds di potenza aggiuntiva EV</span>
+      <strong style="color: #00ff88;">Bound inferiore</strong>: P<sub>flat</sub> = E<sub>giornaliera</sub> / 24h = <strong style="color: #00ff88;">8.5 GW</strong><br>
+      <strong style="color: #ff6b6b;">Bound superiore</strong>: P<sub>peak</sub> = N &times; p<sub>wallbox</sub> &times; f<sub>active</sub> = <strong style="color: #ff6b6b;">27.6 GW</strong>
+    </div>
+
+    <img src="../immagini/italia-elettrica/13_bounds_potenza.png" alt="Bounds di potenza: dal caso migliore al caso peggiore" class="lab-screenshot">
+
+    <p>Il sistema reale vivra' tra questi due estremi. Senza coordinamento, tende naturalmente verso il bound superiore: la gente arriva a casa e attacca. La distribuzione degli arrivi non e' un'ipotesi, e' un fatto demografico. Per raggiungere il bound inferiore ti serve un'infrastruttura di controllo che oggi non esiste.</p>
+
+    <p>E c'e' una legge fisica da cui non si scappa:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Conservazione dell'energia</span>
+      &int;<sub>0</sub><sup>24h</sup> P(t) dt = E<sub>giornaliera</sub> = costante<br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">Ridurre il picco senza ridurre l'energia implica allungare il tempo di utilizzo della rete.<br>Il problema non scompare: si redistribuisce.</span>
+    </div>
+
+    <p>Il +47% e' lo scenario peggiore: "dumb charging", tutti attaccano quando arrivano. Con smart charging (la wallbox aspetta le 2 di notte) il picco si dimezza. Con V2G (l'auto restituisce energia alla rete) puoi scendere sotto il picco attuale. Ma servono infrastruttura digitale, protocolli, tariffe dinamiche, e soprattutto che la gente accetti di non decidere quando carica l'auto.</p>
+
+    <img src="../immagini/italia-elettrica/03_picco_confronto.png" alt="Scenari di gestione ricarica" class="lab-screenshot">
+
+
+    <!-- ============================================================
+         SEZIONE 03 - LA CABINA CHE ESPLODE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Cabina Che Esplode</h2>
+    <span class="section-number">Sezione 03. Il collo di bottiglia e' nel tuo quartiere</span>
+
+    <p>Ok, fin qui abbiamo ragionato sulla rete nazionale. Ma la rete nazionale non esiste come entita' monolitica. E' una catena di trasformatori. La catena si spezza nell'anello piu' debole. E l'anello piu' debole e' la <strong>cabina secondaria MT/BT</strong> del tuo quartiere.</p>
+
+    <p>Quella scatola grigia per strada con il simbolo del fulmine. Prende la media tensione (20 kV) e la trasforma in bassa tensione (400/230 V) per le case. Ce ne sono 524.000 in Italia (445.000 solo e-distribuzione, l'85% della rete). Ciascuna serve in media 70 utenze.</p>
+
+    <p>I numeri di una cabina tipica da 400 kVA:</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number cyan">400</div>
+        <div class="stat-label">kVA capacita'<br>trasformatore</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">380</div>
+        <div class="stat-label">kW disponibili<br>(cos&phi; = 0.95)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">63</div>
+        <div class="stat-label">kW carico base<br>(70 utenze, k<sub>c</sub>=0.3)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">317</div>
+        <div class="stat-label">kW margine<br>residuo</div>
+      </div>
+    </div>
+
+    <p>317 kW di margine sembrano tanti. Poi aggiungi le wallbox. Una wallbox da 7.4 kW con fattore di contemporaneita' k<sub>c</sub> = 0.85:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Vincolo di cabina</span>
+      &sum; P<sub>base,i</sub>(t) + &sum; P<sub>ev,k</sub>(t) &le; S<sub>trafo</sub> &times; cos&phi;<br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">317 kW &divide; (7.4 kW &times; 0.85) = <strong style="color: #ff6b6b;">50 auto</strong></span>
+    </div>
+
+    <p>Cinquanta. Su settanta utenze. Basta che il 71% dei residenti abbia una wallbox e il trasformatore va in sovraccarico.</p>
+
+    <p>Obiezione legittima: 7.4 kW e' la potenza nominale della wallbox, ma in Italia la potenza contrattuale domestica e' tipicamente 3-6 kW. Questo riduce il picco istantaneo, pero' allunga la durata della ricarica. L'energia totale resta identica. Il problema si sposta dalla potenza alla congestione temporale. Non sparisce: cambia forma.</p>
+
+    <p>Il dato che frega davvero e' il <strong>fattore di contemporaneita'</strong>. Per il carico domestico tradizionale (lavatrici, forni, condizionatori) k<sub>c</sub> vale circa 0.3: la gente non usa tutto nello stesso momento. La rete e' dimensionata su quel numero. Per le wallbox k<sub>c</sub> sale a 0.85: quasi tutti attaccano appena arrivano a casa. Il valore 0.85 rappresenta uno scenario ad alta contemporaneita'; valori inferiori sono possibili con gestione attiva del carico, ma richiedono, di nuovo, smart charging. La rete cosi' com'e' e' stata progettata per un k<sub>c</sub> che non esiste piu'.</p>
+
+    <img src="../immagini/italia-elettrica/04_cabina_saturazione.png" alt="Saturazione cabina 400 kVA" class="lab-screenshot">
+
+    <p>Il grafico mostra la rampa: ogni auto aggiunge 6.3 kW di carico coincidente. A 50 auto la linea gialla viene raggiunta. Ogni auto in piu' e' sovraccarico.</p>
+
+    <p>E se la cabina fosse piu' grande? La heatmap sotto mostra il margine residuo per ogni combinazione taglia/penetrazione EV. La linea gialla e' lo zero: sopra sei in sicurezza, sotto sei in sovraccarico.</p>
+
+    <img src="../immagini/italia-elettrica/06_cabina_mappa_termica.png" alt="Heatmap margine cabina per taglia e penetrazione EV" class="lab-screenshot">
+
+    <p>Anche una cabina da 1000 kVA, piu' del doppio della taglia piu' comune, va in rosso sopra l'80% di penetrazione. Con 100% di penetrazione ogni cabina deve servire 108 auto (70 utenze, 1.55 auto/famiglia). Ne regge 50. Servono piu' del doppio delle cabine attuali.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il conto nazionale.</strong> 524.000 cabine, tutte da potenziare. A 80.000 EUR ciascuna (fonte: Phase S.r.l.), sono <strong>42 miliardi di euro</strong>. Solo per le cabine. Senza contare i cavi, le linee MT, le stazioni primarie.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - LA FREQUENZA
+         ============================================================ -->
+    <h2><span class="accent">//</span> I 50 Hertz</h2>
+    <span class="section-number">Sezione 04. Il vincolo che non si vede: la stabilita' di frequenza</span>
+
+    <p>La rete elettrica non e' un serbatoio. E' un equilibrio dinamico. In ogni istante la potenza generata deve eguagliare la potenza consumata. Se il carico aumenta di botto, la frequenza cala. Cala troppo? Scattano le protezioni automatiche e intere zone saltano (load shedding).</p>
+
+    <p>La velocita' con cui la frequenza reagisce si chiama <strong>RoCoF</strong> (Rate of Change of Frequency) e dipende dall'inerzia del sistema:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Rate of Change of Frequency</span>
+      RoCoF = &Delta;P / (2 &times; H &times; S<sub>sistema</sub>) &times; f<sub>0</sub><br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">H = inerzia (s), S = potenza sincronizzata (GW), f<sub>0</sub> = 50 Hz</span>
+    </div>
+
+    <p>H dipende dalle macchine rotanti: turbine a gas, idroelettrico. Roba che gira. I pannelli fotovoltaici e le batterie non hanno inerzia meccanica, non girano. Man mano che le rinnovabili sostituiscono il termoelettrico, H scende. Sistema attuale: H circa 4.5s. Con alta penetrazione rinnovabile: H scende a 2.0s.</p>
+
+    <img src="../immagini/italia-elettrica/16_frequenza.png" alt="Vincolo di frequenza: RoCoF e deviazione" class="lab-screenshot">
+
+    <p>La rampa serale EV, 23 GW in 2 ore, circa <strong>2.9 GW ogni 15 minuti</strong>, con H = 2.0s da' un RoCoF stimato nell'ordine di ~0.6 Hz/s. La soglia di protezione e' 0.5 Hz/s. Siamo sopra.</p>
+
+    <p>Precisazione importante: questo RoCoF e' una stima upper-bound basata su una rampa aggregata. Nella realta' il sistema e' regolato su scala di secondi tramite riserve primarie e secondarie. Ma il punto resta: l'aumento della rampa di carico erode il margine operativo delle riserve e aumenta la probabilita' di eventi critici. Non e' il singolo RoCoF che ti ammazza. E' l'erosione continua del cuscinetto di sicurezza.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Cambio di livello.</strong> Fino alla cabina il problema era infrastrutturale: trasformatori, cavi, colonnine. Qui diventa un problema di <em>stabilita' fisica</em>. Il sistema elettrico non fallisce quando manca energia. Fallisce quando troppa potenza viene richiesta nello stesso punto nello stesso istante.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - LA CODA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Coda Alla Colonnina</h2>
+    <span class="section-number">Sezione 05. Erlang-C, e il tempo che esplode anche prima del collasso</span>
+
+    <p>Ok, fin qui abbiamo parlato di chi carica a casa. Ma il 30% del fabbisogno passera' per colonnine pubbliche: chi non ha il garage, chi viaggia, chi ha bisogno di una botta rapida. Quante colonnine servono?</p>
+
+    <p>La risposta viene dalla <strong>teoria delle code</strong>. Stessa matematica dei call center e dei pronto soccorso. Il modello e' M/M/c (Erlang-C): arrivi Poisson, tempi di servizio esponenziali, c colonnine.</p>
+
+    <p>La formula chiave:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Utilizzazione del sistema</span>
+      &rho; = &lambda; / (c &times; &mu;)<br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">&lambda; = tasso arrivi, &mu; = tasso servizio, c = colonnine</span>
+    </div>
+
+    <p>Quando &rho; si avvicina a 1, il tempo di attesa non cresce linearmente: <strong>esplode</strong>. E' la stessa curva di Kingman che abbiamo visto nell'<a href="il-treno-arriva-con-la-matematica.html">articolo sulle code</a>. Il tempo medio di attesa in coda e':</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Tempo medio di attesa M/M/c</span>
+      W<sub>q</sub> = P(wait) / (c&mu; &minus; &lambda;)<br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">Quando &lambda; &rarr; c&mu;, il denominatore &rarr; 0 e W<sub>q</sub> &rarr; &infin;</span>
+    </div>
+
+    <p>Il punto che pochi capiscono: non serve arrivare a &rho; = 1 per avere un problema. Anche a &rho; = 0.85, sistema formalmente stabile, il tempo di attesa e' gia' dieci volte quello a &rho; = 0.5. La divergenza e' iperbolica. Non avvisa, non degrada con grazia. Un giorno aspetti 5 minuti, il mese dopo 30, e nei numeri non e' cambiato quasi niente.</p>
+
+    <img src="../immagini/italia-elettrica/07_erlang_c_esplosione.png" alt="Erlang-C: esplosione del tempo di attesa" class="lab-screenshot">
+
+    <p>Con 2 colonnine, a &rho; = 0.8 aspetti gia' 20 minuti. Con 8 colonnine lo stesso &rho; ti da' 5 minuti. Piu' server hai, piu' il sistema e' resiliente ai picchi. Ma ogni server costa.</p>
+
+    <p>Adesso facciamo i conti con i numeri italiani. 40.3 milioni di auto, 30% carica in pubblico, consumo giornaliero 5 kWh, sessione pubblica media 25 kWh, tempo di servizio medio 46 minuti (mix DC 50kW/150kW e AC 22kW).</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 03_code.py</span>
+      <span class="t-out"></span>
+      <span class="t-out"><span class="t-ok">[*]</span> Sessioni/giorno totali:     2,439,967</span>
+      <span class="t-out"><span class="t-ok">[*]</span> Punti ricarica attuali:        73,047</span>
+      <span class="t-out"><span class="t-warn">[!]</span> lambda/punto (attuale):          2.78 auto/h</span>
+      <span class="t-out"><span class="t-warn">[!]</span> mu (tasso servizio):             1.31 auto/h</span>
+      <span class="t-out"><span class="t-warn">[!]</span> rho attuale:                     2.13</span>
+      <span class="t-out"></span>
+      <span class="t-out"><span class="t-highlight">rho > 1: sistema instabile. Coda infinita.</span></span>
+    </div>
+
+    <p>&rho; = 2.13. Il sistema e' instabile. Arrivano piu' di due auto per ogni auto servita. La coda cresce all'infinito. Non e' un rallentamento, e' un collasso matematico. Non esiste soluzione di stato stazionario. Il sistema non ha equilibrio.</p>
+
+    <img src="../immagini/italia-elettrica/09_dimensionamento_nazionale.png" alt="Dimensionamento nazionale punti ricarica" class="lab-screenshot">
+
+    <p>Per portare &rho; sotto 0.75 servono almeno <strong>~200.000 punti di ricarica</strong>, e questo assumendo distribuzione ideale degli arrivi. Con picchi di pendolarismo e vincoli spaziali il fabbisogno reale e' significativamente superiore. Oggi ne abbiamo 73.000. Servono come minimo il triplo.</p>
+
+    <img src="../immagini/italia-elettrica/08_colonnine_qos.png" alt="Colonnine necessarie per QoS" class="lab-screenshot">
+
+    <p>Secondo grafico: quante colonnine per stazione in funzione del tasso di arrivo e del target di attesa. A 20 auto/ora, per stare sotto i 10 minuti servono 18 colonnine. La relazione non e' lineare. E' il prezzo della stabilita'.</p>
+
+    <p>Nota per chi vuole attaccare il modello: Erlang-C assume arrivi indipendenti (Poisson). Nella realta' gli arrivi sono correlati. Il pendolarismo crea onde, non gocce. Questo peggiora la congestione rispetto al modello. I numeri qui sono una stima <em>ottimistica</em>.</p>
+
+    <p>E poi c'e' un vincolo che Erlang-C non vede: lo <strong>spazio fisico</strong>. Milano ha circa 6.000-8.000 auto per km&sup2;. Una stazione da 8 colonnine occupa 150-200 m&sup2; tra stalli e accesso. Per servire tutta la citta' con attesa accettabile servono centinaia di stazioni, ognuna in competizione per suolo con parcheggi, marciapiedi, aree verdi. La matematica delle code ti dice quante colonnine servono. L'urbanistica ti dice che non sai dove metterle.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - IL CONTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Conto</h2>
+    <span class="section-number">Sezione 06. 146 miliardi, e non e' nemmeno tutto</span>
+
+    <p>Tiriamo le somme. Ogni voce ha una fonte, ogni parametro e' nello script, ogni numero lo puoi rifare a casa tua.</p>
+
+    <img src="../immagini/italia-elettrica/10_costi_breakdown.png" alt="Breakdown costi investimento" class="lab-screenshot">
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Voce</th>
+          <th>Costo</th>
+          <th>%</th>
+          <th>Fonte</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Generazione (FV + eolico)</td>
+          <td><strong>41.3 mld EUR</strong></td>
+          <td>28%</td>
+          <td>Polimi LCOE 2024</td>
+        </tr>
+        <tr>
+          <td>Rete distribuzione (cabine + linee + smart grid)</td>
+          <td><strong>48.1 mld EUR</strong></td>
+          <td>33%</td>
+          <td>Phase S.r.l., e-distribuzione</td>
+        </tr>
+        <tr>
+          <td>Wallbox domestiche (24.2M unit&agrave;)</td>
+          <td><strong>36.3 mld EUR</strong></td>
+          <td>25%</td>
+          <td>Ingenio 2025</td>
+        </tr>
+        <tr>
+          <td>Storage batterie (15 GW / 60 GWh)</td>
+          <td><strong>15.0 mld EUR</strong></td>
+          <td>10%</td>
+          <td>BNEF 2025</td>
+        </tr>
+        <tr>
+          <td>Colonnine pubbliche (127k nuove)</td>
+          <td><strong>5.4 mld EUR</strong></td>
+          <td>4%</td>
+          <td>MOTUS-E</td>
+        </tr>
+        <tr style="background: rgba(0,255,136,0.05);">
+          <td><strong>TOTALE</strong></td>
+          <td><strong style="color: #ff6b6b;">~146 mld EUR</strong></td>
+          <td>100%</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Ordine di grandezza: <strong>100-200 miliardi di euro</strong>. Scenario base: ~146 miliardi. Circa il 7% del PIL italiano. Piu' del ponte sullo Stretto moltiplicato per venti. Circa <strong>3.600 EUR per auto</strong>, circa <strong>2.400 EUR per cittadino</strong>.</p>
+
+    <p>La variabilita' non e' un errore di stima. E' una proprieta' del sistema: piccoli cambiamenti nei parametri producono grandi variazioni nei costi. E i costi infrastrutturali non crescono linearmente con la domanda. Oltre certe soglie (cabine, linee, potenza di picco) servono interventi strutturali che fanno saltare il costo marginale. Le stime includono solo costi diretti di infrastruttura; costi indiretti (permessi, tempi, inefficienze di implementazione) possono aumentare ulteriormente l'investimento.</p>
+
+    <p>Pero'. E' anche meno di quello che spendiamo in carburanti. L'Italia spende <strong>69.8 miliardi l'anno</strong> in benzina e gasolio (Il Sole 24 Ore, 2024). Di quei 69.8, ben 38.5 miliardi sono accise e IVA che vanno allo Stato. Il costo dell'energia elettrica equivalente, a prezzo retail (0.28 EUR/kWh), sarebbe circa 20.8 miliardi. Anche trasferendo le accise sull'elettricita', il risparmio annuo e' nell'ordine dei 49 miliardi.</p>
+
+    <img src="../immagini/italia-elettrica/11_confronto_carburante.png" alt="Confronto costi annui e payback" class="lab-screenshot">
+
+    <div class="insight-box fade-in">
+      <p><strong>Il paradosso.</strong> L'investimento e' enorme (~146 mld), ma il payback e' sorprendentemente rapido: circa 3 anni a prezzo retail. Questo non rende il problema banale. Lo sposta dal costo totale alla capacita' di eseguire un investimento coordinato su scala nazionale. L'investimento e' principalmente CAPEX (infrastruttura upfront), mentre il sistema attuale e' OPEX (costo distribuito nel tempo del carburante). Il passaggio richiede capacita' di investimento concentrata, non solo convenienza economica. Devi costruire 34 GW di fotovoltaico, potenziare mezzo milione di cabine, installare 24 milioni di wallbox, e convincere la gente a farsi dire dalla rete quando caricare l'auto. Tutto contemporaneamente.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - SMART CHARGING
+         ============================================================ -->
+    <h2><span class="accent">//</span> Smart Charging</h2>
+    <span class="section-number">Sezione 07. L'intelligenza costa meno del rame</span>
+
+    <p>C'e' un modo per dimezzare il costo della rete. Non potenziare tutto: spostare il carico nel tempo. Se la wallbox aspetta le 2 di notte, il picco serale sparisce e la cabina del quartiere respira.</p>
+
+    <p>Il problema diventa un'ottimizzazione pulita:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Ottimizzazione smart charging</span>
+      min<sub>P<sub>k</sub>(t)</sub> max<sub>t</sub> [ &sum; P<sub>base,i</sub>(t) + &sum; P<sub>k</sub>(t) ]<br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">vincolo: &int; P<sub>k</sub>(t) dt = E<sub>k</sub> (l'auto deve essere carica entro le 7:00)</span>
+    </div>
+
+    <p>Minimizzi il picco con il vincolo che ogni auto sia carica entro la mattina. E' un LP, si risolve bene, e il picco si dimezza.</p>
+
+    <img src="../immagini/italia-elettrica/12_smart_vs_dumb.png" alt="Costo rete: smart vs dumb charging" class="lab-screenshot">
+
+    <p>Con smart charging il costo della rete scende da 53 a 25 miliardi. Quasi 30 miliardi di rame risparmiati con il software. Ma ti serve:</p>
+
+    <ul>
+      <li>Tariffe dinamiche (il prezzo cambia ogni 15 minuti)</li>
+      <li>Protocolli wallbox-rete (ISO 15118, OCPP 2.0)</li>
+      <li>Contatori smart di seconda generazione</li>
+      <li>E soprattutto: che la gente accetti di non avere il controllo</li>
+    </ul>
+
+    <p>L'ultimo punto e' il piu' difficile. La razionalita' economica dice di caricare alle 2 di notte. L'ansia da autonomia dice di caricare adesso. L'ansia vince quasi sempre.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - SENSITIVITY
+         ============================================================ -->
+    <h2><span class="accent">//</span> E Se Sbaglio I Parametri?</h2>
+    <span class="section-number">Sezione 08. Sensitivity analysis: il problema resta in ogni scenario</span>
+
+    <p>L'obiezione piu' onesta che mi puoi fare: <em>"hai scelto parametri pessimisti."</em> Ok. Ho fatto girare i numeri con parametri ottimisti, base e pessimisti. Vediamo.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Parametro</th>
+          <th>Ottimista</th>
+          <th>Base</th>
+          <th>Pessimista</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Wallbox</td>
+          <td style="color: #00ff88;">3.7 kW</td>
+          <td>7.4 kW</td>
+          <td style="color: #ff6b6b;">11.0 kW</td>
+        </tr>
+        <tr>
+          <td>k<sub>c</sub> (contemporaneita')</td>
+          <td style="color: #00ff88;">0.60</td>
+          <td>0.85</td>
+          <td style="color: #ff6b6b;">0.95</td>
+        </tr>
+        <tr>
+          <td>% ricarica pubblica</td>
+          <td style="color: #00ff88;">20%</td>
+          <td>30%</td>
+          <td style="color: #ff6b6b;">50%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Cabina MT/BT</strong>: quante auto regge una 400 kVA?</p>
+
+    <img src="../immagini/italia-elettrica/14_sensitivity_cabina.png" alt="Sensitivity cabina: il problema resta in ogni scenario" class="lab-screenshot">
+
+    <p>Scenario piu' ottimista (wallbox da 3.7 kW, k<sub>c</sub> = 0.6): la cabina regge 142 auto, sopra le 108 necessarie. Basta salire a 7.4 kW e sei sotto soglia. E il mercato va verso wallbox piu' potenti, non meno.</p>
+
+    <p><strong>Colonnine</strong>: &rho; resta sopra 1?</p>
+
+    <img src="../immagini/italia-elettrica/15_sensitivity_colonnine.png" alt="Sensitivity colonnine" class="lab-screenshot">
+
+    <p>Unico scenario con &rho; &lt; 1 sulla rete attuale: 20% di ricarica pubblica e tutte colonnine DC a 150 kW. Irrealistico. Oggi il 74% dei punti e' sotto i 50 kW. In tutti gli altri scenari il sistema collassa.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Risultato.</strong> Ho provato a far funzionare i numeri cambiando i parametri. Non funzionano. Il sistema e' in crisi in 4 scenari su 5 per le colonnine e 4 su 5 per le cabine. Il problema non e' nella scelta dei parametri. E' nella scala.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - I DATI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Fonti e Codice</h2>
+    <span class="section-number">Sezione 09. Tutto verificabile</span>
+
+    <p>Ogni numero viene da una fonte istituzionale. Zero blog, zero opinioni, zero "si stima che".</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Dato</th>
+          <th>Valore</th>
+          <th>Fonte</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Parco auto</td>
+          <td>40.3M</td>
+          <td><a href="https://aci.gov.it/comunicati-stampa/annuario-statistico-2025-tutti-i-numeri-delle-auto-in-italia/" target="_blank" rel="noopener">ACI, Annuario Statistico 2025</a></td>
+        </tr>
+        <tr>
+          <td>Percorrenza media</td>
+          <td>10.231 km/anno</td>
+          <td><a href="https://www.istat.it/wp-content/uploads/2025/06/Le-percorrenze-dei-veicoli-stradali-circolanti.pdf" target="_blank" rel="noopener">ISTAT, Percorrenze veicoli 2025</a></td>
+        </tr>
+        <tr>
+          <td>Consumo EV</td>
+          <td>18 kWh/100km</td>
+          <td><a href="https://www.engie.it/casa/magazine/consumo-auto-elettrica/" target="_blank" rel="noopener">ENGIE</a>, <a href="https://www.sorgenia.it/guida-energia/consumo-auto-elettrica" target="_blank" rel="noopener">Sorgenia</a></td>
+        </tr>
+        <tr>
+          <td>Fabbisogno elettrico IT</td>
+          <td>312.2 TWh/anno</td>
+          <td><a href="https://www.terna.it/it/media/comunicati-stampa/dettaglio/consumi-elettrici-2024" target="_blank" rel="noopener">Terna 2024</a></td>
+        </tr>
+        <tr>
+          <td>Picco domanda IT</td>
+          <td>57.5 GW</td>
+          <td><a href="https://www.terna.it/it/media/comunicati-stampa/dettaglio/consumi-elettrici-2024" target="_blank" rel="noopener">Terna, 18 luglio 2024</a></td>
+        </tr>
+        <tr>
+          <td>Cabine secondarie</td>
+          <td>445.144 (e-distr.) / ~524k (totale)</td>
+          <td><a href="https://www.e-distribuzione.it/Azienda/I-nostri-numeri.html" target="_blank" rel="noopener">e-distribuzione 2024</a></td>
+        </tr>
+        <tr>
+          <td>Utenze per cabina</td>
+          <td>~70</td>
+          <td><a href="https://www.e-distribuzione.it/archivio-news/2024/05/come-funziona-la-rete-di-distribuzione--le-cabine-secondarie.html" target="_blank" rel="noopener">e-distribuzione 2024</a></td>
+        </tr>
+        <tr>
+          <td>Punti ricarica pubblici</td>
+          <td>73.047</td>
+          <td><a href="https://www.motus-e.org/news-associative/auto-elettriche-litalia-supera-la-soglia-dei-70-000-punti-di-ricarica-lappello-del-settore-senza-regole-chiare-e-collaborazione-la-crescita-rischia-di-fermarsi/" target="_blank" rel="noopener">MOTUS-E 2025</a></td>
+        </tr>
+        <tr>
+          <td>Spesa carburanti IT</td>
+          <td>69.8 mld EUR/anno</td>
+          <td><a href="https://en.ilsole24ore.com/art/benzina-e-gasolio-autotrazione-2024-spesi-italia-quasi-70-miliardi-AGM6LqmD" target="_blank" rel="noopener">Il Sole 24 Ore 2024</a></td>
+        </tr>
+        <tr>
+          <td>LCOE fotovoltaico IT</td>
+          <td>65-80 EUR/MWh</td>
+          <td><a href="https://www.rinnovabili.it/energia/fotovoltaico/lcoe-rinnovabili-costo-livellato-energia/" target="_blank" rel="noopener">Polimi, Energy & Strategy 2024</a></td>
+        </tr>
+        <tr>
+          <td>Costo cabine MT/BT</td>
+          <td>40-120k EUR</td>
+          <td><a href="https://www.phasesrl.com/quanto-costa-una-cabina-elettrica/" target="_blank" rel="noopener">Phase S.r.l. 2024</a></td>
+        </tr>
+        <tr>
+          <td>Wallbox domestiche</td>
+          <td>700-1.300 EUR</td>
+          <td><a href="https://www.ingenio-web.it/articoli/guida-2025-alle-wallbox-che-cosa-sono-le-caratteristiche-quali-scegliere/" target="_blank" rel="noopener">Ingenio 2025</a></td>
+        </tr>
+        <tr>
+          <td>Fattura energetica IT</td>
+          <td>48.5 mld EUR/anno</td>
+          <td><a href="https://www.i-com.it/2025/07/04/fattura-energetica-italiana-spesa-in-calo-nel-2024-grazie-a-minori-importazioni-ed-euro-piu-forte/" target="_blank" rel="noopener">I-Com 2024</a></td>
+        </tr>
+        <tr>
+          <td>Tariffe elettricita'</td>
+          <td>0.28 EUR/kWh retail</td>
+          <td><a href="https://web.archive.org/web/2024/https://www.arera.it/comunicati-stampa/dettaglio/elettricita-bollette-in-calo-del-198-nel-secondo-trimestre-2024" target="_blank" rel="noopener">ARERA 2024</a></td>
+        </tr>
+        <tr>
+          <td>Trasformatori MT/BT</td>
+          <td>100/250/400/630 kVA</td>
+          <td><a href="https://library.e.abb.com/public/5d00023092cb45469e87fc614efc78b8/Gu_Cabine_MT-BT_it_1VCP000591_1511.pdf" target="_blank" rel="noopener">ABB Guida Tecnica</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Tutto il codice e' nella cartella <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/litalia-non-ha-la-spina" target="_blank" rel="noopener">scripts/litalia-non-ha-la-spina</a>. Cinque script Python, 16 grafici generati. Servono <code>numpy</code>, <code>matplotlib</code>, <code>scipy</code>. Nessuna API key, nessun dato proprietario.</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 01_fabbisogno.py</span>
+      <span class="t-out"><span class="t-ok">[*]</span> Energia totale:       74.2 TWh/anno (+24%)</span>
+      <span class="t-out"><span class="t-warn">[!]</span> Picco EV:            27.6 GW</span>
+      <span class="t-out"><span class="t-warn">[!]</span> Picco combinato:     84.6 GW (+47%)</span>
+      <span class="t-out"></span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 02_cabina.py</span>
+      <span class="t-out"><span class="t-warn">[!]</span> N_max auto per cabina 400 kVA: 50</span>
+      <span class="t-out"><span class="t-warn">[!]</span> Auto per cabina (100% EV):   108.5</span>
+      <span class="t-out"><span class="t-highlight">[!] Fattore sovraccarico:        2.2x</span></span>
+      <span class="t-out"></span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 03_code.py</span>
+      <span class="t-out"><span class="t-warn">[!]</span> rho attuale (con 40M EV):    2.13</span>
+      <span class="t-out"><span class="t-highlight">[!] Sistema instabile. Coda infinita.</span></span>
+      <span class="t-out"></span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 04_costi.py</span>
+      <span class="t-out"><span class="t-ok">[*]</span> Investimento totale:  ~146 mld EUR</span>
+      <span class="t-out"><span class="t-ok">[*]</span> Payback:              2.3-3.0 anni</span>
+      <span class="t-out"></span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 05_sensitivity.py</span>
+      <span class="t-out"><span class="t-warn">[!]</span> Cabina: problema in 4/5 scenari</span>
+      <span class="t-out"><span class="t-warn">[!]</span> Colonnine: rho > 1 in 4/5 scenari</span>
+      <span class="t-out"><span class="t-highlight">[!] RoCoF (H=2.0s): ~0.6 Hz/s > soglia 0.5</span></span>
+    </div>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Torniamo al tizio della cena. Quello con lo studio sul telefono.</p>
+
+    <p>Aveva ragione sull'energia: +24%, fattibile. Aveva torto su tutto il resto.</p>
+
+    <p>Il suo studio non parlava della cabina del quartiere che regge 50 wallbox su 70 appartamenti. Non parlava del picco di potenza alle 19:00, quando 28 milioni di persone attaccano la spina nello stesso quarto d'ora. Non parlava della frequenza a 50 Hz che vacilla con un RoCoF nell'ordine di ~0.6 Hz/s quando la rampa serale colpisce un sistema con poca inerzia. Non parlava di &rho; = 2.13 alle colonnine pubbliche, coda infinita. Non parlava dei 146 miliardi. Non parlava dello spazio fisico in citta' dove non c'e' posto nemmeno per parcheggiare.</p>
+
+    <p>E quando ho provato a dargli ragione, cambiando i parametri, wallbox meno potenti, contemporaneita' piu' bassa, meno ricariche pubbliche, il sistema continuava a collassare in 4 scenari su 5.</p>
+
+    <p>L'auto elettrica e' il futuro. Su questo zero dubbi. Ma la transizione non e' un interruttore. E' un progetto infrastrutturale della scala di un piano Marshall, che tocca ogni angolo della rete elettrica. Dalla centrale alla presa del tuo garage. Sono 84.6 GW di picco contro i 57.5 attuali. Come aggiungere mezza Italia sopra l'Italia, ma solo tra le 18 e le 21.</p>
+
+    <p>Per onesta' intellettuale: esiste uno scenario in cui il sistema regge. Ricarica completamente distribuita nel tempo (smart charging obbligatorio), alta penetrazione di colonnine fast, sovradimensionamento significativo della rete. In questo scenario il picco rientra nei limiti e &rho; resta sotto 1.</p>
+
+    <p>Ma questo scenario richiede coordinamento centralizzato, investimenti massivi e un cambiamento comportamentale di sistema. Non e' lo stato naturale delle cose. E' un progetto. E il sistema elettrico e' vincolato da infrastrutture con tempi di realizzazione pluriennali, mentre la domanda puo' crescere in mesi. Questo disallineamento tra offerta e carico e' strutturale. Non si risolve "col tempo".</p>
+
+    <p>Si puo' fare. Bisogna sapere cosa si sta facendo. Chi dice il contrario ha letto lo studio sbagliato.</p>
+
+    <p>Non esiste configurazione del sistema che elimini simultaneamente il fabbisogno energetico, il picco di potenza e la congestione. Ridurre uno sposta il problema sugli altri due. E' un vincolo, non un'opinione.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il sistema elettrico non fallisce quando manca energia.<br>Fallisce quando troppa potenza viene richiesta<br>nello stesso punto, nello stesso istante."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Dati: ACI, ISTAT, Terna, e-distribuzione, ARERA, MOTUS-E, ENTSO-E, Polimi. Tutto pubblico, tutto riproducibile.</p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
