@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Nature Non E' Neutrale</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/nature-non-e-neutrale.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/nature-non-e-neutrale.html</guid>
+    <pubDate>Sun, 12 Apr 2026 00:00:00 +0200</pubDate>
+    <description>Uno studio su Nature dice che l'algoritmo di X "sposta le opinioni a destra". Ho scaricato i 268.532 post dal dataset di replicazione, letto il codice sorgente dell'algoritmo (github.com/xai-org/x-algorithm), e rifatto i conti. Effetto: 0.11 SD, non robusto per sottogruppo (sui Democratici svanisce). Nessuna evidenza di sovra-rappresentazione conservatrice nel feed. Variabile chiave (orientamento politico) classificata da un LLM con 20% di rumore. I dati sono del 2023, l'algoritmo e' cambiato 2 volte. 20 grafici dai dati originali.</description>
+  </item>
+
+  <item>
     <title>L'Italia Non Ha La Spina</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/litalia-non-ha-la-spina.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/litalia-non-ha-la-spina.html</guid>

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nature Non E' Neutrale | Signal Pirate</title>
+  <meta name="description" content="Uno studio su Nature dice che l'algoritmo di X sposta le opinioni a destra. Abbiamo scaricato i loro dati, letto il codice sorgente dell'algoritmo e rifatto i conti. L'effetto e' 0.11 SD. La classificazione politica e' fatta da Llama 3 con 20% di errore. I conservatori sono MENO presenti nel feed algoritmico. 20 grafici dai dati originali.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Comparison Row === */
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .comparison-row .lab-screenshot { margin: 0; }
+    @media (max-width: 768px) {
+      .comparison-row { grid-template-columns: 1fr; }
+    }
+
+    /* === Chart Caption === */
+    .chart-caption {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-04-12 | Pinperepette</p>
+    <h1 class="article-page-title">Nature Non E' <span class="accent">Neutrale</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Uno studio su Nature dice che l'algoritmo di X "sposta a destra". Abbiamo scaricato i loro dati, letto il codice sorgente dell'algoritmo e rifatto i conti. Nessuna evidenza di sovra-rappresentazione conservatrice nel feed. L'effetto e' 0.11 SD, non robusto per sottogruppo: sui Democratici svanisce. La variabile chiave (orientamento politico) e' classificata da un LLM con 20% di rumore. I dati sono del 2023, l'algoritmo e' cambiato due volte. 20 grafici, zero opinioni.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Peer Review</span>
+      <span class="tag tag-highlight">Replication</span>
+      <span class="tag tag-reaction">Effect Size</span>
+      <span class="tag tag-amplification">Open Source</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - INTRO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Paper Che Fa Comodo</h2>
+    <span class="section-number">Sezione 00. Premessa</span>
+
+    <p>Un politico europeo cita uno studio di Nature e dichiara che l'algoritmo di X "orienta progressivamente le opinioni politiche" verso posizioni conservatrici. Dice "chiaramente". Dice che serve il DSA. Dice che arretrare sulla regolamentazione e' un'erosione della democrazia.</p>
+
+    <p>Lo studio esiste davvero. Si chiama <em>"The political effects of X's feed algorithm"</em> (Gauthier, Hodler, Widmer, Zhuravskaya), pubblicato su Nature il 18 febbraio 2026, DOI: <code>10.1038/s41586-026-10098-2</code>. E' peer-reviewed, e' su Nature, ha i numeri e le tabelle al posto giusto.</p>
+
+    <p>Noi pero' facciamo quella cosa che rompe le scatole a tutti: scarichiamo i dati, apriamo il codice, e controlliamo se i numeri dicono quello che il titolo promette.</p>
+
+    <p>Spoiler: non lo dicono neanche un po'.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Disclaimer.</strong> Questo non e' un articolo di opinione. Abbiamo scaricato il dataset di replicazione da Figshare (10.6084/m9.figshare.28033772), letto il codice sorgente dell'algoritmo di X (<a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/xai-org/x-algorithm</a>), e generato 20 grafici dai dati originali dello studio. Tutto replicabile. Nessun dato inventato.</p>
+    </div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">268,532</div>
+        <div class="stat-label">Post analizzati</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">0.11 SD</div>
+        <div class="stat-label">Effect size principale</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">80.2%</div>
+        <div class="stat-label">Accuratezza Llama 3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">20</div>
+        <div class="stat-label">Grafici dai dati originali</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - IL CONTESTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Due Articoli Fa Lo Sapevamo Gia'</h2>
+    <span class="section-number">Sezione 01. Il contesto</span>
+
+    <p>Se segui questo blog, questa storia la conosci. In <a href="attenzione-invisibile.html" style="color: var(--accent-attention);">L'Attenzione Invisibile</a> abbiamo smontato il codice sorgente di Phoenix, il motore di raccomandazione di X. Sette segnali nascosti, il <code>dwellTimeMs</code>, il peso negativo su <code>isOpenLinked</code>, la variabile latente che stima la tua attenzione prima che tu faccia qualsiasi cosa. In <a href="il-feed-non-e-tuo.html" style="color: var(--accent-attention);">Il Feed Non E' Tuo</a> siamo passati dalla teoria alla pratica: 1.600 tweet catturati, 71 grafici, e la dimostrazione empirica che il 70% del feed "Per Te" arriva da account che non segui.</p>
+
+    <p>Sapevamo gia' che l'algoritmo seleziona per engagement, non per contenuto politico. Sapevamo gia' che il peso su <code>isOpenLinked</code> penalizza i link esterni (cioe' tutto cio' che ti porta fuori dalla piattaforma). Sapevamo gia' che la KL divergence sul sentiment tra feed algoritmico e cronologico era 0.001 bit: nessuna manipolazione emotiva misurabile.</p>
+
+    <p>Quindi quando Nature pubblica un paper che dice "l'algoritmo di X sposta le opinioni a destra", la domanda non e' se sia vero. La domanda e': <strong>i dati lo supportano?</strong></p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - L'EFFETTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> 0.11 Deviazioni Standard</h2>
+    <span class="section-number">Sezione 02. L'effect size</span>
+
+    <p>Il risultato principale dello studio e' uno shift di <strong>0.11 deviazioni standard</strong> sulle "conservative policy priorities" (CI 95%: 0.02-0.20, p=0.016). Per chi non vive di paper: e' un effetto <em>piccolo</em>. Cohen's d sotto 0.2 e' "small". Questo sta a 0.11. Il confidence interval parte da 0.02, praticamente zero, e il p-value a 0.016 non e' esattamente il tipo di certezza su cui costruisci una legge europea.</p>
+
+    <p>Tutti gli effetti misurati sono sotto la soglia "small". Tutti. Nessuna eccezione.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/08_effect_sizes.png" alt="Effect sizes dello studio" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 1. Effect sizes con CI 95%. La linea gialla tratteggiata e' la soglia "small effect" di Cohen (0.2). Nessun effetto la supera.</div>
+
+    <p>Ok, un effetto piccolo non e' automaticamente irrilevante. Su 500 milioni di utenti, anche 0.11 SD potrebbe contare. Ma un effetto piccolo conta solo se e' solido: se regge quando cambi sottogruppo, se resiste ai controlli, se non e' un artefatto del campione. E qui casca tutto.</p>
+
+    <p>Perche' quel 0.11 SD ha tre problemi grossi:</p>
+    <ul>
+      <li><strong>Non e' robusto per sottogruppo:</strong> sui Democratici (46% del campione) l'effetto e' zero. Sparisce. L'intero risultato e' guidato da Repubblicani e Indipendenti gia' orientati.</li>
+      <li><strong>La variabile di misura ha alta incertezza:</strong> la classificazione politica e' fatta da un LLM con 20% di rumore. Con una variabile chiave cosi' imprecisa, un effetto di 0.11 SD puo' essere interamente attenuazione o amplificazione da errore di misura.</li>
+      <li><strong>Il campione e' altamente selezionato:</strong> 78% bianchi, 58% laureati, 46% Dem, reclutati via panel retribuito YouGov. Non e' la popolazione di X.</li>
+    </ul>
+
+    <p>Statisticamente significativo non vuol dire praticamente rilevante, specialmente quando sei sotto la soglia di "small effect". "Chiaramente orienta le opinioni politiche" e' una lettura che i numeri non reggono. Effetto piccolo, non robusto, misurato con uno strumento impreciso su un campione che non rappresenta nessuno. Non ci costruisci sopra una narrativa.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Per confronto.</strong> Lo studio Meta del 2023 (Guess et al., Science) ha testato la stessa cosa su Facebook e Instagram con campioni molto piu' grandi. Risultato: "little evidence that the algorithms [had] a meaningful effect on attitudes". Stessa domanda, piattaforma piu' grande, effetto nullo. Ma quel paper non serviva a nessuna narrativa politica, quindi nessuno lo cita.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - I DEMOCRATICI NON SI MUOVONO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Breakdown Che Nessuno Cita</h2>
+    <span class="section-number">Sezione 03. Democratici vs Repubblicani</span>
+
+    <p>Lo studio ha i dati separati per partito. Extended Data Fig. 4. E qui la narrativa crolla definitivamente.</p>
+
+    <p><strong>Per i Democratici, NESSUN effetto e' statisticamente significativo.</strong> Zero. Conservative policy priorities: p=0.164. Pro-Kremlin attitudes: p=0.842. All attitudes: p=0.238. L'algoritmo non sposta i democratici di un millimetro.</p>
+
+    <p>L'effetto aggregato che tanto fa titolo e' interamente guidato da Repubblicani e Indipendenti. Gente che gia' aveva un orientamento conservatore e che, esposta a contenuti che generano piu' engagement (piu' provocatori, piu' emotivi, piu' retwittabili), ha rafforzato marginalmente le proprie posizioni pre-esistenti.</p>
+
+    <p>Questo cambia completamente la natura del fenomeno. Non e' <strong>manipolazione</strong>, cioe' un sistema che converte opinioni. E' <strong>amplificazione comportamentale</strong>, cioe' un sistema che rinforza cio' che c'era gia'. La differenza non e' semantica. E' la differenza tra un megafono che ti fa cambiare idea e un megafono che alza il volume della tua voce. L'algoritmo non produce conservatori. Trova persone gia' orientate e le espone a contenuti che confermano la loro visione del mondo, perche' quei contenuti generano piu' click.</p>
+
+    <p>E lo fa anche con i liberali, con gli appassionati di sport, con chi guarda meme di gatti. Non discrimina per orientamento politico. Discrimina per engagement. Ma il contenuto conservatore americano nel 2023 (Trump sotto indagine, guerra in Ucraina, campagna elettorale alle porte) era strutturalmente piu' provocatorio e piu' engaging. Se il contenuto liberale avesse generato piu' like, l'algoritmo avrebbe amplificato quello.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/18_dem_vs_rep.png" alt="Effetto per partito" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 2. Breakdown per partito. A sinistra: Rep + Ind (qualche effetto, alcuni significativi). A destra: Dem (tutto grigio, nessun p &lt; 0.05).</div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - PROPORZIONE NEL FEED
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Dato Che Capovolge Tutto</h2>
+    <span class="section-number">Sezione 04. Chi c'e' davvero nel feed</span>
+
+    <p>Abbiamo preso i 268.532 post del dataset e contato la proporzione di contenuti per orientamento politico (secondo la classificazione Llama 3 degli autori stessi) in ciascun tipo di feed.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/01_proporzione_feed.png" alt="Proporzione feed" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 3. Proporzione per orientamento nel feed algoritmico vs cronologico. Elaborazione sui dati originali dello studio.</div>
+
+    <p>I numeri: <strong>nel feed algoritmico i contenuti conservatori sono il 15.6%. Nel cronologico il 16.2%.</strong> La differenza e' -0.6 punti percentuali. Non e' statisticamente significativa, e' rumore. Ma il punto non e' che l'algoritmo "favorisce i liberali". Il punto e' che <strong>non c'e' nessuna evidenza di sovra-rappresentazione conservatrice</strong>. La narrativa "l'algoritmo pompa contenuti di destra" non ha supporto nei dati di composizione del feed.</p>
+
+    <p>Qualcuno rispondera': "ok, i conservatori non sono di piu', ma quelli che ci sono fanno piu' engagement, quindi impatto maggiore". Ed e' un punto valido, lo affrontiamo nella sezione successiva. Ma questo sposta il problema dall'algoritmo al contenuto. L'algoritmo non sceglie contenuti conservatori. Sceglie contenuti engaging. Se il contenuto conservatore genera piu' interazioni, la domanda e' perche' e' piu' engaging, non perche' l'algoritmo lo preferisce.</p>
+
+    <p>E la componente piu' grande? "Cannot say", il 51.1% nel feed algoritmico. La meta' dei contenuti non e' classificabile politicamente. E' entertainment. Meme. Video di gatti. Clip sportive. Roba che genera engagement senza avere un orientamento politico.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/20_composizione_tipo.png" alt="Composizione feed per tipo" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 4. Composizione per tipo di account. L'entertainment e' quasi la meta'. La politica e' una bolla nella bolla.</div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - L'ENGAGEMENT SPIEGA TUTTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> E' l'Engagement, Non la Politica</h2>
+    <span class="section-number">Sezione 05. Il driver vero</span>
+
+    <p>Ecco il pezzo che lo studio non ti racconta, forse perche' gli smonta la tesi. Il contenuto conservatore ha <strong>intrinsecamente piu' engagement</strong> di quello liberale. Non perche' l'algoritmo lo favorisce. Perche' e' piu' provocatorio, piu' emotivo, piu' semplificato, piu' condivisibile. E' content design, non bias algoritmico.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/02_engagement_per_slant.png" alt="Engagement per slant" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 5. Engagement mediano per orientamento politico. Dai dati dello studio. Cons 595 likes vs Lib 315 (1.9x).</div>
+
+    <p>I numeri sono nei loro dati:</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Metrica</th><th>Conservatore</th><th>Liberale</th><th>Ratio</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Likes mediani</td><td>595</td><td>315</td><td>1.9x</td></tr>
+        <tr><td>Retweet mediani</td><td>121</td><td>58</td><td>2.1x</td></tr>
+        <tr><td>Commenti mediani</td><td>69</td><td>21</td><td>3.3x</td></tr>
+      </tbody>
+    </table>
+
+    <p>I conservatori fanno 2-3 volte piu' interazioni. Un algoritmo che ottimizza per engagement amplifica quello che genera engagement. Non ha bisogno di sapere cosa e' "conservatore". Non ha un flag <code>is_conservative</code> nel codice. Ha un contatore di like, e i like parlano da soli.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/15_engagement_tipo_slant.png" alt="Engagement tipo+slant" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 6. Engagement per tipo + orientamento. Gli attivisti conservatori hanno 2.3x i likes degli attivisti liberali.</div>
+
+    <p>E se guardiamo il confronto algo vs chrono per slant, il quadro e' ancora piu' chiaro: i conservatori nel feed algoritmico hanno mediana likes <em>piu' bassa</em> che nel cronologico (544 vs 644). I liberali vengono amplificati di piu' (+38.6%). L'algoritmo non "pompa conservatori". Pompa engagement, e l'engagement nel feed algoritmico si distribuisce in modo piu' omogeneo.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/05_algo_vs_chrono_slant.png" alt="Algo vs Chrono per slant" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 7. Likes mediani algoritmico vs cronologico per slant. I conservatori perdono il -15.5%. I liberali guadagnano il +38.6%.</div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - PERCHE' LE NEWS SPARISCONO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le News Non Sono Censurate</h2>
+    <span class="section-number">Sezione 06. Engagement, non censura</span>
+
+    <p>Lo studio enfatizza il calo delle news nel feed algoritmico (-15.5 punti percentuali). Leggendo il paper sembra censura politica. Leggendo i dati e' aritmetica.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/03_engagement_per_tipo.png" alt="Engagement per tipo" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 8. Likes mediani per tipo di account. Le news hanno 39 likes. Gli account ufficiali 1.240.</div>
+
+    <p>Le testate giornalistiche hanno <strong>mediana 39 likes</strong>. Gli attivisti politici 632. Gli account ufficiali 1.240. L'entertainment 178. Il ratio news/attivisti e' 1:16. L'algoritmo non sa che sono news e non gli importa. Vede un post con 39 like e lo mette sotto uno da 632. Fine.</p>
+
+    <p>Perche' le news hanno engagement cosi' basso? Perche' linkano fuori. E come sappiamo dal <a href="attenzione-invisibile.html" style="color: var(--accent-attention);">codice sorgente di Phoenix</a>, <code>isOpenLinked</code> ha peso negativo. L'algoritmo penalizza i link esterni non perche' odia il giornalismo. Li penalizza perche' ogni click su un link e' un utente che esce dall'app. Ogni utente che esce e' revenue pubblicitaria che vola via.</p>
+
+    <p>E' il business model. Non un complotto politico. Non servono i poteri forti, basta un foglio Excel con i ricavi pubblicitari.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - L'ALGORITMO E' OPEN SOURCE
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Algoritmo E' Pubblico (E Non Ha Bias)</h2>
+    <span class="section-number">Sezione 07. Il codice</span>
+
+    <p>L'algoritmo di X e' open source. Prima versione marzo 2023 (<a href="https://github.com/twitter/the-algorithm" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/twitter/the-algorithm</a>). Seconda versione gennaio 2026 con il nuovo motore Grok-based (<a href="https://github.com/xai-org/x-algorithm" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/xai-org/x-algorithm</a>). Chiunque puo' leggere il codice. Chiunque puo' verificare.</p>
+
+    <p>Il README del nuovo repository lo dice esplicitamente:</p>
+
+    <div class="formula-box fade-in">
+      <span class="formula-name">Dal README di xai-org/x-algorithm</span>
+      "We eliminated every single hand-engineered feature and most heuristics"<br>
+      Final Score = &Sigma; (weight<sub>i</sub> &times; P(action<sub>i</sub>))
+    </div>
+
+    <p>Ma la parte che conta non sono le azioni visibili. Come abbiamo smontato in <a href="attenzione-invisibile.html" style="color: var(--accent-attention);">L'Attenzione Invisibile</a>, Phoenix legge 7 segnali nascosti che tu non vedi da nessuna parte:</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Segnale</th><th>Tipo</th><th>Cosa misura</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>dwellTimeMs</code></td><td>continuo (ms)</td><td>Quanto tempo stai fermo sul post. Il segnale piu' ricco.</td></tr>
+        <tr><td><code>isDetailExpanded</code></td><td>binario</td><td>Hai espanso il thread per leggere le risposte.</td></tr>
+        <tr><td><code>isPhotoExpanded</code></td><td>binario</td><td>Hai allargato la foto a schermo intero.</td></tr>
+        <tr><td><code>isVideoPlayback50</code></td><td>binario</td><td>Hai guardato almeno il 50% del video.</td></tr>
+        <tr><td><code>isProfileClicked</code></td><td>binario</td><td>Hai visitato il profilo dell'autore.</td></tr>
+        <tr><td><code>isBookmarked</code></td><td>binario</td><td>Hai salvato il post. Segnale forte di valore percepito.</td></tr>
+        <tr><td><code>isOpenLinked</code></td><td>binario</td><td>Hai cliccato un link esterno. <strong style="color: var(--accent-reaction);">Peso NEGATIVO.</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>Questi segnali alimentano il transformer che predice la probabilita' di 15 azioni: <code>P(favorite)</code>, <code>P(reply)</code>, <code>P(repost)</code>, <code>P(quote)</code>, <code>P(click)</code>, <code>P(profile_click)</code>, <code>P(video_view)</code>, <code>P(photo_expand)</code>, <code>P(share)</code>, <code>P(dwell)</code>, <code>P(follow_author)</code>, e 4 segnali negativi: <code>P(not_interested)</code>, <code>P(block)</code>, <code>P(mute)</code>, <code>P(report)</code>. Il punteggio finale e' la somma pesata di queste probabilita'.</p>
+
+    <p><strong>Non c'e' nessuna classificazione politica nel codice.</strong> Zero. Nessun token "conservative", nessun embedding "liberal", nessun layer che distingue orientamenti. L'algoritmo non sa se un post e' di destra o di sinistra. Sa quanto tempo ci stai sopra, se allarghi la foto, se espandi il thread, se torni indietro a rivederlo. Sa che ti ha tenuto fermo 8 secondi invece di 2. E questo basta.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/19_pesi_algoritmo.png" alt="Architettura algoritmo X" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 9. A sinistra: i 7 segnali nascosti di Phoenix (dal codice sorgente). A destra: i 15 target di predizione del transformer. Nessuno ha a che fare con l'orientamento politico.</div>
+
+    <p>E qui va chiarita una cosa che la stampa tech ha cannato in pieno: quando dicono che "dietro l'algoritmo c'e' Grok", e' marketing. Grok e' il brand. Il modello che serve il feed in tempo reale a centinaia di milioni di utenti non e' un LLM da 300 miliardi di parametri che ragiona su ogni tweet. Sarebbe fisicamente impossibile. Per servire il feed a 500 milioni di utenti ti servono meno di 100ms per request. Un LLM completo non ce la fa neanche col datacenter di Google.</p>
+
+    <p>Quello che succede sotto il cofano e' information retrieval classico: i segnali comportamentali (dwell time, espansioni, click) vengono proiettati in uno spazio vettoriale ad alta dimensionalita' tramite embedding. Ogni utente diventa un vettore. Ogni post diventa un vettore. Il ranking e' un calcolo di similarita' tra vettori: approximate nearest neighbor per pescare ~1.500 candidati da 500 milioni di post, poi una rete neurale piu' pesante per riordinare le top-N. E' lo stesso identico pattern di YouTube, TikTok, Instagram, Spotify. Non e' un progetto politico. E' un vincolo di latenza.</p>
+
+    <p>Il transformer "Grok-based" di Phoenix condivide l'architettura con Grok (attention heads, positional encoding), ma e' un modello specializzato per ranking, non un chatbot. E' come dire che una Ferrari e un trattore usano entrambi un motore a scoppio. Vero, ma non fanno la stessa cosa.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il meccanismo in 30 secondi.</strong> 500 milioni di post al giorno &rarr; candidate generation: ~1.500 candidati (meta' dal grafo dei tuoi follow, meta' da ML discovery via embedding) &rarr; Phoenix transformer: predice engagement per ogni candidato usando i tuoi segnali comportamentali &rarr; ranking per punteggio &rarr; filtri di diversita' e qualita' &rarr; il tuo feed. Nessuno di questi step sa cosa e' "conservatore". Tutti sanno cosa ti tiene fermo sullo schermo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - LE BOLLE LE CREIAMO NOI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Bolle Le Creiamo Noi</h2>
+    <span class="section-number">Sezione 08. Il vero meccanismo</span>
+
+    <p>Lo studio stesso spiega il meccanismo che smonta la propria tesi, senza rendersene conto. Citano: "exposure to algorithmically curated content led users to follow conservative activist accounts [...] these accounts remained followed after turning the algorithm off."</p>
+
+    <p>Tradotto: l'algoritmo ti mostra post engaging. Tu decidi di seguire chi li ha scritti. Quando torni al feed cronologico, quegli account sono ancora nella tua lista. L'algoritmo ha fatto da <em>motore di scoperta</em>. La scelta di follow l'hai fatta tu.</p>
+
+    <p>Questo e' lo stesso meccanismo di qualsiasi sistema di raccomandazione. Spotify ti suggerisce una playlist. Ti piace e la salvi. Quando spegni Discover Weekly, quella musica resta nella tua libreria. Nessuno accusa Spotify di "spostare i gusti musicali a destra".</p>
+
+    <p>L'obiettivo dell'algoritmo e' uno solo: tenerti dentro l'app piu' a lungo possibile. Non gli importa se quello che ti tiene dentro e' un thread conservatore, un meme liberale, o un video di un cane che fa skateboard. Gli importa che tu scrolli, che tu interagisca, che tu non chiuda l'app. Le bolle informative le creiamo noi con i nostri follow, i nostri like, i nostri retweet. L'algoritmo si limita a darci di piu' di quello che abbiamo gia' dimostrato di volere.</p>
+
+    <p>E' un amplificatore. Non un generatore.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - LLAMA 3 COME CLASSIFICATORE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Llama 3 Come Giudice Politico</h2>
+    <span class="section-number">Sezione 09. Il classificatore</span>
+
+    <p>E qui arriviamo al punto metodologico piu' critico. Come fanno a decidere se un post e' "conservatore" o "liberale"? Abbiamo letto il loro codice (nella cartella <code>llama3_annotations/</code> del dataset di replicazione). Riga 26:</p>
+
+    <div class="formula-box fade-in">
+      <span class="formula-name">Dal file annotate_slant_newsfeed_accounts.py</span>
+      model_id = "./Meta-Llama-3-8B-Instruct"
+    </div>
+
+    <p><strong>Llama 3 8B.</strong> Otto miliardi di parametri. Il piu' piccolo della famiglia. Quello che giri su un portatile con una GPU decente. Non il 70B. Non il 405B. Non Llama 3.1 o 3.2 con le migliorie successive. La versione base, la piu' economica, in bfloat16.</p>
+
+    <p>E il prompt? Prendono 10 tweet a caso dall'account, li incollano in un messaggio, e chiedono <em>"Annotate this account as Conservative, Liberal, or Cannot say"</em>. Fine. Nessun few-shot example. Nessun chain-of-thought. Nessuna calibrazione. Greedy decoding (<code>do_sample=False</code>). Un paper su Nature che classifica 268.532 post con un prompt che non passerebbe un code review su un progetto hobby.</p>
+
+    <p>Nel dataset di validazione (500 post annotati anche da 4 umani), Llama 3 8B concorda con la media umana nell'80.2% dei casi. Suona bene finche' non guardi i dettagli.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/06_confusion_matrix.png" alt="Matrice confusione" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 10. Matrice di confusione Llama 3 vs annotatori umani. 500 post. 99 errori.</div>
+
+    <p>27 post che gli umani classificano come conservatori, Llama 3 li mette in "cannot say". 10 post conservatori secondo gli umani, Llama 3 li classifica liberal. 40 post liberali finiscono in "cannot say". Il 20% delle classificazioni e' sbagliato.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/14_errori_llama3.png" alt="Errori Llama 3" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 11. Direzione degli errori di Llama 3. 27 conservatori "nascosti" in N/A. 40 liberali diluiti.</div>
+
+    <p>Ma il dato piu' devastante e' questo: <strong>gli annotatori umani sono unanimi solo nel 58.8% dei casi</strong>. In 4 persone, su 500 post, concordano tutti e 4 meno di 6 volte su 10.</p>
+
+    <p>Il classification report dal loro stesso codice di validazione racconta il resto:</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Classe</th><th>Precision</th><th>Recall</th><th>F1</th><th>Supporto</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Liberal</td><td>0.87</td><td>0.82</td><td>0.84</td><td>230</td></tr>
+        <tr><td>Cannot Say</td><td>0.67</td><td>0.87</td><td>0.76</td><td>155</td></tr>
+        <tr><td style="color: var(--accent-reaction);">Conservative</td><td style="color: var(--accent-reaction);">0.94</td><td style="color: var(--accent-reaction);">0.68</td><td style="color: var(--accent-reaction);">0.79</td><td>115</td></tr>
+      </tbody>
+    </table>
+
+    <p>Il recall sui contenuti conservatori e' <strong>0.68</strong>: una quota sostanziale (circa il 32%) non viene riconosciuta correttamente e finisce classificata come "Cannot say" o "Liberal". In uno studio che misura se l'algoritmo promuove contenuti conservatori, il classificatore ne manca quasi uno su tre. E la precision su "Cannot say" e' 0.67: circa un terzo dei post etichettati come "non classificabili" in realta' ha un orientamento politico.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/07_accordo_umani.png" alt="Accordo umani" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 12. Accordo tra 4 annotatori umani. Unanimita' nel 58.8% dei casi. Split 2-2 nel 13.2%.</div>
+
+    <p>E gli umani? Il Krippendorff's Alpha (la misura standard di accordo inter-annotatore) e' <strong>0.69</strong>. Nella letteratura, sotto 0.67 e' inaffidabile, tra 0.67 e 0.80 e' sufficiente per conclusioni "tentative". Siamo appena sopra la soglia del minimamente accettabile. Il singolo annotatore peggiore concorda con la media solo nel 68.7% dei casi.</p>
+
+    <p>La variabile "orientamento politico" ha un livello di incertezza e rumore di misura altissimo. E' normale nelle scienze sociali: la classificazione politica e' intrinsecamente ambigua. Ma quando la tua variabile chiave, quella su cui costruisci la conclusione principale, ha questo livello di rumore, un effetto di 0.11 SD puo' essere in parte spiegato o amplificato dall'errore di classificazione. L'intera analisi si regge su 268.532 etichette assegnate da un LLM da 8B parametri con un prompt senza calibrazione, che perde un conservatore su tre.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il problema della circolarita'.</strong> Usano un LLM per decidere cosa e' "conservatore". L'LLM tende a classificare contenuti emotivi, populisti o anti-establishment come conservatori (possibile bias dei modelli di linguaggio addestrati prevalentemente su dati anglofoni). Poi misurano che l'algoritmo di X amplifica contenuti engaging (che sono anche piu' emotivi e provocatori). Poi concludono che X amplifica "contenuti conservatori". Ma il classificatore e il fenomeno condividono lo stesso confondente: l'emotivita' del linguaggio.</p>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il dato che manca.</strong> Il dataset di replicazione non contiene il testo dei post (cancellato per ragioni IRB), non contiene i nomi degli account, e soprattutto <strong>non contiene il conteggio follower</strong> degli account che hanno scritto i post. Questo e' un buco enorme. Senza i follower non puoi testare la spiegazione piu' ovvia: i post conservatori hanno piu' engagement perche' gli account conservatori hanno piu' follower? Il rapporto engagement/follower (il vero indicatore di viralita') e' impossibile da calcolare. Non puoi separare l'effetto "account grande" dall'effetto "contenuto conservatore". E nessuno puo' replicare le classificazioni, perche' i testi originali non sono disponibili nel dataset di replicazione per ragioni IRB.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - IL CAMPIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Campione Piu' Skewed d'America</h2>
+    <span class="section-number">Sezione 10. Chi hanno misurato</span>
+
+    <p>Il campione dello studio: 4.965 utenti. Reclutati tramite YouGov (un panel online). 78% bianchi. 58% con 4+ anni di universita'. 46% democratici, 21% repubblicani. Eta' media 51 anni.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/09_campione_vs_usa.png" alt="Campione vs USA" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 13. Il campione dello studio confrontato con la popolazione USA. Non e' rappresentativo in nessuna dimensione.</div>
+
+    <p>Questo non e' un campione rappresentativo degli utenti di X. Non e' rappresentativo della popolazione USA. E' un campione di utenti istruiti, anziani, prevalentemente bianchi e democratici che hanno accettato di partecipare a un panel retribuito.</p>
+
+    <p>Ma il problema del campione e' secondario rispetto al <strong>funnel di partecipazione</strong>, che e' il vero tallone d'Achille metodologico dello studio.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/16_funnel_partecipanti.png" alt="Funnel partecipanti" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 14. Funnel di partecipazione. Da 13.265 a 784 con il tracker del feed. Solo il 6%.</div>
+
+    <p>Si parte da 13.265 reclutati via YouGov. 3.434 vengono esclusi perche' non abbastanza attivi su X. Dei 9.831 ammessi, 1.486 rinunciano al consenso. 2.320 abbandonano durante il pre-treatment survey. Restano 6.043. Di questi, solo 2.518 usano il desktop (gli altri usano il telefono, dove non puoi installare l'estensione). E di quei 2.518, solo <strong>784 installano la Chrome extension</strong> che traccia cosa appare nel feed.</p>
+
+    <p>784 su 13.265 partenze. Il <strong>6%</strong>. Questo e' il campione su cui si basano TUTTE le analisi del contenuto del feed, cioe' la parte dello studio che dice "l'algoritmo mostra piu' contenuti conservatori". Il restante 94% dei partecipanti contribuisce solo con le risposte ai sondaggi, senza nessuna verifica di cosa hanno effettivamente visto.</p>
+
+    <p>E non e' selection bias casuale. Chi installa volontariamente una Chrome extension per un esperimento accademico e' sistematicamente diverso da chi non lo fa: piu' tech-savvy, piu' interessato alla ricerca, probabilmente con un rapporto diverso con la piattaforma. Non puoi generalizzare da questo sottocampione.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il punto critico.</strong> Su un effetto di 0.11 SD, un selection bias del 94% e un tasso di non-compliance del 14.6% (auto-dichiarato, il dato reale e' probabilmente peggiore) possono facilmente generare o distruggere il risultato. Non stai misurando l'effetto dell'algoritmo. Stai misurando l'effetto dell'algoritmo su un sottocampione ultra-selezionato di utenti che si comportano come nessun altro utente.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 11 - I DATI SONO VECCHI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dati Del 2023, Paper Del 2026</h2>
+    <span class="section-number">Sezione 11. La timeline</span>
+
+    <p>L'esperimento e' stato condotto nell'estate 2023. Il paper e' stato pubblicato a febbraio 2026. Tre anni.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/12_timeline.png" alt="Timeline" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 15. Timeline. I dati sono del 2023. L'algoritmo e' cambiato due volte nel frattempo.</div>
+
+    <p>Nel frattempo l'algoritmo di X e' cambiato almeno due volte. La prima versione open source (marzo 2023) usava SimClusters, TwHIN, e un ranking neurale con feature engineering pesante. La versione attuale (gennaio 2026) ha eliminato tutto il feature engineering e usa un transformer Grok-based puro. Sono due sistemi completamente diversi.</p>
+
+    <p>Pubblicare nel 2026 uno studio basato sull'algoritmo del 2023 e' come fare il crash test di una Punto e dire che vale per la Model 3. Il motore e' cambiato. Il telaio e' cambiato. L'elettronica e' cambiata. Stai misurando un fantasma.</p>
+
+    <p>E la domanda ovvia: perche' tre anni? Un RCT su un panel di 5.000 utenti non richiede tre anni di analisi. La data di ricezione del paper e' dicembre 2024, accettato gennaio 2026. Al di la' delle ragioni del ritardo, la conseguenza concreta e' che <strong>la distanza temporale limita drasticamente la generalizzabilita' ai sistemi attuali</strong>. Non stai descrivendo l'algoritmo di X del 2026. Stai descrivendo un algoritmo che non esiste piu'.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 12 - LA DISTRIBUZIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il 99% Che Nessuno Vede</h2>
+    <span class="section-number">Sezione 12. La distribuzione dell'engagement</span>
+
+    <p>La distribuzione dell'engagement nei dati dello studio e' brutalmente skewed. La media dei likes e' 7.975. La mediana e' 166. Quarantotto volte di differenza. Significa che pochissimi post con milioni di interazioni distorcono tutte le medie.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/10_distribuzione_engagement.png" alt="Distribuzione engagement" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 16. Distribuzione engagement totale (log scale). Media 42x la mediana. Power law classica.</div>
+
+    <p>Quando lo studio dice "i conservatori hanno piu' engagement", parla di pochi post virali nella coda destra della distribuzione. Il 44% dei post conservatori ha piu' di 1.000 likes, contro il 38% dei liberali. Ma la differenza si concentra nella coda estrema.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/11_alto_engagement_per_slant.png" alt="Alto engagement" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 17. % di post sopra varie soglie di likes. I conservatori dominano nelle code.</div>
+
+    <p>Questo e' un artefatto della natura del contenuto, non dell'algoritmo. Il contenuto provocatorio, polarizzante, emotivo genera code pesanti. I conservatori americani nel 2023 erano in piena campagna pre-elettorale, con Trump sotto indagine e la guerra in Ucraina come tema caldo. Qualsiasi contenuto su quei temi genera engagement alto. Non serve un algoritmo: serve un argomento che fa arrabbiare la gente.</p>
+
+    <img src="../immagini/nature-non-e-neutrale/04_distribuzione_likes.png" alt="Distribuzione likes per slant" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 18. Distribuzione likes in log scale per orientamento. La coda destra dei conservatori e' piu' pesante.</div>
+
+
+    <!-- ============================================================
+         SEZIONE 13 - L'HEATMAP
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa C'e' Davvero Nel Feed</h2>
+    <span class="section-number">Sezione 13. La mappa completa</span>
+
+    <img src="../immagini/nature-non-e-neutrale/13_heatmap_tipo_slant.png" alt="Heatmap tipo x slant" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 19. Composizione del feed algoritmico: tipo x orientamento. L'entertainment "Cannot say" domina. Gli attivisti conservatori sono il 9.3% del feed.</div>
+
+    <p>Nella heatmap si vede la struttura reale del feed algoritmico. Entertainment non politico: 35.7%. News cannot-say: 10.8%. Attivisti conservatori: 9.3%. Attivisti liberali: 15.3%. Il feed algoritmico mostra piu' attivisti liberali che conservatori. Lo studio non lo dice.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 14 - COMPLIANCE
+         ============================================================ -->
+    <h2><span class="accent">//</span> 14.6% Non Ha Seguito Le Istruzioni</h2>
+    <span class="section-number">Sezione 14. La compliance</span>
+
+    <img src="../immagini/nature-non-e-neutrale/17_compliance.png" alt="Compliance" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 20. Compliance auto-dichiarata. Il 14.6% ammette di non aver seguito il protocollo.</div>
+
+    <p>Il 14.6% dei partecipanti ammette di aver usato il feed sbagliato "sometimes", "rarely" o "never". E questo e' il dato auto-dichiarato: la gente tende a sovrastimare la propria compliance. Su un effetto di 0.11 SD, un 15% di contaminazione puo' generare o distruggere il risultato.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 15 - LE ALTRE CREPE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Altre Crepe</h2>
+    <span class="section-number">Sezione 15. Problemi metodologici addizionali</span>
+
+    <p>Fin qui abbiamo colpito i punti piu' visibili. Ma ci sono almeno quattro problemi metodologici che un reviewer attento avrebbe dovuto sollevare.</p>
+
+    <h3 style="color: var(--accent-attention); margin-top: 2rem;">Multiple testing senza correzione</h3>
+
+    <p>Lo studio testa 7 outcome principali, in 2 direzioni (algoritmo on e off), con 2 specifiche (con e senza controlli). Fanno 28 test solo nella Fig. 2. Aggiungendo il breakdown per partito (Extended Data Fig. 4) si arriva a 56. Con i test sugli account seguiti (Fig. 4) si superano i 120 test totali.</p>
+
+    <p>Il p-value principale e' 0.016. Con correzioni standard per test multipli (Bonferroni o FDR), la significativita' dell'effetto principale diventa fragile e potrebbe non reggere. Lo studio non applica nessuna correzione. Quando fai 28 test a soglia 0.05, per caso ne trovi almeno uno significativo con probabilita' del 76%.</p>
+
+    <h3 style="color: var(--accent-attention); margin-top: 2rem;">L'effetto e' un LATE su un sottogruppo iper-selezionato</h3>
+
+    <p>L'esperimento e' un RCT, ma la stima non e' un Average Treatment Effect sulla popolazione di X. Con il 6% di installazione della Chrome extension e il 14.6% di non-compliance, lo studio stima di fatto un <strong>Local Average Treatment Effect</strong> su un sottogruppo che ha accettato di partecipare a un panel retribuito, usa X da desktop, ha installato un'estensione del browser, e ha seguito le istruzioni. Generalizzare questo effetto a 500 milioni di utenti che scrollano distrattamente sul telefono mentre aspettano l'autobus e' un salto logico che i dati non supportano.</p>
+
+    <h3 style="color: var(--accent-attention); margin-top: 2rem;">L'outcome e' self-report</h3>
+
+    <p>Le "opinioni politiche" misurate nello studio non sono comportamenti osservati. Sono risposte a un sondaggio. Self-report. Con tutti i problemi noti: desiderabilita' sociale (rispondi quello che pensi sia "giusto"), risposta strategica (rispondi per segnalare appartenenza), instabilita' temporale (la tua risposta cambia con l'umore del giorno). Un effetto di 0.11 SD misurato su self-report dopo 7 settimane potrebbe riflettere un cambiamento di umore, non un cambiamento di opinione. Lo studio non ha nessun modo di distinguere tra i due.</p>
+
+    <h3 style="color: var(--accent-attention); margin-top: 2rem;">Validita' ecologica compromessa</h3>
+
+    <p>I partecipanti sanno di essere osservati. Usano il desktop invece del telefono (dove avviene la maggior parte dell'uso reale di X). Hanno un'estensione del browser che traccia il loro feed. Ricevono email di promemoria ogni 2-3 settimane. Vengono pagati per partecipare. Questo non e' "uso naturale di X". E' uso sotto osservazione in un contesto sperimentale. L'effetto Hawthorne (cambiare comportamento perche' ti senti osservato) e' un confondente classico, e qui ha tutte le condizioni per manifestarsi.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 16 - IL VERDETTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Come E' Finito Su Nature</h2>
+    <span class="section-number">Sezione 16. Il peer review</span>
+
+    <p>La domanda che vi state facendo tutti: come ha fatto questo paper a passare il peer review di Nature?</p>
+
+    <p>Risposta breve: il peer review non fa quello che la gente pensa. I revisori controllano: (1) la metodologia e' formalmente corretta? Si', e' un RCT, randomizzazione fatta bene, survey pre/post, regressioni con covariate. (2) La statistica e' eseguita correttamente? Si', i CI sono calcolati bene, il codice gira. (3) Il topic e' rilevante? Caldissimo. Check.</p>
+
+    <p>Quello che il peer review non fa: verificare se l'effect size e' abbastanza grande per reggere le conclusioni qualitative. Verificare se classificare contenuto politico con un LLM da 8B introduce distorsioni. Verificare se i dati hanno ancora senso quando li pubblichi tre anni dopo e il sistema e' cambiato due volte.</p>
+
+    <p>Nature pubblica paper con effect size piccoli ogni settimana. Non e' un difetto del journal. E' un difetto di chi legge solo il titolo e il comunicato stampa.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 17 - RIEPILOGO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Riepilogo</h2>
+    <span class="section-number">Sezione 17. I numeri</span>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr>
+          <th>Claim</th>
+          <th>Realta' (dai dati dello studio)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>"Chiaramente orienta le opinioni"</td>
+          <td>0.11 SD, effetto piccolo, non robusto: zero effetto sui Democratici</td>
+        </tr>
+        <tr>
+          <td>"L'algoritmo non e' neutrale"</td>
+          <td>Codice open source, zero classificazione politica, ottimizza engagement</td>
+        </tr>
+        <tr>
+          <td>"Sposta verso posizioni conservative"</td>
+          <td>Nessuna sovra-rappresentazione conservatrice nel feed (15.6% vs 16.2%)</td>
+        </tr>
+        <tr>
+          <td>"Amplificazione selettiva"</td>
+          <td>Amplificazione comportamentale, non manipolazione: rinforzo su orientamenti pre-esistenti</td>
+        </tr>
+        <tr>
+          <td>"Effetto sugli utenti"</td>
+          <td>Solo su Rep + Ind gia' orientati. Sui Dem tutti i p > 0.05. Non e' conversione.</td>
+        </tr>
+        <tr>
+          <td>"Indebolisce il dibattito democratico"</td>
+          <td>Variabile chiave (orientamento) con 20% di rumore. Umani unanimi al 59%. Alta incertezza.</td>
+        </tr>
+        <tr>
+          <td>"Sotto la guida di Musk"</td>
+          <td>Dati del 2023. Algoritmo cambiato 2 volte. Paper del 2026. Tre anni di ritardo.</td>
+        </tr>
+        <tr>
+          <td>"Serve il DSA"</td>
+          <td>Lo studio non menziona il DSA ne' suggerisce interventi regolatori</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <div class="insight-box fade-in">
+      <p>Lo studio identifica un effetto statisticamente rilevabile, ma metodologicamente fragile e di interpretazione causale ambigua. I risultati sono compatibili sia con un effetto algoritmico debole sia con una spiegazione alternativa basata su engagement differenziale, errore di misura della variabile chiave e selezione del campione. Senza dati addizionali (testi originali, conteggio follower, validazione su modelli piu' robusti), non e' possibile distinguere tra queste ipotesi. Il salto da un effetto statistico piccolo, non robusto per sottogruppo e non corretto per test multipli a una conclusione qualitativa forte ("l'algoritmo orienta le opinioni politiche") non e' giustificato dai dati.</p>
+    </div>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">L'algoritmo non e' neutrale.<br>Ma neanche lo studio che lo accusa.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+        268.532 post &middot; 20 grafici &middot; dati originali dello studio &middot; codice sorgente dell'algoritmo<br>
+        Tutto replicabile. Zero opinioni.<br>
+        <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/il-feed-non-e-neutrale" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/pinperepette</a>
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. I dati non hanno orientamento politico.</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
