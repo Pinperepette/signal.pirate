@@ -870,7 +870,7 @@
     <h2><span class="accent">//</span> Lab</h2>
     <span class="section-number">Script, report, replica</span>
 
-    <p>Tutti gli script PoC + il security report completo nella cartella <a href="../scripts/l-eta-e-un-booleano/" style="color: var(--accent-attention);">scripts/l-eta-e-un-booleano/</a>. Prerequisiti: emulatore Android API 30, app <code>com.scytales.av.dev</code> installata, <code>adb</code> + <code>sqlite3</code> nel PATH.</p>
+    <p>Tutti gli script PoC + il security report completo nel <a href="../scripts/l-eta-e-un-booleano/" style="color: var(--accent-attention);">lab</a>. Clickando un file qui sotto si apre il viewer GitHub con syntax highlighting; dalla pagina del lab c'e' anche l'opzione raw (download diretto). Prerequisiti: emulatore Android API 30, app <code>com.scytales.av.dev</code> installata, <code>adb</code> + <code>sqlite3</code> nel PATH.</p>
 
     <table class="strategy-table fade-in">
       <thead>
@@ -878,57 +878,57 @@
       </thead>
       <tbody>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/00-common.sh" style="color: var(--accent-attention);">00-common.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/00-common.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">00-common.sh</a></td>
           <td>&mdash;</td>
           <td>Funzioni condivise (read_prefs, write_prefs, restart_app)</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/01-pin-bypass.sh" style="color: var(--accent-attention);">01-pin-bypass.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/01-pin-bypass.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">01-pin-bypass.sh</a></td>
           <td>VULN-01</td>
           <td>Rimuove PinEnc/PinIv, dimostra che le credenziali restano</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/02-ratelimit-bypass.sh" style="color: var(--accent-attention);">02-ratelimit-bypass.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/02-ratelimit-bypass.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">02-ratelimit-bypass.sh</a></td>
           <td>VULN-02</td>
           <td>Forza lockout, resetta, tentativi tornano infiniti</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/03-biometric-bypass.sh" style="color: var(--accent-attention);">03-biometric-bypass.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/03-biometric-bypass.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">03-biometric-bypass.sh</a></td>
           <td>VULN-03</td>
           <td>Flippa UseBiometricsAuth da true a false</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/04-decode-shuffle.py" style="color: var(--accent-attention);">04-decode-shuffle.py</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/04-decode-shuffle.py" target="_blank" rel="noopener" style="color: var(--accent-attention);">04-decode-shuffle.py</a></td>
           <td>VULN-04</td>
           <td>Inverte il Fisher-Yates con seed [1,3,5,7,9,2,4,6,8]</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/05-mitm-setup.sh" style="color: var(--accent-attention);">05-mitm-setup.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/05-mitm-setup.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">05-mitm-setup.sh</a></td>
           <td>VULN-06</td>
           <td>Verifica assenza pinning, setup mitmproxy</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/06-extract-credentials.sh" style="color: var(--accent-attention);">06-extract-credentials.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/06-extract-credentials.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">06-extract-credentials.sh</a></td>
           <td>VULN-07</td>
           <td>Dump del DB SQLite delle credenziali</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/07-full-demo.sh" style="color: var(--accent-attention);">07-full-demo.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/07-full-demo.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">07-full-demo.sh</a></td>
           <td>all</td>
           <td>Catena tutti i test in sequenza con ripristino</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/08-credential-replay-poc.sh" style="color: var(--accent-attention);">08-credential-replay-poc.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/08-credential-replay-poc.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">08-credential-replay-poc.sh</a></td>
           <td>VULN-08</td>
           <td>Estrae CBOR + keys, analizza fattibilita' replay</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/av-security-test.sh" style="color: var(--accent-attention);">av-security-test.sh</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/av-security-test.sh" target="_blank" rel="noopener" style="color: var(--accent-attention);">av-security-test.sh</a></td>
           <td>all</td>
           <td>Versione standalone self-contained</td>
         </tr>
         <tr>
-          <td><a href="../scripts/l-eta-e-un-booleano/SECURITY_REPORT.md" style="color: var(--accent-attention);">SECURITY_REPORT.md</a></td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/l-eta-e-un-booleano/SECURITY_REPORT.md" target="_blank" rel="noopener" style="color: var(--accent-attention);">SECURITY_REPORT.md</a></td>
           <td>&mdash;</td>
           <td>Assessment completo, 8 VULN con file/riga, impact, fix</td>
         </tr>
