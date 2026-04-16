@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Eta' E' Un Booleano | Signal Pirate</title>
+  <meta name="description" content="Von der Leyen dice che l'app europea di age verification 'ticks all the boxes'. Paul Moore la buca in due minuti, poi pubblica un'estensione Chrome che bypassa la verifica da dentro il browser. Io sono andato oltre. Otto vulnerabilita' confermate con PoC su emulatore, cifratura fasulla con seed hardcoded, PIN non legato al vault, userAuthenticationRequired=false. Sotto, un difetto architetturale che nessuna patch sistema: il framework accetta per design issuer con policy di verifica diverse, e il verifier a valle non puo' distinguerli crittograficamente.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    .ck { color: #7c4dff; }
+    .cs { color: #00ff88; }
+    .cn { color: #b5cea8; }
+    .cc { color: #6a6a8a; }
+    .cf { color: #4ecdc4; }
+    .cv { color: #9cdcfe; }
+    .ct { color: #4ec9b0; }
+    .co { color: #d4d4d4; }
+    .cw { color: #ff6b6b; }
+
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .chart-caption {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    .vuln-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0;
+    }
+    .vuln-list li {
+      background: var(--bg-secondary);
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.6rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    .vuln-list li strong { color: var(--accent-reaction); display: block; margin-bottom: 0.3rem; }
+
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-04-16 | Pinperepette</p>
+    <h1 class="article-page-title">L'Eta' E' Un <span class="accent">Booleano</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Von der Leyen dice che l'app europea di age verification "ticks all the boxes": privacy massima, gira ovunque, open source. Un tale su X la buca in due minuti toccando un file XML. Io ho smontato il repo, avviato un emulatore, e in un pomeriggio ho collezionato otto vulnerabilita' e un difetto architetturale che nessuna patch sistema. Il verifier riceve una presentazione firmata che attesta un solo fatto: <code>age_over_18 = true</code>. Non riceve una prova che chi la presenta sia la persona a cui e' stata emessa.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">EUDI Wallet</span>
+      <span class="tag tag-highlight">Android</span>
+      <span class="tag tag-reaction">PoC</span>
+      <span class="tag tag-amplification">OpenID4VP</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00 - LA SCENA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Ticks All The Boxes</h2>
+    <span class="section-number">Sezione 00. La scena</span>
+
+    <p>15 aprile 2026. Ursula von der Leyen pubblica un tweet con un render iPhone e quattro checkmark verdi: <em>highest privacy standards in the world, works on any device, easy to use, fully open source</em>. L'app europea di age verification, dice, spunta tutte le caselle. Sotto, un video di nove secondi che mostra una credenziale "Age Over 18 = true" dentro un wallet tutto azzurro e blu UE.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/tweet-vdl.png" alt="Tweet di Ursula von der Leyen: Our app ticks all the boxes" class="lab-screenshot fade-in" style="max-width: 480px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="chart-caption">Fig. 1. @vonderleyen, 15 aprile 2026. Quattro checkmark verdi, un render iPhone, nove secondi di video.</div>
+
+    <p>Dodici ore dopo, Paul Moore, security consultant dietro l'handle @Paul_Reviews, posta la risposta tecnica piu' lapidaria dell'anno. <em>"Hacking the EU AgeVerification app in under 2 minutes"</em>. Rimuovi <code>PinEnc</code> e <code>PinIv</code> dalle shared_prefs, scegli un nuovo PIN, l'app ti presenta le credenziali create sotto il vecchio profilo come valide. Rate limiting? E' un contatore intero nello stesso file. Basta rimetterlo a zero. Biometria? Un booleano. Basta <code>false</code>. Paul chiude con una frase: <em>"this product will be the catalyst for an enormous breach at some point. It's just a matter of time."</em></p>
+
+    <img src="../immagini/l-eta-e-un-booleano/tweet-paul-pin-bypass.png" alt="Tweet di Paul Moore: Hacking the EU AgeVerification app in under 2 minutes" class="lab-screenshot fade-in" style="max-width: 480px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="chart-caption">Fig. 2. Paul Moore, @Paul_Reviews, 16 aprile 2026. PIN non legato al vault, rate limit in chiaro, biometria booleana. Il tutto in due minuti.</div>
+
+    <p>A questo punto avrei potuto farmi l'ennesimo thread su X. Ho fatto un'altra cosa. Ho clonato il repo ufficiale, acceso un emulatore Android, e ho speso un pomeriggio a verificare se Paul aveva ragione. L'ho verificato. E sotto quello che aveva trovato lui, ne ho trovati altri sei. Poi, mentre stavo finendo di scrivere questo pezzo, Paul ha pubblicato un secondo thread: <em>"Bypassing EU AgeVerification using their own infrastructure. I've ported the Android app logic to a Chrome extension."</em> Un'estensione Chrome che bypassa il sistema da dentro il browser. Ne parliamo in sezione 08, ma l'anticipo qui perche' cambia il quadro.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Materiale.</strong> Repo: <code>eu-digital-identity-wallet/av-app-android-wallet-ui</code>, build <code>devDebug</code>, commit latest main. Emulatore Android API 30 x86_64. Test issuer <code>test.issuer.dev.ageverification.dev</code>. Tutto l'assessment e' stato fatto sull'infrastruttura di test ufficiale del progetto, con il loro endpoint, senza toccare produzione. I PoC sono script bash + python, totale 440 righe, zero dipendenze esotiche.</p>
+    </div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number red">8</div>
+        <div class="stat-label">Vulnerabilita' confermate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">2 min</div>
+        <div class="stat-label">PIN bypass</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">9 byte</div>
+        <div class="stat-label">Seed della "cifratura"</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">30</div>
+        <div class="stat-label">Credenziali per enrollment</div>
+      </div>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Scope del test.</strong> Tutte le vulnerabilita' descritte in questo articolo sono state verificate sull'ambiente di test ufficiale del progetto (<code>test.issuer.dev.ageverification.dev</code>) e automatizzate via script su emulatore Android API 30. Le credenziali usate sono fittizie, emesse dal test issuer ufficiale; nessun documento d'identita' reale, nessun passaporto scannerizzato, nessuna produzione toccata. Gli script PoC completi sono pubblicati in fondo all'articolo. Paul Moore ha gia' reso pubblica una Chrome extension funzionante che opera end-to-end sull'infrastruttura reale: tenere "segreti" degli script da emulatore sarebbe teatro di sicurezza. Il team EUDI Wallet / Scytales / EU Commission puo' contattarmi per coordinamento.</p>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Quello che il client invia, dove finisce, non lo sa nessuno.</strong> Il blueprint contiene un modulo <code>analytics-logic</code> con lo scaffolding pronto (<code>AnalyticsController.logEvent()</code>, <code>logScreen()</code>) e una call site <em>gia' attiva</em> in <code>RouterHost.kt</code> che spara un evento a ogni cambio schermata dell'utente. Nel blueprint non e' wireato nessun provider concreto (default <code>analyticsProviders = emptyMap()</code>, nessun SDK Firebase/Mixpanel nel <code>build.gradle.kts</code>): gli eventi vengono generati ma non li riceve nessuno. Slot vuoto, cannone gia' caricato. Un fork nazionale inserisce Firebase Analytics, Google Analytics, o un proprio endpoint, in dieci righe di Kotlin dentro un <code>AnalyticsProvider</code> custom. Nessuna notifica all'utente, nessuna revisione di sicurezza indipendente: il codice del fork nazionale non e' garantito open source.</p>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>E qui la combo diventa pericolosa.</strong> I tre endpoint hardcoded nella build sono <code>test.issuer.dev.ageverification.dev</code>, <code>passport.issuer.dev.ageverification.dev</code>, <code>wallet-provider.ageverification.dev</code>. Durante enrollment il client spedisce necessariamente MRZ del documento al passport-issuer, device attestation al wallet-provider, authorization code OIDC all'issuer. Cosa i backend memorizzino, per quanto, con che retention, con che right-of-access, non lo stabilisce il codice open source: lo stabilisce un contratto politico-amministrativo che non puoi auditare. L'unico modo di sapere davvero cosa parte dal telefono e' intercettare il traffico. E questo e' esattamente quello che <a href="#" style="color: var(--accent-reaction);">VULN-06</a> rende banale: nessun certificate pinning, TrustManager di default, e <em>la documentazione ufficiale</em> che mostra come disabilitare ogni validazione SSL. Un MITM su una debug build = setup di mitmproxy in quattro righe di bash e vedi tutto. Cio' che non puoi fare e' auditare il server a valle: quello resta chiuso, nazionale, opaco.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - COSA E' L'APP
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Dovrebbe Fare L'App</h2>
+    <span class="section-number">Sezione 01. Il modello</span>
+
+    <p>Prima di smontare, serve capire cosa si sta smontando. L'AV Wallet e' un fork specializzato di EUDI Wallet, il portafoglio digitale UE. Il flusso nominale e' questo.</p>
+
+    <ol>
+      <li>Apri l'app, imposti un PIN a 6 cifre, opzionalmente abiliti la biometria.</li>
+      <li>Fai <em>enrollment</em>: ti colleghi a un issuer fidato (un'autorita' nazionale), gli provi la tua eta' con un documento, lui ti emette una credenziale firmata. In realta' te ne emette 30 insieme, politica <code>OneTimeUse</code>, perche' ogni presentazione brucia una credenziale per non farsi tracciare.</li>
+      <li>Quando un sito vuole sapere se hai 18 anni, ti mostra un QR. Lo scansioni con l'app. L'app firma una presentazione OpenID4VP che contiene un solo dato: <code>age_over_18 = true</code>. Il sito verifica la firma. Fine.</li>
+    </ol>
+
+    <p>Sulla carta e' un bel design. Zero-knowledge nell'intenzione: il sito scopre solo se hai l'eta', non quanti anni, non il nome, non il comune di nascita. In pratica il problema inizia subito: il mapping <em>chi presenta</em> &rarr; <em>chi ha fatto l'enrollment</em> non esiste. Il verifier sa solo che un'entita' qualsiasi ha firmato con una chiave che, un giorno, e' stata associata a un documento reale. <em>Chi</em> controlla quella chiave in questo momento, il verifier non lo sa. E come vedremo, nemmeno l'app lo sa.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/app-verification-methods.png" alt="Schermata di scelta del metodo di verifica dell'eta' nell'app AV" class="lab-screenshot fade-in" style="max-width: 400px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="chart-caption">Fig. 3. Onboarding, step "Verification". Tre vie per provare l'eta': eID nazionale, scan passaporto/ID card (rotta con passport-issuer + face match on-device), token/QR da verifica in presenza. Dopo lo step, l'issuer emette 30 credenziali <code>OneTimeUse</code> nel wallet.</div>
+
+    <p>I file interessanti stanno dentro l'app su un path prevedibile.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc"># package di debug, build devDebug</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="cv">PKG</span><span class="co">=</span><span class="cs">com.scytales.av.dev</span></td></tr>
+        <tr><td class="ln">3</td><td class="code"></td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="cc"># SharedPreferences: PIN, biometria, rate limit, "cifratura"</span></td></tr>
+        <tr><td class="ln">5</td><td class="code"><span class="cv">PREFS</span><span class="co">=</span><span class="cs">/data/data/$PKG/shared_prefs/eudi-wallet.xml</span></td></tr>
+        <tr><td class="ln">6</td><td class="code"></td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="cc"># Credential store: SQLite con le 30 credenziali firmate</span></td></tr>
+        <tr><td class="ln">8</td><td class="code"><span class="cv">DOCDB</span><span class="co">=</span><span class="cs">/data/data/$PKG/no_backup/EudiWalletDocumentManager.db</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Dump delle shared_prefs su emulatore via <code>adb shell run-as $PKG cat $PREFS</code>. Scriveremo sullo stesso file di ritorno con <code>adb push</code> + <code>run-as $PKG cp</code>. Niente root. Il canale <code>run-as</code> esiste perche' la build e' <code>debuggable</code>, esattamente come la build che gli sviluppatori distribuiranno ai tester nazionali. L'ipotesi di attacco e' realistica: accesso fisico al telefono sbloccato per trenta secondi, oppure un malware locale con permessi ADB gia' concessi. Non e' sci-fi, e' un turista che ti lascia il telefono per caricare il charger.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - VULN-01
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il PIN Non Sblocca Niente</h2>
+    <span class="section-number">Sezione 02. VULN-01</span>
+
+    <p>Paul_Reviews l'ha detto in un paragrafo. Spendo due minuti di piu' per il dettaglio, perche' qui si capisce l'intera filosofia del prodotto.</p>
+
+    <p>Il PIN e' cifrato. Davvero. Una chiave AES-256-GCM nell'Android Keystore, IV random, output base64. Il codice in <code>PrefsPinStorageProvider.kt</code> fa le cose bene. Il PIN cifrato finisce in due campi delle shared_prefs, <code>PinEnc</code> e <code>PinIv</code>.</p>
+
+    <p>Il problema non e' la cifratura. Il problema e' cosa succede quando quei due campi <em>non ci sono piu'</em>.</p>
+
+    <div class="code-block" data-lang="kotlin">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc">// QuickPinInteractor.kt:52</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="ck">fun</span> <span class="cf">hasPin</span>(): <span class="ct">Boolean</span> {</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="ck">return</span> <span class="cv">pinStorage</span>.<span class="cf">retrievePin</span>() <span class="co">!=</span> <span class="ck">null</span></td></tr>
+        <tr><td class="ln">4</td><td class="code">}</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Se <code>PinEnc</code> manca, <code>retrievePin()</code> torna null, <code>hasPin()</code> torna false, l'app entra nel flusso di onboarding e ti chiede di impostare un PIN nuovo. Normale. Tranne che nessuno, in nessuna parte del codice, invalida il vault delle credenziali quando questo succede. Il database <code>EudiWalletDocumentManager.db</code> sta in <code>no_backup/</code>, non viene toccato, le 30 credenziali firmate restano la'. Il nuovo PIN le sblocca tutte come se fossero sempre state tue.</p>
+
+    <p>Tradotto in bash.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cv">adb</span> shell <span class="cs">"run-as $PKG cat $PREFS"</span> <span class="co">|</span> \</td></tr>
+        <tr><td class="ln">2</td><td class="code">  grep <span class="co">-</span>v <span class="cs">'name="PinEnc"'</span> <span class="co">|</span> \</td></tr>
+        <tr><td class="ln">3</td><td class="code">  grep <span class="co">-</span>v <span class="cs">'name="PinIv"'</span> <span class="co">&gt;</span> /tmp/nopin.xml</td></tr>
+        <tr><td class="ln">4</td><td class="code"></td></tr>
+        <tr><td class="ln">5</td><td class="code"><span class="cv">adb</span> push /tmp/nopin.xml /data/local/tmp/eudi-wallet.xml</td></tr>
+        <tr><td class="ln">6</td><td class="code"><span class="cv">adb</span> shell <span class="cs">"run-as $PKG cp /data/local/tmp/eudi-wallet.xml $PREFS"</span></td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="cv">adb</span> shell am force-stop <span class="cv">$PKG</span></td></tr>
+        <tr><td class="ln">8</td><td class="code"><span class="cv">adb</span> shell monkey <span class="co">-</span>p <span class="cv">$PKG</span> 1</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>L'app si riapre mostrando la schermata di setup PIN. Imposti "111111", entri, le credenziali sono li'. Conto documenti prima della manovra: <code>SELECT COUNT(*) FROM MzDocuments</code> su dump SQLite. Conto documenti dopo: lo stesso. Nessuna invalidazione.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-pin-bypass.png" alt="Bypass PIN su emulatore: dopo la rimozione di PinEnc/PinIv l'app torna all'onboarding Welcome" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 4. Bypass live. Terminale a sinistra: script rimuove PinEnc/PinIv e riavvia l'app. Emulatore a destra: al prossimo lancio l'app dimentica di avere un PIN e torna al Welcome iniziale. Il vault delle credenziali non e' stato toccato.</div>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-pin-bypass-terminal.png" alt="Output terminale: PIN resettato, credenziali INTATTE" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 5. Output finale di <code>01-pin-bypass.sh</code>. Il conteggio documenti prima e dopo coincide: <em>CONFERMATO: PIN resettato, credenziali INTATTE</em>. Il PIN non e' legato al vault.</div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Cosa manca.</strong> Il PIN dovrebbe essere usato come input di una KDF (PBKDF2, Argon2) per derivare una chiave che sblocca il database delle credenziali. Cosi' se sposti il PIN, le credenziali diventano inaccessibili. Qui il PIN e' solo un buttafuori che sta davanti alla porta. La porta non e' chiusa. Basta girarlo intorno.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - VULN-02
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Rate Limit E' Un File Di Testo</h2>
+    <span class="section-number">Sezione 03. VULN-02</span>
+
+    <p>OK, diciamo che la rimozione del PIN ti spaventa perche' devi almeno riconfigurarlo. Allora lo brute-forzi. Sono sei cifre, un milione di combinazioni, su mobile in poche ore con un accelerometro di scripting ADB.</p>
+
+    <p>Il codice, <em>in teoria</em>, ha un rate limiting progressivo. Tre tentativi sbagliati e aspetti un minuto. Cinque e aspetti un'ora. Nove e aspetti otto ore. Lockout.</p>
+
+    <p>Dove lo memorizza il lockout? Nello stesso file. In chiaro. Due campi.</p>
+
+    <div class="code-block" data-lang="xml">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cs">&lt;int name="PinFailedAttempts" value="9" /&gt;</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="cs">&lt;long name="PinLockoutUntil" value="1744831200000" /&gt;</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p><code>PinFailedAttempts</code> e' un contatore. <code>PinLockoutUntil</code> e' un timestamp in millisecondi epoch. Nessuna cifratura, nessun HMAC, nessuna protezione d'integrita'. Lo modifichi con un <code>sed</code> e ritorni a zero tentativi. Ecco il blocco.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cv">adb</span> shell <span class="cs">"run-as $PKG cat $PREFS"</span> <span class="co">|</span> \</td></tr>
+        <tr><td class="ln">2</td><td class="code">  sed <span class="cs">'s/PinFailedAttempts" value="[0-9]*"/PinFailedAttempts" value="0"/'</span> <span class="co">|</span> \</td></tr>
+        <tr><td class="ln">3</td><td class="code">  sed <span class="cs">'s/PinLockoutUntil" value="[0-9]*"/PinLockoutUntil" value="0"/'</span> <span class="co">&gt;</span> /tmp/reset.xml</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Fai un tentativo PIN sbagliato. Incrementa a 1. Reset a 0. Un altro. Reset. Un altro. Reset. Lo script te lo fa in loop. Un milione di combinazioni a due tentativi al secondo fanno cinque giorni. Ma la mediana si trova a mezzo milione, e chi ha un PIN "casuale" sta mentendo: la distribuzione dei PIN a sei cifre reali e' dominata da compleanni, date, sequenze. Spendi due ore con un dizionario DOB e copri il 40% degli utenti reali.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-lockout-active.png" alt="App AV in stato di lockout: Account locked. Try again in 479:30" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 6. Lockout attivo. Terminale: <code>PinFailedAttempts=9</code>, <code>PinLockoutUntil=+8h</code> scritti nelle shared_prefs. Emulatore: <em>"Account locked. Try again in 479:30"</em>. L'app rispetta lo stato che abbiamo iniettato noi.</div>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-lockout-bypassed.png" alt="App AV dopo bypass: Invalid PIN. 3 attempts remaining" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 7. Stessa app, mezzo secondo dopo. Terminale: <code>PinFailedAttempts=0</code>, <code>PinLockoutUntil=0</code>. Emulatore: <em>"Invalid PIN. 3 attempts remaining"</em>. Il lockout di 8 ore e' scomparso. L'app riprende ad accettare tentativi.</div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Cosa manca.</strong> Il rate limit deve vivere in un componente che l'app non puo' leggere ne' scrivere. Keystore hardware con attestation, counter monotono nel TEE, oppure server-side. Qui il contatore sta nello stesso file delle credenziali, gestito dallo stesso processo. E' il cane che si morde la coda.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - VULN-03
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Biometria E' Un Booleano</h2>
+    <span class="section-number">Sezione 04. VULN-03</span>
+
+    <p>Il device ha biometria attiva. L'utente l'ha abilitata per l'app. L'app mostra il FaceID invece del PIN, l'utente si fida. Tutto bene? No.</p>
+
+    <p>Lo stato "biometria attiva per questa app" e' memorizzato come.</p>
+
+    <div class="code-block" data-lang="xml">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cs">&lt;boolean name="UseBiometricsAuth" value="true" /&gt;</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Un attributo <code>value="true"</code>. Nel solito file. Che sostituiamo con <code>false</code>. L'app al prossimo avvio si dimentica di essere configurata per usare il FaceID e torna alla schermata PIN. A cui applichi VULN-01 o VULN-02. Downgrade path pulitissimo.</p>
+
+    <p>Il codice che legge questo flag sta in <code>PrefsBiometryStorageProvider.kt</code>. Lo chiamo "codice" ma e' un <code>sharedPreferences.getBoolean("UseBiometricsAuth", false)</code> senza ulteriori controlli. Niente attestation della Keystore, niente binding al <code>BiometricPrompt</code>, niente chiave hardware-backed che richiede autenticazione utente per essere usata. Il BiometricPrompt Android esiste apposta per questo e l'app lo ignora.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - VULN-04
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Cifratura Che Non Cifra</h2>
+    <span class="section-number">Sezione 05. VULN-04</span>
+
+    <p>Questa e' la parte divertente. Apri <code>PrefsController.kt</code> e leggi.</p>
+
+    <div class="code-block" data-lang="kotlin">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc">// PrefsController.kt:194</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="cc">// Shared preferences are encrypted.</span></td></tr>
+        <tr><td class="ln">3</td><td class="code"></td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="ck">fun</span> <span class="cf">setString</span>(<span class="cv">key</span>: <span class="ct">String</span>, <span class="cv">value</span>: <span class="ct">String</span>) {</td></tr>
+        <tr><td class="ln">5</td><td class="code">    <span class="cv">prefs</span>.<span class="cf">edit</span>().<span class="cf">putString</span>(<span class="cv">key</span>, <span class="cv">value</span>.<span class="cf">encrypt</span>()).<span class="cf">apply</span>()</td></tr>
+        <tr><td class="ln">6</td><td class="code">}</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Commento: <em>"Shared preferences are encrypted."</em> C'e' persino il metodo <code>.encrypt()</code>. Che fa <code>.encrypt()</code>? Apri <code>StringExtensions.kt</code>. 27 righe.</p>
+
+    <div class="code-block" data-lang="kotlin">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc">// StringExtensions.kt:186 (sintesi)</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="ck">private val</span> <span class="cv">SEED</span> <span class="co">=</span> <span class="cf">intArrayOf</span>(<span class="cn">1</span>, <span class="cn">3</span>, <span class="cn">5</span>, <span class="cn">7</span>, <span class="cn">9</span>, <span class="cn">2</span>, <span class="cn">4</span>, <span class="cn">6</span>, <span class="cn">8</span>)</td></tr>
+        <tr><td class="ln">3</td><td class="code"></td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="ck">fun</span> <span class="ct">String</span>.<span class="cf">encrypt</span>(): <span class="ct">String</span> {</td></tr>
+        <tr><td class="ln">5</td><td class="code">    <span class="ck">val</span> <span class="cv">b64</span> <span class="co">=</span> <span class="cf">Base64.encode</span>(<span class="ck">this</span>.<span class="cf">toByteArray</span>())</td></tr>
+        <tr><td class="ln">6</td><td class="code">    <span class="ck">return</span> <span class="cv">b64</span>.<span class="cf">fisherYatesShuffle</span>(<span class="cv">SEED</span>)</td></tr>
+        <tr><td class="ln">7</td><td class="code">}</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Base64. Poi uno shuffle Fisher-Yates con seed hardcoded <code>[1, 3, 5, 7, 9, 2, 4, 6, 8]</code>. Nove byte costanti. Nel sorgente pubblico. Su GitHub.</p>
+
+    <p>E' banalmente reversibile. Cinque righe di Python.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cv">SEED</span> <span class="co">=</span> [<span class="cn">1</span>, <span class="cn">3</span>, <span class="cn">5</span>, <span class="cn">7</span>, <span class="cn">9</span>, <span class="cn">2</span>, <span class="cn">4</span>, <span class="cn">6</span>, <span class="cn">8</span>]</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="ck">def</span> <span class="cf">unshuffle</span>(<span class="cv">s</span>):</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="cv">items</span> <span class="co">=</span> <span class="cf">list</span>(<span class="cv">s</span>)</td></tr>
+        <tr><td class="ln">4</td><td class="code">    <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">reversed</span>(<span class="cf">range</span>(<span class="cf">len</span>(<span class="cv">items</span>))):</td></tr>
+        <tr><td class="ln">5</td><td class="code">        <span class="cv">k</span> <span class="co">=</span> <span class="cv">SEED</span>[<span class="cv">i</span> <span class="co">%</span> <span class="cn">9</span>] <span class="co">%</span> <span class="cf">len</span>(<span class="cv">items</span>)</td></tr>
+        <tr><td class="ln">6</td><td class="code">        <span class="cv">items</span>[<span class="cv">k</span>], <span class="cv">items</span>[<span class="cv">i</span>] <span class="co">=</span> <span class="cv">items</span>[<span class="cv">i</span>], <span class="cv">items</span>[<span class="cv">k</span>]</td></tr>
+        <tr><td class="ln">7</td><td class="code">    <span class="ck">return</span> <span class="cs">''</span>.<span class="cf">join</span>(<span class="cv">items</span>)</td></tr>
+        <tr><td class="ln">8</td><td class="code"></td></tr>
+        <tr><td class="ln">9</td><td class="code"><span class="cv">plaintext</span> <span class="co">=</span> <span class="cf">base64.b64decode</span>(<span class="cf">unshuffle</span>(<span class="cv">ciphertext</span>))</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Il valore che decifra piu' spesso e' <code>CryptoAlias</code>, ovvero il nome dell'alias dentro l'Android Keystore che contiene la chiave AES che cifra il PIN. Uno schema a cipolla: la vera cifratura esiste, ma il puntatore a quella cifratura sta dietro uno shuffle di Fisher-Yates dichiarato "cifratura" in un commento. Questo non e' un bug. E' un design che usa la parola <em>encrypt</em> in modo fraudolento.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-decode-shuffle.png" alt="Output di 04-decode-shuffle.py con CryptoAlias, PinIv, PinEnc decifrati" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 8. Output di <code>04-decode-shuffle.py</code>. Il <code>CryptoAlias</code> offuscato diventa <code>b618ca17-39a5-49f9-b3d6-537c1e25e90d...</code>, ovvero l'UUID dell'alias nell'Android Keystore che contiene la vera chiave AES. <code>PinIv</code> e <code>PinEnc</code> vengono decifrati allo stesso modo. La riga finale dello script: <em>"The 'encryption' is a Fisher-Yates shuffle with hardcoded seed [1, 3, 5, 7, 9, 2, 4, 6, 8]. Any value can be decoded with this script."</em></div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Perche' importa.</strong> Android ha <code>EncryptedSharedPreferences</code> da Jetpack Security, che usa AES-256-GCM con chiavi nel Keystore hardware. Tre righe di gradle, cinque di Kotlin. Ha scelto di non usarla, ha scritto un encoder casalingo, ha messo un commento che dice "cifrato". Questo e' documentazione che mente. Un audit che si ferma a leggere i commenti del codice non trova niente di sbagliato.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - VULN-05
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Chiave Che Firma Senza Chiedere</h2>
+    <span class="section-number">Sezione 06. VULN-05 (critica)</span>
+
+    <p>Da qui in poi la cosa si sposta. Le precedenti sono sviste implementative, sporche ma risolvibili con una patch. Quella che segue e' un flag. Un singolo parametro booleano che riassume la filosofia dell'intero prodotto.</p>
+
+    <div class="code-block" data-lang="kotlin">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc">// WalletCoreConfigImpl.kt:40</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="cf">configureDocumentKeyCreation</span>(</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="cv">userAuthenticationRequired</span> <span class="co">=</span> <span class="cw">false</span>,</td></tr>
+        <tr><td class="ln">4</td><td class="code">    <span class="cc">// ...</span></td></tr>
+        <tr><td class="ln">5</td><td class="code">)</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Le chiavi crittografiche che firmano le presentazioni delle credenziali vengono generate nell'Android Keystore con il flag <code>userAuthenticationRequired</code> a <strong>false</strong>. Tradotto: quando l'app chiede al sistema operativo di firmare una presentazione con la chiave privata di una credenziale, il sistema operativo <em>non chiede all'utente nulla</em>. Ne' PIN, ne' biometria, ne' lockscreen. Firma.</p>
+
+    <p>L'app, sopra quella chiave, ha messo un proprio livello di PIN applicativo (quello di VULN-01 e VULN-02). Ma quel livello sta nel processo dell'app. Qualsiasi altro processo con accesso al contesto dell'app (un malware locale, un debugger, un exploit che bypassa il sandbox) puo' usare la stessa API e firmare. Senza popup, senza interazione utente, senza traccia.</p>
+
+    <p>La conseguenza la capisci guardando il checkpoint nel presentation controller.</p>
+
+    <div class="code-block" data-lang="kotlin">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc">// WalletCorePresentationController.kt:365</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="ck">if</span> (<span class="cv">key</span>.<span class="cv">userAuthenticationRequired</span>) {</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="cv">promptForAuth</span>(<span class="cv">key</span>)  <span class="cc">// non chiamato mai</span></td></tr>
+        <tr><td class="ln">4</td><td class="code">} <span class="ck">else</span> {</td></tr>
+        <tr><td class="ln">5</td><td class="code">    <span class="cv">signPresentation</span>(<span class="cv">key</span>)</td></tr>
+        <tr><td class="ln">6</td><td class="code">}</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Il ramo "chiedi al sistema di autenticare l'utente" non viene mai preso, perche' il flag e' hardcoded a false nella configurazione sopra. Questo trasforma la credenziale in un token bearer: chiunque tiene la chiave firma.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Perche' e' li'?</strong> UX. Attivare <code>userAuthenticationRequired</code> significa che ogni presentazione (OGNI volta che mostri l'eta' a un sito) scatena un BiometricPrompt di sistema. E' la cosa giusta. Ma rallenta il flusso di due secondi e rompe il video patinato da nove secondi del tweet di von der Leyen. Quindi niente.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - VULN-06
+         ============================================================ -->
+    <h2><span class="accent">//</span> MITM Documentato Nel README</h2>
+    <span class="section-number">Sezione 07. VULN-06</span>
+
+    <p>Due cose separate, stessa direzione.</p>
+
+    <p>Prima: il file <code>network_security_config.xml</code> dell'app. Una riga utile, <code>cleartextTrafficPermitted="false"</code>. Nessun <code>pin-set</code>, nessun <code>&lt;certificates&gt;</code> limitato. Il client HTTP Ktor in <code>NetworkModule.kt</code> viene costruito con <code>HttpClient(Android)</code> senza custom TrustManager, senza CertificatePinner, senza HostnameVerifier. Tradotto: l'app si fida di qualsiasi CA valida per il dominio. Compresa una CA installata dall'utente. Compresa la CA del tuo mitmproxy, se il device e' in debug o su Android &lt; 7.</p>
+
+    <p>Seconda: <code>docs/how_to_build.md</code>, la guida ufficiale per gli sviluppatori nazionali che implementeranno la loro versione. Riga 134 in poi.</p>
+
+    <div class="code-block" data-lang="kotlin">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="ck">class</span> <span class="ct">TrustAllX509TrustManager</span>: <span class="ct">X509TrustManager</span> {</td></tr>
+        <tr><td class="ln">2</td><td class="code">    <span class="ck">override fun</span> <span class="cf">checkClientTrusted</span>(...) { <span class="cc">/* noop */</span> }</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="ck">override fun</span> <span class="cf">checkServerTrusted</span>(...) { <span class="cc">/* noop */</span> }</td></tr>
+        <tr><td class="ln">4</td><td class="code">    <span class="ck">override fun</span> <span class="cf">getAcceptedIssuers</span>(): <span class="ct">Array</span><span class="co">&lt;</span><span class="ct">X509Certificate</span><span class="co">&gt;</span> <span class="co">=</span> <span class="cf">arrayOf</span>()</td></tr>
+        <tr><td class="ln">5</td><td class="code">}</td></tr>
+        <tr><td class="ln">6</td><td class="code"></td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="cv">HostnameVerifier</span> { <span class="cv">_</span>, <span class="cv">_</span> <span class="co">-&gt;</span> <span class="cw">true</span> }</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Un trust manager che accetta ogni certificato e un hostname verifier che dice sempre true. Nella documentazione ufficiale. Con il disclaimer "solo per sviluppo locale". Sai come fa uno sviluppatore sotto deadline quando legge "per lo sviluppo locale"? Copia-incolla.</p>
+
+    <p>Il setup pratico del MITM e' quattro righe di bash.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code">brew install mitmproxy</td></tr>
+        <tr><td class="ln">2</td><td class="code">mitmproxy <span class="co">--</span>listen<span class="co">-</span>port 8080</td></tr>
+        <tr><td class="ln">3</td><td class="code">adb shell settings put global http_proxy 10.0.2.2:8080</td></tr>
+        <tr><td class="ln">4</td><td class="code">adb push ~/.mitmproxy/mitmproxy<span class="co">-</span>ca<span class="co">-</span>cert.cer /sdcard/</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Installi la CA di mitmproxy nel trust store utente dalle Settings, apri l'app, e vedi in chiaro i token OAuth, gli authorization code OIDC, le response di issuance con le credenziali firmate. Su una debug build e' tutto. Su una release build su device non rooted, con Android 7+, servirebbe una CA nello store di sistema, quindi un device compromesso. Ma la debug build e' quella che gli sviluppatori nazionali useranno per sei mesi prima del rilascio, e che i beta-tester installeranno sui loro telefoni personali.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - VULN-07 + VULN-08
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Credenziali Si Copiano</h2>
+    <span class="section-number">Sezione 08. VULN-07 e VULN-08</span>
+
+    <p>Il database delle credenziali. <code>EudiWalletDocumentManager.db</code>. SQLite standard, nessuna cifratura, nessun SQLCipher, nessun Android EncryptedFile. Vive in <code>no_backup/</code>, che e' il path Android corretto per "non finire nel backup utente", ma non protegge dal comando giusto.</p>
+
+    <div class="code-block" data-lang="bash">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code">adb shell <span class="cs">"run-as com.scytales.av.dev cat ..."</span> <span class="co">&gt;</span> dump.db</td></tr>
+        <tr><td class="ln">2</td><td class="code">sqlite3 dump.db <span class="cs">".schema"</span></td></tr>
+        <tr><td class="ln">3</td><td class="code">sqlite3 dump.db <span class="cs">"SELECT id, length(data) FROM MzDocuments"</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>La tabella <code>MzDocuments</code> contiene le credenziali come blob CBOR firmati dall'issuer. Dentro il blob trovi in chiaro le stringhe <code>age_over_18</code>, <code>eu.europa.ec.av</code>, <code>eu.europa.ec.eudi.pid</code>, la firma COSE, le chiavi EC2 curve P-256. La tabella <code>MzAndroidKeystoreSecureArea</code> contiene i metadata per usare le chiavi.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-extract-db.png" alt="Output di 06-extract-credentials.sh: schema SQLite, dump CBOR, Key ID nel Keystore" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 9. Output di <code>06-extract-credentials.sh</code> dopo l'enrollment di un account. Il database e' stato estratto (229376 byte) via <code>adb run-as</code>. Schema con le quattro tabelle (<code>MzDocuments</code>, <code>MzCredentials</code>, <code>MzAndroidKeystoreSecureArea</code>, <code>Mz_SCHEMA</code>). Una credenziale <em>parent</em> (<code>MzDocuments</code>) + 30 credenziali <em>OneTimeUse</em> (<code>MzCredentials</code>) + 30 chiavi nel Keystore. Nel dump CBOR hex si leggono in chiaro <code>provisioned</code>, <code>displayName</code>, <code>Proof of Age</code>, <code>other</code>. Le Key ID sono direttamente utilizzabili perche' <code>userAuthenticationRequired=false</code>.</div>
+
+    <p>Adesso componi i pezzi.</p>
+
+    <ul>
+      <li>Le credenziali sono 30, pre-generate, <code>OneTimeUse</code>: ciascuna e' bruciabile una volta con un verifier diverso, stile Privacy Pass.</li>
+      <li>La chiave privata per firmare ogni credenziale sta nel Keystore. Su emulatore o rooted device: estraibile. Su device fisico: resta nel TEE, <em>ma</em> userAuthenticationRequired=false significa che qualsiasi processo con contesto dell'app puo' farla firmare senza interazione utente.</li>
+      <li>Il protocollo di presentazione e' <em>OpenID4VP con DCQL</em>. Pubblico. Documentato. Implementazioni open source disponibili.</li>
+      <li>Il client_id scheme e' <code>RedirectUri</code>: il verifier si identifica via redirect URI, non via mutual TLS con certificato X.509. Non puo' provare crittograficamente chi e'.</li>
+    </ul>
+
+    <p>Chiunque con accesso one-shot al device puo' estrarre il blob CBOR e, con la stessa chiave (disponibile perche' non richiede auth), firmare una presentazione valida da una app qualsiasi. Un'estensione Chrome che rileva il QR del verifier e risponde con una presentazione OpenID4VP firmata, riciclando le 30 credenziali estratte, e' un progetto da weekend.</p>
+
+    <p><strong>E infatti qualcuno l'ha gia' fatto.</strong></p>
+
+
+    <!-- ============================================================
+         SEZIONE 08.5 - L'ESTENSIONE CHROME
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Estensione Chrome Esiste</h2>
+    <span class="section-number">Sezione 08b. Paul Moore, round 2</span>
+
+    <p>Mentre finivo di scrivere le sezioni precedenti, Paul Moore ha pubblicato un secondo thread. Questo, rispetto al primo, non e' piu' un bypass locale. E' il tipo di dimostrazione che fa ritirare un prodotto.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/tweet-paul-chrome-extension.png" alt="Tweet di Paul Moore sulla Chrome extension che bypassa EU Age Verification" class="lab-screenshot fade-in" style="max-width: 480px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="chart-caption">Fig. 10. Paul Moore, @Paul_Reviews, 16 aprile 2026. <em>"Bypassing EU AgeVerification using their own infrastructure. I've ported the Android app logic to a Chrome extension."</em> Nel video, il sito <code>verifier.ageverification.dev</code> accetta la presentazione firmata da dentro il browser.</div>
+
+    <p>Traduco letteralmente, perche' questo thread va letto parola per parola.</p>
+
+    <div class="insight-box fade-in">
+      <p><em>"Bypassing EU AgeVerification using their own infrastructure. Ho portato la logica dell'app Android in un'estensione Chrome, eliminando il noioso passaggio di consegnare dati biometrici che possono comunque leakare, e passi la verifica istantaneamente. Step 1: installi l'estensione. Step 2: registri un'identita' (una volta sola). Step 3: continui a usare il web normalmente. L'estensione rileva il QR, genera un payload crittograficamente identico e dice al verifier che sono over 18, cosa di cui si fida 'fully'. Questo non e' un bug, e' un design flaw fondamentale che non possono risolvere senza legare irrevocabilmente una chiave alla tua persona, il che abiliterebbe tracking/monitoring. Ovviamente potrei saltare completamente l'enrollment e hard-codare le credenziali nell'estensione, e il verifier non lo saprebbe mai."</em></p>
+    </div>
+
+    <p>Tutto quello che avevo descritto come <em>fattibile</em> in sezione 08 e' stato fatto da Paul Moore in poche ore. Scompongo quello che ha costruito in pezzi tecnici, perche' il punto non e' il suo script, e' che la logica dell'app lo <em>permette</em>.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Cosa serve e cosa non serve.</strong> L'estensione richiede un enrollment iniziale valido: Paul si e' registrato una volta sull'issuer di test, ha ottenuto 30 credenziali <code>OneTimeUse</code>, le ha estratte, le ha portate dentro l'estensione. Da quel momento in poi pero' il sistema <em>non distingue piu' tra uso legittimo e riuso</em>. La chiave privata e' fuori dal telefono, il verifier non ha come chiedere attestation del device, le presentazioni firmate dall'estensione sono crittograficamente indistinguibili da quelle firmate dall'app ufficiale. Cost dell'attacco: un enrollment reale, una volta. Scalabilita' dell'attacco: infinita, perche' l'estensione puo' essere ridistribuita con le stesse credenziali impacchettate (vedi step 3).</p>
+    </div>
+
+    <h3>Step 1: content script che ascolta il QR</h3>
+
+    <p>Le estensioni Chrome sono JavaScript con permessi DOM. Un content script su <code>verifier.ageverification.dev</code> (o su qualsiasi sito che mostri un QR OpenID4VP, il protocollo e' lo stesso) intercetta il QR. Il QR, decodificato, contiene un'URL con i parametri OpenID4VP: <code>client_id</code>, <code>redirect_uri</code>, <code>response_type=vp_token</code>, <code>presentation_definition</code>. Pubblico, standard, una libreria JS di cinquanta kB lo parsa.</p>
+
+    <h3>Step 2: payload crittograficamente identico</h3>
+
+    <p>"Cryptographically identical" significa che il verifier non puo' distinguere il token generato dall'estensione da quello generato dall'app Android ufficiale. Perche' no? Perche' il verifier valida tre cose.</p>
+
+    <ol>
+      <li><strong>Firma dell'issuer sulla credenziale</strong>: COSE_Sign1 con la chiave privata dell'issuer, verificabile con la chiave pubblica dell'issuer. Se Paul ha fatto enrollment legittimo una volta, la firma e' valida. Punto.</li>
+      <li><strong>Firma del wallet sulla presentazione</strong>: COSE_Sign1 con la chiave del wallet, verificabile con la chiave pubblica nel blob della credenziale. L'estensione genera la sua coppia di chiavi EC P-256, la registra con l'issuer durante l'enrollment, e firma le presentazioni con la sua privata. Crittograficamente indistinguibile da una chiave generata nell'Android Keystore.</li>
+      <li><strong>Device attestation</strong>: <em>sarebbe</em> il punto di rottura, se l'app la richiedesse. Ma il flag <code>userAuthenticationRequired=false</code> e la configurazione <code>ClientIdScheme.RedirectUri</code> non impongono attestation binding al device. Paul lo dice: "without irrevocably tying a key to you personally". Il verifier non ha un modo crittografico di chiedere "provami che questa chiave sta su un Android Keystore hardware". Si fida della firma. Fine.</li>
+    </ol>
+
+    <h3>Step 3: la variante "hard-coded credentials"</h3>
+
+    <p>Paul aggiunge un dettaglio che e' una coltellata. <em>"I could skip the enrolment process entirely and hard-code the credentials into the extension... and the verifier would never know."</em> Significa: prendi una credenziale emessa una volta dall'issuer (legittimamente o da un issuer compromesso), la compili dentro l'estensione, e chiunque la installi vale maggiorenne agli occhi dei verifier. Distribuzione via unpacked extension, via un sideload Firefox, via un fork di un'estensione open source rebrandizzata. Il verifier non ha come distinguere.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Perche' Paul ha ragione quando dice "fundamental design flaw".</strong> L'unica difesa contro la sua estensione sarebbe legare la chiave di presentazione a un'identita' stabile e verificabile: un hash del volto, un certificato device attestation firmato da Google/Apple, un identificativo SIM. Tutte queste difese rompono la privacy promise dell'app. Se la chiave e' "irrevocably tied to you personally", il verifier sa chi sei. Non piu' zero-knowledge. Piu' zero-knowledge = bypassabile con una Chrome extension. Non c'e' una terza strada. Paul l'ha visualizzato in modo che anche un funzionario della Commissione possa capirlo: nel video il suo browser passa la verifica senza nemmeno fingere di essere un telefono.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Sulla non-trasferibilita' (cosa manca).</strong> Un wallet ben fatto lega crittograficamente la chiave di presentazione a una <em>device attestation</em> (Play Integrity, Android Keystore attestation), e quella device attestation e' parte del contratto crittografico con l'issuer. Qui la configurazione non la richiede. Il verifier riceve solo la firma sulla credenziale. Non riceve una prova che quella credenziale sia ancora sul device originale, ne' che sia presentata da un'applicazione mobile, ne' tanto meno da quella specifica applicazione ufficiale. L'estensione di Paul e' l'esempio canonico di cosa va storto quando <em>userAuthenticationRequired=false</em> incontra <em>ClientIdScheme.RedirectUri</em> senza mutual TLS.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08c - IL TEST ISSUER E LA CATENA DI FIDUCIA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Vede Il Verifier A Valle</h2>
+    <span class="section-number">Sezione 08c. Il test issuer e il trust store</span>
+
+    <p>Voglio essere preciso: quello che segue non e' una vulnerabilita' del test issuer, e' una proprieta' del framework. Il README del repo lo dice esplicitamente: <em>"This white-label application is a reference implementation [...] any national-specific enrolment procedures must be implemented by the respective Member States or publishing parties."</em> Il test issuer <code>test.issuer.dev.ageverification.dev</code> e' scaffolding per sviluppatori. E' pensato per non chiedere un passaporto vero, perche' sarebbe assurdo obbligare i dev a scannerizzarne uno ogni volta che testano la UI. Fin qui tutto corretto.</p>
+
+    <p>Quello che voglio mostrarti e' cosa significa il design del framework. Quando ho fatto l'enrollment sul test issuer, il flusso e' stato questo.</p>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-issuer-toggle.png" alt="Test issuer che chiede all'utente di flippare il toggle Age Over 18" class="lab-screenshot fade-in" style="max-width: 400px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="chart-caption">Fig. 11. <code>test.issuer.dev.ageverification.dev</code>, schermata "Issue attributes for your Age Verification demo application". Il test issuer chiede all'utente di flippare il toggle <em>Age Over 18</em>. By design: e' un ambiente di test, la logica di verifica e' stub.</div>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-issuer-review.png" alt="Review della credenziale prima della firma: Age Over 18 True, Test QEAA issuer" class="lab-screenshot fade-in" style="max-width: 400px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="chart-caption">Fig. 12. <em>Review & Send</em>. Il test issuer sta per firmare: <code>Age Over 18: True</code>, expiry 2026-07-15, Issuing Authority "Test QEAA issuer", Issuing Country <code>AV</code>.</div>
+
+    <img src="../immagini/l-eta-e-un-booleano/demo-credential-issued.png" alt="Wallet con credenziale age_over_18 = yes emessa, badge 18+" class="lab-screenshot fade-in" style="max-width: 400px; display: block; margin-left: auto; margin-right: auto;">
+    <div class="chart-caption">Fig. 13. Credenziale emessa nel wallet. Badge 18+, <code>Age Over 18: yes</code>, firma COSE_Sign1 valida del Test QEAA issuer.</div>
+
+    <p>Adesso vengono le domande interessanti. La firma di quella credenziale <em>e' crittograficamente valida</em>. Il wallet la memorizza come qualsiasi altra. Il verifier, quando la riceve, verifica due cose: la firma (OK) e se la chiave pubblica dell'issuer e' nel suo <em>trust store</em>. Se si', la credenziale vale. Se no, la rifiuta.</p>
+
+    <p>La sicurezza dell'intero sistema si sposta quindi al livello <em>trust store + policy degli issuer</em>. E qui ci sono tre domande serie che il framework non risolve.</p>
+
+    <ol>
+      <li><strong>Quali issuer finiscono nei trust store dei verifier?</strong> Nel codice del repo, <code>R.raw.av_issuer_ca01</code> viene caricato in <code>configureReaderTrustStore()</code>. Significa che l'app viene distribuita con una CA preconfigurata. Chi e' quella CA in produzione, chi la amministra, come si aggiungono e rimuovono issuer, con che revocation list, non e' normato dal framework tecnico. E' una decisione operativa delegata ai Member States.</li>
+      <li><strong>Che policy di verifica applicano gli issuer reali?</strong> Ogni issuer nazionale definira' la propria. Un paese potrebbe chiedere passaporto biometrico + liveness. Un altro potrebbe accettare l'autodichiarazione su base SPID equivalente. Un terzo potrebbe lasciare che un Comune emetta credenziali a sportello. Il framework OpenID4VCI non impone un livello minimo di identity proofing. E' un contratto amministrativo, non crittografico.</li>
+      <li><strong>Il verifier puo' distinguerli?</strong> No. Crittograficamente un verifier vede una firma valida da un issuer nel suo trust store. Non vede <em>come</em> quell'issuer ha emesso la credenziale. Se la "test QEAA issuer" o un suo equivalente debole in produzione finissero nel trust store, le credenziali che emette sarebbero indistinguibili da quelle emesse dopo un controllo passaporto serio.</li>
+    </ol>
+
+    <p>In altri termini: il test issuer con il toggle <em>e' un test</em>, e questo e' legittimo. Ma il framework che lo ospita accetta per design che issuer diversi abbiano verifiche diverse, e il verifier a valle non ha nessuna finestra sulla forza dell'enrollment. Il "fully trusts" che Paul Moore cita nel suo tweet della Chrome extension e' esattamente questo: il verifier si fida perche' la firma e' valida e la chiave e' trusted, non perche' sappia che l'utente ha presentato un passaporto.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Cosa fare perche' abbia senso.</strong> Servirebbe un campo nel payload firmato che attesta il <em>livello di identity proofing</em> fatto dall'issuer (qualcosa come eIDAS LoA: low, substantial, high), con una semantica normata e un meccanismo di revoca forte sugli issuer deboli. OpenID Connect ha l'<code>acr</code> (Authentication Context Class Reference) che serve a qualcosa di simile, ma non e' standardizzato nelle credenziali AV. Senza questo, il verifier che vuole essere conservativo deve scegliere a mano quali issuer fidarsi, operazione che finira' a fare ogni piattaforma in modo diverso, producendo la frammentazione che il sistema unificato dovrebbe evitare.</p>
+    </div>
+
+    <p>La cosa interessante del toggle non e' il toggle in se'. E' il fatto che dal punto di vista del verifier la credenziale firmata dopo il toggle e la credenziale firmata dopo un vero scan del passaporto sono <strong>byte per byte dello stesso schema, con la sola differenza della chiave privata che le ha firmate</strong>. Se le due chiavi sono entrambe nel trust store, la distinzione si perde nel protocollo.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - IL DIFETTO ARCHITETTURALE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Difetto Che Nessuna Patch Sistema</h2>
+    <span class="section-number">Sezione 09. Il design</span>
+
+    <div class="warning-box fade-in">
+      <p><strong>Separazione dei piani.</strong> Le vulnerabilita' da VULN-01 a VULN-08 descritte fin qui sono errori implementativi. Si possono correggere con refactor, patch, release nuova: <code>EncryptedSharedPreferences</code>, PIN legato al vault con PBKDF2, rate limit in un counter hardware, <code>userAuthenticationRequired=true</code>, certificate pinning, database cifrato con SQLCipher. Rilavoro serio ma tecnicamente tutto fattibile. Il problema che discuto in questa sezione e' di altro tipo: non e' un bug, e' una proprieta' del modello di fiducia. Nessuna patch lo sistema perche' non c'e' niente da patchare, c'e' un contratto crittografico da riscrivere.</p>
+    </div>
+
+    <p>Mettiamo per un secondo che il team Scytales patcha tutti e otto i VULN domani mattina. Release nuova, audit pulito, tutti contenti.</p>
+
+    <p>Rimane un buco che nessuna implementazione puo' chiudere. Il verifier riceve una presentazione firmata con questa struttura.</p>
+
+    <div class="code-block" data-lang="text">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc">// VP token OpenID4VP (semplificato)</span></td></tr>
+        <tr><td class="ln">2</td><td class="code">{</td></tr>
+        <tr><td class="ln">3</td><td class="code">  <span class="cs">"presentation_submission"</span>: {...},</td></tr>
+        <tr><td class="ln">4</td><td class="code">  <span class="cs">"verifiable_presentation"</span>: {</td></tr>
+        <tr><td class="ln">5</td><td class="code">    <span class="cs">"age_over_18"</span>: <span class="cw">true</span>,</td></tr>
+        <tr><td class="ln">6</td><td class="code">    <span class="cs">"issuer"</span>: <span class="cs">"Test QEAA issuer"</span>,</td></tr>
+        <tr><td class="ln">7</td><td class="code">    <span class="cs">"issuer_signature"</span>: <span class="cs">"&lt;COSE_Sign1&gt;"</span>,</td></tr>
+        <tr><td class="ln">8</td><td class="code">    <span class="cs">"wallet_proof"</span>: <span class="cs">"&lt;COSE_Sign1 device key&gt;"</span></td></tr>
+        <tr><td class="ln">9</td><td class="code">  }</td></tr>
+        <tr><td class="ln">10</td><td class="code">}</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Due firme. La prima (<code>issuer_signature</code>) garantisce che un issuer fidato ha detto <em>age_over_18 = true</em> per la chiave pubblica del wallet. La seconda (<code>wallet_proof</code>) garantisce che chi sta presentando ha la chiave privata del wallet corrispondente. Matematicamente: due firme valide verificano il possesso. Non verificano:</p>
+
+    <ol>
+      <li>Che la persona che presenta ora sia la persona che ha fatto enrollment tre mesi fa.</li>
+      <li>Che nessuno abbia bypassato il PIN applicativo prima della presentazione.</li>
+      <li>Che la credenziale non sia stata estratta e ripresentata da un device diverso.</li>
+      <li>Che la persona sia fisicamente davanti allo schermo mentre la presentazione avviene.</li>
+    </ol>
+
+    <p>Il prima vs dopo, cosi' come lo vende Bruxelles, e'.</p>
+
+    <div class="code-block" data-lang="text">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cc">// Prima</span></td></tr>
+        <tr><td class="ln">2</td><td class="code">Sito: <span class="cs">"Hai 18 anni?"</span></td></tr>
+        <tr><td class="ln">3</td><td class="code">Utente: <span class="cs">"Si'."</span></td></tr>
+        <tr><td class="ln">4</td><td class="code"></td></tr>
+        <tr><td class="ln">5</td><td class="code"><span class="cc">// Dopo</span></td></tr>
+        <tr><td class="ln">6</td><td class="code">Sito: <span class="cs">"Hai 18 anni?"</span></td></tr>
+        <tr><td class="ln">7</td><td class="code">App: <span class="cs">"Si'."</span> (firmato)</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Stessa risposta. Ora con dati biometrici in un server nazionale, una device attestation in un backend nazionale, e una catena di fiducia che rimbalza su fornitori nazionali che nessuno ha auditato.</p>
+
+    <p>L'unico modo di risolvere davvero sarebbe legare la chiave di presentazione all'identita' biometrica <em>in ogni transazione</em>. Ma quello significa tracciabilita' cross-sito e fine della zero-knowledge premise. Se voglio non-trasferibilita' forte perdo la privacy promessa. Se tengo la privacy accetto la trasferibilita'. Non c'e' un punto nella curva in cui hai tutte e due.</p>
+
+    <p>L'app dice "ticks all the boxes". Alcune di quelle box non possono essere spuntate insieme. E' una scelta di teoria dell'informazione, non di implementazione.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - LA MEZZA VERITA'
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Fully Open Source Non Esiste</h2>
+    <span class="section-number">Sezione 10. L'implementazione nazionale</span>
+
+    <p>Torniamo al tweet. Checkmark numero quattro, <em>fully open source</em>. Tecnicamente non e' una bugia. Il repo <code>eu-digital-identity-wallet/av-app-android-wallet-ui</code> e' pubblico, licenza Apache 2.0, codice leggibile. Quello che ho smontato sta la'. E' l'unico motivo per cui questo articolo esiste: senza sorgente non avrei trovato lo shuffle con seed <code>[1, 3, 5, 7, 9, 2, 4, 6, 8]</code> in due secondi di ripgrep.</p>
+
+    <p>Il problema e' cosa intende Bruxelles con "l'app". Quello su GitHub e' il <strong>blueprint</strong>. Un kit. Il core module scritto da Scytales + EU Commission + partner tecnici. Mattoni. L'app che scaricherai dal Play Store italiano o tedesco o olandese sara' un'altra cosa: un fork del blueprint, integrato nel wallet nazionale di identita' digitale, con il backend del tuo ministero, con i fornitori che il tuo ministero ha scelto, con le modifiche che il tuo ministero ha ordinato. Nessuno garantisce che queste implementazioni nazionali saranno open source. Alcune lo saranno, altre no, altre lo saranno parzialmente.</p>
+
+    <p>Il kernel del problema e' che <em>il backend conta piu' del frontend</em>. Il frontend open source ti fa vedere che la UI non spedisce il tuo volto a un server. Il backend chiuso gestisce i log, le policy di retention, gli endpoint di auditing, le query ai database statali d'identita'. L'infrastruttura che sa chi sei. Quella parte, nelle implementazioni nazionali, puo' rimanere una scatola nera.</p>
+
+    <p>E c'e' un livello ulteriore. L'app chiede permessi. Camera (per scannare QR verifier), storage (per le credenziali), network (per l'issuer). Un fork nazionale puo' aggiungere permessi. Un fork nazionale puo' aggiungere SDK di analytics. Un fork nazionale puo' aggiungere logging server-side. Leggi l'Android Manifest della tua versione nazionale, non del blueprint. Quello e' il contratto reale.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Regola operativa.</strong> Quando un politico dice "fully open source" di un sistema distribuito, la parola che conta e' "quale parte". Il client? Il server? I forks nazionali? Le librerie proprietarie linkate a build time? Il codice che gira davvero sul tuo telefono dopo la compilation e l'assemblaggio? Open source a monte non implica open source a valle.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 11 - RIEPILOGO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Tabellone</h2>
+    <span class="section-number">Sezione 11. Ricapitolando</span>
+
+    <ul class="vuln-list">
+      <li><strong>VULN-01 // PIN non legato al vault</strong>Rimuovendo PinEnc/PinIv si resetta il PIN, le credenziali restano accessibili. Fix richiede KDF dal PIN alla chiave del vault.</li>
+      <li><strong>VULN-02 // Rate limit client-side</strong>PinFailedAttempts e PinLockoutUntil in chiaro nelle shared_prefs. Reset a zero = brute force senza limiti.</li>
+      <li><strong>VULN-03 // Biometria booleana</strong>UseBiometricsAuth e' un bool editabile. Fix richiede binding hardware al BiometricPrompt.</li>
+      <li><strong>VULN-04 // Falsa cifratura</strong>Fisher-Yates shuffle con seed [1,3,5,7,9,2,4,6,8] documentato come "encryption" nel sorgente.</li>
+      <li><strong>VULN-05 // userAuthenticationRequired=false</strong>Le chiavi di presentazione firmano senza interazione utente. Critica: trasforma la credenziale in token bearer.</li>
+      <li><strong>VULN-06 // MITM pattern nei docs</strong>TrustAllX509TrustManager e HostnameVerifier { true } nel how_to_build.md ufficiale.</li>
+      <li><strong>VULN-07 // DB credenziali in chiaro</strong>SQLite standard, nessun SQLCipher, estraibile con un cat e <code>run-as</code>.</li>
+      <li><strong>VULN-08 // Replay / portabilita'</strong>Combinazione di 05+07+RedirectUri abilita una chrome extension che firma presentazioni fuori dall'app.</li>
+      <li><strong>DESIGN // Il booleano firmato</strong>Il verifier riceve age_over_18 = true. Non puo' distinguere presentazione legittima da replay o credenziale emessa senza verifica reale. Non risolvibile senza rompere la privacy promise.</li>
+    </ul>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Vuln</th><th>Complessita' fix</th><th>Tempo stimato</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>VULN-01 (PIN binding)</td><td>Alta</td><td>Refactor sicurezza</td></tr>
+        <tr><td>VULN-02 (rate limit)</td><td>Media</td><td>2-3 settimane</td></tr>
+        <tr><td>VULN-03 (biometria)</td><td>Media</td><td>1 settimana</td></tr>
+        <tr><td>VULN-04 (cifratura)</td><td>Bassa</td><td>3 ore</td></tr>
+        <tr><td>VULN-05 (user auth)</td><td>Codice bassa, UX alta</td><td>Decisione di prodotto</td></tr>
+        <tr><td>VULN-06 (pinning)</td><td>Media</td><td>1 settimana</td></tr>
+        <tr><td>VULN-07 (SQLCipher)</td><td>Media</td><td>2 settimane</td></tr>
+        <tr><td>VULN-08 (replay)</td><td>Molto alta</td><td>Mesi</td></tr>
+        <tr><td>DESIGN</td><td>Impossibile senza trade-off privacy</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Von der Leyen ha fatto un tweet. Paul Moore le ha risposto con due minuti di <code>adb push</code> e poi con un'estensione Chrome che bypassa la verifica da dentro il browser. Io ho passato un pomeriggio a verificare che avesse ragione su tutto, e sotto i suoi tre punti ne ho trovati altri cinque.</p>
+
+    <p>Il punto non e' che l'AV Wallet e' scritto male. Il punto e' che e' scritto come un'app di esempio per un talk a una conferenza Kotlin, e poi viene venduto come l'infrastruttura di verifica dell'eta' per mezzo miliardo di persone. La distanza tra i due e' quello che trovi aprendo <code>StringExtensions.kt</code> e leggendo il commento <em>"Shared preferences are encrypted."</em>.</p>
+
+    <p>Il codice e' aperto. Chiunque puo' verificare. E' l'unica cosa che funziona davvero qui: il fatto di poter scrivere questo articolo. Paul l'ha fatto in due minuti di PIN bypass, poi in poche ore di Chrome extension, io in un pomeriggio di report. Uno sviluppatore di un'autorita' nazionale che lo prende e lo fork-a farebbe bene a leggere anche i commenti. E a guardare il video di Paul prima di firmare il contratto di deployment.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il verifier riceve una firma.<br>Chi la presenta, non lo verifica."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Ticks all the boxes. Just not the ones that matter.</p>
+    </div>
+
+
+    <!-- ============================================================
+         LAB - SCRIPT
+         ============================================================ -->
+    <h2><span class="accent">//</span> Lab</h2>
+    <span class="section-number">Script, report, replica</span>
+
+    <p>Tutti gli script PoC + il security report completo nella cartella <a href="../scripts/l-eta-e-un-booleano/" style="color: var(--accent-attention);">scripts/l-eta-e-un-booleano/</a>. Prerequisiti: emulatore Android API 30, app <code>com.scytales.av.dev</code> installata, <code>adb</code> + <code>sqlite3</code> nel PATH.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>File</th><th>VULN</th><th>Cosa fa</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/00-common.sh" style="color: var(--accent-attention);">00-common.sh</a></td>
+          <td>&mdash;</td>
+          <td>Funzioni condivise (read_prefs, write_prefs, restart_app)</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/01-pin-bypass.sh" style="color: var(--accent-attention);">01-pin-bypass.sh</a></td>
+          <td>VULN-01</td>
+          <td>Rimuove PinEnc/PinIv, dimostra che le credenziali restano</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/02-ratelimit-bypass.sh" style="color: var(--accent-attention);">02-ratelimit-bypass.sh</a></td>
+          <td>VULN-02</td>
+          <td>Forza lockout, resetta, tentativi tornano infiniti</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/03-biometric-bypass.sh" style="color: var(--accent-attention);">03-biometric-bypass.sh</a></td>
+          <td>VULN-03</td>
+          <td>Flippa UseBiometricsAuth da true a false</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/04-decode-shuffle.py" style="color: var(--accent-attention);">04-decode-shuffle.py</a></td>
+          <td>VULN-04</td>
+          <td>Inverte il Fisher-Yates con seed [1,3,5,7,9,2,4,6,8]</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/05-mitm-setup.sh" style="color: var(--accent-attention);">05-mitm-setup.sh</a></td>
+          <td>VULN-06</td>
+          <td>Verifica assenza pinning, setup mitmproxy</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/06-extract-credentials.sh" style="color: var(--accent-attention);">06-extract-credentials.sh</a></td>
+          <td>VULN-07</td>
+          <td>Dump del DB SQLite delle credenziali</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/07-full-demo.sh" style="color: var(--accent-attention);">07-full-demo.sh</a></td>
+          <td>all</td>
+          <td>Catena tutti i test in sequenza con ripristino</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/08-credential-replay-poc.sh" style="color: var(--accent-attention);">08-credential-replay-poc.sh</a></td>
+          <td>VULN-08</td>
+          <td>Estrae CBOR + keys, analizza fattibilita' replay</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/av-security-test.sh" style="color: var(--accent-attention);">av-security-test.sh</a></td>
+          <td>all</td>
+          <td>Versione standalone self-contained</td>
+        </tr>
+        <tr>
+          <td><a href="../scripts/l-eta-e-un-booleano/SECURITY_REPORT.md" style="color: var(--accent-attention);">SECURITY_REPORT.md</a></td>
+          <td>&mdash;</td>
+          <td>Assessment completo, 8 VULN con file/riga, impact, fix</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Ogni script fa backup delle SharedPreferences prima di modificarle e ripristina lo stato originale alla fine.</p>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

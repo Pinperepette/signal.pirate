@@ -55,6 +55,31 @@
 
     <div class="articles-grid">
 
+      <!-- Article Card: L'Eta' E' Un Booleano -->
+      <a href="articoli/l-eta-e-un-booleano.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-04-16</div>
+        <h3 class="article-card-title">L'Eta' E' Un Booleano</h3>
+        <p class="article-card-abstract">
+          Von der Leyen dice che l'app europea di age verification "ticks all the boxes":
+          privacy massima, gira ovunque, open source. Paul Moore la buca in due minuti
+          toccando shared_prefs, poi pubblica un'estensione Chrome che bypassa la verifica
+          da dentro il browser. Ho clonato il repo, acceso un emulatore Android e in un
+          pomeriggio ho collezionato otto vulnerabilita': PIN non legato al vault,
+          rate limit in chiaro, biometria = bool, "cifratura" che e' un Fisher-Yates
+          con seed [1,3,5,7,9,2,4,6,8], userAuthenticationRequired=false,
+          TrustAllX509TrustManager nei docs ufficiali, SQLite estraibile, replay fatto.
+          Sotto, il difetto architetturale che nessuna patch sistema: il framework
+          accetta per design issuer con policy diverse, e il verifier a valle non
+          puo' distinguerli crittograficamente.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">EUDI Wallet</span>
+          <span class="tag tag-highlight">Android</span>
+          <span class="tag tag-reaction">PoC</span>
+          <span class="tag tag-amplification">OpenID4VP</span>
+        </div>
+      </a>
+
       <!-- Article Card: Nature Non E' Neutrale -->
       <a href="articoli/nature-non-e-neutrale.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-04-12</div>
