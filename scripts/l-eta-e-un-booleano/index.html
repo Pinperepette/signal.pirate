@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab — L'Eta' E' Un Booleano | Signal Pirate</title>
+  <meta name="description" content="PoC scripts per le vulnerabilita' dell'app EU Age Verification descritte nell'articolo 'L'Eta' E' Un Booleano'. Test automatizzati su emulatore Android, zero produzione.">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../css/style.css">
+
+  <style>
+    .lab-header {
+      max-width: 900px;
+      margin: 2rem auto 1rem;
+      padding: 0 1.5rem;
+    }
+    .lab-header .article-meta {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .lab-header h1 {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 2.2rem;
+      margin: 0.5rem 0 1rem;
+      line-height: 1.2;
+    }
+    .lab-header h1 .accent { color: var(--accent-attention); }
+    .lab-header .lab-sub {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 700px;
+    }
+    .lab-wrap {
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      padding: 0 1.5rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; font-family: var(--font-mono); font-size: 0.9rem; }
+
+    .lab-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 1.5rem 0;
+    }
+    .lab-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .lab-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+      vertical-align: top;
+    }
+    .lab-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .lab-table td a {
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      text-decoration: none;
+    }
+    .lab-table td a:hover { text-decoration: underline; }
+    .lab-table td.vuln {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent-reaction);
+      white-space: nowrap;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      overflow-x: auto;
+    }
+    .code-block .prompt { color: #00ff88; }
+    .code-block .comment { color: #6a6a8a; }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    .back-link {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-attention);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      padding: 0.4rem 0;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .back-link::before { content: "← "; opacity: 0.6; }
+
+    h2 {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin: 2.5rem 0 1rem;
+      color: var(--text-primary);
+    }
+    h2 .accent { color: var(--accent-attention); }
+
+    p { line-height: 1.7; }
+
+    ul { line-height: 1.8; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../../index.html">Home</a></li>
+      <li><a href="../../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="lab-header">
+    <a href="../../articoli/l-eta-e-un-booleano.html" class="back-link">Torna all'articolo</a>
+    <p class="article-meta">Lab · Scripts · 2026-04-16</p>
+    <h1>L'Eta' E' Un <span class="accent">Booleano</span> — Lab</h1>
+    <p class="lab-sub">
+      PoC scripts per le otto vulnerabilita' descritte nell'articolo.
+      Target: <code>eu-digital-identity-wallet/av-app-android-wallet-ui</code>, build <code>devDebug</code>.
+      Ambiente: emulatore Android API 30 x86_64, test issuer <code>test.issuer.dev.ageverification.dev</code>.
+      Nessuna produzione toccata, nessun dato utente reale coinvolto.
+    </p>
+  </header>
+
+  <main class="lab-wrap">
+
+    <h2><span class="accent">//</span> Prerequisiti</h2>
+    <ul>
+      <li>Emulatore Android API 30+ avviato</li>
+      <li>App AV installata (<code>com.scytales.av.dev</code>) e avviata almeno una volta</li>
+      <li><code>adb</code> nel PATH (<code>$ANDROID_HOME/platform-tools/adb</code>)</li>
+      <li><code>sqlite3</code> per gli script di estrazione database</li>
+      <li><code>python3</code> per <code>04-decode-shuffle.py</code></li>
+      <li><code>mitmproxy</code> per <code>05-mitm-setup.sh</code> (opzionale)</li>
+    </ul>
+
+    <h2><span class="accent">//</span> Script</h2>
+    <table class="lab-table">
+      <thead>
+        <tr><th>File</th><th>VULN</th><th>Descrizione</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="00-common.sh">00-common.sh</a></td>
+          <td class="vuln">&mdash;</td>
+          <td>Funzioni condivise (read_prefs, write_prefs, restart_app)</td>
+        </tr>
+        <tr>
+          <td><a href="01-pin-bypass.sh">01-pin-bypass.sh</a></td>
+          <td class="vuln">VULN-01</td>
+          <td>Rimuove PinEnc/PinIv, dimostra che le credenziali restano</td>
+        </tr>
+        <tr>
+          <td><a href="02-ratelimit-bypass.sh">02-ratelimit-bypass.sh</a></td>
+          <td class="vuln">VULN-02</td>
+          <td>Forza lockout, resetta, i tentativi tornano infiniti</td>
+        </tr>
+        <tr>
+          <td><a href="03-biometric-bypass.sh">03-biometric-bypass.sh</a></td>
+          <td class="vuln">VULN-03</td>
+          <td>Flippa UseBiometricsAuth da true a false</td>
+        </tr>
+        <tr>
+          <td><a href="04-decode-shuffle.py">04-decode-shuffle.py</a></td>
+          <td class="vuln">VULN-04</td>
+          <td>Inverte il Fisher-Yates con seed [1,3,5,7,9,2,4,6,8]</td>
+        </tr>
+        <tr>
+          <td><a href="05-mitm-setup.sh">05-mitm-setup.sh</a></td>
+          <td class="vuln">VULN-06</td>
+          <td>Verifica assenza pinning, setup mitmproxy</td>
+        </tr>
+        <tr>
+          <td><a href="06-extract-credentials.sh">06-extract-credentials.sh</a></td>
+          <td class="vuln">VULN-07</td>
+          <td>Dump del DB SQLite delle credenziali</td>
+        </tr>
+        <tr>
+          <td><a href="07-full-demo.sh">07-full-demo.sh</a></td>
+          <td class="vuln">all</td>
+          <td>Catena tutti i test in sequenza con ripristino</td>
+        </tr>
+        <tr>
+          <td><a href="08-credential-replay-poc.sh">08-credential-replay-poc.sh</a></td>
+          <td class="vuln">VULN-08</td>
+          <td>Estrae CBOR + keys, analizza fattibilita' replay</td>
+        </tr>
+        <tr>
+          <td><a href="av-security-test.sh">av-security-test.sh</a></td>
+          <td class="vuln">all</td>
+          <td>Versione standalone self-contained</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2><span class="accent">//</span> Report</h2>
+    <ul>
+      <li><a href="SECURITY_REPORT.md">SECURITY_REPORT.md</a> &mdash; assessment completo, 8 VULN con file/riga del sorgente, impact, proof, raccomandazioni</li>
+      <li><a href="README.md">README.md</a> &mdash; istruzioni sintetiche in markdown</li>
+    </ul>
+
+    <h2><span class="accent">//</span> Uso</h2>
+    <div class="code-block">
+<span class="comment"># clona il repo</span>
+<span class="prompt">$</span> git clone https://github.com/Pinperepette/signal.pirate.git
+<span class="prompt">$</span> cd signal.pirate/scripts/l-eta-e-un-booleano
+
+<span class="comment"># rendi eseguibili</span>
+<span class="prompt">$</span> chmod +x *.sh *.py
+
+<span class="comment"># test singolo</span>
+<span class="prompt">$</span> ./01-pin-bypass.sh
+
+<span class="comment"># demo completa con ripristino</span>
+<span class="prompt">$</span> ./07-full-demo.sh
+    </div>
+
+    <p>Ogni script fa backup delle SharedPreferences prima di modificarle e ripristina lo stato originale alla fine (dove applicabile).</p>
+
+    <div class="warning-box">
+      <p><strong>Nota etica.</strong> Paul Moore (<a href="https://twitter.com/Paul_Reviews" style="color: var(--accent-reaction);">@Paul_Reviews</a>) ha gia' pubblicamente dimostrato sia il PIN bypass sia una Chrome extension funzionante che bypassa la verifica end-to-end sull'infrastruttura reale. Gli script in questo repository automatizzano su emulatore verifiche che sono ormai di pubblico dominio; non aggiungono capability di attacco che non esistessero gia'. La pubblicazione serve a permettere la replica indipendente del lavoro e a rendere auditabile l'intero stack di verifica dell'eta' europeo. Il team EUDI Wallet / Scytales / EU Commission puo' contattarmi per coordinamento su disclosure o chiarimenti.</p>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../../js/main.js"></script>
+</body>
+</html>
