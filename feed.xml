@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Vicino Vuol Dire Vettore</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/vicino-vuol-dire-vettore.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/vicino-vuol-dire-vettore.html</guid>
+    <pubDate>Sat, 19 Apr 2026 00:00:00 +0200</pubDate>
+    <description>X ha attivato la traduzione automatica in tempo reale: Grok traduce mentre scorri, niente click. Sembra una feature di comodita'. Il motore semantico era gia' li'. Quello che hanno tolto e' il filtro linguistico sull'output. Ho catturato il mio feed il 19 aprile, 1143 tweet in 22 lingue, e ho misurato: embedding multilingue, PCA, UMAP, HDBSCAN, 22 cluster semantici. Un tweet in italiano sull'AI e' 2.7x piu' vicino a un tweet in inglese sull'AI che a un tweet in italiano sulla guerra. La lingua conta meno dell'argomento. Test falsificabile, tabella completa dei cluster, controesempio sul sarcasmo. Due script, un terminale, replicabile.</description>
+  </item>
+
+  <item>
     <title>L'Eta' E' Un Booleano</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/l-eta-e-un-booleano.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/l-eta-e-un-booleano.html</guid>

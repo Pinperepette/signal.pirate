@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vicino Vuol Dire Vettore | Signal Pirate</title>
+  <meta name="description" content="X traduce tutto automaticamente. Arabi, cinesi, giapponesi nel tuo feed. Il mondo è diventato più vicino. Ma cosa significa vicino per un algoritmo? Risposta: 384 numeri in fila.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green  { color: var(--accent-attention); }
+    .stat-number.red    { color: var(--accent-reaction); }
+    .stat-number.cyan   { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .comparison-row .lab-screenshot { margin: 0; }
+    @media (max-width: 768px) {
+      .comparison-row { grid-template-columns: 1fr; }
+    }
+
+    .chart-caption {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    .pipeline-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+    }
+    .pipeline-step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--accent-attention);
+      min-width: 2.5rem;
+    }
+    .pipeline-step-body strong {
+      display: block;
+      color: var(--accent-yellow);
+      margin-bottom: 0.3rem;
+    }
+    .pipeline-step-body p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-04-19 | Pinperepette</p>
+    <h1 class="article-page-title">Vicino Vuol Dire <span class="accent">Vettore</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      X ha appena attivato la traduzione automatica in tempo reale nel feed: niente click, Grok traduce mentre scorri. Sembra una feature di comodità. Il motore semantico era già lì. Il feed era già cross-lingual dentro. Quello che X ha fatto è togliere il freno linguistico sull'output. E cambia tutto. 1143 tweet, 22 lingue, 384 dimensioni. L'avevamo misurato prima che lo annunciassero.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Embeddings</span>
+      <span class="tag tag-highlight">NLP</span>
+      <span class="tag tag-reaction">UMAP</span>
+      <span class="tag tag-amplification">Cross-lingual</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00 - LA NOTIZIA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Notizia</h2>
+    <span class="section-number">Sezione 00. Cosa è successo questa settimana</span>
+
+    <p>Negli ultimi giorni X ha iniziato a rilasciare la traduzione automatica in tempo reale nel feed. Non più il tasto "Traduci post". Non più Google Translate aperto in un'altra tab. Il contenuto viene tradotto direttamente mentre scorri, in silenzio, senza che tu faccia niente. Grok, il modello di X, lavora in background e ti consegna già il testo in italiano.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">Prima</div>
+        <div class="stat-label">Traduzione manuale, opzionale, esterna</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">Ora</div>
+        <div class="stat-label">Automatica, integrata, invisibile</div>
+      </div>
+    </div>
+
+    <p>Sembra una feature di comodità. Un'ottimizzazione UX. Non devi più cliccare. Ma c'è qualcosa sotto che vale la pena capire.</p>
+
+    <p>Per capire cosa è cambiato davvero bisogna separare due cose che fino a ieri stavano appiccicate: il <strong>motore di raccomandazione</strong> e il <strong>filtro linguistico sull'output</strong>. Erano due sistemi distinti, e X ne ha toccato solo uno.</p>
+
+    <p>Il motore di raccomandazione era già semantico, già cross-lingual, già cieco alle lingue. Prendeva un tweet in arabo, lo trasformava in vettore, misurava la distanza dal tuo profilo e decideva se mostrartelo. La lingua non è la dimensione dominante nel calcolo semantico: il sistema lavora principalmente sulla similarità tra rappresentazioni vettoriali. Questo non è cambiato.</p>
+
+    <p>Quello che esisteva sopra era un filtro: X preferiva mostrarti contenuti nella tua lingua. Non perché il modello lo richiedesse, ma per ridurre l'attrito dell'utente. Se non capisci il cinese, il tweet in cinese ti disturba. Quindi veniva tenuto indietro. Il motore lo valutava rilevante, ma il filtro linguistico lo frenava.</p>
+
+    <p><strong>Ora quel freno è tolto.</strong> Il motore gira esattamente come prima. Ma tutto quello che trova rilevante arriva, in qualsiasi lingua, già tradotto. Lo spazio semantico globale è finalmente esposto per intero.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Prima:</strong> <code>motore semantico + filtro lingua in output</code><br>
+      <strong>Ora:</strong> <code>motore semantico + nessun filtro + traduzione automatica</code><br><br>
+      Hanno rimosso il tappo. Il motore girava già. Adesso esce tutto.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - LA IENA E IL TWEET IN CINESE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Iena e il Tweet in Cinese</h2>
+    <span class="section-number">Sezione 01. Il problema spiegato male</span>
+
+    <p>Sto scrollando il telefono. La iena mi spia con la coda dell'occhio, come fa sempre quando pensa che io stia guardando roba che non devo. Poi vede che sto guardando un tweet in cinese, già tradotto senza che io abbia fatto niente, e decide che è il momento buono.</p>
+
+    <p>"Ma quello è cinese."</p>
+
+    <p>"Sì, ma X me lo ha già tradotto."</p>
+
+    <p>"Lo so. Ma perché te lo propone? Segui cinesi?"</p>
+
+    <p>"No."</p>
+
+    <p>"Allora perché?"</p>
+
+    <p>Risposta automatica: "Perché parla di cose vicine a quello che mi interessa." Lei mi guarda. Io guardo il telefono. Poi mi rendo conto che ho usato la parola sbagliata. <strong>Vicine.</strong> Vicine come? È una metafora o qualcosa di più preciso? La iena ha il fiuto per queste cose.</p>
+
+    <p>"Vicine come, scusa?"</p>
+
+    <p>Ecco. Ci siamo.</p>
+
+    <p>Il 19 aprile 2026 ho catturato il mio feed di X, 1245 tweet, prima che la notizia della traduzione automatica diventasse rumore sui social. Ho pulito le pubblicità dal database, fatto girare un modello di embedding multilingue su tutto, e misurato. Quello che segue è la risposta alla domanda della iena.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">1.143</div>
+        <div class="stat-label">Tweet analizzati</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">22</div>
+        <div class="stat-label">Lingue diverse</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">384</div>
+        <div class="stat-label">Dimensioni per tweet</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">22</div>
+        <div class="stat-label">Cluster semantici</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LA TRADUZIONE È SOLO LA SUPERFICIE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Traduzione È Solo la Superficie</h2>
+    <span class="section-number">Sezione 02. Cosa c'è sotto</span>
+
+    <p>Un sistema di ranking moderno basato su embedding funziona così: <strong>non lavora sul testo grezzo</strong>, lavora su vettori. Prima di mostrarti un contenuto, il sistema lo ha già trasformato in un punto nello spazio matematico. La distanza tra quel punto e il tuo profilo determina se lo vedi o no. La lingua del testo originale non è la dimensione dominante nel calcolo: il sistema lavora principalmente sulla similarità tra rappresentazioni vettoriali. Questa analisi non accede al sistema interno di X, ma mostra che il comportamento osservato è coerente con un sistema di ranking basato su embedding semantici. Il codice sorgente parziale del motore di raccomandazione di X pubblicato nel 2023 è allineato con questa architettura.</p>
+
+    <p>Quello che è cambiato non è il motore. È il rubinetto. Prima il motore trovava contenuto rilevante in tutte le lingue, ma un filtro sull'output decideva di mostrarti prevalentemente la tua lingua. Meno attrito per l'utente medio, meno valore per chi sa usare il feed. Ora quel filtro è sparito: un sistema di ranking vettoriale lavora come sempre, ma tutto quello che trova rilevante arriva da te, già tradotto da Grok in tempo reale.</p>
+
+    <p>Il risultato è che per la prima volta il feed riflette la struttura dello spazio semantico sottostante in modo più diretto. Niente più attenuazione linguistica. Se un tweet in giapponese è vicino al tuo profilo vettoriale, lo vedi. E lo capisci.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Punto chiave.</strong> Un sistema di ranking vettoriale era già cross-lingual per costruzione. Il filtro linguistico sull'output attenuava il segnale. Ora quel filtro è rimosso e la traduzione automatica copre l'attrito residuo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - COSA È UN VETTORE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa È un Vettore</h2>
+    <span class="section-number">Sezione 03. La matematica sotto</span>
+
+    <p>Un tweet è testo. Un modello di embedding lo trasforma in un vettore: una lista di numeri. Nel modello che ho usato, 384 numeri.</p>
+
+    <p>Ogni numero rappresenta una coordinata in uno spazio a 384 dimensioni. Non riusciamo a visualizzarlo (tre dimensioni sono già il nostro limite), ma matematicamente funziona come lo spazio fisico: due punti vicini si assomigliano, due punti lontani no.</p>
+
+    <div class="formula-box fade-in">
+      <span class="formula-name">Cosine Similarity: quanto due vettori puntano nella stessa direzione</span>
+      sim(A, B) = (A · B) / (‖A‖ · ‖B‖)
+      <br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">1.0 = identici · 0.0 = non correlati · −1.0 = opposti</span>
+    </div>
+
+    <p>La cosa importante è che questo spazio <strong>cattura il significato, non le parole</strong>. "Cane" in italiano e "dog" in inglese finiscono nella stessa zona. "Guerra" e "conflict" pure. "Putin" e "Kremlin" sono vicini anche se non condividono nessuna lettera.</p>
+
+    <p>Il modello che ho usato, <code>paraphrase-multilingual-MiniLM-L12-v2</code>, è stato addestrato su 50 lingue in parallelo, con l'obiettivo esplicito di far sì che la stessa frase in lingue diverse finisca nello stesso punto. È progettato per quello. La lingua diventa un accidente superficiale.</p>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/01_tweet_come_vettore.png" alt="Un tweet trasformato in vettore" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 1. Visualizzazione di un tweet come punto nello spazio vettoriale. Ogni asse è una dimensione del vettore.</div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - LA PROVA CROSS-LINGUALE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Prova Cross-Linguale</h2>
+    <span class="section-number">Sezione 04. Stesso significato, lingue diverse</span>
+
+    <p>Smontare il concetto è una cosa. Dimostrarlo sui dati reali è un'altra. Ho preso 1143 tweet dal mio feed (italiano, inglese, arabo, cinese, giapponese, turco, una ventina di lingue in totale) e ho calcolato la similarità coseno tra tutte le coppie possibili, raggruppando per lingua.</p>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/02_crosslingual_heatmap.png" alt="Heatmap cross-linguale" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 2. Similarità media tra tweet di lingue diverse. Più è luminoso, più i contenuti si assomigliano semanticamente.</div>
+
+    <p>Quello che vedi nella heatmap non è un artefatto del modello. È la struttura del mio feed. Le lingue che appaiono vicine parlano degli stessi argomenti. Il fatto che un tweet in arabo e uno in italiano finiscano nella stessa zona dello spazio significa che il modello ha imparato qualcosa di reale: la struttura del significato è condivisa tra le lingue, non appartiene a nessuna di esse.</p>
+
+    <p>Per renderlo ancora più concreto: ho fatto una ricerca semantica cross-linguale. Ho preso una query in italiano, "intelligenza artificiale e sicurezza informatica", e ho cercato i tweet più simili nel feed, indipendentemente dalla lingua. I risultati più vicini includono tweet in inglese, cinese e arabo che parlano esattamente di quello. Nessuna traduzione in input, nessun filtraggio per lingua.</p>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/08_ricerca_crosslingual.png" alt="Ricerca semantica cross-linguale" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 3. Query in italiano, risultati in più lingue. Il modello trova il significato, non le parole.</div>
+
+    <div class="insight-box fade-in">
+      <p>Quando X ti mostra un tweet in cinese che non hai cercato, in una lingua che non capisci, sta navigando uno spazio geometrico dove quel tweet è vicino a quello che ti interessa. La traduzione automatica è solo la didascalia.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - RIDURRE LE DIMENSIONI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Da 384 a 2 Dimensioni</h2>
+    <span class="section-number">Sezione 05. Come si visualizza l'invisibile</span>
+
+    <p>384 dimensioni non si disegnano su uno schermo. Per visualizzare la struttura dello spazio ho usato due tecniche di riduzione dimensionale in sequenza.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">01</div>
+        <div class="pipeline-step-body">
+          <strong>PCA: 384 → 50 dimensioni</strong>
+          <p>Proiezione lineare. Conserva il 66.85% della varianza totale. Elimina il rumore, mantiene la struttura principale. Veloce e stabile.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">02</div>
+        <div class="pipeline-step-body">
+          <strong>UMAP HD: 50 → 15 dimensioni</strong>
+          <p>Riduzione non lineare. Preserva sia la struttura locale (vicini restano vicini) sia quella globale (cluster lontani restano lontani).</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">03</div>
+        <div class="pipeline-step-body">
+          <strong>UMAP 2D: 15 → 2 dimensioni</strong>
+          <p>Proiezione finale per la visualizzazione. A questo punto ogni tweet è un punto su un piano che possiamo guardare.</p>
+        </div>
+      </div>
+    </div>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/03_pca_varianza.png" alt="Varianza PCA" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 4. Varianza spiegata da PCA in funzione del numero di componenti. Con 50 dimensioni catturiamo il 66.85% della struttura originale.</div>
+
+    <p>Il risultato è una mappa. Ogni punto è un tweet. I punti vicini hanno significato simile, indipendentemente dalla lingua con cui sono stati scritti.</p>
+
+    <div class="comparison-row fade-in">
+      <div>
+        <img src="../immagini/vicino-vuol-dire-vettore/04_umap_per_lingua.png" alt="UMAP per lingua" class="lab-screenshot">
+        <div class="chart-caption">Fig. 5. Mappa UMAP colorata per lingua.</div>
+      </div>
+      <div>
+        <img src="../immagini/vicino-vuol-dire-vettore/05_umap_per_cluster.png" alt="UMAP per cluster" class="lab-screenshot">
+        <div class="chart-caption">Fig. 6. Stessa mappa, colorata per cluster semantico.</div>
+      </div>
+    </div>
+
+    <p>Guardali uno accanto all'altro. A sinistra le lingue, a destra i cluster. <strong>Le lingue sono mescolate dentro ogni cluster.</strong> Italiano, inglese, arabo, cinese: stessa zona dello spazio, stesso argomento. Il raggruppamento non segue la lingua, segue il significato.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Nota metodologica.</strong> UMAP preserva bene le relazioni locali tra punti vicini, ma distorce quelle globali: le distanze assolute tra cluster lontani sulla mappa non sono proporzionali alle distanze reali nello spazio a 384 dimensioni. Le strutture visibili vanno interpretate come approssimazioni della geometria originale, non come misure precise.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - I CLUSTER DEL MIO FEED
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Cluster del Mio Feed</h2>
+    <span class="section-number">Sezione 06. Cosa ha trovato l'algoritmo</span>
+
+    <p>Per trovare i gruppi ho usato HDBSCAN: un algoritmo di clustering che non richiede di specificare quanti cluster vuoi. Li trova da solo, basandosi sulla densità locale dei punti. Se una zona dello spazio è densa, è un cluster. Se un punto è isolato, è un outlier.</p>
+
+    <p>Risultato: <strong>22 cluster</strong>, 433 outlier. I cluster non sono costruzioni mie: sono la struttura naturale del mio feed, estratta dallo spazio vettoriale.</p>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/06_metriche_cluster.png" alt="Metriche cluster" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 7. Qualità dei cluster: Silhouette Score 0.402, Davies-Bouldin Index 0.886. I cluster sono ben separati e compatti.</div>
+
+    <p>Le etichette che vedete nei grafici non sono generate da un keyword extractor automatico. Ho letto manualmente i tweet più rappresentativi di ogni cluster, quelli più vicini al centroide geometrico del gruppo, e ho assegnato un nome che descrivesse il tema reale. Alcuni esempi:</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">10.8%</div>
+        <div class="stat-label">LLM, API e sviluppo AI</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">7.9%</div>
+        <div class="stat-label">Sinistra italiana, ironia</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">4.9%</div>
+        <div class="stat-label">Contenuti virali</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">3.6%</div>
+        <div class="stat-label">Scambi brevi e battute</div>
+      </div>
+    </div>
+
+    <p>Il cluster più grande, quasi l'11% del feed, parla di LLM, API, sviluppo software legato all'AI. In più lingue: inglese, italiano, cinese. Stesso argomento, stessa zona dello spazio, traduzione automatica come optional.</p>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/09_correlazioni_temporali.png" alt="Correlazioni temporali" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 8. Distribuzione temporale dei cluster principali. Alcuni argomenti arrivano in ondate, altri sono distribuiti uniformemente.</div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - I LIVELLI COGNITIVI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quanto È Mainstream il Tuo Feed</h2>
+    <span class="section-number">Sezione 07. Densità locale e livelli cognitivi</span>
+
+    <p>C'è un'altra cosa che si può misurare nello spazio vettoriale: la densità locale. Se un tweet è in una zona densa, circondato da molti vicini, significa che parla di un argomento comune, molto dibattuto. Se è in una zona rada, parla di qualcosa di niché.</p>
+
+    <p>Ho usato KNN (k-nearest neighbors) per misurare la densità intorno a ogni punto e ho diviso il feed in tre livelli:</p>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/07_livelli_cognitivi.png" alt="Livelli cognitivi" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 9. Distribuzione dei tweet per livello cognitivo in base alla densità locale nello spazio vettoriale.</div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">69.8%</div>
+        <div class="stat-label">Niché / tecnico</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">26.0%</div>
+        <div class="stat-label">Intermedio</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">4.2%</div>
+        <div class="stat-label">Mainstream</div>
+      </div>
+    </div>
+
+    <p>Il 70% del mio feed è in zone a bassa densità. Argomenti specialistici, poco condivisi in termini assoluti. Solo il 4% è mainstream. Questo mi dice dove mi trovo sulla mappa, rispetto alla popolazione totale dei tweet: lontano dal centro.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - IL PROFILO ALGORITMICO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Tuo Profilo Algoritmico</h2>
+    <span class="section-number">Sezione 08. Cosa pensa di te l'algoritmo</span>
+
+    <p>L'ultima cosa che ho costruito è un grafico che risponde alla domanda originale della iena in modo diretto: <em>cosa pensa di te l'algoritmo di X?</em></p>
+
+    <p>Non le preferenze che hai dichiarato, gli interessi che hai scelto di seguire. La struttura di quello che il sistema ha deciso di mostrarti. Ogni cluster, con il suo peso percentuale, è una coordinata: dove il sistema di raccomandazione ti ha messo sulla mappa.</p>
+
+    <img src="../immagini/vicino-vuol-dire-vettore/10_profilo_algoritmico.png" alt="Profilo algoritmico" class="lab-screenshot fade-in">
+    <div class="chart-caption">Fig. 10. Il profilo algoritmico: ogni riga è un cluster semantico, con peso percentuale e tweet rappresentativo.</div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Attenzione.</strong> Quello che vedi è il profilo che X ha costruito su di te, basato su quello che ti ha mostrato, che può coincidere con i tuoi interessi reali o no. Il feed non è tuo, come abbiamo già visto. Adesso però hai la mappa.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE TEST FALSIFICABILE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Test Falsificabile</h2>
+    <span class="section-number">Sezione 09. Se è vero, allora succede questo</span>
+
+    <p>Un'affermazione vale quanto riesci a falsificarla. Quindi: se il modello cattura davvero il significato indipendentemente dalla lingua, allora un tweet in italiano su AI deve essere <strong>più vicino</strong> a un tweet in inglese su AI che a un tweet in italiano su un argomento completamente diverso.</p>
+
+    <p>Ho preso tre tweet reali dal feed:</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">A</div>
+        <div class="pipeline-step-body">
+          <strong>IT — AI/LLM</strong>
+          <p>"Troppo potente e troppo rischioso, per essere messo nelle mani di tutti. Il nuovo modello AI di Anthropic che ha mandato nel panico le istituzioni..."</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">B</div>
+        <div class="pipeline-step-body">
+          <strong>EN — AI/LLM</strong>
+          <p>"I think this is the coolest thing ever, cross-SIEM Sysmon &lt;-&gt; CloudTrail correlation - coming soon to AI Cyber Defense Ops!"</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">C</div>
+        <div class="pipeline-step-body">
+          <strong>IT — Guerra/Iran</strong>
+          <p>"Confusione a Teheran, caos a Hormuz, propaganda al massimo. Trump ha parlato di un accordo imminente..."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-box fade-in">
+      <span class="formula-name">Similarità coseno — dati reali dal feed</span>
+      A vs B &nbsp;(lingue diverse, stesso topic) &nbsp;&nbsp;= <strong style="color:var(--accent-attention)">0.438</strong><br>
+      A vs C &nbsp;(stessa lingua, topic opposto) &nbsp;&nbsp;&nbsp;= <strong style="color:var(--accent-reaction)">0.162</strong>
+      <br>
+      <span style="font-size:0.8rem;color:var(--text-secondary)">Un tweet in italiano sull'AI è 2.7x più vicino a un tweet in inglese sull'AI che a un tweet in italiano sulla guerra</span>
+    </div>
+
+    <p>Il test regge. La lingua conta meno dell'argomento. Quei numeri lo dimostrano.</p>
+
+
+    <!-- ============================================================
+         SEZIONE TABELLA CLUSTER
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Mappa Numerica del Feed</h2>
+    <span class="section-number">Sezione 10. Cluster, distanze, densità</span>
+
+    <p>I cluster non sono solo etichette. Hanno una geometria misurabile: quanto sono compatti, quanto sono densi, quanto pesano sul feed totale. Questa è la tabella completa.</p>
+
+    <div style="overflow-x:auto; margin: 1.5rem 0;">
+      <table class="strategy-table">
+        <thead>
+          <tr>
+            <th>Cluster</th>
+            <th>Argomento</th>
+            <th>Tweet</th>
+            <th>% Feed</th>
+            <th>Dist. media</th>
+            <th>Densità</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>C19</td><td>LLM, API e sviluppo software AI</td><td>124</td><td>10.8%</td><td>0.520</td><td>0.4</td></tr>
+          <tr><td>C1</td><td>Sinistra italiana, ironia e critica</td><td>90</td><td>7.9%</td><td>0.436</td><td>0.4</td></tr>
+          <tr><td>C20</td><td>Contenuti virali, shock e stupore</td><td>56</td><td>4.9%</td><td>0.355</td><td>0.4</td></tr>
+          <tr><td>C17</td><td>Scambi brevi, battute e risposte</td><td>41</td><td>3.6%</td><td>0.327</td><td>0.3</td></tr>
+          <tr><td>C14</td><td>Nostalgia, storia e curiosità scientifiche</td><td>37</td><td>3.2%</td><td>0.516</td><td>0.2</td></tr>
+          <tr><td>C2</td><td>UE, social media e regole digitali</td><td>37</td><td>3.2%</td><td>0.389</td><td>0.4</td></tr>
+          <tr><td>C13</td><td>Scuola, infanzia e istruzione</td><td>36</td><td>3.1%</td><td>0.433</td><td>0.3</td></tr>
+          <tr><td>C4</td><td>Politica italiana, corruzione e populismo</td><td>34</td><td>3.0%</td><td>0.306</td><td>0.5</td></tr>
+          <tr><td>C3</td><td>Geopolitica, Trump, Russia, Ucraina</td><td>32</td><td>2.8%</td><td>0.321</td><td>0.5</td></tr>
+          <tr><td>C8</td><td>Fisco, banche e controllo finanziario</td><td>29</td><td>2.5%</td><td>0.452</td><td>0.2</td></tr>
+          <tr><td>C15</td><td>Claude, AI tools e produttività tech</td><td>26</td><td>2.3%</td><td>0.468</td><td>0.5</td></tr>
+          <tr><td>C18</td><td>Cybersecurity, CVE e lavoro in tech</td><td>18</td><td>1.6%</td><td>0.474</td><td>0.3</td></tr>
+          <tr><td>C7</td><td>Cinismo e disillusione sociale</td><td>17</td><td>1.5%</td><td>0.359</td><td>0.2</td></tr>
+          <tr><td>C5</td><td>Roma vs Milano, rivalità urbana</td><td>16</td><td>1.4%</td><td>0.281</td><td>0.5</td></tr>
+          <tr><td>C21</td><td>Cultura, linguaggio e critica letteraria</td><td>16</td><td>1.4%</td><td>0.250</td><td>0.3</td></tr>
+          <tr><td>C12</td><td>Giornalismo, propaganda e disinformazione</td><td>16</td><td>1.4%</td><td>0.365</td><td>0.3</td></tr>
+          <tr><td>C16</td><td>Commenti ironici e battute sul web</td><td>14</td><td>1.2%</td><td>0.288</td><td>0.3</td></tr>
+          <tr><td>C0</td><td>Iran vs USA, guerra e propaganda</td><td>13</td><td>1.1%</td><td>0.290</td><td>0.5</td></tr>
+          <tr><td>C9</td><td>AI-generated images e creatività visiva</td><td>13</td><td>1.1%</td><td>0.341</td><td>0.3</td></tr>
+          <tr><td>C10</td><td>Diritto, giustizia e riforme istituzionali</td><td>15</td><td>1.3%</td><td>0.441</td><td>0.2</td></tr>
+          <tr><td>C11</td><td>Immigrazione, toni accesi e polemiche</td><td>15</td><td>1.3%</td><td>0.303</td><td>0.2</td></tr>
+          <tr><td>C6</td><td>Momenti di vita quotidiana e ironia</td><td>15</td><td>1.3%</td><td>0.350</td><td>0.5</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Come leggere la tabella.</strong> "Dist. media" è la distanza coseno media tra ogni tweet e il centroide del suo cluster: più è bassa, più il cluster è coeso e specifico. C21 (cultura/linguaggio, 0.250) e C5 (Roma vs Milano, 0.281) sono i più compatti. C19 (LLM/AI, 0.520) e C14 (nostalgia/storia, 0.516) sono i più dispersi: argomenti ampi con molte sfumature. "Densità" misura quanto i tweet sono semanticamente simili tra loro nello spazio locale. Cluster densi indicano argomenti trattati in modo uniforme; cluster meno densi indicano temi più vari e sfaccettati.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08bis - LA LETTURA DA HACKER
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Lettura da Hacker</h2>
+    <span class="section-number">Sezione 09. Cosa ci vedi se sai guardare</span>
+
+    <p>La maggior parte delle persone leggerà questa notizia e penserà: hanno aggiunto la traduzione, comodo. Fine.</p>
+
+    <p>Quello che X ha attivato è un <strong>layer di normalizzazione</strong>. Tutto il contenuto che entra nel feed, qualsiasi lingua, qualsiasi formato, qualsiasi cultura, viene proiettato in uno spazio unico e condiviso. Da quel momento in poi è tutto confrontabile. Rankabile. Ottimizzabile.</p>
+
+    <div class="formula-box fade-in">
+      <span class="formula-name">Il vero modello mentale</span>
+      input: qualsiasi lingua<br>
+      ↓ embedding multilingue<br>
+      output: vettori confrontabili nello stesso spazio<br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">lingua = accidente superficiale · significato = coordinate geometriche</span>
+    </div>
+
+    <p>Questo cambia qualcosa per chi sa usarlo. Se il tuo feed non ha più barriere linguistiche a livello di algoritmo, puoi smettere di pensare "seguo persone italiane" e iniziare a pensare "intercetto segnali su certi argomenti, ovunque arrivino".</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">01</div>
+        <div class="pipeline-step-body">
+          <strong>Intercetti trend prima</strong>
+          <p>Un argomento esplode prima in inglese o in cinese. Prima arrivava nel tuo feed italiano con settimane di ritardo, filtrato dai media. Ora arriva direttamente, tradotto in tempo reale.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">02</div>
+        <div class="pipeline-step-body">
+          <strong>Salti i media intermedi</strong>
+          <p>Giornali e newsletter sono layer di ritardo e filtraggio. Il segnale originale esiste già nello spazio semantico globale. Ora puoi toccarlo direttamente.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">03</div>
+        <div class="pipeline-step-body">
+          <strong>Confronti narrative diverse</strong>
+          <p>Lo stesso evento raccontato da prospettive diverse finisce vicino nello spazio vettoriale. Puoi vedere in un colpo come lo stesso fatto viene inquadrato in lingue e culture diverse.</p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">04</div>
+        <div class="pipeline-step-body">
+          <strong>Trovi segnali deboli</strong>
+          <p>I segnali deboli sono quasi sempre in nicchie linguistiche che non segui. Ora l'algoritmo te li porta comunque: la traduzione li rende leggibili. Il rumore di fondo diventa ricercabile.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Rovescio della medaglia.</strong> Lo stesso layer che ti porta segnali utili porta anche propaganda, disinformazione e contenuti ottimizzati per engagement da qualsiasi angolo del mondo, già tradotti e già nel tuo feed. La normalizzazione è simmetrica: non distingue tra segnale e rumore. Quello lo devi fare tu.</p>
+    </div>
+
+    <h3 style="margin-top:2rem; font-family:var(--font-mono); color:var(--accent-yellow);">Il limite: quando il sarcasmo diventa rumore</h3>
+
+    <p>C'è un caso in cui il sistema si inceppa: il sarcasmo.</p>
+
+    <p>Prendi questo tweet italiano reale dal feed:</p>
+
+    <div class="formula-box fade-in" style="text-align:left; font-size:0.95rem; color:var(--text-primary); font-family:var(--font-mono);">
+      "Ottimo lavoro del governo: altra tassa sui risparmi. Complimenti, davvero. Bravi tutti."
+    </div>
+
+    <p>In italiano il significato è chiarissimo: è ironia feroce contro il governo. Ma un modello di embedding lavora sulla superficie semantica del testo. Le parole "ottimo", "complimenti", "bravi" hanno un vettore positivo. Il tono critico reale viene parzialmente perso.</p>
+
+    <p>La traduzione automatica peggiora le cose: Grok traduce correttamente le parole, ma il sarcasmo implicito in quella costruzione italiana specifica può non sopravvivere in inglese. Il tweet finisce vicino a contenuti genuinamente positivi sul governo, non a contenuti critici.</p>
+
+    <p>Il modello non capisce il registro. Capisce le parole. Per argomenti fattuali funziona benissimo: AI, guerra, politica estera, tecnologia. Per ironia, sarcasmo, doppi sensi culturali: attenzione.</p>
+
+
+    <!-- ============================================================
+         SEZIONE LAB REPLICABILE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Replicalo</h2>
+    <span class="section-number">Lab. Due script, un terminale</span>
+
+    <p>Tutto il codice è su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/vicino-vuol-dire-vettore" target="_blank" rel="noopener" style="color: var(--accent-highlight);">GitHub</a>, nella cartella <code>scripts/vicino-vuol-dire-vettore/</code>. Puoi replicare l'analisi sul tuo feed in meno di 10 minuti.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">01</div>
+        <div class="pipeline-step-body">
+          <strong>Installa le dipendenze</strong>
+          <p><code>pip install -r requirements.txt</code></p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">02</div>
+        <div class="pipeline-step-body">
+          <strong>Estrai i tuoi tweet da MongoDB</strong>
+          <p><code>python 00_extract.py</code> — legge da <code>SnareData.twitter</code> e salva in <code>data/tweets.json</code></p>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-step-num">03</div>
+        <div class="pipeline-step-body">
+          <strong>Esegui l'analisi completa</strong>
+          <p><code>python 01_analisi.py</code> — embedding, riduzione, clustering, 10 grafici, report JSON</p>
+        </div>
+      </div>
+    </div>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>File</th><th>Cosa fa</th><th>Output</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>00_extract.py</code></td><td>Estrae tweet da MongoDB, filtra promossi e duplicati</td><td><code>data/tweets.json</code></td></tr>
+        <tr><td><code>01_analisi.py</code></td><td>Embedding multilingue, PCA, UMAP, HDBSCAN, 10 grafici, report</td><td><code>output/*.png</code>, <code>output/report.json</code>, <code>output/tweets_full.csv</code></td></tr>
+        <tr><td><code>output/cluster_labels.json</code></td><td>Etichette manuali per i cluster — modificabile a piacere</td><td>Letto da <code>01_analisi.py</code> se presente</td></tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box fade-in">
+      <p><strong>Struttura cartelle.</strong></p>
+      <pre style="font-family:var(--font-mono); font-size:0.85rem; margin:0.5rem 0 0; color:var(--accent-attention); line-height:1.7;">vicino-vuol-dire-vettore/
+├── 00_extract.py
+├── 01_analisi.py
+├── requirements.txt
+├── data/
+│   └── tweets.json          ← il tuo feed
+└── output/
+    ├── 01_tweet_come_vettore.png
+    ├── 02_crosslingual_heatmap.png
+    ├── ...
+    ├── cluster_labels.json  ← etichette cluster (opzionale)
+    ├── report.json
+    └── tweets_full.csv</pre>
+    </div>
+
+    <p>Se non hai MongoDB, puoi partire direttamente da un <code>tweets.json</code> tuo con la struttura <code>[{"text": "...", "lang": "it", "created_at": "..."}]</code>. Lo script <code>00_extract.py</code> serve solo per chi cattura il feed con Snare.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - CHIUDIAMO IL CERCHIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Chiudiamo il Cerchio</h2>
+    <span class="section-number">Sezione 10. La risposta alla iena</span>
+
+    <p>Ero rimasto a quella domanda: "vicine come?"</p>
+
+    <p>La risposta è questa. Ogni tweet che leggi è stato trasformato in 384 numeri. Quei numeri definiscono la sua posizione in uno spazio matematico. La distanza in quello spazio misura la somiglianza semantica: non lessicale, non grammaticale. Il significato. Il significato. Quello che resta quando togli la lingua.</p>
+
+    <p>X ha tolto il filtro linguistico sull'output. Il motore di raccomandazione girava già su vettori cross-lingual, già cieco alle lingue, già capace di trovare un tweet in giapponese rilevante per un italiano. Ma lo tratteneva. Ora non lo trattiene più, e Grok lo traduce in tempo reale così non devi nemmeno cambiare tab.</p>
+
+    <p>La risposta non è "perché X sa che ti interessa". La risposta è che quel tweet, trasformato in 384 numeri, si trovava nelle vicinanze del tuo profilo nello spazio semantico. Il motore lo sapeva già prima. Adesso ti arriva anche.</p>
+
+    <p>Il mondo non è diventato più piccolo perché ci capiamo meglio. È diventato più piccolo perché hanno rimosso il tappo che teneva fuori tutto quello che il modello aveva già deciso che ti apparteneva.</p>
+
+    <p>La iena, quando le ho spiegato tutto questo, ha detto: "Quindi mi spiano."</p>
+
+    <p>"No, misurano."</p>
+
+    <p>"Stessa cosa."</p>
+
+    <p>Non ho risposto. Aveva ragione.</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">Il motore era già lì.<br>Hanno tolto il freno.<br>Ora esce tutto.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+        1.143 tweet &middot; 22 lingue &middot; 22 cluster &middot; silhouette 0.402<br>
+        Catturato il 19 aprile 2026, prima dell'annuncio &middot;
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener" style="color: var(--accent-attention);">github.com/pinperepette</a>
+      </p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. Vicino vuol dire vettore.</p>
+      <div class="footer-links">
+        <a href="../index.html">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

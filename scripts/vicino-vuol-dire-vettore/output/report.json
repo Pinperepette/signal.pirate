@@ -1,0 +1,468 @@
+{
+  "totale_tweet": 1143,
+  "lingue": {
+    "it": 737,
+    "en": 329,
+    "es": 21,
+    "ja": 11,
+    "fr": 10,
+    "ar": 8,
+    "pt": 6,
+    "tr": 6,
+    "de": 4,
+    "qme": 3,
+    "zh": 2,
+    "ro": 1,
+    "ru": 1,
+    "no": 1,
+    "und": 1,
+    "qht": 1,
+    "is": 1
+  },
+  "livelli_cognitivi": {
+    "niché/tecnico": 798,
+    "intermedio": 297,
+    "mainstream": 48
+  },
+  "cluster": [
+    {
+      "id": -1,
+      "name": "Outlier",
+      "size": 433,
+      "pct": 37.88,
+      "langs": {
+        "it": 284,
+        "en": 107,
+        "es": 13,
+        "ja": 7,
+        "ar": 5,
+        "fr": 5,
+        "tr": 4,
+        "de": 2,
+        "ro": 1,
+        "ru": 1,
+        "qme": 1,
+        "pt": 1,
+        "no": 1,
+        "zh": 1
+      }
+    },
+    {
+      "id": 0,
+      "name": "Iran vs USA — guerra e propaganda",
+      "size": 13,
+      "pct": 1.14,
+      "langs": {
+        "it": 9,
+        "en": 3,
+        "pt": 1
+      }
+    },
+    {
+      "id": 1,
+      "name": "Sinistra italiana — ironia e critica",
+      "size": 90,
+      "pct": 7.87,
+      "langs": {
+        "it": 82,
+        "en": 6,
+        "ar": 1,
+        "es": 1
+      }
+    },
+    {
+      "id": 2,
+      "name": "UE, social media e regole digitali",
+      "size": 37,
+      "pct": 3.24,
+      "langs": {
+        "it": 23,
+        "en": 12,
+        "fr": 1,
+        "de": 1
+      }
+    },
+    {
+      "id": 3,
+      "name": "Geopolitica — Trump, Russia, Ucraina",
+      "size": 32,
+      "pct": 2.8,
+      "langs": {
+        "it": 28,
+        "en": 4
+      }
+    },
+    {
+      "id": 4,
+      "name": "Politica italiana — corruzione e populismo",
+      "size": 34,
+      "pct": 2.97,
+      "langs": {
+        "it": 31,
+        "en": 3
+      }
+    },
+    {
+      "id": 5,
+      "name": "Roma vs Milano — rivalità urbana",
+      "size": 16,
+      "pct": 1.4,
+      "langs": {
+        "it": 16
+      }
+    },
+    {
+      "id": 6,
+      "name": "Momenti di vita quotidiana e ironia",
+      "size": 15,
+      "pct": 1.31,
+      "langs": {
+        "it": 9,
+        "en": 4,
+        "pt": 1,
+        "ja": 1
+      }
+    },
+    {
+      "id": 7,
+      "name": "Cinismo e disillusione sociale",
+      "size": 17,
+      "pct": 1.49,
+      "langs": {
+        "it": 15,
+        "en": 2
+      }
+    },
+    {
+      "id": 8,
+      "name": "Fisco, banche e controllo finanziario",
+      "size": 29,
+      "pct": 2.54,
+      "langs": {
+        "it": 25,
+        "en": 3,
+        "fr": 1
+      }
+    },
+    {
+      "id": 9,
+      "name": "AI-generated images e creatività visiva",
+      "size": 13,
+      "pct": 1.14,
+      "langs": {
+        "it": 8,
+        "en": 3,
+        "ar": 1,
+        "tr": 1
+      }
+    },
+    {
+      "id": 10,
+      "name": "Diritto, giustizia e riforme istituzionali",
+      "size": 15,
+      "pct": 1.31,
+      "langs": {
+        "it": 12,
+        "en": 2,
+        "es": 1
+      }
+    },
+    {
+      "id": 11,
+      "name": "Immigrazione — toni accesi e polemiche",
+      "size": 15,
+      "pct": 1.31,
+      "langs": {
+        "it": 14,
+        "ja": 1
+      }
+    },
+    {
+      "id": 12,
+      "name": "Giornalismo, propaganda e disinformazione",
+      "size": 16,
+      "pct": 1.4,
+      "langs": {
+        "it": 12,
+        "en": 4
+      }
+    },
+    {
+      "id": 13,
+      "name": "Scuola, infanzia e istruzione",
+      "size": 36,
+      "pct": 3.15,
+      "langs": {
+        "it": 28,
+        "en": 5,
+        "es": 1,
+        "fr": 1,
+        "de": 1
+      }
+    },
+    {
+      "id": 14,
+      "name": "Nostalgia, storia e curiosità scientifiche",
+      "size": 37,
+      "pct": 3.24,
+      "langs": {
+        "it": 26,
+        "en": 9,
+        "fr": 1,
+        "es": 1
+      }
+    },
+    {
+      "id": 15,
+      "name": "Claude, AI tools e produttività tech",
+      "size": 26,
+      "pct": 2.27,
+      "langs": {
+        "en": 23,
+        "fr": 1,
+        "und": 1,
+        "es": 1
+      }
+    },
+    {
+      "id": 16,
+      "name": "Commenti ironici e battute sul web",
+      "size": 14,
+      "pct": 1.22,
+      "langs": {
+        "it": 12,
+        "en": 2
+      }
+    },
+    {
+      "id": 17,
+      "name": "Scambi brevi — battute e risposte",
+      "size": 41,
+      "pct": 3.59,
+      "langs": {
+        "it": 34,
+        "en": 4,
+        "ja": 2,
+        "tr": 1
+      }
+    },
+    {
+      "id": 18,
+      "name": "Cybersecurity, CVE e lavoro in tech",
+      "size": 18,
+      "pct": 1.57,
+      "langs": {
+        "en": 16,
+        "it": 1,
+        "es": 1
+      }
+    },
+    {
+      "id": 19,
+      "name": "LLM, API e sviluppo software AI",
+      "size": 124,
+      "pct": 10.85,
+      "langs": {
+        "en": 106,
+        "it": 15,
+        "zh": 1,
+        "pt": 1,
+        "is": 1
+      }
+    },
+    {
+      "id": 20,
+      "name": "Contenuti virali — shock e stupore",
+      "size": 56,
+      "pct": 4.9,
+      "langs": {
+        "it": 38,
+        "en": 11,
+        "pt": 2,
+        "qme": 2,
+        "ar": 1,
+        "es": 1,
+        "qht": 1
+      }
+    },
+    {
+      "id": 21,
+      "name": "Cultura, linguaggio e critica letteraria",
+      "size": 16,
+      "pct": 1.4,
+      "langs": {
+        "it": 15,
+        "es": 1
+      }
+    }
+  ],
+  "metriche_cluster": {
+    "silhouette": 0.4023,
+    "davies_bouldin": 0.8861,
+    "clusters": [
+      {
+        "cluster": 0,
+        "size": 13,
+        "intra_dist": 0.23389999568462372
+      },
+      {
+        "cluster": 1,
+        "size": 90,
+        "intra_dist": 0.6491000056266785
+      },
+      {
+        "cluster": 2,
+        "size": 37,
+        "intra_dist": 0.34040001034736633
+      },
+      {
+        "cluster": 3,
+        "size": 32,
+        "intra_dist": 0.39590001106262207
+      },
+      {
+        "cluster": 4,
+        "size": 34,
+        "intra_dist": 0.33079999685287476
+      },
+      {
+        "cluster": 5,
+        "size": 16,
+        "intra_dist": 0.24779999256134033
+      },
+      {
+        "cluster": 6,
+        "size": 15,
+        "intra_dist": 0.24809999763965607
+      },
+      {
+        "cluster": 7,
+        "size": 17,
+        "intra_dist": 0.4733000099658966
+      },
+      {
+        "cluster": 8,
+        "size": 29,
+        "intra_dist": 0.5178999900817871
+      },
+      {
+        "cluster": 9,
+        "size": 13,
+        "intra_dist": 0.29260000586509705
+      },
+      {
+        "cluster": 10,
+        "size": 15,
+        "intra_dist": 0.5095000267028809
+      },
+      {
+        "cluster": 11,
+        "size": 15,
+        "intra_dist": 0.33899998664855957
+      },
+      {
+        "cluster": 12,
+        "size": 16,
+        "intra_dist": 0.3978999853134155
+      },
+      {
+        "cluster": 13,
+        "size": 36,
+        "intra_dist": 0.5407000184059143
+      },
+      {
+        "cluster": 14,
+        "size": 37,
+        "intra_dist": 0.8815000057220459
+      },
+      {
+        "cluster": 15,
+        "size": 26,
+        "intra_dist": 0.47130000591278076
+      },
+      {
+        "cluster": 16,
+        "size": 14,
+        "intra_dist": 0.28870001435279846
+      },
+      {
+        "cluster": 17,
+        "size": 41,
+        "intra_dist": 0.37610000371932983
+      },
+      {
+        "cluster": 18,
+        "size": 18,
+        "intra_dist": 0.3589000105857849
+      },
+      {
+        "cluster": 19,
+        "size": 124,
+        "intra_dist": 0.6144000291824341
+      },
+      {
+        "cluster": 20,
+        "size": 56,
+        "intra_dist": 0.436599999666214
+      },
+      {
+        "cluster": 21,
+        "size": 16,
+        "intra_dist": 0.35359999537467957
+      }
+    ]
+  },
+  "crosslingual_demo": {
+    "intelligenza artificiale e automazione del lavoro": [
+      {
+        "lang": "is",
+        "score": 0.6319,
+        "text": "#IntelligenzaArtificiale anni '80 #AI https://t.co/5wL3xB1RsI"
+      },
+      {
+        "lang": "en",
+        "score": 0.5705,
+        "text": "🚀 Pentest Copilot — AI That Actually Hacks (Legally)\n\nAutonomous pentesting agent that connects to Kali, runs tools, analyzes outp"
+      },
+      {
+        "lang": "en",
+        "score": 0.5358,
+        "text": "Some jobs done by all machines https://t.co/9H8CesDRCS"
+      }
+    ],
+    "crisi politica e governo": [
+      {
+        "lang": "it",
+        "score": 0.5464,
+        "text": "LA MELONI HA PERSO IL TOCCO MAGICO. LO RITROVERA’?\nSu @LibertiMedia nella rubrica Senza Filtro @EnrPerucchietti ed io  analizziamo"
+      },
+      {
+        "lang": "it",
+        "score": 0.5406,
+        "text": "C'è  chi dice che con il governo Meloni \n\"siamo nella merda\"\nImmaginate in che condizioni saremmo se in questi anni di disgrazie a"
+      },
+      {
+        "lang": "it",
+        "score": 0.5346,
+        "text": "Protestare contro le scelte del Governo di cui si è parte integrante?\nFATTO ✅ \nSe ci fosse Wanna Marchi, chiederebbe subito un alt"
+      }
+    ],
+    "criptovalute e investimenti": [
+      {
+        "lang": "it",
+        "score": 0.5217,
+        "text": "Forse non è chiaro,la cybersecurity in 🇺🇸 è sicurezza nazionale allo stesso livello delle armi. Quindi lo stesso DEVE fare l’🇮🇹,tu"
+      },
+      {
+        "lang": "it",
+        "score": 0.5021,
+        "text": "Il FALSO QUOTIDIANO è un buco nero di DEBITI:\n\n🧨 8 milioni a FORNITORI\n🧨1 milione di tasse\n🧨5,5 alle banche\n🧨1,5 alla PREVIDENZA\n🧨"
+      },
+      {
+        "lang": "it",
+        "score": 0.48,
+        "text": "Questo dimostra ancora una volta che la maggior parte delle persone non ha ancora minimamente idea di quale sia il problema di Bit"
+      }
+    ]
+  }
+}
