@@ -1,0 +1,15 @@
+{
+  "core_concepts": {
+    "CVSS_v31": "Score 0-10: Critical≥9.0, High≥7.0, Medium≥4.0, Low<4.0. Vettore: AV/AC/PR/UI/S/C/I/A. Il CVSS Base non misura exploitability reale: un 9.8 senza PoC è meno urgente di un 7.2 con exploit in the wild.",
+    "CIA_triad": "Confidentiality / Integrity / Availability. Base di ogni analisi di rischio. Un attacco può colpire una o tutte e tre. Il CVSS separa esplicitamente i tre impatti.",
+    "kill_chain": "Reconnaissance → Weaponization → Delivery → Exploitation → Installation → C2 → Actions. MITRE ATT&CK mappa le fasi post-delivery in dettaglio.",
+    "IOC_vs_TTP": "IOC (Indicatori di Compromissione): IP, hash, domini — volatili, facili da cambiare dall'attaccante. TTP (Tattiche/Tecniche/Procedure): comportamenti — stabili, costosi da cambiare. Difendere su TTP è più efficace.",
+    "defense_in_depth": "Nessun controllo singolo è sufficiente. Layer sovrapposti: perimetro, endpoint, identità, dati, monitoraggio. Un attaccante che bypassa uno strato deve affrontarne altri.",
+    "zero_trust": "Non fidarsi mai implicitamente, verificare sempre. Microsegmentazione, least privilege, MFA ovunque. Elimina il concetto di 'rete interna sicura'.",
+    "patch_priority": "Non patchare per CVSS score in ordine decrescente. Priorità reale: (CVSS × exploitability × esposizione superficie). Un 7.0 con PoC pubblico e servizio esposto su internet batte un 9.8 interno senza exploit.",
+    "lateral_movement": "Tecnica post-compromissione per muoversi da un sistema a altri. Pass-the-Hash, Kerberoasting, Living-off-the-Land. Il rilevamento è più difficile del punto d'ingresso perché usa tool legittimi.",
+    "RAG": "Retrieval-Augmented Generation: recupera chunk rilevanti al momento della query via embedding similarity. Ideale per corpus che cambia frequentemente (CVE, advisory). Latenza: 100-300ms.",
+    "CAG": "Context-Augmented Generation: knowledge pre-caricata nel system prompt. Zero latenza. Per concetti stabili che non cambiano (tassonomia, principi fondamentali)."
+  },
+  "compressed_memory": "La differenza tra un analista mediocre e uno bravo non è la conoscenza dei concetti base — è la capacità di collegare un pattern di traffico anomalo a una tecnica ATT&CK specifica, e quella tecnica a una CVE recente con exploit disponibile. Questo agente tenta di fare esattamente questo: CAG per i principi stabili, RAG per i dati freschi (CVE reali + ATT&CK reale), stream per il contesto live."
+}

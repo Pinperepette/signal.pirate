@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Agente Che Non Inventa (Perche' Sa Quando Cercare) | Signal Pirate</title>
+  <meta name="description" content="Come ho costruito un agente AI che ragiona su dati reali invece di inventarseli. RAG + CAG + Meta-controller + Stream + Tool + Reflection + Memory. Lab completo con corpus NVD reale, MITRE ATT&CK, e un PCAP di CTF analizzato in autonomia.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    .ck { color: #7c4dff; }
+    .cs { color: #00ff88; }
+    .cn { color: #b5cea8; }
+    .cc { color: #6a6a8a; }
+    .cf { color: #4ecdc4; }
+    .cv { color: #9cdcfe; }
+    .ct { color: #4ec9b0; }
+    .co { color: #d4d4d4; }
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.5;
+    }
+
+    .arch-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .arch-layer {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.3rem 0;
+    }
+    .arch-label {
+      min-width: 160px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    .arch-desc {
+      color: #6a6a8a;
+      font-size: 0.72rem;
+    }
+    .arch-arrow {
+      color: rgba(0,255,136,0.4);
+      font-size: 0.9rem;
+      text-align: center;
+      padding-left: 2rem;
+    }
+    .l-meta   { color: #7c4dff; }
+    .l-cag    { color: #4ecdc4; }
+    .l-rag    { color: #00ff88; }
+    .l-stream { color: #f5c518; }
+    .l-tool   { color: #ff6b6b; }
+    .l-ref    { color: #b5cea8; }
+    .l-mem    { color: #9cdcfe; }
+
+    .route-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .route-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .route-card:hover { transform: translateY(-2px); }
+    .route-name {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .route-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .route-when {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      margin-top: 0.6rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+    .rc-cag    { border-color: #4ecdc4; }
+    .rc-cag    .route-name { color: #4ecdc4; }
+    .rc-rag    { border-color: #00ff88; }
+    .rc-rag    .route-name { color: #00ff88; }
+    .rc-stream { border-color: #f5c518; }
+    .rc-stream .route-name { color: #f5c518; }
+    .rc-full   { border-color: #7c4dff; }
+    .rc-full   .route-name { color: #7c4dff; }
+
+    .two-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 1.5rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    @media (max-width: 768px) { .two-panel { grid-template-columns: 1fr; } }
+    .panel-side { padding: 1.5rem; }
+    .panel-left {
+      background: rgba(0,255,136,0.05);
+      border-right: 1px solid var(--border-subtle);
+    }
+    .panel-right { background: rgba(124,77,255,0.05); }
+    .panel-side-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    .panel-left .panel-side-title  { color: var(--accent-attention); }
+    .panel-right .panel-side-title { color: #7c4dff; }
+    .panel-side p { font-size: 0.82rem; line-height: 1.6; margin: 0.4rem 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-04-21 | Pinperepette</p>
+    <h1 class="article-page-title">L'Agente Che <span class="accent">Non Inventa</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Perche' sa quando cercare. RAG + CAG + Meta-controller su dati reali.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">RAG</span>
+      <span class="tag tag-highlight">CAG</span>
+      <span class="tag tag-reaction">AI Agent</span>
+      <span class="tag tag-amplification">Security</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00 — Il problema
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Problema</h2>
+    <span class="section-number">Sezione 00. Perche' la maggior parte degli agenti fa schifo</span>
+
+    <p>La maggior parte degli "agenti AI" che vedo in giro fa una cosa sola: manda un prompt a un LLM e stampa la risposta. Lo chiamano agente. Non lo e'.</p>
+
+    <p>Un LLM da solo ha tre problemi fondamentali che nessun prompt engineering risolve:</p>
+
+    <p>Primo: <strong>non sa niente di quello che e' successo dopo il training</strong>. Le CVE degli ultimi 6 mesi non esistono per lui. Il bollettino Microsoft di ieri: non pervenuto. Ti risponde comunque, con grande sicurezza, inventando.</p>
+
+    <p>Secondo: <strong>non vede il contesto corrente</strong>. Se stai avendo un attacco in corso, lui non lo sa. Se ci sono 500 login falliti nell'ultimo minuto, lui non lo sa. Risponde come se il mondo fosse fermo al momento del training.</p>
+
+    <p>Terzo: <strong>non impara</strong>. Ogni query e' come la prima. Non ricorda che ieri ha analizzato lo stesso pattern. Non migliora. Non tiene traccia di niente.</p>
+
+    <p>Ho passato un po' di tempo a pensare a come dovrebbe essere fatto un agente base che risolve questi tre problemi. Questo articolo e' il risultato: un'architettura a 7 layer, un corpus reale di 3089 documenti (CVE + MITRE ATT&CK), e un demo che analizza un PCAP di CTF in autonomia senza che nessuno gli faccia domande.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="7" data-suffix=" layer">0</div>
+        <div class="stat-label">Architettura</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green" data-count="3089" data-suffix=" doc">0</div>
+        <div class="stat-label">Corpus reale (NVD + MITRE)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="4" data-suffix=" route">0</div>
+        <div class="stat-label">Meta-controller routing</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red" data-count="0" data-suffix=" query">0</div>
+        <div class="stat-label">Umane nel demo finale</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 — L'architettura
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Architettura</h2>
+    <span class="section-number">Sezione 01. I 7 layer e perche' esistono tutti</span>
+
+    <p>Prima di scrivere una riga di codice ho disegnato l'architettura. Non per fare il figo con i diagrammi: perche' ogni layer risolve un problema preciso, e se non sai perche' esiste un layer non sai quando toglierlo o cambiarlo.</p>
+
+    <div class="arch-diagram">
+      <div class="arch-layer">
+        <span class="arch-label l-meta">META-CONTROLLER</span>
+        <span class="arch-desc">→ decide quale percorso prendere prima di fare qualsiasi cosa</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-cag">CAG</span>
+        <span class="arch-desc">→ conoscenza stabile pre-caricata nel system prompt, zero latenza</span>
+      </div>
+      <div class="arch-layer">
+        <span class="arch-label l-rag">RAG</span>
+        <span class="arch-desc">→ retrieval su corpus reale al momento della query</span>
+      </div>
+      <div class="arch-layer">
+        <span class="arch-label l-stream">STREAM</span>
+        <span class="arch-desc">→ eventi live dal mondo reale (traffico, log, alert)</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-tool">TOOL / MCP</span>
+        <span class="arch-desc">→ azioni reali: query NVD, ricerca exploit, esecuzione codice</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-ref">REFLECTION</span>
+        <span class="arch-desc">→ l'agente valuta la propria risposta: era utile? aveva bisogno del RAG?</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-mem">MEMORY</span>
+        <span class="arch-desc">→ memoria persistente con decay: semantic + episodic, sopravvive al restart</span>
+      </div>
+    </div>
+
+    <p>Ogni layer risponde a una domanda specifica:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Domanda che risponde</th>
+          <th>Senza di lui</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#7c4dff">Meta-controller</strong></td>
+          <td>Quanto e' complessa questa query? Serve davvero il RAG?</td>
+          <td>Ogni query passa per tutti i layer. Spreco di risorse e latenza.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#4ecdc4">CAG</strong></td>
+          <td>Cosa so gia' con certezza?</td>
+          <td>Il LLM reinventa i concetti base ad ogni query.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#00ff88">RAG</strong></td>
+          <td>Cosa devo andare a cercare perche' potrebbe essere cambiato?</td>
+          <td>CVE di ieri: il modello non le conosce. Inventa.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#f5c518">Stream</strong></td>
+          <td>Cosa sta succedendo adesso?</td>
+          <td>L'agente risponde come se il mondo fosse fermo.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#ff6b6b">Tool</strong></td>
+          <td>Cosa posso fare per verificare invece di supporre?</td>
+          <td>Il modello suppone. Con i tool: chiede, verifica, agisce.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#b5cea8">Reflection</strong></td>
+          <td>La mia risposta era buona? Avevo abbastanza contesto?</td>
+          <td>L'agente non impara mai dai propri errori o successi.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#9cdcfe">Memory</strong></td>
+          <td>Ho gia' visto questo pattern? Cosa ho imparato?</td>
+          <td>Ogni sessione riparte da zero.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box fade-in">
+      <p>Non tutti i layer servono sempre. Una query semplice ("cos'e' il CVSS?") non ha bisogno di RAG, stream o tool. Il meta-controller esiste proprio per questo: evitare di sparare con un cannone a un moscerino.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 — CAG
+         ============================================================ -->
+    <h2><span class="accent">//</span> CAG: Quello Che Sa Gia'</h2>
+    <span class="section-number">Sezione 02. Context-Augmented Generation: quando il system prompt basta</span>
+
+    <p>CAG significa mettere la conoscenza direttamente nel system prompt. Zero retrieval, zero latenza, zero infrastruttura. Il modello la vede dall'inizio di ogni conversazione come se fosse sua.</p>
+
+    <p>La domanda e': <em>cosa ci metti?</em></p>
+
+    <p>La risposta sbagliata e' "tutto". Se metti troppo nel system prompt diventa rumore, il modello non riesce a usarlo bene, e comunque ci sono limiti di contesto. Il CAG funziona per conoscenza <strong>stabile</strong>: roba che non cambia ogni mese.</p>
+
+    <div class="two-panel">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">✓ Buono per CAG</div>
+        <p>Principi fondamentali (CVSS, CIA triad, kill chain)</p>
+        <p>Tassonomie stabili (MITRE ATT&CK top-level)</p>
+        <p>Logiche di ragionamento (come prioritizzare un patch)</p>
+        <p>Definizioni che non cambiano</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">✗ Non per CAG</div>
+        <p>CVE specifiche (cambiano ogni giorno)</p>
+        <p>Exploit in the wild (cambiano ogni settimana)</p>
+        <p>Infrastrutture esposte (cambiano in real-time)</p>
+        <p>Qualsiasi cosa con una data di scadenza</p>
+      </div>
+    </div>
+
+    <p>Il mio CAG e' un file JSON con 10 concetti fondamentali della security. Ci ho messo cose come la differenza tra CVSS teorico ed exploitability reale, la distinzione IOC vs TTP, il concetto di defense-in-depth. Roba che un analista senior sa a memoria ma che un LLM senza contesto tende a trattare in modo approssimativo.</p>
+
+    <div class="code-block" data-lang="json">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code">{</td></tr>
+<tr><td class="ln">2</td><td class="code">  <span class="cs">"core_concepts"</span>: {</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cs">"patch_priority"</span>: <span class="cs">"Non patchare per CVSS in ordine decrescente.</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cs">      Priorita' reale: CVSS x exploitability x esposizione superficie.</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cs">      Un 7.0 con PoC pubblico e servizio esposto batte un 9.8 interno senza exploit."</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cs">"IOC_vs_TTP"</span>: <span class="cs">"IOC (IP, hash, domini) sono volatili.</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cs">      TTP (comportamenti) sono stabili e costosi da cambiare per l'attaccante.</span></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cs">      Difendere su TTP e' piu' efficace."</span></td></tr>
+<tr><td class="ln">9</td><td class="code">  }</td></tr>
+<tr><td class="ln">10</td><td class="code">}</td></tr>
+      </table></div>
+    </div>
+
+    <p>Quello che noti nelle risposte e' che il modello usa queste distinzioni in modo naturale. Quando analizza una CVE con CVSS 7.5 ma exploit Metasploit pubblico, dice esplicitamente "il CVSS base e' 7.5 ma la priorita' operativa e' CRITICAL perche' esiste un modulo Metasploit pronto all'uso". Questo ragionamento viene dal CAG.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il CAG non e' un database.</strong> E' piu' vicino alla memoria procedurale di un esperto: sa come ragionare, non solo cosa rispondere. La differenza si vede quando il modello deve combinare piu' concetti in un'analisi complessa.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 — RAG
+         ============================================================ -->
+    <h2><span class="accent">//</span> RAG: Quello Che Va a Cercare</h2>
+    <span class="section-number">Sezione 03. Retrieval su dati reali: NVD + MITRE ATT&CK</span>
+
+    <p>RAG significa: quando arriva una query, cerca nel corpus i pezzi piu' rilevanti e passali al modello insieme alla domanda. Il corpus e' aggiornabile senza retrainare niente.</p>
+
+    <p>Il punto critico e' il corpus. Se metti dentro documentazione generica o roba inventata, ottieni risposte generiche o inventate. Ho costruito il corpus con due fonti reali:</p>
+
+    <p><strong>NVD API v2.0:</strong> 2401 CVE reali degli ultimi 120 giorni, filtrate per CVSS ≥ 7 (CRITICAL + HIGH). Ogni CVE diventa un file di testo con descrizione, score, CWE, references. Aggiornabile con un comando.</p>
+
+    <p><strong>MITRE ATT&CK STIX bundle:</strong> il bundle ufficiale da GitHub di MITRE. 691 tecniche estratte con ID, tattiche, piattaforme, detection notes, mitigazioni. Formato testuale, indicizzato come tutto il resto.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Scarica CVE reali da NVD API v2.0</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">params</span> = {</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cs">'pubStartDate'</span>: start.<span class="cf">strftime</span>(<span class="cs">'%Y-%m-%dT%H:%M:%S.000'</span>),</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cs">'cvssV3Severity'</span>: <span class="cs">'CRITICAL'</span>,</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cs">'resultsPerPage'</span>: <span class="cn">100</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cs">'startIndex'</span>: offset,</td></tr>
+<tr><td class="ln">7</td><td class="code">}</td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cv">resp</span> = <span class="cv">session</span>.<span class="cf">get</span>(<span class="cs">'https://services.nvd.nist.gov/rest/json/cves/2.0'</span>, <span class="cv">params</span>=<span class="cv">params</span>)</td></tr>
+      </table></div>
+    </div>
+
+    <p>L'indicizzazione usa sentence-transformers con il modello <code>paraphrase-multilingual-MiniLM-L12-v2</code>. Ogni chunk del corpus viene trasformato in un vettore di 384 dimensioni. Al momento della query, la query stessa viene trasformata nello stesso spazio e si cercano i chunk piu' vicini per cosine similarity.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">retrieve</span>(<span class="cv">query</span>, <span class="cv">docs</span>, <span class="cv">embeddings</span>, <span class="cv">encoder</span>, <span class="cv">top_k</span>=<span class="cn">8</span>):</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="cv">q</span> = <span class="cv">encoder</span>.<span class="cf">encode</span>([<span class="cv">query</span>])</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">norms</span> = <span class="cv">np</span>.<span class="cf">linalg</span>.<span class="cf">norm</span>(<span class="cv">embeddings</span>, <span class="cv">axis</span>=<span class="cn">1</span>) * <span class="cv">np</span>.<span class="cf">linalg</span>.<span class="cf">norm</span>(<span class="cv">q</span>) + <span class="cn">1e-8</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">scores</span> = (<span class="cv">embeddings</span> @ <span class="cv">q</span>.<span class="cv">T</span>).<span class="cf">flatten</span>() / <span class="cv">norms</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cv">idx</span> = <span class="cv">np</span>.<span class="cf">argsort</span>(<span class="cv">scores</span>)[::<span class="cn">-1</span>][:<span class="cv">top_k</span>]</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="ck">return</span> [<span class="cv">docs</span>[<span class="cv">i</span>] <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cv">idx</span> <span class="ck">if</span> <span class="cv">scores</span>[<span class="cv">i</span>] > <span class="cn">0.28</span>]</td></tr>
+      </table></div>
+    </div>
+
+    <p>La soglia 0.28 non e' casuale: sotto quella similarity il chunk non e' abbastanza rilevante e fa piu' rumore che segnale. Meglio dare al modello 3 chunk pertinenti che 8 generici.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il problema del RAG che non si vede:</strong> se il corpus e' vecchio o superficiale, il retrieval trova roba, ma roba sbagliata. Il modello la usa comunque perche' ha una similarity ragionevole. Il risultato e' peggio di non avere RAG. Corpus di qualita' prima, retrieval dopo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 — Meta-controller
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Meta-controller</h2>
+    <span class="section-number">Sezione 04. Chi decide quale strada prendere</span>
+
+    <p>Il meta-controller e' il componente che mi ha convinto di piu' di tutta l'architettura. L'idea e' semplice: non ogni query ha bisogno della pipeline completa. Mandare tutto attraverso RAG + Stream + Tool per una domanda concettuale e' uno spreco. Ma non puoi nemmeno decidere a priori: dipende dalla query.</p>
+
+    <p>Ho implementato un sistema a due livelli:</p>
+
+    <p><strong>Livello 1: Pattern matching deterministico.</strong> Ogni route ha una serie di regex con pesi associati. La query viene scorata contro tutti i pattern. Se la confidence e' ≥ 0.75, la decisione e' presa senza chiamare nessun LLM.</p>
+
+    <p><strong>Livello 2: Fallback LLM (Haiku).</strong> Solo se la confidence e' sotto soglia. Usa il modello piu' veloce e cheap disponibile, non il modello principale. Non ha senso usare Sonnet per decidere se usare Sonnet.</p>
+
+    <div class="route-cards">
+      <div class="route-card rc-cag">
+        <div class="route-name">CAG Only</div>
+        <div class="route-desc">Risposta diretta dalla knowledge base. Nessun retrieval, nessun tool.</div>
+        <div class="route-when">quando: domande concettuali, definizioni, principi fondamentali</div>
+      </div>
+      <div class="route-card rc-rag">
+        <div class="route-name">CAG + RAG</div>
+        <div class="route-desc">Retrieval dal corpus NVD + MITRE. Per CVE specifiche o tecniche recenti.</div>
+        <div class="route-when">quando: CVE-ID, nomi di vulnerabilita', tecniche ATT&CK specifiche</div>
+      </div>
+      <div class="route-card rc-stream">
+        <div class="route-name">CAG + Stream</div>
+        <div class="route-desc">Analisi del traffico live senza retrieval esterno.</div>
+        <div class="route-when">quando: query sul traffico corrente, alert attivi</div>
+      </div>
+      <div class="route-card rc-full">
+        <div class="route-name">FULL</div>
+        <div class="route-desc">Tutti i layer. Attivato automaticamente quando lo stream segnala un attacco.</div>
+        <div class="route-when">quando: attacco rilevato, o query complessa con CVE + stream + tool</div>
+      </div>
+    </div>
+
+    <p>C'e' un override che scavalca tutto: se lo stream segnala un attacco attivo, il routing e' sempre FULL indipendentemente dalla query. Un attacco in corso e' sempre un caso FULL.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">route</span>(<span class="cv">self</span>, <span class="cv">query</span>: <span class="ct">str</span>, <span class="cv">attack_active</span>: <span class="ct">bool</span> = <span class="ck">False</span>) -> <span class="ct">RoutingDecision</span>:</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="cc"># override immediato: attacco in corso = sempre FULL</span></td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="ck">if</span> <span class="cv">attack_active</span>:</td></tr>
+<tr><td class="ln">4</td><td class="code">        <span class="ck">return</span> <span class="ct">RoutingDecision</span>(<span class="cv">route</span>=<span class="ct">Route</span>.<span class="cv">FULL</span>, <span class="cv">confidence</span>=<span class="cn">1.0</span>,</td></tr>
+<tr><td class="ln">5</td><td class="code">                              <span class="cv">method</span>=<span class="cs">'deterministic'</span>,</td></tr>
+<tr><td class="ln">6</td><td class="code">                              <span class="cv">reason</span>=<span class="cs">'stream: attacco attivo rilevato → upgrade a FULL pipeline'</span>)</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cv">scores</span> = <span class="cv">self</span>.<span class="cf">_score_patterns</span>(<span class="cv">query</span>)</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="cv">best_route</span> = <span class="cf">max</span>(<span class="cv">scores</span>, <span class="cv">key</span>=<span class="cv">scores</span>.<span class="cf">get</span>)</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="cv">confidence</span> = <span class="cv">scores</span>[<span class="cv">best_route</span>]</td></tr>
+<tr><td class="ln">11</td><td class="code"></td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">if</span> <span class="cv">confidence</span> &gt;= <span class="cn">0.75</span>:          <span class="cc"># deterministic</span></td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="ck">return</span> <span class="ct">RoutingDecision</span>(<span class="cv">route</span>=<span class="cv">best_route</span>, <span class="cv">confidence</span>=<span class="cv">confidence</span>,</td></tr>
+<tr><td class="ln">14</td><td class="code">                              <span class="cv">method</span>=<span class="cs">'deterministic'</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code">    <span class="ck">else</span>:                              <span class="cc"># fallback LLM (Haiku)</span></td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="ck">return</span> <span class="cv">self</span>.<span class="cf">_llm_route</span>(<span class="cv">query</span>, <span class="cv">scores</span>)</td></tr>
+      </table></div>
+    </div>
+
+    <p>Nella pratica il 90% delle query viene risolto al livello 1. Il LLM di fallback quasi non viene chiamato, il che e' esattamente il punto. Il meta-controller deve essere veloce e prevedibile, non intelligente.</p>
+
+    <p>C'e' un terzo segnale che quasi nessuno implementa: la <strong>confidence della risposta</strong>. Se il modello ha bassa confidence su quello che sa gia' (entropy alta sull'output), il routing viene upgradato automaticamente anche quando il pattern matching diceva CAG-only. L'idea e' semplice: evitare l'overconfidence del CAG. Un concetto che sembrava stabile potrebbe avere eccezioni che il modello non conosce. Il segnale di incertezza e' l'unico modo per accorgersene senza un umano in loop.</p>
+
+    <div class="insight-box fade-in">
+      <p>Confidence bassa non significa risposta sbagliata, significa che il modello sta operando ai limiti di quello che sa. In quel caso meglio recuperare contesto in piu' che fidarsi ciecamente del CAG.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 — Stream e Tool
+         ============================================================ -->
+    <h2><span class="accent">//</span> Stream e Tool</h2>
+    <span class="section-number">Sezione 05. Contesto live e capacita' di agire</span>
+
+    <p>Lo stream e' un thread in background che genera eventi continui: login attempts, richieste HTTP, connessioni TCP, alert. Il meta-controller lo drena ad ogni query e decide se e' rilevante per il routing.</p>
+
+    <p>La cosa importante e' questa: <strong>lo stream non viene solo letto, puo' forzare un cambio di strategia anche contro la query</strong>. Se arriva una domanda concettuale mentre c'e' un attacco attivo nello stream, il routing va a FULL indipendentemente da quello che ha chiesto l'utente. Lo stream non e' contesto passivo: e' un trigger che cambia il comportamento dell'agente. Questa e' roba da sistema reale, non demo.</p>
+
+    <p>I tool sono la parte che preferisco. Un LLM senza tool <em>suppone</em>. Un LLM con tool <em>verifica</em>. In security, supporre e' un bug.</p>
+
+    <p>Ho implementato tre tool:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Cosa fa</th>
+          <th>Fonte</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>query_cve</code></td>
+          <td>Recupera CVSS, CWE, descrizione, references di una CVE specifica</td>
+          <td>NVD API v2.0 (dati reali)</td>
+        </tr>
+        <tr>
+          <td><code>search_web</code></td>
+          <td>Cerca exploit pubblici, infrastrutture esposte, intelligence</td>
+          <td>Exploit-DB, Shodan, GreyNoise (mock con delay realistico)</td>
+        </tr>
+        <tr>
+          <td><code>run_code</code></td>
+          <td>Esegue codice Python in sandbox per analisi numerica, timeline, statistiche</td>
+          <td>subprocess con blocklist (no os, sys, open, eval)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Il modello decide da solo quando e quali tool usare. Non viene forzato. Se ritiene che per rispondere bene debba prima interrogare NVD, lo fa. Se deve calcolare statistiche su un dataset di eventi, esegue codice. Questo e' il punto: il tool use e' un'espressione di ragionamento, non un'API call schedulata.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>query_cve e' l'unico tool con dati reali al 100%.</strong> Colpisce la NVD API vera e torna dati reali. search_web e run_code sono mock o sandbox, abbastanza realistici da dimostrare il pattern, ma non esposti a internet in questo lab.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 — Reflection e Memory
+         ============================================================ -->
+    <h2><span class="accent">//</span> Reflection e Memory</h2>
+    <span class="section-number">Sezione 06. L'agente che si valuta e ricorda</span>
+
+    <p>Dopo ogni risposta l'agente fa una reflection: valuta la propria risposta su una scala 1-10, risponde a due domande booleane (<em>era utile il RAG? avrei fallito senza RAG?</em>), e identifica lacune e punti di forza.</p>
+
+    <p>Il punto che quasi nessuno implementa e' questo: <strong>la reflection dovrebbe influenzare il routing futuro</strong>. Se il modello scopre che avrebbe fallito senza RAG su una certa query, quel pattern dovrebbe essere promosso a "RAG-required" per le prossime query simili. Senza questo loop, reflection e routing sono due sistemi separati che non si parlano. Con questo loop, l'agente inizia davvero a evolvere. In questo lab il loop non e' ancora chiuso: ne parlo nella sezione finale.</p>
+
+    <p>Il risultato della reflection va in memoria. La memoria ha due layer:</p>
+
+    <p><strong>Semantic:</strong> conoscenza acquisita durante le sessioni. Principi appresi, pattern identificati. Sopravvive ai restart. Ha un decay: ogni giorno il score si riduce del 5%, e sotto 0.25 viene eliminata. La memoria che non viene rinforzata svanisce.</p>
+
+    <p><strong>Episodic:</strong> decisioni prese in passato. "Ho visto questo pattern e ho fatto questa analisi, con questo score". Utile per non ripetere gli stessi errori.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">apply_decay</span>(<span class="cv">self</span>):</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="cv">now</span> = <span class="cv">datetime</span>.<span class="cf">now</span>()</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="ck">for</span> <span class="cv">item</span> <span class="ck">in</span> <span class="cv">self</span>.<span class="cv">data</span>[<span class="cs">'semantic'</span>]:</td></tr>
+<tr><td class="ln">4</td><td class="code">        <span class="cv">days</span> = (<span class="cv">now</span> - <span class="cf">fromisoformat</span>(<span class="cv">item</span>[<span class="cs">'timestamp'</span>])).<span class="cv">days</span></td></tr>
+<tr><td class="ln">5</td><td class="code">        <span class="cv">item</span>[<span class="cs">'score'</span>] *= (<span class="cn">1</span> - <span class="cn">0.05</span>) ** <span class="cv">days</span>  <span class="cc"># 5% decay al giorno</span></td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cv">self</span>.<span class="cv">data</span>[<span class="cs">'semantic'</span>] = [</td></tr>
+<tr><td class="ln">7</td><td class="code">        <span class="cv">i</span> <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cv">self</span>.<span class="cv">data</span>[<span class="cs">'semantic'</span>] <span class="ck">if</span> <span class="cv">i</span>[<span class="cs">'score'</span>] >= <span class="cn">0.25</span></td></tr>
+<tr><td class="ln">8</td><td class="code">    ]</td></tr>
+      </table></div>
+    </div>
+
+    <p>Il decay e' fondamentale. Una memoria senza decay diventa rumore nel tempo: troppi episodi, troppi pattern, il retrieval trova tutto e non trova niente. Il 5% al giorno significa che una memoria non rinforzata sparisce in ~27 giorni (0.95^27 ≈ 0.25). Se e' importante, verra' rinforzata da nuovi episodi simili.</p>
+
+    <p><strong>La memoria non e' un log: e' conoscenza filtrata.</strong> Molti sistemi salvano tutto. Questo no. Quello che sopravvive al decay e' quello che ha dimostrato di essere utile piu' di una volta. Il resto sparisce. E' la differenza tra un archivio e una mente.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 — Il Lab: 3 Query
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab: Tre Query</h2>
+    <span class="section-number">Sezione 07. Lo stesso agente, tre comportamenti diversi</span>
+
+    <p>Per dimostrare che l'architettura funziona ho costruito un demo con tre query scelte apposta per attivare route diversi. Stessa istanza, stesso modello, stessa memoria. Cambia solo la query.</p>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/rag-cag-agente/01.png" alt="Query 1, CAG-only: credential stuffing vs brute force. Route: cag_only, confidence 100%, deterministic, tempo 45s" loading="lazy">
+      <figcaption>Query 1, CAG-only. "Cos'e' il credential stuffing?" → route: cag_only, confidence 100%, nessun retrieval, risposta dalla knowledge base. Il meta-controller non ha neanche considerato il RAG.</figcaption>
+    </figure>
+
+    <p>La prima query e' "Cos'e' il credential stuffing e come si distingue da un brute force classico?", una domanda concettuale. Il meta-controller la riconosce come CAG-only con confidence 100% e non tocca il corpus. Risposta in 45 secondi (generazione LLM, non retrieval).</p>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/rag-cag-agente/02.png" alt="Query 2, CAG+Stream: analisi traffico con attacco attivo. Route: full, confidence 100%, stream: 20 eventi con pattern di attacco rilevati" loading="lazy">
+      <figcaption>Query 2, CAG+Stream con override FULL. Attacco attivo nello stream → routing upgradato automaticamente. L'agente analizza 20 eventi e correla con tecniche MITRE dal corpus.</figcaption>
+    </figure>
+
+    <p>La seconda query e' "Analizza il traffico corrente". Prima di mandarla, trigghero un attacco nello stream. Il meta-controller vede l'attack_active flag, ignora il pattern matching, e va direttamente a FULL. L'agente analizza gli eventi, recupera le tecniche MITRE correlate dal corpus, e produce un'analisi con verdict esplicito.</p>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/rag-cag-agente/03.png" alt="Query 3, CAG+RAG+MCP: CVE-2024-6387 (regreSSHion). Tool calls: query_cve, search_web x3, run_code. Superficie esposta: 2.382 host Shodan, 1.065 IP GreyNoise malicious" loading="lazy">
+      <figcaption>Query 3, CAG+RAG+MCP. CVE-2024-6387 (regreSSHion): retrieval dal corpus NVD, query diretta NVD API, Shodan, GreyNoise, run_code per analisi statistica. Risk score: 10/10 operativo nonostante CVSS base 8.1.</figcaption>
+    </figure>
+
+    <p>La terza query e' "CVE-2024-6387: analisi e piano di remediation". Qui parte tutto: retrieval dal corpus NVD, query_cve per i dati reali, search_web su Shodan e GreyNoise per la superficie esposta, run_code per calcolare statistiche. Il modello arriva a un risk score operativo di 10/10 nonostante il CVSS base sia 8.1, perche' il CAG gli ha insegnato che CVSS base non e' priorita' reale.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 — Il Demo Finale
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Demo: PCAP Autonomo</h2>
+    <span class="section-number">Sezione 08. Zero query umane, zero intervento, incident report completo</span>
+
+    <p>Questo e' il pezzo che preferisco. Un PCAP reale di una CTF (AngstromCTF 2016, macchina Metasploitable). L'agente parte, monitora il replay del traffico, rileva l'attack chain da solo, e produce un incident report completo senza che nessuno gli faccia domande.</p>
+
+    <p>Il PCAP contiene un'attack chain in tre fasi:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Fase</th><th>Evento</th><th>MITRE</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1. Exploitation</td>
+          <td>POST /wp-admin/admin-post.php, upload tema malevolo via plugin MailPoet/Wysija</td>
+          <td>T1190</td>
+        </tr>
+        <tr>
+          <td>2. Installation</td>
+          <td>GET /wp-content/uploads/wysija/themes/[random]/[random].php, esecuzione webshell</td>
+          <td>T1505.003</td>
+        </tr>
+        <tr>
+          <td>3. C2</td>
+          <td>TCP 192.168.1.7 → 192.168.1.13:4444, Meterpreter reverse shell</td>
+          <td>T1071.001</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>L'agente rileva ogni fase man mano che arriva dal replay. Quando vede la connessione C2 su porta 4444, la firma inequivocabile di Metasploit: scatta l'alert: attack chain completa. A quel punto parte la generazione del report.</p>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/rag-cag-agente/04.png" alt="run_incident.py: monitoring PCAP in real-time, rilevamento attack chain (exploit_upload, webshell_exec, c2_connection), incident report con CVE-2014-4725, kill chain ricostruita, IOC, azioni immediate" loading="lazy">
+      <figcaption>run_incident.py, autonomo. In alto: il monitoring live con i 3 eventi dell'attack chain rilevati in sequenza. In basso: l'incident report generato autonomamente con CVE-2014-4725, kill chain, IOC, superficie esposta, azioni immediate.</figcaption>
+    </figure>
+
+    <p>Il report che produce e' questo:</p>
+
+    <ul>
+      <li><strong>CVE-2014-4725</strong>: trovata autonomamente dal modello a partire dal path <code>wysija</code> nell'URI. Non gliel'ho detta io.</li>
+      <li><strong>CVSS 7.5 HIGH</strong> → elevato a CRITICAL operativo perche' esiste un modulo Metasploit nativo. Ragionamento CAG applicato.</li>
+      <li><strong>Kill chain ricostruita</strong> con timestamp precisi: exploit T+2.391s, webshell T+3.023s, C2 T+3.026s. Totale exploit-to-C2: 0.635 secondi.</li>
+      <li><strong>Analisi traffico C2</strong>: burst iniziale di ~4KB in 6ms = staged Meterpreter payload. Beacon interval medio 116ms.</li>
+      <li><strong>IOC</strong>: IP, URI webshell, porta C2, User-Agent Metasploit hardcoded.</li>
+      <li><strong>Azioni immediate</strong> ordinate per priorita': isolamento host, blocco porta 4444, revoca credenziali, rimozione webshell, hardening nginx, detection rules SIEM.</li>
+    </ul>
+
+    <p>Sette tool call in autonomia. Nessuna istruzione da parte mia su quale CVE cercare, quali tool usare, come strutturare il report. L'agente lo ha deciso da solo basandosi su quello che ha visto nel traffico, quello che sapeva gia' (CAG), e quello che ha recuperato live (RAG + tool).</p>
+
+    <p>La cosa interessante non e' che trova la CVE. E' che capisce che deve cercarla.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Una precisazione importante:</strong> il PCAP e' del 2016. CVE-2014-4725 ha 10 anni. In un contesto reale questo sistema avrebbe gia' la CVE nel corpus NVD, ma non l'avrebbe nel corpus degli ultimi 120 giorni. Per un agente in produzione il corpus dovrebbe avere storia piu' lunga, o un tool di ricerca storica. Questo e' un lab didattico, non uno strumento SOC.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 — Conclusione
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Manca Ancora</h2>
+    <span class="section-number">Sezione 09. Dove si rompe tutto e cosa farei diversamente</span>
+
+    <p>L'architettura funziona, ma ci sono pezzi che in produzione mi preoccuperebbero.</p>
+
+    <p><strong>Il corpus decade.</strong> NVD e MITRE ATT&CK vengono aggiornati continuamente. Il corpus va ricostruito periodicamente, altrimenti il RAG recupera roba vecchia con alta confidence. Non e' un problema tecnico difficile, e' un problema operativo che si dimentica.</p>
+
+    <p><strong>La reflection non migliora il routing.</strong> Il meta-controller non impara dalle reflection. Se continuamente prende decisioni di routing sbagliate su certi pattern, nessuno glielo dice. Un loop di feedback routing → reflection → aggiornamento pattern sarebbe il passo successivo.</p>
+
+    <p><strong>Il tool use e' mock per search_web.</strong> In un sistema reale search_web colpirebbe Shodan API, GreyNoise API, Exploit-DB. Con key reali, rate limiting, gestione errori. Non complicato, ma non e' implementato qui.</p>
+
+    <p><strong>La memoria e' locale e non condivisa.</strong> In un SOC reale vorresti memoria condivisa tra piu' istanze dell'agente. Se un'istanza impara qualcosa su un pattern di attacco, le altre dovrebbero beneficiarne. Questo richiede un backend centralizzato, non un file JSON.</p>
+
+    <p>Detto questo: l'idea base funziona. Un agente che combina conoscenza stabile (CAG), retrieval su dati freschi (RAG), contesto live (stream), capacita' di agire (tool), auto-valutazione (reflection), e memoria persistente (memory) si comporta in modo qualitativamente diverso da un LLM nudo. Non inventa CVE. Non ignora il traffico. Non dimentica quello che ha fatto ieri.</p>
+
+    <p>E' un inizio.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">
+        "Un agente AI non e' un LLM con un bel wrapper.<br>
+        E' un sistema che sa cosa sa, sa cosa non sa,<br>
+        e sa dove andare a cercarlo."
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Codice:</strong> tutto il lab e' disponibile in <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/rag-cag-agente" target="_blank" rel="noopener">scripts/rag-cag-agente</a>. Prerequisiti: Python 3.10+, tshark (Wireshark), chiave NVD API (gratuita), ANTHROPIC_API_KEY. Il PCAP e' incluso.</p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
