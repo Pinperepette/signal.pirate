@@ -1,0 +1,15 @@
+{
+  "core_concepts": {
+    "CVSS_v31": "Score 0-10: Critical>=9.0, High>=7.0, Medium>=4.0, Low<4.0. Il CVSS Base non misura exploitability reale: un 9.8 senza PoC e' meno urgente di un 7.2 con exploit in the wild.",
+    "CIA_triad": "Confidentiality / Integrity / Availability. Base di ogni analisi di rischio.",
+    "kill_chain": "Reconnaissance -> Weaponization -> Delivery -> Exploitation -> Installation -> C2 -> Actions. MITRE ATT&CK mappa le fasi post-delivery in dettaglio.",
+    "IOC_vs_TTP": "IOC (IP, hash, domini) sono volatili. TTP (comportamenti) sono stabili e costosi da cambiare. Difendere su TTP e' piu' efficace.",
+    "defense_in_depth": "Nessun controllo singolo e' sufficiente. Layer sovrapposti: perimetro, endpoint, identita', dati, monitoraggio.",
+    "zero_trust": "Non fidarsi mai implicitamente, verificare sempre. Microsegmentazione, least privilege, MFA ovunque.",
+    "patch_priority": "Non patchare per CVSS score decrescente. Priorita' reale: CVSS x exploitability x esposizione superficie.",
+    "lateral_movement": "Post-compromissione: Pass-the-Hash, Kerberoasting, Living-off-the-Land. Il rilevamento e' piu' difficile del punto d'ingresso.",
+    "RAG": "Retrieval-Augmented Generation: recupera chunk rilevanti via embedding similarity. Per corpus che cambia frequentemente.",
+    "CAG": "Context-Augmented Generation: knowledge pre-caricata nel system prompt. Zero latenza. Per concetti stabili."
+  },
+  "compressed_memory": "La differenza tra un analista mediocre e uno bravo non e' la conoscenza dei concetti base — e' la capacita' di collegare un pattern di traffico anomalo a una tecnica ATT&CK specifica, e quella tecnica a una CVE recente con exploit disponibile."
+}

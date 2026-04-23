@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Agente Che Costruisce Conoscenza | Signal Pirate</title>
+  <meta name="description" content="Perche' memoria non basta. Come aggiungere un knowledge graph dinamico tra Memory e CAG per trasformare un agente da stateless a sistema che costruisce conoscenza strutturata nel tempo. Obsidian, backlink, grafo, promozione automatica. Lab completo.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    .ck { color: #7c4dff; }
+    .cs { color: #00ff88; }
+    .cn { color: #b5cea8; }
+    .cc { color: #6a6a8a; }
+    .cf { color: #4ecdc4; }
+    .cv { color: #9cdcfe; }
+    .ct { color: #4ec9b0; }
+    .co { color: #d4d4d4; }
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.5;
+    }
+
+    .arch-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .arch-layer {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.3rem 0;
+    }
+    .arch-label {
+      min-width: 160px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    .arch-desc {
+      color: #6a6a8a;
+      font-size: 0.72rem;
+    }
+    .arch-arrow {
+      color: rgba(0,255,136,0.4);
+      font-size: 0.9rem;
+      text-align: center;
+      padding-left: 2rem;
+    }
+    .l-meta   { color: #7c4dff; }
+    .l-cag    { color: #4ecdc4; }
+    .l-wiki   { color: #f5c518; }
+    .l-rag    { color: #00ff88; }
+    .l-stream { color: #ff9f43; }
+    .l-tool   { color: #ff6b6b; }
+    .l-ref    { color: #b5cea8; }
+    .l-mem    { color: #9cdcfe; }
+
+    .two-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 1.5rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    @media (max-width: 768px) { .two-panel { grid-template-columns: 1fr; } }
+    .panel-side { padding: 1.5rem; }
+    .panel-left {
+      background: rgba(0,255,136,0.05);
+      border-right: 1px solid var(--border-subtle);
+    }
+    .panel-right { background: rgba(124,77,255,0.05); }
+    .panel-side-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    .panel-left .panel-side-title  { color: var(--accent-attention); }
+    .panel-right .panel-side-title { color: #7c4dff; }
+    .panel-side p { font-size: 0.82rem; line-height: 1.6; margin: 0.4rem 0; }
+
+    .route-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .route-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .route-card:hover { transform: translateY(-2px); }
+    .route-name {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .route-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .route-when {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      margin-top: 0.6rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+    .rc-cag    { border-color: #4ecdc4; }
+    .rc-cag    .route-name { color: #4ecdc4; }
+    .rc-wiki   { border-color: #f5c518; }
+    .rc-wiki   .route-name { color: #f5c518; }
+    .rc-rag    { border-color: #00ff88; }
+    .rc-rag    .route-name { color: #00ff88; }
+    .rc-stream { border-color: #ff9f43; }
+    .rc-stream .route-name { color: #ff9f43; }
+    .rc-full   { border-color: #7c4dff; }
+    .rc-full   .route-name { color: #7c4dff; }
+
+    .wiki-note {
+      background: #0d1117;
+      border: 1px solid rgba(245,197,24,0.2);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+    }
+    .wiki-note-title {
+      font-weight: 800;
+      color: #f5c518;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+    .wiki-note .wl { color: #4ecdc4; }
+    .wiki-note .wt { color: #6a6a8a; }
+    .wiki-note .wa { color: #9cdcfe; }
+    .wiki-note .wn { color: #c8c8d8; }
+
+    .wiki-graph {
+      background: #0d1117;
+      border: 1px solid rgba(245,197,24,0.15);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 2;
+    }
+    .wiki-graph .wg-node { color: #f5c518; font-weight: 700; }
+    .wiki-graph .wg-edge { color: rgba(0,255,136,0.5); }
+    .wiki-graph .wg-tag  { color: #6a6a8a; }
+
+    .flow-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 2.2;
+      text-align: center;
+    }
+    .flow-step { font-weight: 700; }
+    .flow-arrow { color: rgba(0,255,136,0.4); }
+    .flow-new { color: #f5c518; font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-04-23 | Pinperepette</p>
+    <h1 class="article-page-title">L'Agente Che <span class="accent">Costruisce Conoscenza</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Perche' memoria non basta. Serve un knowledge graph che si costruisce da solo.
+    </p>
+    <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; opacity: 0.7;">
+      Seguito di <a href="l-agente-che-non-inventa.html" style="color: var(--accent-attention);">L'Agente Che Non Inventa</a>
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Knowledge Graph</span>
+      <span class="tag tag-highlight">Knowledge Layer</span>
+      <span class="tag tag-reaction">AI Agent</span>
+      <span class="tag tag-amplification">Obsidian</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 10 — Memory non basta
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Problema</h2>
+    <span class="section-number">Sezione 10. La memoria non basta</span>
+
+    <p style="font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--accent-attention); line-height: 1.8; margin-bottom: 1.5rem;">Un agente senza knowledge graph ricorda fatti.<br>Un agente con knowledge graph capisce pattern.</p>
+
+    <p>Nell'<a href="l-agente-che-non-inventa.html">articolo precedente</a> ho costruito un agente a 7 layer. Funziona. Sa cosa sa, sa cosa non sa, sa dove andare a cercarlo. Ma dopo averlo usato per un po' mi sono accorto di un limite che non si vede finche' non ci sbatti contro.</p>
+
+    <p>L'agente vede CVE-2024-6387 il giorno 1. Vede CVE-2024-3094 il giorno 5. Entrambe riguardano OpenSSH. Entrambe sono CRITICAL. Ma nella sua memoria sono questo:</p>
+
+    <div class="two-panel">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">Memoria (piatta)</div>
+        <p style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 2;">
+          CVE-2024-6387 &nbsp;[score 9]<br>
+          CVE-2024-3094 &nbsp;[score 9]<br>
+          CVE-2024-XXXX &nbsp;[score 8]
+        </p>
+        <p style="margin-top: 0.8rem; opacity: 0.7;">Un elenco. Nessuna relazione.</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">Knowledge Graph</div>
+        <p style="font-family: var(--font-mono); font-size: 0.8rem; line-height: 2; white-space: pre;">       OpenSSH
+      /        \
+CVE-6387    CVE-3094
+  |            |
+Race       Supply
+Condition   Chain</p>
+      </div>
+    </div>
+
+    <p>A sinistra: tre fatti isolati. A destra: un pattern — stesso target, vettori diversi, relazione strutturale. L'informazione e' la stessa. La differenza e' che a destra l'agente <em>capisce</em> che sono collegati. A sinistra deve rifare un RAG completo ogni volta per scoprirlo.</p>
+
+    <p>La memory ha due layer che funzionano bene. <strong>Episodic</strong>: cosa e' successo. <strong>Semantic</strong>: cosa ho imparato. Ma nessuno dei due e' navigabile. Non puoi esplorare la memoria. Non puoi collegare concetti. Non puoi aggiornarla in modo strutturato. E' un log intelligente con un motore di ricerca.</p>
+
+    <p>Quello che manca e' il <strong>grafo delle relazioni</strong>.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Cosa fa</th>
+          <th>Limite</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#9cdcfe">Memory</strong></td>
+          <td>Ricorda il passato</td>
+          <td>Piatto. Nessuna relazione tra i fatti.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#00ff88">RAG</strong></td>
+          <td>Cerca nel corpus</td>
+          <td>Non impara. Ogni query riparte da zero.</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#f5c518">Knowledge Graph</strong></td>
+          <td>Collega, struttura, evolve</td>
+          <td>Quello che manca.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Se manca il terzo: l'agente sa tante cose, ma non le capisce nel tempo. Ogni sessione e' una foto isolata, non un film.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="9" data-suffix=" note">0</div>
+        <div class="stat-label">Knowledge graph in 3 query</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green" data-count="17" data-suffix=" link">0</div>
+        <div class="stat-label">Grafo di relazioni</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="0" data-suffix=" RAG">0</div>
+        <div class="stat-label">Query 3: bypass retrieval</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red" data-count="3" data-suffix=" query">0</div>
+        <div class="stat-label">Reali via API</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 11 — Il Knowledge Layer
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Knowledge Layer</h2>
+    <span class="section-number">Sezione 11. Un knowledge graph tra Memory e CAG</span>
+
+    <p>La soluzione e' aggiungere un layer tra Memory e CAG. Non sostituire nessuno dei due: inserire qualcosa che faccia da ponte. Non documentazione. Un <strong>knowledge graph dinamico che l'agente costruisce da solo</strong>, interazione dopo interazione.</p>
+
+    <div class="flow-diagram">
+      <span class="flow-step" style="color:#9cdcfe">MEMORY</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-new">KNOWLEDGE GRAPH</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step" style="color:#4ecdc4">CAG</span>
+    </div>
+
+    <p><strong>Memory</strong> = il passato. Cosa e' successo, cosa ho fatto, con quale risultato.</p>
+    <p><strong>Knowledge Graph</strong> = la comprensione. Concetti atomici collegati da relazioni esplicite. Navigabile, esplorabile, vivo.</p>
+    <p><strong>CAG</strong> = l'azione. Quello che l'agente tiene nel system prompt perche' lo usa ad ogni query.</p>
+
+    <p>Passato, comprensione, azione. Tre layer, tre funzioni cognitive diverse. La memoria cattura tutto. Il knowledge graph filtra, struttura e collega. Il CAG prende solo il meglio del grafo e lo mette a disposizione istantaneamente.</p>
+
+    <p>La promozione non e' manuale. L'agente decide da solo cosa promuovere. Dopo ogni risposta con reflection score >= 7, estrae i concetti chiave, crea nodi nel grafo, e li collega a quelli esistenti. Se un nodo viene acceduto abbastanza volte (>= 3), viene promosso a CAG. Se un concetto nel CAG smette di essere usato per piu' di 60 giorni, viene degradato al grafo.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Promozione: Memory → Wiki</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">if</span> <span class="cv">reflection</span>.<span class="cv">score</span> >= <span class="cn">7</span>:</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">concepts</span> = <span class="cv">extract_concepts</span>(<span class="cv">query</span>, <span class="cv">answer</span>)</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">wiki</span>.<span class="cf">create_note</span>(<span class="cv">concepts</span>[<span class="cn">0</span>], <span class="cv">content</span>, <span class="cv">links</span>=<span class="cv">concepts</span>[<span class="cn">1</span>:])</td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cc"># Promozione: Wiki → CAG</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="ck">if</span> <span class="cv">note</span>.<span class="cv">access_count</span> >= <span class="cn">3</span>:</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cv">cag</span>[<span class="cv">note</span>.<span class="cv">title</span>] = <span class="cv">note</span>.<span class="cv">content</span></td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cc"># Demozione: CAG → Wiki</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="ck">if</span> <span class="cv">days_since_access</span> > <span class="cn">60</span> <span class="ck">and</span> <span class="cv">note</span>.<span class="cv">access_count</span> < <span class="cn">2</span>:</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">del</span> <span class="cv">cag</span>[<span class="cv">key</span>]</td></tr>
+      </table></div>
+    </div>
+
+    <p>Il CAG non cresce all'infinito. Ha un cap di 20 concetti. Se vuoi aggiungerne uno e il cap e' pieno, devi degradarne uno vecchio. Il result: il system prompt resta snello, e contiene solo la conoscenza che l'agente usa davvero.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Non e' documentazione. Non e' un database.</strong> E' un knowledge graph che si costruisce da solo e che evolve nel tempo. Puoi promuovere nodi dal grafo al CAG. Puoi degradare concetti dal CAG al grafo. Il CAG statico della prima versione diventa un sistema vivo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 12 — Perche' un Knowledge Graph e non un DB
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' un Knowledge Graph</h2>
+    <span class="section-number">Sezione 12. Un database salva dati. Un knowledge graph salva relazioni.</span>
+
+    <p>La domanda ovvia e': perche' non usare un database? PostgreSQL, SQLite, un vector store, qualcosa di strutturato con query SQL.</p>
+
+    <p>Perche' un database salva dati. Un knowledge graph salva <strong>relazioni</strong>.</p>
+
+    <p>Quando l'agente analizza CVE-2024-6387, non produce un record con 5 campi. Produce una rete di concetti collegati:</p>
+
+    <div class="wiki-graph">
+      <span class="wg-node">CVE-2024-6387</span><br>
+      <span class="wg-edge">&nbsp;&nbsp;→ </span>sfrutta una <span class="wg-node">Race Condition</span><br>
+      <span class="wg-edge">&nbsp;&nbsp;→ </span>in <span class="wg-node">OpenSSH</span><br>
+      <span class="wg-edge">&nbsp;&nbsp;→ </span>tecnica MITRE <span class="wg-node">T1190</span><br>
+      <span class="wg-edge">&nbsp;&nbsp;→ </span>exploit Metasploit disponibile<br>
+      <span class="wg-edge">&nbsp;&nbsp;→ </span>priorita' operativa: CRITICAL<br>
+      <span class="wg-tag">&nbsp;&nbsp;#cve #critical #network #exploit</span>
+    </div>
+
+    <p>Non e' un graph database. Non e' Neo4j, non e' un triple store, non e' niente che richieda un server. E' un <strong>grafo emergente costruito da note e link</strong>. File Markdown con <code>[[backlink]]</code> dentro. Il grafo non lo disegni tu: emerge dalle relazioni che l'agente crea mentre lavora.</p>
+
+    <p>Questo grafo di relazioni e' esattamente il tipo di struttura che un agente puo' riusare. Quando arriva una nuova CVE che riguarda OpenSSH, il knowledge graph la collega automaticamente al nodo esistente, perche' i concetti vengono estratti e normalizzati. Quando l'agente vede "race condition" in un altro contesto, ha gia' il collegamento. Un database puo' farlo, ma devi modellarlo esplicitamente. Qui le relazioni emergono automaticamente dalle interazioni.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 13 — Perche' Obsidian
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' Obsidian Come Backend</h2>
+    <span class="section-number">Sezione 13. Il knowledge graph ha bisogno di un formato. Obsidian e' perfetto.</span>
+
+    <p>Il knowledge graph e' il concetto. Serve un formato concreto per implementarlo. Obsidian e' perfetto per quattro ragioni:</p>
+
+    <p><strong>File-based:</strong> ogni nota e' un file Markdown. Un LLM sa leggere e scrivere Markdown. Non serve un driver, un ORM, una connessione. <code>path.write_text()</code> e hai fatto.</p>
+
+    <p><strong>Link-based:</strong> i backlink <code>[[nota]]</code> creano un grafo navigabile. L'agente scrive <code>[[OpenSSH]]</code> dentro la nota di una CVE, e il link esiste. Non devi definire uno schema, non devi creare tabelle di relazione.</p>
+
+    <p><strong>Locale:</strong> tutto resta sul disco. Per un agente che gira con un LLM locale (Ollama, llama.cpp) questo e' fondamentale. Zero dipendenze esterne, zero latenza di rete, zero rischi di privacy.</p>
+
+    <p><strong>Gia' pensato come "second brain":</strong> Obsidian nasce per costruire conoscenza nel tempo. Il graph view, i tag, le query Dataview: sono esattamente i tool che servono per navigare la conoscenza di un agente. E la cosa bella e' che funziona anche per l'umano: puoi aprire il vault del tuo agente in Obsidian e navigare il suo grafo.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 14 — Struttura del Wiki
+         ============================================================ -->
+    <h2><span class="accent">//</span> Struttura del Knowledge Graph</h2>
+    <span class="section-number">Sezione 14. Note atomiche, link espliciti, Agent Notes</span>
+
+    <p>Il knowledge graph si materializza come un vault Obsidian-compatibile. Ogni nodo e' un file Markdown con frontmatter YAML, contenuto atomico, e una sezione speciale: le Agent Notes.</p>
+
+    <div class="wiki-note">
+      <div class="wiki-note-title">CVE-2024-6387.md</div>
+      <span class="wt">---</span><br>
+      <span class="wt">title:</span> <span class="wn">CVE-2024-6387</span><br>
+      <span class="wt">type:</span> <span class="wn">concept</span><br>
+      <span class="wt">tags:</span> <span class="wn">[cve, critical, network, exploit]</span><br>
+      <span class="wt">created:</span> <span class="wn">2026-04-21 14:30</span><br>
+      <span class="wt">access_count:</span> <span class="wn">4</span><br>
+      <span class="wt">---</span><br>
+      <br>
+      <span class="wn">CVE-2024-6387 (regreSSHion) e' una </span><span class="wl">[[Race Condition]]</span><span class="wn"> nel signal</span><br>
+      <span class="wn">handler di </span><span class="wl">[[OpenSSH]]</span><span class="wn"> server (sshd) versioni 8.5p1-9.7p1.</span><br>
+      <span class="wn">CVSS base 8.1, priorita' operativa CRITICAL.</span><br>
+      <span class="wn">Tecnica MITRE: </span><span class="wl">[[T1190]]</span><br>
+      <br>
+      <span class="wa">## Agent Notes</span><br>
+      <span class="wa">- Exploit pubblico disponibile (Metasploit)</span><br>
+      <span class="wa">- Priorita' reale: CRITICAL (confidence 0.94)</span><br>
+      <span class="wa">- RAG necessario (score: 9/10)</span><br>
+      <span class="wa">- Fonti: nvd/CVE-2024-6387, mitre/T1190</span><br>
+      <br>
+      <span class="wt">#cve #critical #network #exploit</span>
+    </div>
+
+    <p>La struttura ha quattro elementi:</p>
+
+    <p><strong>1. Una nota = un concetto.</strong> Atomica. <code>CVE-2024-6387.md</code>, <code>OpenSSH.md</code>, <code>Race Condition.md</code>. Non un documento lungo con tutto dentro.</p>
+
+    <p><strong>2. Link espliciti.</strong> <code>CVE-2024-6387 sfrutta una [[Race Condition]] in [[OpenSSH]]</code>. I link creano il grafo. Obsidian li rende cliccabili e mostra i backlink.</p>
+
+    <p><strong>3. Tag semantici.</strong> <code>#cve #critical #network #exploit</code>. Utili per filtrare e raggruppare.</p>
+
+    <p><strong>4. Agent Notes.</strong> Qui sta la magia. Questa sezione viene scritta dall'agente, non dall'umano. Contiene le annotazioni operative: exploit disponibile, priorita' reale, confidence, fonti. Ogni volta che l'agente rivede un concetto, puo' aggiungere nuove note.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Le Agent Notes non sono la risposta dell'agente.</strong> Sono meta-conoscenza: cosa l'agente ha imparato su questo concetto durante le sue analisi. La risposta va all'utente. Le Agent Notes vanno nel knowledge graph. Sono due cose diverse.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 15 — Come l'agente usa il Wiki
+         ============================================================ -->
+    <h2><span class="accent">//</span> Come l'Agente Usa il Knowledge Graph</h2>
+    <span class="section-number">Sezione 15. Tre casi, tre comportamenti diversi</span>
+
+    <p>Il knowledge graph non viene usato sempre. Come il RAG, viene attivato solo quando serve. Il meta-controller decide.</p>
+
+    <div class="two-panel">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">Query semplice</div>
+        <p>"Cos'e' il CVSS?"</p>
+        <p>→ usa CAG</p>
+        <p>→ ignora knowledge graph</p>
+        <p>→ ignora RAG</p>
+        <p style="opacity:0.6">Nessun overhead.</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">Query complessa</div>
+        <p>"Pattern di attacco su OpenSSH"</p>
+        <p>→ cerca nel grafo PRIMA del RAG</p>
+        <p>→ trova nodi collegati</p>
+        <p>→ se il grafo basta, bypassa il RAG</p>
+        <p style="opacity:0.6">Zero latenza di retrieval.</p>
+      </div>
+    </div>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Il meta-controller cerca nel wiki prima del RAG</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">if</span> <span class="cv">concept_in_wiki</span>(<span class="cv">query</span>):</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="ck">return</span> <span class="ct">Route</span>.<span class="cv">CAG_WIKI</span>    <span class="cc"># bypass RAG</span></td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="ck">if</span> <span class="cv">requires_fresh_data</span>(<span class="cv">query</span>):</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="ck">return</span> <span class="ct">Route</span>.<span class="cv">CAG_RAG</span>     <span class="cc"># retrieval classico</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>E dopo ogni risposta:</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Dopo la reflection: aggiorna il wiki</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">if</span> <span class="cv">reflection</span>.<span class="cv">score</span> >= <span class="cn">7</span>:</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">notes</span> = <span class="cv">knowledge</span>.<span class="cf">maybe_promote_to_wiki</span>(<span class="cv">query</span>, <span class="cv">answer</span>, <span class="cv">reflection</span>)</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cc"># → crea note, estrae concetti, collega al grafo</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cv">promoted</span> = <span class="cv">knowledge</span>.<span class="cf">maybe_promote_to_cag</span>()</td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cc"># → se una nota ha >= 3 accessi, diventa CAG</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>Il terzo caso e' il piu' interessante: <strong>nuova conoscenza</strong>. Quando l'agente analizza qualcosa di nuovo e la reflection da' un buon punteggio, il knowledge layer estrae automaticamente i concetti (CVE, tecniche, software), crea nodi nel grafo, e li collega ai nodi esistenti. I nodi linkati che non esistono ancora vengono creati come stub, pronti per essere arricchiti in futuro.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 16 — L'architettura aggiornata
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Architettura V2</h2>
+    <span class="section-number">Sezione 16. Il nuovo routing e la pipeline completa</span>
+
+    <p>La pipeline dell'articolo precedente aveva 7 layer. Questa ne ha 8: il knowledge graph si inserisce tra CAG e RAG, e aggiunge un nuovo route al meta-controller.</p>
+
+    <div class="arch-diagram">
+      <div class="arch-layer">
+        <span class="arch-label l-meta">META-CONTROLLER V2</span>
+        <span class="arch-desc">→ decide il percorso, ora include check knowledge graph</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-cag">CAG</span>
+        <span class="arch-desc">→ conoscenza stabile (ora puo' evolvere via promozione grafo→CAG)</span>
+      </div>
+      <div class="arch-layer">
+        <span class="arch-label l-wiki">KNOWLEDGE GRAPH</span>
+        <span class="arch-desc">→ conoscenza strutturata: nodi atomici, backlink, grafo navigabile</span>
+      </div>
+      <div class="arch-layer">
+        <span class="arch-label l-rag">RAG</span>
+        <span class="arch-desc">→ retrieval su corpus esterno (bypassato se il grafo basta)</span>
+      </div>
+      <div class="arch-layer">
+        <span class="arch-label l-stream">STREAM</span>
+        <span class="arch-desc">→ eventi live dal mondo reale</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-tool">TOOL / MCP</span>
+        <span class="arch-desc">→ azioni reali: query NVD, ricerca exploit</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-ref">REFLECTION</span>
+        <span class="arch-desc">→ auto-valutazione</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-mem">MEMORY</span>
+        <span class="arch-desc">→ memoria persistente con decay</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-layer">
+        <span class="arch-label l-wiki">KNOWLEDGE GRAPH (update)</span>
+        <span class="arch-desc">→ promozione automatica: score >= 7 → crea/aggiorna nodi</span>
+      </div>
+    </div>
+
+    <p>Il meta-controller V2 ha un route in piu':</p>
+
+    <div class="route-cards">
+      <div class="route-card rc-cag">
+        <div class="route-name">CAG Only</div>
+        <div class="route-desc">Risposta diretta dalla knowledge base.</div>
+        <div class="route-when">domande concettuali, definizioni</div>
+      </div>
+      <div class="route-card rc-wiki">
+        <div class="route-name">CAG + Knowledge Graph</div>
+        <div class="route-desc">Concetto nel grafo. Arricchisce con relazioni, bypassa RAG.</div>
+        <div class="route-when">concetti gia' analizzati, correlazioni, storico</div>
+      </div>
+      <div class="route-card rc-rag">
+        <div class="route-name">CAG + RAG</div>
+        <div class="route-desc">Retrieval dal corpus. Per dati freschi non ancora nel grafo.</div>
+        <div class="route-when">CVE nuove, tecniche non ancora viste</div>
+      </div>
+      <div class="route-card rc-stream">
+        <div class="route-name">CAG + Stream</div>
+        <div class="route-desc">Analisi traffico live.</div>
+        <div class="route-when">query su traffico corrente, alert</div>
+      </div>
+      <div class="route-card rc-full">
+        <div class="route-name">FULL</div>
+        <div class="route-desc">Tutti i layer. Knowledge Graph + RAG + Stream + Tool.</div>
+        <div class="route-when">attacco attivo, query complessa</div>
+      </div>
+    </div>
+
+    <p>Il cambio di routing e' la parte interessante. La prima volta che l'agente vede OpenSSH, prende la strada RAG. La seconda, la terza: knowledge graph. Il routing si adatta automaticamente alla conoscenza accumulata. Non devi configurare niente.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il knowledge graph non sostituisce il RAG.</strong> Lo complementa. Per dati freschi che l'agente non ha mai visto, il RAG resta indispensabile. Il grafo serve per quello che l'agente ha gia' analizzato e strutturato. La differenza e' tra "cercare di nuovo" e "sapere gia'".</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 17 — Il Lab
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab: Tre Fasi</h2>
+    <span class="section-number">Sezione 17. Lo stesso agente, tre giorni diversi, il knowledge graph che cresce</span>
+
+    <p>Il lab simula tre fasi temporali. Giorno 1, giorno 5, giorno 10. Stessa istanza, stesso grafo vuoto all'inizio. Alla fine: una rete di conoscenza strutturata che la memoria piatta non potrebbe costruire.</p>
+
+
+    <h3>Fase 1 — Giorno 1: CVE-2024-6387</h3>
+
+    <p>L'agente analizza CVE-2024-6387 (regreSSHion). La reflection da' 9/10. Il knowledge layer decide: score >= 7, promuovi al grafo.</p>
+
+    <p>Concetti estratti: <code>CVE-2024-6387</code>, <code>OpenSSH</code>, <code>Race Condition</code>, <code>T1190</code>. Quattro nodi creati, collegati tra loro. Ogni nodo ha le sue Agent Notes con priorita' operativa, fonti, confidence.</p>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/l-agente-che-costruisce-conoscenza/01_fase1.png" alt="Query 1: CVE-2024-6387 regreSSHion. Route cag_rag_mcp, 6 note wiki create, 10 link, grafo con CVE-2024-6387 al centro collegata a OpenSSH, Race Condition, RCE, Signal Handler, CVE-2006-5051" loading="lazy">
+      <figcaption>Query 1, CVE-2024-6387. Route: cag_rag_mcp, score 8/10. Tool reali: query_cve NVD, search_web Shodan/GreyNoise/Exploit-DB, run_code. 6 nodi creati, 10 link. L'agente trova anche CVE-2006-5051 (la regressione originale) e la collega al grafo.</figcaption>
+    </figure>
+
+    <p>Il knowledge graph dopo la fase 1: 4 nodi, 3 link, un grafo piccolo ma strutturato.</p>
+
+
+    <h3>Fase 2 — Giorno 5: CVE-2024-3094</h3>
+
+    <p>Cinque giorni dopo. L'agente analizza CVE-2024-3094 (xz backdoor). Anche questa riguarda OpenSSH, ma con un vettore completamente diverso: supply chain compromise.</p>
+
+    <p>Il knowledge layer crea i nodi per la nuova CVE. Ma quando trova <code>[[OpenSSH]]</code> nel contenuto, non crea un nuovo nodo: lo collega a quello esistente. Il nodo OpenSSH adesso ha due backlink: uno dalla race condition, uno dal supply chain attack.</p>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/l-agente-che-costruisce-conoscenza/02_fase2.png" alt="Query 2: CVE-2024-3094 xz backdoor. Route full, 8 note wiki totali, 14 link. OpenSSH hub con backlink da entrambe le CVE" loading="lazy">
+      <figcaption>Query 2, CVE-2024-3094 (xz backdoor). Route: full, score 8/10. Il grafo cresce a 8 nodi, 14 link. CVE-2024-3094 si collega a OpenSSH gia' esistente: due CVE, due vettori (race condition + supply chain), stesso target.</figcaption>
+    </figure>
+
+    <p>Qui e' dove il knowledge graph mostra il suo valore. La memoria avrebbe due entry separate. Il grafo ha OpenSSH come hub collegato a due CVE, due tecniche MITRE, due vettori di attacco diversi. L'informazione e' la stessa, ma la struttura e' completamente diversa.</p>
+
+
+    <h3>Fase 3 — Giorno 10: Pattern OpenSSH</h3>
+
+    <p>Dieci giorni dopo. L'agente riceve: "Pattern di attacco ricorrenti su OpenSSH: cosa sappiamo?"</p>
+
+    <p>Senza knowledge graph, il meta-controller manderebbe la query al RAG. Col grafo, il meta-controller cerca prima li'. Trova il nodo OpenSSH, vede i backlink, segue le relazioni in profondita' 1. Risultato: contesto strutturato, zero retrieval su corpus esterno.</p>
+
+    <div class="two-panel">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">Senza Knowledge Graph</div>
+        <p>Memory episodica:</p>
+        <p style="font-family: var(--font-mono); font-size: 0.75rem;">Q: CVE-2024-6387... [score 9/10]</p>
+        <p style="font-family: var(--font-mono); font-size: 0.75rem;">Q: CVE-2024-3094... [score 9/10]</p>
+        <p style="margin-top: 1rem;">Due entry separate. L'agente non sa che sono collegate. Per capire il pattern deve rifare RAG da zero.</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">Con Knowledge Graph</div>
+        <p>Graph search → OpenSSH (4 accessi):</p>
+        <p style="font-family: var(--font-mono); font-size: 0.75rem;">→ CVE-2024-6387 (Race Condition)</p>
+        <p style="font-family: var(--font-mono); font-size: 0.75rem;">→ CVE-2024-3094 (Supply Chain)</p>
+        <p style="font-family: var(--font-mono); font-size: 0.75rem;">→ T1190, T1195.002</p>
+        <p style="margin-top: 1rem;">Grafo strutturato. Due vettori, stesso target. Zero retrieval esterno.</p>
+      </div>
+    </div>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/l-agente-che-costruisce-conoscenza/03_fase3.png" alt="Query 3: pattern OpenSSH. Route cag_wiki, zero retrieval esterno. Knowledge graph finale: 9 nodi, 17 link" loading="lazy">
+      <figcaption>Query 3, pattern OpenSSH. Route: cag_wiki, score 7/10, zero retrieval su corpus esterno. Il meta-controller trova OpenSSH nel knowledge graph e bypassa il RAG. In basso: confronto senza grafo (due entry separate) vs con grafo (relazioni strutturate). Knowledge graph finale: 9 nodi, 17 link.</figcaption>
+    </figure>
+
+    <p>Il meta-controller V2 vede che il concetto e' nel knowledge graph e prende la strada CAG_WIKI. Il RAG non viene nemmeno chiamato. L'agente risponde usando il contesto strutturato del grafo: due CVE, due vettori, due tecniche MITRE, Agent Notes con confidence e fonti.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Alla terza query non fa retrieval.</strong> Non perche' e' piu' bravo. Perche' sa gia'. Il knowledge graph ha trasformato esperienza passata in conoscenza strutturata. Il RAG serve per quello che non sai. Il grafo serve per quello che hai gia' capito.</p>
+    </div>
+
+    <p>E se OpenSSH ha raggiunto 3+ accessi, il knowledge layer lo promuove a CAG. Dalla prossima sessione sara' direttamente nel system prompt.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 18 — Il codice chiave
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Codice Chiave</h2>
+    <span class="section-number">Sezione 18. WikiManager e graph traversal</span>
+
+    <p>Il cuore del sistema e' il WikiManager. Gestisce il vault Obsidian: crea nodi, estrae link, costruisce il grafo, fa ricerca semantica + tag, e supporta il graph traversal in profondita'.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">get_linked_context</span>(<span class="cv">self</span>, <span class="cv">title</span>: <span class="ct">str</span>, <span class="cv">depth</span>: <span class="ct">int</span> = <span class="cn">1</span>) -> <span class="ct">list</span>[<span class="ct">WikiNote</span>]:</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="cv">visited</span> = {<span class="cv">title</span>}</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">frontier</span> = [<span class="cv">title</span>]</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">result</span> = []</td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="ck">for</span> _ <span class="ck">in</span> <span class="cf">range</span>(<span class="cv">depth</span>):</td></tr>
+<tr><td class="ln">7</td><td class="code">        <span class="cv">next_frontier</span> = []</td></tr>
+<tr><td class="ln">8</td><td class="code">        <span class="ck">for</span> <span class="cv">t</span> <span class="ck">in</span> <span class="cv">frontier</span>:</td></tr>
+<tr><td class="ln">9</td><td class="code">            <span class="cv">note</span> = <span class="cv">self</span>.<span class="cv">notes</span>.<span class="cf">get</span>(<span class="cv">t</span>)</td></tr>
+<tr><td class="ln">10</td><td class="code">            <span class="ck">if not</span> <span class="cv">note</span>: <span class="ck">continue</span></td></tr>
+<tr><td class="ln">11</td><td class="code">            <span class="ck">for</span> <span class="cv">link</span> <span class="ck">in</span> <span class="cv">note</span>.<span class="cv">links</span>:</td></tr>
+<tr><td class="ln">12</td><td class="code">                <span class="ck">if</span> <span class="cv">link</span> <span class="ck">not in</span> <span class="cv">visited</span> <span class="ck">and</span> <span class="cv">link</span> <span class="ck">in</span> <span class="cv">self</span>.<span class="cv">notes</span>:</td></tr>
+<tr><td class="ln">13</td><td class="code">                    <span class="cv">visited</span>.<span class="cf">add</span>(<span class="cv">link</span>)</td></tr>
+<tr><td class="ln">14</td><td class="code">                    <span class="cv">next_frontier</span>.<span class="cf">append</span>(<span class="cv">link</span>)</td></tr>
+<tr><td class="ln">15</td><td class="code">                    <span class="cv">result</span>.<span class="cf">append</span>(<span class="cv">self</span>.<span class="cv">notes</span>[<span class="cv">link</span>])</td></tr>
+<tr><td class="ln">16</td><td class="code">            <span class="ck">for</span> <span class="cv">backlink</span> <span class="ck">in</span> <span class="cv">self</span>.<span class="cf">get_backlinks</span>(<span class="cv">t</span>):</td></tr>
+<tr><td class="ln">17</td><td class="code">                <span class="ck">if</span> <span class="cv">backlink</span> <span class="ck">not in</span> <span class="cv">visited</span>:</td></tr>
+<tr><td class="ln">18</td><td class="code">                    <span class="cv">visited</span>.<span class="cf">add</span>(<span class="cv">backlink</span>)</td></tr>
+<tr><td class="ln">19</td><td class="code">                    <span class="cv">result</span>.<span class="cf">append</span>(<span class="cv">self</span>.<span class="cv">notes</span>[<span class="cv">backlink</span>])</td></tr>
+<tr><td class="ln">20</td><td class="code">        <span class="cv">frontier</span> = <span class="cv">next_frontier</span></td></tr>
+<tr><td class="ln">21</td><td class="code"></td></tr>
+<tr><td class="ln">22</td><td class="code">    <span class="ck">return</span> <span class="cv">result</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>Il traversal segue sia i link in uscita che i backlink. Quando cerchi "OpenSSH" con depth=1, ottieni tutte le note che puntano a OpenSSH (CVE-2024-6387, CVE-2024-3094) e tutte le note a cui OpenSSH punta. E' una BFS bidirezionale sul grafo del wiki.</p>
+
+    <p>La ricerca usa due segnali combinati: similarity semantica via embedding (stesso encoder del RAG: sentence-transformers) e tag matching. Se una nota ha un tag che appare nella query, il suo score viene boostato. In pratica funziona bene: per query tipo "pattern attacco OpenSSH" la similarity trova la nota OpenSSH, e il tag <code>#network</code> booste le note correlate.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">search</span>(<span class="cv">self</span>, <span class="cv">query</span>: <span class="ct">str</span>, <span class="cv">top_k</span>: <span class="ct">int</span> = <span class="cn">5</span>) -> <span class="ct">list</span>[<span class="ct">tuple</span>]:</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="cv">results</span> = []</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cc"># 1. Semantic search via embeddings</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">q_emb</span> = <span class="cv">self</span>.<span class="cv">encoder</span>.<span class="cf">encode</span>([<span class="cv">query</span>])[<span class="cn">0</span>]</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="ck">for</span> <span class="cv">title</span>, <span class="cv">emb</span> <span class="ck">in</span> <span class="cv">self</span>.<span class="cv">_embeddings</span>.<span class="cf">items</span>():</td></tr>
+<tr><td class="ln">6</td><td class="code">        <span class="cv">sim</span> = <span class="cv">cosine_sim</span>(<span class="cv">q_emb</span>, <span class="cv">emb</span>)</td></tr>
+<tr><td class="ln">7</td><td class="code">        <span class="ck">if</span> <span class="cv">sim</span> > <span class="cn">0.3</span>:</td></tr>
+<tr><td class="ln">8</td><td class="code">            <span class="cv">results</span>.<span class="cf">append</span>((<span class="cv">self</span>.<span class="cv">notes</span>[<span class="cv">title</span>], <span class="cv">sim</span>))</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="cc"># 2. Tag boost</span></td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="ck">for</span> <span class="cv">note</span> <span class="ck">in</span> <span class="cv">self</span>.<span class="cv">notes</span>.<span class="cf">values</span>():</td></tr>
+<tr><td class="ln">11</td><td class="code">        <span class="ck">if</span> <span class="cf">any</span>(<span class="cv">t</span> <span class="ck">in</span> <span class="cv">query</span>.<span class="cf">lower</span>() <span class="ck">for</span> <span class="cv">t</span> <span class="ck">in</span> <span class="cv">note</span>.<span class="cv">tags</span>):</td></tr>
+<tr><td class="ln">12</td><td class="code">            <span class="cc"># boost o aggiungi</span></td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="ck">return</span> <span class="cf">sorted</span>(<span class="cv">results</span>, <span class="cv">key</span>=<span class="ck">lambda</span> <span class="cv">x</span>: -<span class="cv">x</span>[<span class="cn">1</span>])[:<span class="cv">top_k</span>]</td></tr>
+      </table></div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 19 — Il routing V2
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Routing V2</h2>
+    <span class="section-number">Sezione 19. Quando il meta-controller sceglie il knowledge graph</span>
+
+    <p>Il meta-controller V2 ha la stessa logica del V1 con un'aggiunta: prima di decidere il route finale, controlla se il concetto e' gia' nel knowledge graph. Se lo trova, fa un upgrade a CAG_WIKI e bypassa il RAG.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">route</span>(<span class="cv">self</span>, <span class="cv">query</span>, <span class="cv">stream_attack_active</span>=<span class="ck">False</span>):</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="ck">if</span> <span class="cv">stream_attack_active</span>:</td></tr>
+<tr><td class="ln">3</td><td class="code">        <span class="ck">return</span> <span class="ct">Route</span>.<span class="cv">FULL</span></td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cv">scores</span> = <span class="cf">_score_patterns</span>(<span class="cv">query</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cv">best</span> = <span class="cf">max</span>(<span class="cv">scores</span>, <span class="cv">key</span>=<span class="cv">scores</span>.<span class="cf">get</span>)</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cc"># NUOVO: check wiki prima del routing finale</span></td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">if</span> <span class="cv">best</span> <span class="ck">in</span> (<span class="ct">Route</span>.<span class="cv">CAG_ONLY</span>, <span class="ct">Route</span>.<span class="cv">CAG_RAG</span>):</td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="ck">if</span> <span class="cv">self</span>.<span class="cv">wiki_checker</span>(<span class="cv">query</span>):</td></tr>
+<tr><td class="ln">11</td><td class="code">            <span class="ck">return</span> <span class="ct">Route</span>.<span class="cv">CAG_WIKI</span>  <span class="cc"># bypass RAG</span></td></tr>
+<tr><td class="ln">12</td><td class="code"></td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="ck">if</span> <span class="cv">confidence</span> >= <span class="cn">0.75</span>:</td></tr>
+<tr><td class="ln">14</td><td class="code">        <span class="ck">return</span> <span class="cv">best</span>            <span class="cc"># deterministic</span></td></tr>
+<tr><td class="ln">15</td><td class="code">    <span class="ck">else</span>:</td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="ck">return</span> <span class="cv">self</span>.<span class="cf">_llm_route</span>() <span class="cc"># fallback Haiku</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>L'idea e' semplice: se il grafo ha gia' il contesto necessario, non ha senso fare un retrieval su un corpus esterno. Il knowledge graph e' piu' veloce, piu' strutturato, e contiene le Agent Notes dell'agente stesso. E' conoscenza di prima mano, non recuperata.</p>
+
+    <div class="insight-box fade-in">
+      <p>Il routing si adatta automaticamente alla conoscenza dell'agente. All'inizio, quando il grafo e' vuoto, tutto va al RAG. Man mano che l'agente lavora e costruisce il knowledge graph, sempre piu' query vengono risolte dal grafo. Il RAG diventa un fallback per concetti nuovi.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 20 — Pipeline completa
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Pipeline Completa</h2>
+    <span class="section-number">Sezione 20. Da query a knowledge graph update</span>
+
+    <div class="flow-diagram">
+      <span class="flow-step" style="color:#fff">USER QUERY</span><br>
+      <span class="flow-arrow">↓</span><br>
+      <span class="flow-step l-meta">META-CONTROLLER V2</span><br>
+      <span class="flow-arrow">↓</span><br>
+      <span class="flow-step l-cag">CAG</span>
+      <span class="flow-arrow"> ↔ </span>
+      <span class="flow-new">KNOWLEDGE GRAPH</span>
+      <span class="flow-arrow"> ↔ </span>
+      <span class="flow-step l-rag">RAG</span><br>
+      <span class="flow-arrow">↓</span><br>
+      <span class="flow-step l-tool">TOOLS</span><br>
+      <span class="flow-arrow">↓</span><br>
+      <span class="flow-step l-ref">REFLECTION</span><br>
+      <span class="flow-arrow">↓</span><br>
+      <span class="flow-step l-mem">MEMORY</span><br>
+      <span class="flow-arrow">↓</span><br>
+      <span class="flow-new">KNOWLEDGE GRAPH (update)</span>
+    </div>
+
+    <p>La pipeline e' lineare come prima, ma con due aggiunte: il knowledge graph viene consultato durante la generazione (prima riga), e viene aggiornato dopo la reflection (ultima riga). Il ciclo si chiude: l'agente usa il grafo per rispondere e lo arricchisce dopo aver risposto.</p>
+
+    <p>C'e' un punto sottile: la freccia bidirezionale tra CAG e Knowledge Graph. Il CAG non e' piu' statico. Nodi del grafo con abbastanza accessi vengono promossi a CAG. Concetti del CAG non usati vengono degradati al grafo. Il system prompt evolve con l'agente.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 21 — Cosa cambia davvero
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Cambia Davvero</h2>
+    <span class="section-number">Sezione 21. Dove si rompe, dove e' fragile, dove funziona</span>
+
+    <p>Funziona, ma non e' tutto rose.</p>
+
+    <p><strong>L'estrazione dei concetti e' fragile.</strong> Nel lab uso regex e pattern matching per estrarre CVE, termini noti, tecniche MITRE. In un sistema reale dovresti usare il LLM per estrarre concetti, il che aggiunge una chiamata API e latenza. L'alternativa e' un NER specializzato, ma aggiunge complessita'.</p>
+
+    <p><strong>Il grafo puo' crescere troppo.</strong> Senza un meccanismo di pruning i nodi si accumulano. Il decay della memoria semantica aiuta, ma il knowledge graph non ha un equivalente. Serve un pruning basato su: accessi, eta', rilevanza. Non l'ho implementato in questo lab.</p>
+
+    <p><strong>La promozione grafo→CAG e' conservativa.</strong> Tre accessi sono pochi per decidere che un concetto e' "stabile". In produzione servirebbe una finestra temporale: almeno N accessi in M giorni. Un nodo acceduto 3 volte in un'ora non e' la stessa cosa di uno acceduto 3 volte in un mese.</p>
+
+    <p><strong>Il vault e' locale.</strong> Per un agente singolo su una macchina va bene. Per un team di agenti in un SOC serve un grafo condiviso, e li' tornano i problemi di concorrenza, merge, conflitti. Non banale.</p>
+
+    <p>Detto questo: il pezzo che funziona davvero e' il routing adattivo. Il fatto che il meta-controller impari automaticamente a bypassare il RAG quando il knowledge graph ha gia' il contesto necessario e' elegante e misurabile. La terza query del lab e' la dimostrazione: zero retrieval su corpus esterno, contesto strutturato dal grafo.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 22 — Architettura Cognitiva
+         ============================================================ -->
+    <h2><span class="accent">//</span> Un'Architettura Cognitiva</h2>
+    <span class="section-number">Sezione 22. Memoria, comprensione, azione</span>
+
+    <p>Guardala dall'alto. Quello che abbiamo costruito in due articoli non e' una pipeline. E' un'architettura cognitiva.</p>
+
+    <div class="flow-diagram">
+      <span class="flow-step l-mem">MEMORY</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-new">KNOWLEDGE GRAPH</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-cag">CAG</span><br><br>
+      <span style="color:#6a6a8a; font-size: 0.75rem;">il passato</span>
+      <span style="color:#6a6a8a; font-size: 0.75rem;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <span style="color:#6a6a8a; font-size: 0.75rem;">la comprensione</span>
+      <span style="color:#6a6a8a; font-size: 0.75rem;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      <span style="color:#6a6a8a; font-size: 0.75rem;">l'azione</span>
+    </div>
+
+    <p>La memoria ricorda cosa e' successo. Il knowledge graph capisce le relazioni tra le cose. Il CAG mette quella comprensione a disposizione nel momento della decisione. Esperienza diventa conoscenza. Conoscenza diventa capacita' operativa.</p>
+
+    <p>E' lo stesso schema con cui funziona un analista esperto. Vede un incidente (memoria). Collega quel pattern a casi precedenti (comprensione). La prossima volta che vede un segnale simile, reagisce senza dover ricercare tutto da zero (azione).</p>
+
+    <p>Questo e' il knowledge graph. Non documentazione. Un grafo di conoscenza in continua evoluzione, costruito da interazioni reali.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il collegamento con <a href="https://github.com/Pinperepette/claude-reforge" target="_blank" rel="noopener">Claude Reforge</a>.</strong> Reforge si aggancia al lifecycle di Claude Code con quattro hook. Cattura episodi (task → errore → soluzione → esito), estrae regole dai pattern ricorrenti, e inietta warning preventivi quando l'agente sta per ripetere un errore gia' visto. Memoria episodica e comportamentale, locale, senza API.</p>
+      <p style="margin-top: 0.8rem;">Il knowledge graph di questo articolo fa l'altra meta'.</p>
+      <p style="margin-top: 0.8rem; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.8;">Reforge cambia il <strong>comportamento</strong>. Evita errori.<br>Il knowledge graph cambia la <strong>comprensione</strong>. Costruisce conoscenza.</p>
+      <p style="margin-top: 0.8rem;">Insieme: un agente che evolve davvero. Impara dai suoi errori <em>e</em> struttura quello che scopre. Learning comportamentale e learning strutturale. Due cose diverse, stesso obiettivo: non ripartire da zero ogni volta.</p>
+    </div>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">
+        "Un LLM risponde.<br>
+        Un agente agisce.<br>
+        Un sistema con un knowledge graph capisce nel tempo."
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Codice:</strong> tutto il lab e' disponibile in <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/l-agente-che-costruisce-conoscenza" target="_blank" rel="noopener">scripts/l-agente-che-costruisce-conoscenza</a>. Prerequisiti: Python 3.10+, ANTHROPIC_API_KEY, sentence-transformers. Il corpus NVD + MITRE del lab precedente e' opzionale. Il vault generato si apre direttamente in Obsidian.</p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

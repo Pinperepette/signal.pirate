@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>L'Agente Che Costruisce Conoscenza</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/l-agente-che-costruisce-conoscenza.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/l-agente-che-costruisce-conoscenza.html</guid>
+    <pubDate>Wed, 23 Apr 2026 00:00:00 +0200</pubDate>
+    <description>La memoria di un agente funziona: ricorda fatti, salva episodi. Ma non collega. Due CVE che riguardano OpenSSH restano due entry separate. Ho aggiunto un knowledge graph dinamico tra Memory e CAG: nodi atomici Obsidian-compatibili con backlink, grafo navigabile, Agent Notes scritte dall'agente. Il meta-controller V2 cerca nel grafo prima del RAG: se il concetto e' gia' strutturato, bypassa il retrieval. Promozione automatica grafo→CAG. Lab in 3 fasi (giorno 1, 5, 10): il knowledge graph costruisce conoscenza che la memoria piatta non puo' costruire.</description>
+  </item>
+
+  <item>
     <title>L'Agente Che Non Inventa</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/l-agente-che-non-inventa.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/l-agente-che-non-inventa.html</guid>
