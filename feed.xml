@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>L'Agente Non Ha Una Forma</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/l-agente-non-ha-una-forma.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/l-agente-non-ha-una-forma.html</guid>
+    <pubDate>Mon, 04 May 2026 00:00:00 +0200</pubDate>
+    <description>L'agente non ha una forma, ha dei percorsi. Il diagramma dell'architettura agentica sembra una pipeline fissa: in realta' quasi nessuna richiesta attraversa tutti i sette layer, le frecce sono possibilita' selettive. Hai un solo sistema che a ogni query decide quali parti di se' usare, non tre configurazioni separate. Tre conseguenze: il design vero e' il routing tra le scelte, il collo di bottiglia e' il decisore che attiva i layer, il deliverable e' uno spazio in cui molti agenti possibili coesistono. Quattro casi d'uso reali, quattro sentieri ricorrenti. Ieri (3 maggio 2026) antirez ha pubblicato il nuovo tipo Array di Redis: ARSET sparse, ARGREP regex server-side, ARINSERT, perfetto per skill markdown condivise da una moltitudine di agenti remoti (sue parole). PR #15162, quattro mesi di sviluppo AI-assisted. Lab in cucina italiana (universale): tre query con tre sentieri davvero diversi, ognuno stampa a video il PATH effettivo e i layer SALTATI. Apertura e chiusura con il racconto "Iola Varga" di Salvatore Sanfilippo: la finzione della rete e i bit di memoria che si corrompono.</description>
+  </item>
+
+  <item>
     <title>L'Agente Che Costruisce Conoscenza</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/l-agente-che-costruisce-conoscenza.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/l-agente-che-costruisce-conoscenza.html</guid>

@@ -1,0 +1,8 @@
+anthropic>=0.39.0
+redis>=5.0.0
+numpy>=1.26.0
+
+# Opzionale: encoder semantico vero (richiede Python 3.10+ / torch).
+# Il lab funziona senza, con bag-of-words leggero. Decommenta se vuoi
+# l'embedding "vero":
+# sentence-transformers>=2.7.0

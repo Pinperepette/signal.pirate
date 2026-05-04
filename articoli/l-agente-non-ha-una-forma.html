@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Agente Non Ha Una Forma | Signal Pirate</title>
+  <meta name="description" content="L'agente non ha una forma, ha dei percorsi. Il diagramma dell'architettura agentica sembra una pipeline fissa: non lo e'. Sette layer, quattro sentieri ricorrenti, una sola idea: non progetti sistemi, progetti routing; non costruisci agenti, costruisci spazi di possibilita'. Con il nuovo tipo Array di Redis annunciato da antirez (ARSET, ARGREP, ARINSERT) e un lab in cucina italiana che stampa a video PATH e SKIPPED layer per ogni query.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .iola-box {
+      background: #0d1117;
+      border-left: 3px solid #b5cea8;
+      border-radius: 0 10px 10px 0;
+      padding: 1.4rem 1.8rem;
+      margin: 2rem 0;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      font-style: italic;
+    }
+    .iola-box .iola-attr {
+      display: block;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+      font-style: normal;
+      font-size: 0.7rem;
+      color: #6a6a8a;
+      letter-spacing: 0.05em;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    .ck { color: #7c4dff; }
+    .cs { color: #00ff88; }
+    .cn { color: #b5cea8; }
+    .cc { color: #6a6a8a; }
+    .cf { color: #4ecdc4; }
+    .cv { color: #9cdcfe; }
+    .ct { color: #4ec9b0; }
+    .co { color: #d4d4d4; }
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.5;
+    }
+
+    .layer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .layer-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      border-left: 3px solid var(--accent-attention);
+    }
+    .layer-card .ln-num {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--accent-attention);
+      margin-bottom: 0.4rem;
+    }
+    .layer-card .ln-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .layer-card .ln-role {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.6rem;
+    }
+    .layer-card .ln-desc {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .lc-1 { border-left-color: #4ecdc4; }
+    .lc-1 .ln-num { color: #4ecdc4; }
+    .lc-2 { border-left-color: #00ff88; }
+    .lc-2 .ln-num { color: #00ff88; }
+    .lc-3 { border-left-color: #7c4dff; }
+    .lc-3 .ln-num { color: #7c4dff; }
+    .lc-4 { border-left-color: #f5c518; }
+    .lc-4 .ln-num { color: #f5c518; }
+    .lc-5 { border-left-color: #ff9f43; }
+    .lc-5 .ln-num { color: #ff9f43; }
+    .lc-6 { border-left-color: #ff6b6b; }
+    .lc-6 .ln-num { color: #ff6b6b; }
+    .lc-7 { border-left-color: #9cdcfe; }
+    .lc-7 .ln-num { color: #9cdcfe; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
+      margin: 1.5rem 0;
+    }
+    .form-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+    }
+    .form-name {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-attention);
+      margin-bottom: 0.4rem;
+    }
+    .form-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.6rem;
+    }
+    .form-arch {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #b5cea8;
+      margin: 0.6rem 0 0.8rem;
+    }
+    .form-why {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .form-ex {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: #6a6a8a;
+      margin-top: 0.7rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .arch-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .arch-layer {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.3rem 0;
+    }
+    .arch-label {
+      min-width: 180px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    .arch-desc {
+      color: #6a6a8a;
+      font-size: 0.72rem;
+    }
+    .arch-arrow {
+      color: rgba(0,255,136,0.4);
+      font-size: 0.9rem;
+      text-align: center;
+      padding-left: 2rem;
+    }
+    .l-input  { color: #4ecdc4; }
+    .l-ctx    { color: #00ff88; }
+    .l-orch   { color: #7c4dff; }
+    .l-tool   { color: #f5c518; }
+    .l-out    { color: #ff9f43; }
+    .l-grd    { color: #ff6b6b; }
+    .l-mem    { color: #9cdcfe; }
+
+    .two-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 1.5rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    @media (max-width: 768px) { .two-panel { grid-template-columns: 1fr; } }
+    .panel-side { padding: 1.5rem; }
+    .panel-left {
+      background: rgba(0,255,136,0.05);
+      border-right: 1px solid var(--border-subtle);
+    }
+    .panel-right { background: rgba(124,77,255,0.05); }
+    .panel-side-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    .panel-left .panel-side-title  { color: var(--accent-attention); }
+    .panel-right .panel-side-title { color: #7c4dff; }
+    .panel-side p { font-size: 0.82rem; line-height: 1.6; margin: 0.4rem 0; }
+
+    .redis-note {
+      background: linear-gradient(135deg, rgba(220,38,38,0.08), rgba(245,197,24,0.05));
+      border: 1px solid rgba(220,38,38,0.25);
+      border-radius: 10px;
+      padding: 1.4rem 1.6rem;
+      margin: 1.5rem 0;
+    }
+    .redis-note .rn-tag {
+      display: inline-block;
+      background: rgba(220,38,38,0.2);
+      color: #ff6b6b;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 0.7rem;
+    }
+
+    .flow-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 2.2;
+      text-align: center;
+    }
+    .flow-step { font-weight: 700; }
+    .flow-arrow { color: rgba(0,255,136,0.4); }
+    .flow-new { color: #f5c518; font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-05-04 | Pinperepette</p>
+    <h1 class="article-page-title">L'Agente <span class="accent">Non Ha Una Forma</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Sette layer, quattro forme. La struttura giusta dipende dal lavoro.
+    </p>
+    <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; opacity: 0.7;">
+      Terzo capitolo della serie iniziata con <a href="l-agente-che-non-inventa.html" style="color: var(--accent-attention);">L'Agente Che Non Inventa</a> e <a href="l-agente-che-costruisce-conoscenza.html" style="color: var(--accent-attention);">L'Agente Che Costruisce Conoscenza</a>.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Architettura Agentica</span>
+      <span class="tag tag-highlight">Redis 8</span>
+      <span class="tag tag-reaction">AI Agent</span>
+      <span class="tag tag-amplification">antirez</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <div style="border-left: 2px solid var(--border-subtle); padding: 0.4rem 1.4rem 0.8rem; margin: 0 0 2.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7;">
+      <span style="display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-attention); margin-bottom: 0.6rem;">Premessa</span>
+      <p style="margin: 0 0 0.8rem;">Se anche tu ti sei messo a studiare gli agenti sul serio, te ne sei accorto: non ci stai dietro. Esce un paper la mattina, una libreria il pomeriggio, un benchmark che ribalta tutto la sera. Io di anni ne ho cinquanta. A trenta non ero sveglissimo, ma il modello mentale lo rifacevi in un weekend; adesso te ne servono tre, e qualcosa per strada lo perdi comunque.</p>
+      <p style="margin: 0;">Quello che leggi qui e' solo quello che ho capito io a grandi linee, dopo essermi fatto male N volte. Ci sono dentro gli errori che ho fatto, le pipeline che ho dovuto smontare e rismontare, e qualche cosa che mi fa ancora dire 'oh la madonna'. Una di queste e' la PR di antirez sull'Array, e' un salto di pensiero: la knowledge base smette di essere un file su disco e diventa una struttura Redis nativa, interrogabile con regex, condivisa fra una moltitudine di agenti remoti. Se trovi qualcosa di sbagliato, scrivimi.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 1 — La finzione della rete
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Finzione</h2>
+    <span class="section-number">Sezione 1. Quello che vedi non e' quello che c'e'</span>
+
+    <div class="iola-box">
+      C'e' qualcosa di ambiguo nelle reti di computer. Finche' le usi ti danno l'impressione di una continuita' che sai non esistere, come se sotto la gomma dei cavi vene e arterie si intrecciassero per irrigare lo spazio fra un computer e l'altro. La realta' e' piu' discreta. Pacchetti di poche centinaia di caratteri prendono forma nei transistor della memoria, vengono trasmessi singolarmente, sottoposti alla gogna del checksum: se un 1 diventa 0, l'intero pacchetto viene scartato dal flusso. Non c'e' pieta' per la corruzione. Eppure questo sistema sostiene una finzione in cui l'idea quasi tangibile di un flusso liscio, veloce e affidabile sostituisce la realta' materiale. E' una farsa che presto si scambia per realta', e in qualche modo diventa la realta' piu' autentica.
+      <span class="iola-attr">Iola Varga, in <a href="http://invece.org/iola.html" style="color:#b5cea8" target="_blank" rel="noopener">Tales of Illustrious Computer Scientists</a> di Salvatore Sanfilippo</span>
+    </div>
+
+    <p>Iola descriveva ARPANET nel 1965. Stessa frase, oggi, descrive un agente AI.</p>
+
+    <p>Quando interagisci con un sistema agentico hai l'impressione di una mente continua. Una cosa che ricorda, decide, agisce. Sotto, non c'e' niente di tutto questo. C'e' un LLM stateless che riceve un prompt e produce token, una memoria che e' un database, una catena di tool call che potrebbero fallire ad ogni passo. Ogni invocazione e' un pacchetto: o passa il checksum (la reflection, i guardrail, la validazione del JSON) o viene scartata.</p>
+
+    <p>L'agente non e' un'entita' coerente. E' una <strong>finzione di continuita' su pacchetti discreti</strong>. La differenza con la rete di Iola e' solo che qui l'illusione e' piu' giovane, e quindi piu' fragile.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 2 — La tesi
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Tesi</h2>
+    <span class="section-number">Sezione 2. Non esiste l'architettura perfetta</span>
+
+    <p style="font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--accent-attention); line-height: 1.8; margin-bottom: 1.5rem;">Non esiste la struttura perfetta.<br>Esiste quella giusta per quello che devi fare.</p>
+
+    <p>Apri un articolo qualsiasi su "agentic architecture" e trovi il diagramma a sette scatole: input, contesto, orchestrazione, tool, output, guardrail, memoria. Ogni scatola con i suoi sottoblocchi. Ogni freccia dipinta come se non fosse opzionale. Il messaggio implicito: questa e' la forma corretta dell'agente.</p>
+
+    <p>Falso. Quella e' la forma <em>massima</em>. Un agente che ha bisogno di tutti e sette i layer e' un agente che fa molte cose diverse. La maggior parte degli agenti reali ne usa quattro o cinque, e il taglio non e' arbitrario: dipende dal compito.</p>
+
+    <p>Un helpdesk aziendale che risponde a domande sulla policy ferie non ha bisogno di multi-agent, planner, knowledge graph e RAG distribuito. Ha bisogno di un loop semplice + un vector DB sui documenti HR + un guardrail su PII in uscita. Cinque layer su sette, e il quinto solo perche' il legale lo richiede. Aggiungere il sesto layer non lo rende piu' intelligente: lo rende piu' fragile.</p>
+
+    <p>Un copilota che gestisce trading, ticket, escalation e analisi di portafoglio invece ha bisogno di tutti e sette. Senza orchestrazione multi-agent perde i ruoli. Senza memoria a lungo termine non impara dai casi precedenti. Senza guardrail finisce in tribunale.</p>
+
+    <p>Stesso vocabolario, due architetture diverse. Il punto non e' "ho usato tutti i layer". Il punto e' "ho scelto i layer giusti".</p>
+
+
+    <!-- ============================================================
+         SEZIONE 3 — I sette layer
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Sette Layer</h2>
+    <span class="section-number">Sezione 3. Cosa fa ogni layer e quando serve</span>
+
+    <p>Prima di parlare di forme, serve sapere quali sono le forme possibili. Sette layer, ognuno con un ruolo distinto.</p>
+
+    <div class="layer-grid">
+      <div class="layer-card lc-1">
+        <span class="ln-num">LAYER 1</span>
+        <div class="ln-name">Input / Contesto</div>
+        <div class="ln-role">cosa entra nel sistema</div>
+        <div class="ln-desc">Prompt utente, cronologia conversazione, dati interni (file, DB), eventi/trigger (scheduler, webhook), dati esterni (API, sensori). Normalizzazione, parsing, arricchimento. Banale finche' arrivano cinque sorgenti, complicato quando arrivano cinquanta.</div>
+      </div>
+      <div class="layer-card lc-2">
+        <span class="ln-num">LAYER 2</span>
+        <div class="ln-name">Costruzione del Contesto</div>
+        <div class="ln-role">come si fornisce conoscenza all'agente</div>
+        <div class="ln-desc">Tre tecniche, tre obiettivi. <strong>RAG</strong>: recupero semantico per knowledge base ampie. <strong>CAG</strong>: contesto pre-costruito, stato applicazione, riassunti, view, cache. <strong>Knowledge Graph</strong>: nodi, relazioni, reasoning multi-hop. Si combinano, raramente si escludono.</div>
+      </div>
+      <div class="layer-card lc-3">
+        <span class="ln-num">LAYER 3</span>
+        <div class="ln-name">Orchestrazione</div>
+        <div class="ln-role">chi decide e come</div>
+        <div class="ln-desc">Single agent (loop LLM + tool), planner-executor (pianifica poi esegue), multi-agent (ruoli specializzati). Pattern di controllo: ReAct, Plan &amp; Solve, routing dinamico, reflection/self-correction. La scelta determina determinismo, costo, latenza.</div>
+      </div>
+      <div class="layer-card lc-4">
+        <span class="ln-num">LAYER 4</span>
+        <div class="ln-name">Tool / Azioni</div>
+        <div class="ln-role">le mani dell'agente</div>
+        <div class="ln-desc">API e servizi (CRM, mail, calendar), database e query, esecuzione codice, web/scraping, altri LLM (embedding, classifier), sistemi interni (FS, ERP). Ogni tool e' un contratto: schema input, formato output, errori previsti. Senza tool, l'agente parla.</div>
+      </div>
+      <div class="layer-card lc-5">
+        <span class="ln-num">LAYER 5</span>
+        <div class="ln-name">Output / Risultati</div>
+        <div class="ln-role">cosa produce</div>
+        <div class="ln-desc">Risposta all'utente (testo, JSON, report), esecuzione di azioni (operazioni, invii, update), generazione di contenuti (riepiloghi, insight), aggiornamento stato (scrittura su DB, file, code). Spesso piu' di una contemporaneamente.</div>
+      </div>
+      <div class="layer-card lc-6">
+        <span class="ln-num">LAYER 6</span>
+        <div class="ln-name">Valutazione e Controllo</div>
+        <div class="ln-role">guardrail</div>
+        <div class="ln-desc">Validazione (coerenza, completezza, veridicita', formato), sicurezza (filtri PII, policy, permessi, rate limit), autocorrezione (reflection, retry con strategie diverse, critic agent), feedback umano (approvazione, modifica). Senza guardrail, l'agente e' un esperimento.</div>
+      </div>
+      <div class="layer-card lc-7">
+        <span class="ln-num">LAYER 7</span>
+        <div class="ln-name">Memoria (trasversale)</div>
+        <div class="ln-role">l'agente ricorda nel tempo</div>
+        <div class="ln-desc">Short-term: sessione, cronologia, stato corrente. Long-term: vector DB, knowledge graph, data lake. Cache: stato condiviso ad alta velocita' (Redis, Redis Stack) per personalizzazione, continuita', evitare ricalcoli, learning continuo. Trasversale a tutti gli altri layer.</div>
+      </div>
+    </div>
+
+    <p>Un agente "completo" usa tutti e sette. Un agente "minimo" puo' funzionare con tre: input, orchestrazione, tool. Tutto il resto e' optional. Il design consiste nel decidere quali optional valgono il loro costo per il <em>tuo</em> caso.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 4 — Il diagramma mente
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Diagramma Mente</h2>
+    <span class="section-number">Sezione 4. Le frecce non sono obbligatorie</span>
+
+    <p>Torna al diagramma in cima a questo articolo (o a quello che ti viene in mente quando pensi a "agentic architecture"). Sembra una pipeline fissa: input → contesto → orchestrazione → tool → output → guardrail → memoria. Sequenza ordinata, frecce piene, ogni passo collegato al successivo.</p>
+
+    <p style="font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--accent-attention); line-height: 1.8; margin: 1.2rem 0;">
+      Sembra una pipeline fissa. Non lo e'.
+    </p>
+
+    <p>Quasi nessuna richiesta reale attraversa tutti i layer. La maggior parte ne tocca tre, a volte quattro. Il diagramma e' la lista completa dei pezzi che <em>potresti</em> usare; l'esecuzione e' la scelta dei pezzi che usi <em>per quella query</em>.</p>
+
+    <p>Tre esempi concreti. Lo stesso agente, lo stesso pool di sette layer disponibili. Tre query diverse, tre sentieri diversi:</p>
+
+    <div class="flow-diagram">
+      <span style="color:#6a6a8a; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;">domanda semplice</span><br>
+      <span class="flow-step l-input">Input</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-ctx">CAG</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-out">Output</span>
+    </div>
+
+    <div class="flow-diagram">
+      <span style="color:#6a6a8a; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;">task operativo</span><br>
+      <span class="flow-step l-input">Input</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-ctx">CAG</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-tool">Tool</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-out">Output</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-mem">Memoria</span>
+    </div>
+
+    <div class="flow-diagram">
+      <span style="color:#6a6a8a; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;">analisi</span><br>
+      <span class="flow-step l-input">Input</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step" style="color:#00ff88">RAG</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step" style="color:#f5c518">KG</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-orch">Orchestrazione</span>
+      <span class="flow-arrow"> → </span>
+      <span class="flow-step l-out">Output</span>
+    </div>
+
+    <p>Il diagramma e' completo. L'esecuzione e' selettiva.</p>
+
+    <p style="font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--accent-attention); line-height: 1.8; margin: 1.2rem 0;">
+      Le frecce non sono obbligatorie. Sono possibilita'.
+    </p>
+
+    <p>Cambia il modo di leggere il resto dell'articolo. La domanda non e' "quale architettura monto?". E' "per ciascun tipo di query, quale sentiero seguo nel grafo dei layer disponibili?". I quattro casi della prossima sezione sono quattro sentieri ricorrenti, non quattro architetture rivali.</p>
+
+    <div class="insight-box fade-in">
+      <p>Il lab di questo articolo dimostra esattamente questo punto. Stesso agente, tre query, tre path stampati a video durante l'esecuzione. La query 1 attraversa tre layer, la query 2 cinque, la query 3 quattro, ma combinazioni diverse, non sottoinsiemi annidati. Vedi che layer si attivano e quali no, riga per riga, mentre il sistema risponde.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 5 — Le quattro forme
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quattro Forme</h2>
+    <span class="section-number">Sezione 5. Lo stesso vocabolario, quattro architetture</span>
+
+    <p>Quattro casi reali. Stessi sette layer disponibili, quattro selezioni diverse. Ognuna ha la sua logica.</p>
+
+    <div class="form-grid">
+      <div class="form-card">
+        <div class="form-name">CASO 1</div>
+        <div class="form-title">Knowledge Aziendale</div>
+        <p style="font-size:0.78rem; color:var(--text-secondary); margin:0;">documentazione, FAQ, manuali</p>
+        <div class="form-arch">
+          ⊕ 1 agente (loop semplice)<br>
+          ⊕ RAG su corpus interno<br>
+          ⊕ Tool leggeri<br>
+          ⊕ Memoria minima (sessione + vector DB)
+        </div>
+        <p class="form-why">L'obiettivo e' recuperare informazioni affidabili e rispondere in modo coerente. Multi-agent qui e' overhead. Il KG aggiunge complessita' senza valore: i documenti hanno gia' la loro struttura.</p>
+        <div class="form-ex">helpdesk · policy · onboarding · manuali tecnici</div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-name">CASO 2</div>
+        <div class="form-title">Workflow Operativo</div>
+        <p style="font-size:0.78rem; color:var(--text-secondary); margin:0;">automazioni, trading, pipeline</p>
+        <div class="form-arch">
+          ⊕ CAG (stato strutturato)<br>
+          ⊕ Memoria veloce (Redis)<br>
+          ⊕ Tool forti (API, DB, esecuzioni)<br>
+          ⊕ Poco o nessun RAG
+        </div>
+        <p class="form-why">Servono controllo, determinismo, bassa latenza. Il contesto e' stabile e prevedibile (numeri, stati, regole). Il RAG semantico introduce ambiguita' dove serve precisione. Ogni millisecondo conta.</p>
+        <div class="form-ex">trading · ETL · operazioni finanziarie · gestione ordini</div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-name">CASO 3</div>
+        <div class="form-title">Ricerca / Analisi Complessa</div>
+        <p style="font-size:0.78rem; color:var(--text-secondary); margin:0;">OSINT, intelligence, research</p>
+        <div class="form-arch">
+          ⊕ RAG + Knowledge Graph<br>
+          ⊕ Multi-agent (ricercatore, analista, redattore)<br>
+          ⊕ Planner<br>
+          ⊕ Tool avanzati (scraping, API specializzate)
+        </div>
+        <p class="form-why">Le relazioni fra entita' contano: serve reasoning multi-hop e collegamenti fra informazioni. Singolo agente fallisce sulla pianificazione. Il KG diventa la struttura portante, non un accessorio.</p>
+        <div class="form-ex">OSINT · due diligence · analisi di mercato · ricerca accademica</div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-name">CASO 4</div>
+        <div class="form-title">Copilota Aziendale Complesso</div>
+        <p style="font-size:0.78rem; color:var(--text-secondary); margin:0;">assistente trasversale</p>
+        <div class="form-arch">
+          ⊕ Planner + Executor<br>
+          ⊕ RAG + memoria a lungo termine<br>
+          ⊕ Multi-agent + tool + cache<br>
+          ⊕ Layer di valutazione serio
+        </div>
+        <p class="form-why">Ambiente dinamico, compiti eterogenei, richieste imprevedibili. Servono coordinazione, affidabilita' e continuita' nel tempo. Qui i sette layer servono davvero. Tagliarne uno e' una scelta deliberata, non una semplificazione.</p>
+        <div class="form-ex">copilota dipendenti · supporto decisionale · automazione end-to-end</div>
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p>Quattro casi, quattro architetture, zero coincidenze. Il RAG che e' indispensabile nel caso 1 diventa zavorra nel caso 2. Il multi-agent che e' overkill nel caso 1 e' essenziale nel caso 3. Il knowledge graph che fa la differenza nel caso 3 non aggiunge nulla nel caso 1.</p>
+      <p style="margin-top: 0.8rem;"><strong>L'errore comune e' partire dall'architettura.</strong> Si parte sempre dal compito. L'architettura e' un effetto collaterale.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 5 — Sei principi
+         ============================================================ -->
+    <h2><span class="accent">//</span> Sei Principi</h2>
+    <span class="section-number">Sezione 6. Le regole che si pagano se ignorate</span>
+
+    <p>Indipendentemente dalla forma, sei principi resistono al cambio di scenario. Non sono best practice, considerale il prezzo del primo incidente. Se li ignori paghi.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Principio</th>
+          <th>Cosa significa</th>
+          <th>Cosa succede se lo ignori</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Separa i layer</strong></td>
+          <td>Modulare = scalabile e manutenibile</td>
+          <td>Cambiare il prompt rompe il retrieval. Cambiare il vector DB rompe la reflection.</td>
+        </tr>
+        <tr>
+          <td><strong>2. Il contesto e' tutto</strong></td>
+          <td>Meglio poco e rilevante che tanto e rumoroso</td>
+          <td>Allucinazioni mascherate da contenuto pertinente. Il LLM cita rumore con sicurezza.</td>
+        </tr>
+        <tr>
+          <td><strong>3. La memoria e' potere</strong></td>
+          <td>Senza memoria, l'agente e' amnesico</td>
+          <td>Ogni sessione riparte da zero. L'utente lo nota al terzo turno.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Tools &gt; parole</strong></td>
+          <td>Gli agenti diventano utili quando possono agire</td>
+          <td>L'agente "spiega" invece di "fare". Demo brillante, ROI zero.</td>
+        </tr>
+        <tr>
+          <td><strong>5. Valutare sempre</strong></td>
+          <td>Senza controllo si sbaglia in modo sicuro e ripetibile</td>
+          <td>Errori che si propagano per mesi prima di essere visti.</td>
+        </tr>
+        <tr>
+          <td><strong>6. Iterare e osservare</strong></td>
+          <td>Log, metriche, feedback umano</td>
+          <td>Sai che qualcosa non funziona ma non sai cosa, ne' dove, ne' quando.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Sono regole noiose. Vengono violate sistematicamente, anche da team senior, perche' il primo demo che funziona sembra non averne bisogno. Ne hanno bisogno al terzo mese in produzione.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 6 — Maggio 2026, antirez
+         ============================================================ -->
+    <h2><span class="accent">//</span> Maggio 2026: Antirez Cambia Una Tessera</h2>
+    <span class="section-number">Sezione 7. Il nuovo Array type di Redis e perche' c'entra con gli agenti</span>
+
+    <p>Il 3 maggio 2026 Salvatore Sanfilippo (antirez, l'autore originale di Redis) <a href="https://antirez.com/news/164" target="_blank" rel="noopener">pubblica un post</a>: il nuovo tipo di dato <strong>Array</strong> per Redis e' pronto, dopo quattro mesi di sviluppo iniziati a gennaio. <a href="https://github.com/redis/redis/pull/15162" target="_blank" rel="noopener">PR #15162</a>. Spec scritta a mano, poi affinata con Opus, poi GPT-5.x, poi revisione riga per riga.</p>
+
+    <p>Il dettaglio rilevante per chi costruisce agenti non e' il tipo in se', e' la combinazione di tre cose:</p>
+
+    <div class="redis-note">
+      <span class="rn-tag">REDIS ARRAY · PR #15162</span>
+      <p style="margin: 0.4rem 0; font-size: 0.9rem; line-height: 1.6;">
+        <strong>Sparse representation.</strong> <code>ARSET myarray 293842948324 foo</code> non alloca trentuno gigabyte. La struttura interna e' una "super-directory di directory sliced dense" con slice di 4096 elementi. Indici giganti, memoria proporzionale a quello che usi davvero.
+      </p>
+      <p style="margin: 0.7rem 0 0.4rem; font-size: 0.9rem; line-height: 1.6;">
+        <strong>ARGREP server-side.</strong> Ricerca con regex (libreria TRE), MATCH/GLOB/EXACT/RE, predicati multipli con AND/OR. La feature nasce per supportare la ricerca dentro file Markdown immagazzinati in array Redis. <em>Esattamente</em> il caso d'uso del knowledge layer di un agente.
+      </p>
+      <p style="margin: 0.7rem 0 0; font-size: 0.9rem; line-height: 1.6;">
+        <strong>ARSCAN proporzionale.</strong> Scan in tempo proporzionale agli elementi popolati, non al range. Su un array sparso con dieci elementi su un indice da miliardi, lo scan e' istantaneo.
+      </p>
+    </div>
+
+    <p>Tradotto in linguaggio agentico: il <em>knowledge layer</em> dell'articolo precedente, che era un vault Obsidian su filesystem locale, diventa una struttura Redis nativa interrogabile lato server con regex, dentro lo stesso processo che gia' tiene la memoria a breve termine, la cache di sessione, e (con Vector Sets) il RAG. Un solo backend per quattro layer.</p>
+
+    <p>Su X, lo stesso giorno del post, antirez chiarisce la cornice in un thread di quattro tweet. La parte importante non e' il tipo di dato, e' come cambia la forma del knowledge layer di un agente:</p>
+
+    <div class="iola-box">
+      Una cosa da capire sul nuovo tipo Array di Redis e sul supporto di ARGREP e' che puoi memorizzare, nelle chiavi di Redis, diversi documenti markdown (abilita') che vengono utilizzati e aggiornati collettivamente da una <strong>moltitudine di agenti remoti</strong>. Credo che il fatto che Redis sia cosi' ben compreso da parte degli LLM e delle persone, sia remoto, e questo supporto permettera' di creare <strong>knowledge base per agenti che non sono centralizzati, non devono risiedere nel filesystem, e sono banali da aggiornare / accedere</strong>. Gli agenti possono scoprire documenti tramite <code>KEYS</code> o <code>ARGREP</code>-pando un indice, e poi possono <code>ARGREP skill.md - + RE foo|bar|zap</code> e cosi' via.
+      <span class="iola-attr">antirez, X, 3 maggio 2026</span>
+    </div>
+
+    <p>Tre cose, in ordine. <strong>Primo</strong>: i documenti che l'agente legge non sono file su disco. Sono chiavi Redis, accessibili in rete, non sequenziali rispetto alla CPU dell'agente. Cambia la topologia: niente filesystem condiviso, niente sync. <strong>Secondo</strong>: il pattern di accesso e' <code>KEYS</code> per scoprire l'indice + <code>ARGREP</code> per filtrare il singolo documento. Discovery e retrieval su due livelli, entrambi server-side. <strong>Terzo</strong>: gli agenti sono <em>una moltitudine</em>. Concorrenti, distribuiti, magari di fornitori diversi, che leggono e aggiornano collettivamente lo stesso set di skill.</p>
+
+    <p>Questo punto vale piu' del comando in se'. Il knowledge graph dell'articolo precedente era locale: un vault per agente. Bene per un single agent in cloud o per un assistente personale, scomodo per qualunque scenario multi-agente. Antirez sta dicendo che con l'Array type Redis diventa una <strong>memoria collettiva interrogabile</strong>: l'equivalente per gli agenti di quello che il filesystem e' per i processi Unix, ma con regex server-side e accesso remoto.</p>
+
+    <p>Antirez stesso, nel post, e' onesto sul punto: il PR e' aperto, non ancora merged. Ma la direzione che traccia e' chiara, e si vede gia' nelle altre parti del progetto. Aprile 2026, sempre dal blog Redis: <a href="https://redis.io/blog/long-term-memory-architectures-ai-agents/" target="_blank" rel="noopener">Long-Term Memory Architectures for AI Agents</a>. Una settimana dopo, <a href="https://github.com/redis/agent-memory-server" target="_blank" rel="noopener">Redis Agent Memory Server</a> in alpha. Il messaggio e' coerente: Redis non vuole essere "anche utile" per gli agenti, vuole essere il backbone di default.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Una nota di metodo.</strong> Antirez racconta apertamente di aver usato AI-assisted programming per scrivere il PR (Opus per il design, GPT-5.x e Codex per l'implementazione). Non e' un dettaglio di colore. Lui scrive: "per system programming ad alta qualita' occorre restare pienamente coinvolti". Il modello giusto non e' "l'AI scrive il codice". E' "l'AI fornisce la rete di sicurezza per gestire complessita' che altrimenti avrei evitato". Stessa filosofia che usiamo per costruire un agente che fa security: non sostituisce l'analista, gli toglie il carico ripetitivo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 7 — Perche' Redis diventa il backbone
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' Redis Diventa Il Backbone</h2>
+    <span class="section-number">Sezione 8. Un solo processo, sette ruoli</span>
+
+    <p>L'argomento "usa Redis come backbone agentico" non e' marketing: e' una constatazione architetturale. Guarda l'immagine dei sette layer e contali quanti ne tocca un Redis 8.x ben configurato.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Funzione Redis</th>
+          <th>Latenza tipica</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Memoria a breve termine</td>
+          <td>Hash + TTL per sessione, cronologia, task state</td>
+          <td>&lt; 1 ms</td>
+        </tr>
+        <tr>
+          <td>Memoria a lungo termine (vettoriale)</td>
+          <td>Vector Set (HNSW, AVX2/AVX512 dot product)</td>
+          <td>~5-20 ms su milioni di vettori</td>
+        </tr>
+        <tr>
+          <td>Knowledge layer (note, regex)</td>
+          <td>Array type + ARGREP <em>(in arrivo, PR #15162)</em></td>
+          <td>O(elementi popolati)</td>
+        </tr>
+        <tr>
+          <td>Cache / stato condiviso</td>
+          <td>String + TTL, Hash partizionati</td>
+          <td>&lt; 1 ms</td>
+        </tr>
+        <tr>
+          <td>Stream eventi (pub/sub multi-agent)</td>
+          <td>Streams (XADD/XREAD/XACK)</td>
+          <td>&lt; 5 ms</td>
+        </tr>
+        <tr>
+          <td>Hybrid search (RAG + filtri)</td>
+          <td>FT.HYBRID (Redis 8.4+)</td>
+          <td>parallel I/O, ~4.7x throughput</td>
+        </tr>
+        <tr>
+          <td>Semantic cache (LLM-level)</td>
+          <td>LangCache (preview)</td>
+          <td>~ms (hit), risparmia token</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Un solo processo, sette ruoli. Non significa "fai tutto con Redis". Significa che la <strong>linea di taglio</strong> tra cosa tenere in Redis e cosa spostare altrove e' molto piu' alta di quanto sembri. Per la maggior parte degli agenti reali, "Redis + un LLM" copre i sette layer. Postgres, Neo4j, Pinecone diventano necessari solo quando il caso lo richiede davvero.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Onestamente: funziona finche' i vincoli restano gestibili.</strong> Quando la scala cresce, quando servono join complessi su entita' eterogenee, quando le query analitiche multi-hop diventano la norma e non l'eccezione, Redis come backbone unico inizia a stridere. Il punto non e' "Redis e' la soluzione finale": e' che il <em>punto di rottura</em> e' molto piu' lontano di quanto la cargo-cult dello stack ML tipica suggerisca. Conviene partire da qui e migrare quando il dolore reale si manifesta, non prima.</p>
+    </div>
+
+    <p>La regola e' sempre quella: parti dal compito. Se il caso e' caso 2 (workflow operativo), Redis basta e avanza. Se e' caso 3 (OSINT pesante con reasoning multi-hop su milioni di entita'), serve un graph database vero. Se e' caso 4, dipende dal volume.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 8 — Il lab
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab: Tre Sentieri Nello Stesso Diagramma</h2>
+    <span class="section-number">Sezione 9. Un agente di cucina che cambia forma a seconda della query</span>
+
+    <p>Per dimostrare il punto della sezione 4 (le frecce sono possibilita', non obbligo) il lab esce volutamente dal dominio della security: un assistente di cucina italiana, costruito su Redis 8 come backbone unico. Cucina perche' tutti capiscono cosa fa: convertire una ricetta per N persone, riconoscere uno stile regionale, trovare pattern fra preparazioni. La tesi e' la stessa indipendentemente dal dominio.</p>
+
+    <p>Tre query, tre sentieri reali nel diagramma. Il codice stampa <code>PATH</code> e <code>SKIPPED</code> ad ogni run cosi' lo vedi a occhio.</p>
+
+    <div class="form-grid">
+      <div class="form-card">
+        <div class="form-name">QUERY 1 · domanda semplice</div>
+        <div class="form-title">"Cos'e' il soffritto?"</div>
+        <div class="form-arch">
+          PATH<br>
+          INPUT → CAG → OUTPUT → GUARDRAIL<br><br>
+          <span style="color:#6a6a8a">SKIPPED</span><br>
+          <span style="color:#6a6a8a">RAG, KG, ORCHESTRATION,</span><br>
+          <span style="color:#6a6a8a">TOOL, MEMORY(write)</span>
+        </div>
+        <p class="form-why">La definizione e' nel system prompt CAG. Una sola chiamata LLM, output diretto. Niente retrieval, niente tool, niente memoria persistente.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-name">QUERY 2 · task operativo</div>
+        <div class="form-title">"Convertimi la Carbonara per 6 persone"</div>
+        <div class="form-arch">
+          PATH<br>
+          INPUT → CAG → TOOL<br>
+          → OUTPUT → GUARDRAIL → MEMORY<br><br>
+          <span style="color:#6a6a8a">SKIPPED</span><br>
+          <span style="color:#6a6a8a">RAG, KG, ORCHESTRATION</span>
+        </div>
+        <p class="form-why">Il routing rileva ricetta + numero di persone. Chiama il tool deterministico <code>convert_servings</code> che parsa gli ingredienti e li scala. Il LLM impagina il risultato, la memoria di sessione registra l'interazione.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="form-name">QUERY 3 · analisi multi-hop</div>
+        <div class="form-title">"Pattern delle ricette napoletane"</div>
+        <div class="form-arch">
+          PATH<br>
+          INPUT → KG (ARGREP)<br>
+          → ORCHESTRATION (multi-agent)<br>
+          → OUTPUT → GUARDRAIL<br><br>
+          <span style="color:#6a6a8a">SKIPPED</span><br>
+          <span style="color:#6a6a8a">CAG (verbatim), RAG, TOOL,</span><br>
+          <span style="color:#6a6a8a">MEMORY(write)</span>
+        </div>
+        <p class="form-why">Il KG contiene sei ricette. Filtro <code>ARGREP "stile:.*napolet"</code>: trova le tre napoletane. Multi-agent: <em>researcher</em> (Haiku) estrae i fatti, <em>analyst</em> (Sonnet) sintetizza i pattern. Niente RAG: il KG e' gia' pieno di contesto.</p>
+      </div>
+    </div>
+
+    <p>Tre query, tre sentieri davvero diversi. Non sottoinsiemi annidati: combinazioni differenti. La query 1 attraversa quattro layer, la 2 ne attraversa sei, la 3 cinque, ma il sentiero della 3 non passa per il TOOL della 2, e quello della 2 non tocca KG e ORCHESTRATION della 3. Stesso agente, stesso pool, sentieri distinti.</p>
+
+    <p>Il pezzo nuovo che rende efficiente il sentiero analitico e' il modulo <code>redis_array.py</code>: una classe Python che riproduce le semantiche di ARSET/ARGREP/ARINSERT del PR di antirez, ma sopra primitive Redis disponibili oggi (Sorted Set + Hash). L'API e' la stessa che esporra' il PR quando verra' merged. Quando il PR atterra in master, sostituisci la classe con i comandi nativi senza toccare il resto del codice.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># redis_array.py: emula ARSET/ARGREP/ARINSERT su Redis 8.x</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">class</span> <span class="ct">RedisArray</span>:</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="ck">def</span> <span class="cf">arset</span>(<span class="cv">self</span>, <span class="cv">key</span>: <span class="ct">str</span>, <span class="cv">index</span>: <span class="ct">int</span>, <span class="cv">value</span>: <span class="ct">str</span>):</td></tr>
+<tr><td class="ln">4</td><td class="code">        <span class="cc"># sparse: salviamo solo gli indici popolati in un Sorted Set</span></td></tr>
+<tr><td class="ln">5</td><td class="code">        <span class="cv">self</span>.<span class="cv">r</span>.<span class="cf">zadd</span>(<span class="cs">f</span><span class="cs">"</span><span class="cs">{key}</span><span class="cs">:idx"</span>, {<span class="cf">str</span>(<span class="cv">index</span>): <span class="cv">index</span>})</td></tr>
+<tr><td class="ln">6</td><td class="code">        <span class="cv">self</span>.<span class="cv">r</span>.<span class="cf">hset</span>(<span class="cs">f</span><span class="cs">"</span><span class="cs">{key}</span><span class="cs">:val"</span>, <span class="cf">str</span>(<span class="cv">index</span>), <span class="cv">value</span>)</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="ck">def</span> <span class="cf">argrep</span>(<span class="cv">self</span>, <span class="cv">key</span>: <span class="ct">str</span>, <span class="cv">pattern</span>: <span class="ct">str</span>, <span class="cv">mode</span>=<span class="cs">"RE"</span>):</td></tr>
+<tr><td class="ln">9</td><td class="code">        <span class="cc"># lato server (mock): regex su tutti i valori popolati</span></td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="cv">vals</span> = <span class="cv">self</span>.<span class="cv">r</span>.<span class="cf">hgetall</span>(<span class="cs">f</span><span class="cs">"</span><span class="cs">{key}</span><span class="cs">:val"</span>)</td></tr>
+<tr><td class="ln">11</td><td class="code">        <span class="cv">rx</span> = <span class="cv">re</span>.<span class="cf">compile</span>(<span class="cv">pattern</span>)</td></tr>
+<tr><td class="ln">12</td><td class="code">        <span class="ck">return</span> [(<span class="cf">int</span>(<span class="cv">i</span>), <span class="cv">v</span>) <span class="ck">for</span> <span class="cv">i</span>, <span class="cv">v</span> <span class="ck">in</span> <span class="cv">vals</span>.<span class="cf">items</span>() <span class="ck">if</span> <span class="cv">rx</span>.<span class="cf">search</span>(<span class="cv">v</span>)]</td></tr>
+<tr><td class="ln">13</td><td class="code"></td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="ck">def</span> <span class="cf">arinsert</span>(<span class="cv">self</span>, <span class="cv">key</span>: <span class="ct">str</span>, <span class="cv">value</span>: <span class="ct">str</span>) -> <span class="ct">int</span>:</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="cv">last</span> = <span class="cv">self</span>.<span class="cv">r</span>.<span class="cf">zrange</span>(<span class="cs">f</span><span class="cs">"</span><span class="cs">{key}</span><span class="cs">:idx"</span>, -<span class="cn">1</span>, -<span class="cn">1</span>, <span class="cv">withscores</span>=<span class="ck">True</span>)</td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="cv">next_idx</span> = <span class="cf">int</span>(<span class="cv">last</span>[<span class="cn">0</span>][<span class="cn">1</span>]) + <span class="cn">1</span> <span class="ck">if</span> <span class="cv">last</span> <span class="ck">else</span> <span class="cn">0</span></td></tr>
+<tr><td class="ln">17</td><td class="code">        <span class="cv">self</span>.<span class="cf">arset</span>(<span class="cv">key</span>, <span class="cv">next_idx</span>, <span class="cv">value</span>)</td></tr>
+<tr><td class="ln">18</td><td class="code">        <span class="ck">return</span> <span class="cv">next_idx</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>Quando lanci <code>python run_demo.py</code> il programma stampa, per ogni query, il PATH effettivo e i layer SALTATI. La verita' di cosa e' stato eseguito, non lo schema teorico.</p>
+
+    <div class="code-block" data-lang="text">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc">QUERY 1 (knowledge): Cos'è il soffritto?</span></td></tr>
+<tr><td class="ln">2</td><td class="code">  PATH    : <span class="cs">INPUT → CAG → OUTPUT → GUARDRAIL</span></td></tr>
+<tr><td class="ln">3</td><td class="code">  SKIPPED : <span class="cc">RAG, KG, ORCHESTRATION, TOOL, MEMORY(write)</span></td></tr>
+<tr><td class="ln">4</td><td class="code"></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cc">QUERY 2 (operational): Convertimi la Carbonara per 6 persone</span></td></tr>
+<tr><td class="ln">6</td><td class="code">  PATH    : <span class="cs">INPUT → CAG → TOOL → OUTPUT → GUARDRAIL → MEMORY(write)</span></td></tr>
+<tr><td class="ln">7</td><td class="code">  SKIPPED : <span class="cc">RAG, KG, ORCHESTRATION</span></td></tr>
+<tr><td class="ln">8</td><td class="code">  TOOL    : <span class="cv">convert_servings(Carbonara, 6)</span></td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cc">QUERY 3 (analytic): Pattern delle ricette napoletane?</span></td></tr>
+<tr><td class="ln">11</td><td class="code">  PATH    : <span class="cs">INPUT → KG → ORCHESTRATION → OUTPUT → GUARDRAIL</span></td></tr>
+<tr><td class="ln">12</td><td class="code">  SKIPPED : <span class="cc">CAG, RAG, TOOL, MEMORY(write)</span></td></tr>
+<tr><td class="ln">13</td><td class="code">  KG      : <span class="cv">ARGREP "stile:\s*napoletana"</span> → 3 ricette</td></tr>
+<tr><td class="ln">14</td><td class="code">  AGENTS  : <span class="cv">researcher (Haiku) → analyst (Sonnet)</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>Vedi la differenza riga per riga: nessuna delle tre query attraversa tutti i layer, nessuna e' un sottoinsieme banale di un'altra. La 2 chiama un tool che la 1 non chiama, la 3 attiva un'orchestrazione multi-agent che la 2 non tocca, la 1 e' un sentiero piatto che le altre non fanno.</p>
+
+    <p style="font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--accent-attention); line-height: 1.8; margin: 1.4rem 0;">
+      Non esistono tre configurazioni. Esiste un solo sistema che, a ogni query, decide quali parti di se' usare.
+    </p>
+
+    <p>Stesso codice, stesso processo, stesso pool di componenti. Cambia il <em>sentiero</em>. E' una cosa diversa dall'avere tre agenti specializzati: e' un <em>unico</em> agente che si riconfigura runtime, query per query.</p>
+
+    <figure class="article-image fade-in">
+      <img src="../immagini/l-agente-non-ha-una-forma/demo-output.png" alt="Output del demo: Q1 knowledge attraversa Input/CAG/Output/Guardrail in 2.87s; Q2 operational chiama convert_servings(Carbonara, 6) e produce 480g spaghetti, 225g guanciale, 6 tuorli, 1.5 uovo intero, 120g pecorino in 6.69s; Q3 analytic filtra il KG con ARGREP 'stile:.*napolet' trovando Genovese, Pasta e Patate, Pizza Margherita e sintetizza 6 pattern comuni alla cucina napoletana in 12.57s." loading="lazy">
+      <figcaption>Esecuzione di <code>python run_demo.py</code>. Q1 (knowledge): 4 layer, 2.87s. Q2 (operational): 7 layer, tool che scala la Carbonara da 4 a 6 persone con fattore 1.5, 6.69s. Q3 (analytic): 5 layer, ARGREP filtra le 3 napoletane, multi-agent researcher+analyst sintetizza i pattern, 12.57s.</figcaption>
+    </figure>
+
+
+    <!-- ============================================================
+         SEZIONE 9 — Il routing
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Routing</h2>
+    <span class="section-number">Sezione 10. Chi sceglie il sentiero</span>
+
+    <p>Il <strong>router</strong> decide quale sentiero attivare. Volutamente deterministico: zero token bruciati per classificare query banali. Tre segnali, tre euristiche, fallback a knowledge form se nessuna scatta.</p>
+
+    <div class="code-block" data-lang="python">
+      <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">def</span> <span class="cf">decide_form</span>(<span class="cv">query</span>: <span class="ct">str</span>, <span class="cv">mem</span>: <span class="ct">Memory</span>) -> <span class="ct">Form</span>:</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="cv">q</span> = <span class="cv">query</span>.<span class="cf">lower</span>()</td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cc"># 1) domanda definitoria → CAG-only</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="ck">if</span> <span class="cf">any</span>(<span class="cv">k</span> <span class="ck">in</span> <span class="cv">q</span> <span class="ck">for</span> <span class="cv">k</span> <span class="ck">in</span> [<span class="cs">"cos'e'"</span>, <span class="cs">"definizione"</span>, <span class="cs">"spiega"</span>]):</td></tr>
+<tr><td class="ln">6</td><td class="code">        <span class="ck">return</span> <span class="ct">Form</span>.<span class="cv">KNOWLEDGE</span></td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cc"># 2) "pattern", "stile X" + KG popolato → analisi multi-agent</span></td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">if</span> <span class="cf">any</span>(<span class="cv">k</span> <span class="ck">in</span> <span class="cv">q</span> <span class="ck">for</span> <span class="cv">k</span> <span class="ck">in</span> [<span class="cs">"pattern"</span>, <span class="cs">"in comune"</span>]) <span class="ck">or</span> <span class="cf">detect_style</span>(<span class="cv">q</span>):</td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="ck">if</span> <span class="cv">mem</span>.<span class="cv">kg</span>.<span class="cf">size</span>() >= <span class="cn">2</span>:</td></tr>
+<tr><td class="ln">11</td><td class="code">            <span class="ck">return</span> <span class="ct">Form</span>.<span class="cv">ANALYTIC</span></td></tr>
+<tr><td class="ln">12</td><td class="code"></td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="cc"># 3) ricetta nota + numero di persone → tool deterministico</span></td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="ck">if</span> <span class="cf">detect_recipe</span>(<span class="cv">query</span>) <span class="ck">and</span> <span class="cf">detect_servings</span>(<span class="cv">query</span>):</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="ck">return</span> <span class="ct">Form</span>.<span class="cv">OPERATIONAL</span></td></tr>
+<tr><td class="ln">16</td><td class="code"></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="ck">return</span> <span class="ct">Form</span>.<span class="cv">KNOWLEDGE</span>  <span class="cc"># default sicuro, costa pochissimo</span></td></tr>
+      </table></div>
+    </div>
+
+    <p>Tre regole, niente classifier LLM. Funziona perche' il dominio della cucina ha pattern lessicali stabili: <code>cos'e'</code>, <code>per N persone</code>, <code>napoletana</code>, <code>in comune</code>. In un dominio meno strutturato vale la pena aggiungere un fallback a Haiku, ma solo come ultima istanza.</p>
+
+    <p>Il piacere di questo approccio e' che la "forma" non e' configurata: emerge. La query 3 e' analitica solo perche' il KG ha gia' due o piu' ricette. Su un'installazione a freddo verrebbe degradata a knowledge. L'agente si adatta a quello che ha.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10 — Limiti
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Si Rompe</h2>
+    <span class="section-number">Sezione 11. Onesti sui limiti</span>
+
+    <p>Il sistema funziona ma non e' senza punti deboli. Tre, in particolare.</p>
+
+    <p><strong>Il PR di antirez non e' merged.</strong> ARSET/ARGREP/ARINSERT sono ancora in review. Il lab usa una classe Python che emula le semantiche su Sorted Set + Hash. La latenza sara' diversa quando atterrera' la versione nativa: sicuramente piu' bassa, probabilmente molto. Il codice resta uguale, l'API e' la stessa, ma i numeri di benchmark che vedi adesso non sono quelli che vedrai a merge avvenuto.</p>
+
+    <p><strong>Il routing deterministico copre i casi facili.</strong> Le tre euristiche del decisore funzionano per il dominio del lab (cucina italiana: ricette note, stili regionali, parole chiave come "pattern" e "per N persone"). Su un dominio diverso vanno reimpostate. Per agenti con migliaia di query/giorno e dominio aperto, l'unica strada e' fine-tuning di un classifier piccolo.</p>
+
+    <p><strong>Memoria non e' apprendimento.</strong> L'agente ricorda. Non impara nel senso forte: i pesi del LLM non cambiano. Se sbaglia in modo sistematico su un certo tipo di query, lo continua a sbagliare. La reflection alza un alert, la memoria di errori riduce la frequenza, ma il bias di base resta. Senza un loop di fine-tuning vero, "imparare" e' una metafora.</p>
+
+    <p>Detto questo: la parte che funziona davvero e' la pulizia del backbone. Un solo Redis per memoria, KG, cache, stream. Quattro layer su un processo. Quando il PR Array atterra, diventano cinque. La latenza scende. Il codice si semplifica. La promessa di antirez sull'AI-assisted programming si vede nella forma del PR stesso: 4000 righe di C ben fatte, 4 mesi di lavoro che senza AI ne sarebbero stati otto, e che senza supervisione sarebbero stati pessimi.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 11 — Tre articoli, una architettura
+         ============================================================ -->
+    <h2><span class="accent">//</span> Tre Articoli, Una Architettura</h2>
+    <span class="section-number">Sezione 12. Dove ci siamo arrivati</span>
+
+    <p>Tre pezzi, tre angolazioni dello stesso problema.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Articolo</th>
+          <th>Domanda</th>
+          <th>Risposta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="l-agente-che-non-inventa.html"><strong>L'Agente Che Non Inventa</strong></a></td>
+          <td>Come si costruisce un agente che non allucina?</td>
+          <td>Sette layer, meta-controller, RAG + tool + reflection.</td>
+        </tr>
+        <tr>
+          <td><a href="l-agente-che-costruisce-conoscenza.html"><strong>L'Agente Che Costruisce Conoscenza</strong></a></td>
+          <td>Come fa l'agente a imparare nel tempo?</td>
+          <td>Knowledge graph dinamico tra Memory e CAG, promozione automatica.</td>
+        </tr>
+        <tr>
+          <td><strong>L'Agente Non Ha Una Forma</strong></td>
+          <td>Quale architettura scegliere?</td>
+          <td>Quella giusta per il compito. Sette layer sono il pool, non il template.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Il primo articolo costruisce. Il secondo aggiunge. Questo dice quando togliere. La progressione naturale di chi prima impara la grammatica completa e poi capisce che lo stile e' decidere cosa non dire.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 13 — L'agente ha dei percorsi
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Agente Ha Dei Percorsi</h2>
+    <span class="section-number">Sezione 13. Il punto vero, in tre righe</span>
+
+    <p>Tutto quello che hai letto fin qui (sette layer, quattro forme, il diagramma che mente, l'Array di antirez, il lab in cucina, il routing deterministico) converge in una frase sola.</p>
+
+    <p style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-attention); line-height: 1.6; margin: 1.6rem 0; text-align: center;">
+      L'agente non ha una forma.<br>
+      Ha dei percorsi.
+    </p>
+
+    <p>Implica un cambio di mestiere per chi progetta sistemi del genere. Tre conseguenze, ognuna piu' importante della precedente:</p>
+
+    <div class="layer-grid">
+      <div class="layer-card lc-3">
+        <span class="ln-num">CONSEGUENZA 1</span>
+        <div class="ln-name">Il design vero e' il routing</div>
+        <div class="ln-desc" style="margin-top: 0.6rem;">Il valore di un agente sta nelle decisioni che prende su quali componenti usare per ogni query, non nell'inventario dei componenti che monti. Cambia il livello del lavoro: dal cablare una pipeline al disegnare un grafo di scelte.</div>
+      </div>
+      <div class="layer-card lc-4">
+        <span class="ln-num">CONSEGUENZA 2</span>
+        <div class="ln-name">Il collo di bottiglia e' il decisore</div>
+        <div class="ln-desc" style="margin-top: 0.6rem;">Migliorare il RAG serve poco se il router lo chiama nei casi sbagliati; migliorare il KG serve meno se non viene mai consultato. La qualita' che paga sta nelle euristiche di routing, non nei layer in se'.</div>
+      </div>
+      <div class="layer-card lc-2">
+        <span class="ln-num">CONSEGUENZA 3</span>
+        <div class="ln-name">Il deliverable e' uno spazio, non un agente</div>
+        <div class="ln-desc" style="margin-top: 0.6rem;">Quello che metti in produzione e' un sistema in cui molti agenti possibili coesistono, e quello effettivo emerge query per query dal routing. Cambia la query, cambia l'agente. La forma e' una proprieta' emergente, non una scelta fatta a priori.</div>
+      </div>
+    </div>
+
+    <p>Questa e' la riformulazione che vale piu' di un anno di paper su agentic architecture. Non e' RAG vs CAG. Non e' single vs multi-agent. Non e' Redis vs Postgres. E' la differenza fra <em>oggetto</em> e <em>processo</em>: l'agente non e' una cosa, e' un comportamento.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 14 — Conclusione (Iola)
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Memoria Sostituisce I Ricordi</h2>
+    <span class="section-number">Sezione 14. Iola, di nuovo</span>
+
+    <p>Iola Varga, sul letto d'ospedale, scrive la sua autobiografia. Si interrompe. Pensa: <em>e se quello che ho scritto non corrispondesse a quello che e' successo?</em> Decide di rileggere e correggere. Subito dopo capisce qualcosa di peggio.</p>
+
+    <div class="iola-box">
+      Rileggo quello che ho scritto: e' lacunoso. Sono tormentata dai dubbi sulla fedelta' di certi eventi, e se provo a verificarli e' anche peggio: la scrittura sostituisce i ricordi. Bit di memoria corrotti, 0 che diventano 1 e viceversa; non voglio neanche pieta'.
+      <span class="iola-attr">Iola Varga, ultima pagina</span>
+    </div>
+
+    <p>Un agente con memoria a lungo termine ha lo stesso problema. Ogni summarization sostituisce un pezzo di contesto originale con una sua compressione. Ogni promozione al CAG decide che certe note rappresentano "l'agente". Ogni decay cancella. Ad ogni passo, la rappresentazione che il sistema ha di se' si allontana un po' da quello che e' davvero successo.</p>
+
+    <p>Non e' un bug: e' la condizione necessaria per non saturare. Senza compressione la memoria diventa inutile. Senza decay, anche. Ma significa che la coerenza dell'agente, oltre l'orizzonte breve, e' un'opera narrativa, non un archivio. Bit che diventano 1, bit che diventano 0. Senza pieta'.</p>
+
+    <p>La forma giusta dell'agente, in fondo, non e' un grafo di layer. E' il modo in cui scegli quanta corruzione tollerare in cambio di quanta capacita' di rispondere.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">
+        "L'agente non ha una forma, ha dei percorsi.<br>
+        Quello che consegni e' uno spazio di possibilita'.<br>
+        E quello che ricordi non e' quello che e' successo."
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Codice:</strong> tutto il lab e' in <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/l-agente-non-ha-una-forma" target="_blank" rel="noopener">scripts/l-agente-non-ha-una-forma</a>. Prerequisiti: Python 3.10+, Redis 8.x (Docker compose incluso), <code>ANTHROPIC_API_KEY</code>. Quando il PR <a href="https://github.com/redis/redis/pull/15162" target="_blank" rel="noopener">#15162</a> di antirez atterra, basta sostituire <code>redis_array.py</code> con i comandi nativi.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Riferimenti.</strong></p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+        ⊕ <a href="https://antirez.com/news/164" target="_blank" rel="noopener">antirez.com/news/164</a>: il post che annuncia l'Array type (3 maggio 2026).<br>
+        ⊕ <a href="http://invece.org/iola.html" target="_blank" rel="noopener">invece.org/iola.html</a>: Tales of Illustrious Computer Scientists, Iola Varga.<br>
+        ⊕ <a href="https://redis.io/blog/long-term-memory-architectures-ai-agents/" target="_blank" rel="noopener">redis.io/blog/long-term-memory-architectures-ai-agents</a>: l'architettura che inquadra il lavoro.<br>
+        ⊕ <a href="https://github.com/redis/agent-memory-server" target="_blank" rel="noopener">redis/agent-memory-server</a>: il server di memoria agentica di Redis.
+      </p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
