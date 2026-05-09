@@ -55,6 +55,35 @@
 
     <div class="articles-grid">
 
+      <!-- Article Card: Ogni Blocco Ha Un Nome -->
+      <a href="articoli/ogni-blocco-ha-un-nome.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-05-09</div>
+        <h3 class="article-card-title">Ogni Blocco Ha Un Nome</h3>
+        <p class="article-card-abstract">
+          La polemica MD vs HTML per gli LLM si e' riaccesa questa settimana:
+          l'8 maggio Thariq Shihipar del team Claude Code di Anthropic
+          argomenta HTML come output format, ripreso da Simon Willison. Il
+          giorno prima esce mdream che fa il contrario, converte HTML in
+          Markdown con il 50% di token in meno. Cloudflare a marzo aveva
+          lanciato Markdown for Agents. Sembrano tre posizioni opposte, in
+          realta' sono tre risposte a tre fasi diverse dello stesso
+          workflow (ingestion, output ricco, editing collaborativo)
+          scambiate per una sola polemica. La fase 3 nessuno la sta
+          misurando. Ho costruito un prototipo Rust (AGD) per esplorarla:
+          parser LL(1), 89 test, demone Redis nativo che fa 2,3 us/op.
+          Numeri onesti: AGD costa il 20% in piu' di Markdown sul
+          whole-doc loading, ma 14 volte in meno sul retrieval mirato.
+          Lab a tre vie, due versioni (sequenziale + Redis), tutto
+          riproducibile.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">Document Format</span>
+          <span class="tag tag-highlight">LLM Tokens</span>
+          <span class="tag tag-reaction">Multi-Agent Edit</span>
+          <span class="tag tag-amplification">Rust</span>
+        </div>
+      </a>
+
       <!-- Article Card: L'Agente Non Ha Una Forma -->
       <a href="articoli/l-agente-non-ha-una-forma.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-05-04</div>

@@ -1,0 +1,6 @@
+output/
+v2_redis/output/
+__pycache__/
+v2_redis/__pycache__/
+*.pyc
+.DS_Store

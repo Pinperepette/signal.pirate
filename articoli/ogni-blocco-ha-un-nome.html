@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ogni Blocco Ha Un Nome | Signal Pirate</title>
+  <meta name="description" content="Il dibattito Markdown vs HTML per gli LLM si e' riacceso questa settimana: l'8 maggio Thariq Shihipar del team Claude Code di Anthropic pubblica un post che dice HTML batte Markdown, Simon Willison lo amplifica. Il giorno prima, lunedi' 5 maggio, esce mdream che fa il contrario: converte HTML in Markdown con 50% meno token. Cloudflare a marzo aveva lanciato Markdown for Agents. Sembrano tre posizioni opposte, in realta' sono tre risposte a tre problemi diversi (ingestion, output ricco, editing collaborativo) scambiate per una sola polemica. La casella vuota e' la terza, l'editing multi-agente di documenti lunghi nel tempo, e nessuno la sta misurando. Ho costruito un prototipo in Rust (AGD) per esplorare quel buco. Sintassi line-oriented, ID stabili per blocco, parser LL(1) in 1000 righe, 89 test, una scoperta architetturale: l'index O(1) sui block IDs vince 583x sul find lineare a 10k blocchi. Onesto: per il 95% dei casi reali Markdown resta la scelta giusta. AGD ha senso solo nel 5% del multi-agent edit. Il post non e' un annuncio di prodotto, e' una mappa del design space.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .iola-box {
+      background: #0d1117;
+      border-left: 3px solid #b5cea8;
+      border-radius: 0 10px 10px 0;
+      padding: 1.4rem 1.8rem;
+      margin: 2rem 0;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      font-style: italic;
+    }
+    .iola-box .iola-attr {
+      display: block;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+      font-style: normal;
+      font-size: 0.7rem;
+      color: #6a6a8a;
+      letter-spacing: 0.05em;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      padding: 1rem 1.4rem;
+      white-space: pre;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .strategy-table .num { text-align: right; font-family: var(--font-mono); }
+
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.5;
+    }
+
+    .phase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .phase-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      border-left: 3px solid var(--accent-attention);
+    }
+    .phase-card .ph-num {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--accent-attention);
+      margin-bottom: 0.4rem;
+    }
+    .phase-card .ph-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .phase-card .ph-claim {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-highlight);
+      margin-bottom: 0.6rem;
+    }
+    .phase-card .ph-desc {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .pc-1 { border-left-color: #4ecdc4; }
+    .pc-1 .ph-num { color: #4ecdc4; }
+    .pc-2 { border-left-color: #00ff88; }
+    .pc-2 .ph-num { color: #00ff88; }
+    .pc-3 { border-left-color: #f5c518; }
+    .pc-3 .ph-num { color: #f5c518; }
+    .pc-empty { border-left-color: #ff6b6b; }
+    .pc-empty .ph-num { color: #ff6b6b; }
+
+    .agd-syntax {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.4rem 1.8rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .agd-syntax .at  { color: #00ff88; font-weight: 700; }
+    .agd-syntax .id  { color: #f5c518; }
+    .agd-syntax .at-key { color: #4ecdc4; }
+    .agd-syntax .str { color: #b5cea8; }
+    .agd-syntax .cmt { color: #6a6a8a; font-style: italic; }
+    .agd-syntax .fn  { color: #7c4dff; }
+
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .verdict-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+    }
+    .verdict-card.win { border-left: 3px solid #00ff88; }
+    .verdict-card.lose { border-left: 3px solid #ff6b6b; }
+    .verdict-card.draw { border-left: 3px solid #f5c518; }
+    .verdict-card .v-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .verdict-card.win .v-tag { color: #00ff88; }
+    .verdict-card.lose .v-tag { color: #ff6b6b; }
+    .verdict-card.draw .v-tag { color: #f5c518; }
+    .verdict-card .v-body { font-size: 0.88rem; line-height: 1.55; }
+
+    .timeline {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.4rem 1.8rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.9;
+    }
+    .timeline .t-row {
+      display: flex;
+      gap: 1.4rem;
+      align-items: baseline;
+    }
+    .timeline .t-date {
+      min-width: 6.5rem;
+      color: var(--accent-attention);
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    .timeline .t-body {
+      flex: 1;
+      color: var(--text-secondary);
+    }
+    .timeline .t-actor {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-05-09 | Pinperepette</p>
+    <h1 class="article-page-title">Ogni Blocco <span class="accent">Ha Un Nome</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Il dibattito di questa settimana e' una falsa polemica. Tre fasi diverse, scambiate per una sola.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Document Format</span>
+      <span class="tag tag-highlight">LLM Tokens</span>
+      <span class="tag tag-reaction">Multi-Agent Edit</span>
+      <span class="tag tag-amplification">Rust</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <div style="border-left: 2px solid var(--border-subtle); padding: 0.4rem 1.4rem 0.8rem; margin: 0 0 2.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7;">
+      <span style="display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-attention); margin-bottom: 0.6rem;">Premessa</span>
+      <p style="margin: 0 0 0.8rem;">Ieri sera ho letto un post di Simon Willison che amplifica un altro post, di Thariq Shihipar del team Claude Code di Anthropic. Tema: "the unreasonable effectiveness of HTML", cioe' Markdown e' troppo poco, dovremmo chiedere agli agenti di produrre HTML. Ho aperto Twitter, mi sono accorto che lunedi' (5 maggio) e' uscito mdream che fa esattamente l'opposto: converte HTML in Markdown con il 50% di token in meno, perche' "ogni token conta". Cloudflare a marzo aveva lanciato un servizio simile. Sono andato a leggere meglio: stanno tutti dicendo cose molto sensate e molto in conflitto fra loro.</p>
+      <p style="margin: 0;">Mi sono reso conto che il dibattito e' una falsa polemica. Tre persone serie litigano su tre problemi diversi, scambiati per uno solo. Il pezzo prova a separarli, e a guardare la casella che resta vuota una volta separati. Quella casella mi ha fatto scrivere mille righe di Rust in un giorno per provare a riempirla. Spoiler: il prototipo funziona, ma non risolve la falsa polemica. Risolve un problema diverso, che probabilmente non e' ancora vostro. Forse lo diventera' quest'anno.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 1 — Il post di ieri
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Post Di Ieri</h2>
+    <span class="section-number">Sezione 1. Anthropic spinge HTML, e ha ragione su quello che dice</span>
+
+    <p>L'8 maggio 2026 Simon Willison pubblica <a href="https://simonwillison.net/2026/May/8/unreasonable-effectiveness-of-html/" target="_blank" rel="noopener"><em>Using Claude Code: The Unreasonable Effectiveness of HTML</em></a>. Riprende un post di Thariq Shihipar, che lavora sul team Claude Code dentro Anthropic. La tesi di Shihipar in due righe e' chiara: per gli artifact che gli agenti producono per gli umani, HTML e' meglio di Markdown.</p>
+
+    <p>I motivi che porta sono concreti, non opinabili:</p>
+
+    <ul>
+      <li><strong>Information density.</strong> HTML ha tabelle vere, SVG, CSS, script, layout assoluti, immagini. Markdown ha header, liste, fence di codice. Per uno spec con diagrammi e mockup, MD ti costringe a ripiegare su ASCII art o, nel caso peggiore, a stimare i colori con caratteri Unicode.</li>
+      <li><strong>Visual clarity.</strong> Un MD da 100+ righe nessuno lo legge. Un HTML rendered con tabs, illustrazioni, link interni, sezioni, e' molto piu' digeribile. Soprattutto se vuoi che lo legga qualcun altro nel team.</li>
+      <li><strong>Sharing.</strong> Il browser apre l'HTML nativamente. Un MD lo apri in editor, in viewer, o lo converti. La probabilita' che il tuo PR writeup venga davvero letto e' molto piu' alta in HTML.</li>
+      <li><strong>Two-way interaction.</strong> Sliders, knobs, copy buttons che riportano JSON al prompt. Un Markdown e' un testo, un HTML e' una piccola UI usa-e-getta.</li>
+    </ul>
+
+    <p>Onesto sui downside: HTML costa 2-4× il tempo di generazione, i diff in PR sono noisy, "in token usa di piu' ma con il context da 1M di Opus 4.7 non si nota". Spende esplicitamente piu' token in cambio di artifact che effettivamente leggi.</p>
+
+    <p>Se quello che ti serve e' un piano leggibile dal team con diagrammi e mockup veri, ha ragione lui &mdash; HTML e' meglio.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 2 — La controspinta
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Controspinta</h2>
+    <span class="section-number">Sezione 2. mdream, Cloudflare, e perche' Markdown non e' affatto morto</span>
+
+    <p>Il giorno prima, lunedi' 5 maggio 2026, esce <a href="https://www.blog.brightcoding.dev/2026/05/05/mdream-the-revolutionary-html-to-markdown-converter-for-llms" target="_blank" rel="noopener">mdream</a> di Harlan Zw, JavaScript library da 6 KB gzipped che converte HTML in Markdown. Filosofia esplicita nella documentazione: <em>every token counts</em>. Output con il 50% di token in meno rispetto a Turndown, 3× piu' veloce, 1.8 MB di HTML processato in 60 ms. La promessa: pipeline RAG piu' efficienti, retrieval piu' denso, context window meno congestionato.</p>
+
+    <p>Il 5 marzo Cloudflare aveva lanciato <a href="https://www.infoq.com/news/2026/03/cloudflare-crawler/" target="_blank" rel="noopener">Markdown for Agents</a>. Funzionamento: i crawler AI mandano un header <code>Accept: text/markdown</code>, gli edge server di Cloudflare convertono al volo, restituiscono Markdown con un header aggiuntivo <code>x-markdown-tokens</code>. Esempio citato nell'annuncio: un blog post da 16.180 token in HTML diventa 3.150 token in Markdown. Risparmio dell'80%.</p>
+
+    <p>John Mueller di Google ha definito Markdown for Agents <em>"a stupid idea"</em>, perche' rimuove contesto e struttura. Cloudflare l'ha lasciato passare. Questa e' la posizione mainstream del mercato adesso: per fare ingestion di contenuti web verso un LLM, il Markdown e' una vittoria di defaults a tre cifre percentuali in costo.</p>
+
+    <p>Microsoft il 17 aprile ha rilasciato <a href="https://www.blog.brightcoding.dev/2026/04/17/markitdown-transform-any-file-into-llm-ready-markdown" target="_blank" rel="noopener">MarkItDown</a>, converter universale per file Office, PDF, immagini, audio → Markdown. Stessa filosofia: per dare contesto agli LLM, Markdown vince.</p>
+
+    <p>L'argomento profondo della controspinta non e' solo il conteggio token. E' che gli LLM sono pretrained su miliardi di token di prosa e codice, contro una frazione di HTML soup. Quando produci HTML come <em>input</em> per il modello paghi due volte: piu' token e meno allineamento con la distribuzione di training. La densita' semantica del Markdown si paga in espressivita', si guadagna in comprensione.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 3 — Il trucco
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Trucco</h2>
+    <span class="section-number">Sezione 3. Stanno parlando di cose diverse</span>
+
+    <p>Shihipar parla di <strong>output</strong>: cosa l'agente produce per te.</p>
+    <p>Cloudflare e mdream parlano di <strong>input</strong>: cosa tu fai vedere all'agente.</p>
+
+    <p>Sono fasi diverse del workflow, con vincoli opposti. Shihipar ha 1M token di context window, gli costa quasi nulla aggiungere CSS e SVG, in cambio gli torna un PDF leggibile. Cloudflare deve farti pagare 16.180 token invece di 3.150 per ogni pagina che dai in pasto a un crawler che fa retrieval batch su milioni di URL. La vittoria del primo non e' la sconfitta del secondo, e viceversa.</p>
+
+    <div class="iola-box">
+      Quando piu' osservatori onesti misurano la stessa cosa con strumenti diversi e ottengono risposte diverse, di solito non stanno misurando la stessa cosa. Stanno guardando facce diverse di un oggetto che hanno chiamato con lo stesso nome.
+    </div>
+
+    <p>Il dibattito di questa settimana sembra "Markdown contro HTML, chi vince per gli LLM". E' una semplificazione che salta in aria appena guardi <em>quale fase</em> del workflow stanno ottimizzando. Tre fasi, tre vincitori diversi.</p>
+
+    <div class="phase-grid">
+      <div class="phase-card pc-1">
+        <span class="ph-num">FASE 1 · INGESTION</span>
+        <div class="ph-name">Markdown</div>
+        <div class="ph-claim">−80% token, semantic density</div>
+        <div class="ph-desc">L'agente legge documenti per rispondere. Pretraining massivo su testo + codice, MD e' piu' vicino alla distribuzione di training. Cloudflare, mdream, MarkItDown, llms.txt: tutto questo polo punta a comprimere l'input.</div>
+      </div>
+      <div class="phase-card pc-2">
+        <span class="ph-num">FASE 2 · OUTPUT RICCO</span>
+        <div class="ph-name">HTML</div>
+        <div class="ph-claim">SVG, interazione, sharing</div>
+        <div class="ph-desc">L'agente produce artifact per umani. Diagrammi veri, tabelle navigabili, sliders per tuning, copy buttons che riportano al prompt. Shihipar e Anthropic ci credono al punto da cambiare default sul team.</div>
+      </div>
+      <div class="phase-card pc-empty">
+        <span class="ph-num">FASE 3 · EDITING</span>
+        <div class="ph-name">??? (casella vuota)</div>
+        <div class="ph-claim">N agenti modificano lo stesso doc nel tempo</div>
+        <div class="ph-desc">Nessuno dei due formati ha ID stabili, forma canonica byte-stable, edit operations come dati. Markdown e' un disastro su tutte e tre. HTML va meglio sugli ID ma costa caro in token e i diff sono illeggibili.</div>
+      </div>
+    </div>
+
+    <p>Il punto del pezzo e' la terza casella. La fase 1 e' coperta dal mainstream Markdown. La fase 2 e' coperta dalla nicchia HTML che cresce questa settimana. La fase 3 nessuno la sta misurando, ed e' quella che fra dodici mesi vi mordera'.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 4 — Timeline
+         ============================================================ -->
+    <h2><span class="accent">//</span> Timeline Della Settimana</h2>
+    <span class="section-number">Sezione 4. Cinque pezzi in due mesi, come incastrarli</span>
+
+    <div class="timeline">
+      <div class="t-row">
+        <div class="t-date">5 mar 2026</div>
+        <div class="t-body"><span class="t-actor">Cloudflare</span> &middot; lancia Markdown for Agents. Header <code>Accept: text/markdown</code>, conversione edge-side, esempio 16.180 → 3.150 token. John Mueller di Google la chiama "stupid idea". Polo INPUT.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">17 apr 2026</div>
+        <div class="t-body"><span class="t-actor">Microsoft</span> &middot; rilascia MarkItDown, converter universale (Office, PDF, immagini, audio) verso Markdown per ingestion. Polo INPUT.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">~ apr 2026</div>
+        <div class="t-body"><span class="t-actor">codersera</span> &middot; <em>State of llms.txt</em>: solo 10.13% dei domini lo hanno, nessun effetto SEO misurabile. Tutti i devtool serii lo shippano comunque. Limbo. Polo INPUT.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">5 mag 2026</div>
+        <div class="t-body"><span class="t-actor">Harlan Zw</span> &middot; pubblica mdream, converter HTML→MD ottimizzato per LLM. 6 KB gzipped, 50% token in meno di Turndown, 3× piu' veloce. Polo INPUT.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">8 mag 2026</div>
+        <div class="t-body"><span class="t-actor">Thariq Shihipar (Anthropic) + Simon Willison</span> &middot; argomentano HTML come output format per Claude Code. Tabelle, SVG, sliders, sharing via S3. Polo OUTPUT.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">9 mag 2026</div>
+        <div class="t-body"><span class="t-actor">questo post</span> &middot; nessuno ha ancora messo il polo EDITING al tavolo.</div>
+      </div>
+    </div>
+
+    <p>Quattro voci sul polo input, una sul polo output, zero sul polo editing. Il debate ha un punto cieco. Se non ti accorgi che le tre fasi sono distinte, leggi il post di Shihipar e pensi "ma allora Cloudflare ha sbagliato?". Non ha sbagliato. Stanno parlando di cose diverse.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 5 — La domanda mancante
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Domanda Mancante</h2>
+    <span class="section-number">Sezione 5. Cosa succede quando il documento dura mesi</span>
+
+    <p>Tutta la letteratura della polemica corrente assume un workflow single-shot. L'utente scrive un prompt, l'LLM legge contesto e produce output, fine. Per quel mestiere Markdown vince in input, HTML inizia a vincere in output ricco, e la decisione e' chiara abbastanza.</p>
+
+    <p>Esiste un secondo mestiere che non e' nei benchmark, e non e' ancora un commodity production pattern, ma sta arrivando: <strong>piu' agenti diversi modificano lo stesso documento nel tempo</strong>. Knowledge base interne aggiornate da agenti per mesi, runbook operativi mantenuti da SRE bot, spec di RFC redatte da swarm di agenti, checklist d'incidente con audit trail. Non e' fantascienza, e' lo scenario operativo di chi sta deployando agenti in produzione adesso.</p>
+
+    <p>Cambia tutto. Se piu' agenti devono editare lo stesso documento, ti serve:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Proprieta'</th>
+          <th>Markdown</th>
+          <th>HTML</th>
+          <th>JSON</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ID stabile per blocco editabile</td>
+          <td>No (heading anchors non sono universali)</td>
+          <td>Si' (<code>id="..."</code>)</td>
+          <td>Si' (chiave dell'oggetto)</td>
+        </tr>
+        <tr>
+          <td>Forma canonica (stesso AST → stessi byte)</td>
+          <td>No (CommonMark vs GFM vs MDX)</td>
+          <td>No (whitespace, ordering, attribute quoting)</td>
+          <td>Sostanzialmente si' (con sort)</td>
+        </tr>
+        <tr>
+          <td>Parser deterministico (stesso input → stesso AST)</td>
+          <td>No (ambiguita' su nesting)</td>
+          <td>Si' (DOM standard)</td>
+          <td>Si'</td>
+        </tr>
+        <tr>
+          <td>Edit operations come dati (replay, merge, audit)</td>
+          <td>Diff testuali fragili</td>
+          <td>DOM diff (verboso, difficile)</td>
+          <td>JSON Patch (RFC 6902)</td>
+        </tr>
+        <tr>
+          <td>Leggibile in <code>cat</code></td>
+          <td>Si'</td>
+          <td>No (chiusure, attributi, soup)</td>
+          <td>Mediocre</td>
+        </tr>
+        <tr>
+          <td>Diff in PR utile per code review</td>
+          <td>Mediocre</td>
+          <td>No (Shihipar lo ammette esplicitamente)</td>
+          <td>No</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Markdown e' un disastro su quasi tutte le righe tranne due. HTML e JSON vanno bene strutturalmente ma costano caro in token e leggibilita'. Il quadrante mancante e' "abbastanza compatto da non bruciare context window, abbastanza strutturato da permettere edit chirurgici, abbastanza umano da leggerlo in <code>cat</code>". Nessuno dei tre formati popolari sta in quel quadrante.</p>
+
+    <p>La domanda diventa: <em>qual e' il formato giusto per un documento di lunga vita editato da piu' agenti?</em></p>
+
+    <div class="warning-box">
+      <p><strong>Onestamente, prima di andare oltre.</strong> Tutto quello che hai letto fin qui e' la polemica reale. Quello che segue e' un esperimento per la casella vuota. Se ti serve la risposta a "quale formato uso oggi nel 95% dei casi", la risposta e' Markdown per input, HTML se vuoi un artifact ricco da condividere, e basta. Se sei in produzione e devi scegliere adesso, smetti di leggere e scegli uno dei due. La sezione 6 in poi parla di un caso che probabilmente non hai ancora.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 6 — AGD: il prototipo
+         ============================================================ -->
+    <h2><span class="accent">//</span> Tre Regole, Un Sigillo</h2>
+    <span class="section-number">Sezione 6. AGD, un prototipo per la casella vuota</span>
+
+    <p>Per la mia testa, la risposta alla casella vuota e' un formato che eredita il line-oriented di Markdown e ci aggiunge tre cose: ID di blocco stabili, sintassi LL(1) deterministica, operazioni di edit come dati JSON. Il prototipo si chiama AGD (Agent Document) ed e' su <a href="https://github.com/Pinperepette/agd" target="_blank" rel="noopener">github.com/Pinperepette/agd</a>. Rust, MIT, v0.1.0.</p>
+
+    <p>Ogni blocco AGD inizia con <code>@&lt;tag&gt;</code> a colonna 0. E' l'intera storia sintattica.</p>
+
+    <div class="agd-syntax">
+<span class="cmt">// metadati del documento, attributi key=value</span>
+<span class="at">@meta</span> <span class="at-key">title</span>=<span class="str">"Welcome"</span> <span class="at-key">author</span>=<span class="str">alice</span>
+
+<span class="cmt">// heading con ID stabile in coda</span>
+<span class="at">@h1</span> Hello <span class="id">[#intro]</span>
+<span class="at">@p</span> Body text. Inline supporta *bold*, _italic_, `code`.
+
+<span class="cmt">// lista, item su righe successive</span>
+<span class="at">@ul</span> <span class="id">[#features]</span>
+- token-efficient vs HTML
+- LL(1) parser
+- stable per-block IDs
+
+<span class="cmt">// fence verbatim per codice</span>
+<span class="at">@code</span> <span class="at-key">lang</span>=<span class="str">python</span> <span class="id">[#hello]</span>
+~~~
+def hello():
+    return "world"
+~~~
+
+<span class="cmt">// cross-reference a un altro blocco</span>
+<span class="at">@ref</span> <span class="id">#hello</span>
+    </div>
+
+    <p>Tre regole, niente di piu':</p>
+
+    <div class="phase-grid">
+      <div class="phase-card pc-1">
+        <span class="ph-num">REGOLA 1</span>
+        <div class="ph-name">Un sigillo, a colonna 0</div>
+        <div class="ph-desc">L'<code>@</code> apre sempre un blocco. Markdown ha <code>#</code>, <code>*</code>, <code>&gt;</code>, <code>-</code>, spazi indentati, ognuno con regole diverse. AGD ne ha uno solo. Il lexer e' una macchina a 7 stati line-oriented in 150 righe di Rust.</div>
+      </div>
+      <div class="phase-card pc-2">
+        <span class="ph-num">REGOLA 2</span>
+        <div class="ph-name">ID opzionale, sempre in coda</div>
+        <div class="ph-desc"><code>[#nome]</code> alla fine di qualunque blocco lo rende indirizzabile. Chiunque puo' editarlo per ID, non per offset di byte. E' la feature load-bearing del formato. Il resto sono accessori.</div>
+      </div>
+      <div class="phase-card pc-3">
+        <span class="ph-num">REGOLA 3</span>
+        <div class="ph-name">Niente chiusure</div>
+        <div class="ph-desc">Riga vuota o un altro <code>@</code> chiudono il blocco precedente. L'equivalente di <code>&lt;h1&gt;...&lt;/h1&gt;</code> e' solo <code>@h1 ...</code>. Niente nesting profondo, niente DOM tree, niente XML soup.</div>
+      </div>
+    </div>
+
+    <p>La grammatica completa e' frozen in <a href="https://github.com/Pinperepette/agd/blob/main/grammar/agd.ebnf" target="_blank" rel="noopener">grammar/agd.ebnf</a> — 50 righe di EBNF. Nessun backtracking, nessun lookahead oltre la riga corrente. Il parser e' single-pass, LL(1). Il senso di tutto questo e' che lo stesso file dato a due implementazioni diverse di AGD deve produrre lo stesso AST. E' la proprieta' che HTML ha (DOM standard) e Markdown non ha (CommonMark vs GFM vs MDX disagree su edge cases).</p>
+
+
+    <!-- ============================================================
+         SEZIONE 7 — Promesse vs misure
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quello Che Promettevo, Quello Che E' Uscito</h2>
+    <span class="section-number">Sezione 7. La onesta' fa male e va fatta</span>
+
+    <p>Quando ho buttato giu' il design, prima di scrivere una riga di Rust, avevo fatto stime token a vista. Erano sbagliate. Lo dico subito perche' il pezzo non funziona se mento.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Promessa iniziale</th>
+          <th>Misurato (corpora 100 → 100k blocchi)</th>
+          <th>Verdetto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>−5 a −10% vs Markdown</td>
+          <td><strong>+18 a +22%</strong> (AGD costa di piu')</td>
+          <td>Sbagliato di segno</td>
+        </tr>
+        <tr>
+          <td>−30 a −40% vs HTML</td>
+          <td>−16 a −19%</td>
+          <td>Direzione giusta, ridotto a meta'</td>
+        </tr>
+        <tr>
+          <td>−50% vs JSON</td>
+          <td>−56 a −59%</td>
+          <td>Onesto, leggermente meglio del previsto</td>
+        </tr>
+        <tr>
+          <td>"Parser ~200 righe"</td>
+          <td>~1000 righe Rust</td>
+          <td>Equivalente a 300 righe Python (overhead di linguaggio)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>L'errore peggiore sta sulla riga uno. Avevo in testa che <code>@h1</code> e <code># </code> fossero entrambi 2 token. Falso: <code>@h1</code> tokenizza come 3 token con BPE cl100k_base, mentre <code># </code> e' 1 token. Su 1000 blocchi sono gia' 2000 token di prefisso. Misurato su corpora di 100k blocchi, AGD costa il 20% in piu' di Markdown a tutte le scale, con una banda 18-22% molto stretta.</p>
+
+    <p>Vince invece contro HTML del 16-19%, contro JSON del 56-59%. Niente di sensazionale rispetto a XML. Il +20% rispetto a Markdown e' il prezzo onesto degli ID espliciti e dei prefissi <code>@&lt;tag&gt;</code>: lo paghi sempre, non c'e' un trucchetto per recuperarlo a livello sintattico.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 8 — DocumentIndex
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Scoperta Vera</h2>
+    <span class="section-number">Sezione 8. L'index batte il find lineare di 2625x</span>
+
+    <p>Il valore di AGD e' indicizzare i blocchi per ID. Il primo design ingenuo era <code>Document::find(&amp;id)</code> con linear scan: O(n). Per 100 blocchi va bene. Per 100k inizia a fare male. Quanto male? Misurato:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Blocchi</th>
+          <th>Linear find</th>
+          <th>Indexed find</th>
+          <th>Speedup</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">100</td><td class="num">80 ns</td><td class="num">25 ns</td><td class="num">3×</td></tr>
+        <tr><td class="num">1.000</td><td class="num">1.6 µs</td><td class="num">26 ns</td><td class="num"><strong>62×</strong></td></tr>
+        <tr><td class="num">10.000</td><td class="num">21 µs</td><td class="num">36 ns</td><td class="num"><strong>583×</strong></td></tr>
+        <tr><td class="num">100.000</td><td class="num">283 µs</td><td class="num">108 ns</td><td class="num"><strong>2625×</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>Senza l'index, ogni edit operation costa 283 µs solo per <em>trovare</em> il blocco target su un documento da 100k entries. Con l'index, 108 ns. Differenza di tre ordini di grandezza.</p>
+
+    <p>La conseguenza architetturale e' importante e l'avevo sottovalutata: <strong>chiunque usi AGD seriamente deve costruirsi un indice</strong>. Non e' un'ottimizzazione, e' la differenza fra "usabile" e "inutilizzabile". Il codice client ideale e' questo:</p>
+
+    <div class="agd-syntax">
+<span class="fn">use</span> agd::{parse, edit::Operation, index::DocumentIndex};
+
+<span class="cmt">// parse una volta sola</span>
+<span class="fn">let mut</span> doc = parse(&amp;source)?;
+<span class="fn">let</span> idx = DocumentIndex::build(&amp;doc);  <span class="cmt">// O(n) una volta</span>
+
+<span class="cmt">// applica N edit, lookup costa O(1)</span>
+<span class="fn">for</span> op <span class="fn">in</span> ops {
+    <span class="fn">if</span> idx.position(op.target_id()).is_some() {
+        doc.apply(op)?;
+    }
+}
+    </div>
+
+    <p>Il pattern "parse-once, edit-many" gira a 500k op/sec via library API. Lo stesso flow via CLI subprocess (un <code>agd edit</code> per operazione) gira a 76 op/sec. Differenza: <strong>6500×</strong>. Implicazione: AGD ha senso solo se mantieni il documento parseato in memoria in un servizio, non se invochi la CLI in loop.</p>
+
+    <div class="warning-box">
+      <p><strong>Conseguenza per l'architettura.</strong> Qualunque adozione seria di AGD deve avere la forma di un demone che mantiene i documenti in memoria, espone le edit operations via socket o RPC, ricostruisce l'index dopo ogni write batch. Senza questo strato, AGD non vale il +20% di token che paga rispetto a Markdown. Con questo strato, vale per il 5% dei casi dove l'editing multi-agente conta davvero.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 9 — Il lab a tre vie
+         ============================================================ -->
+    <h2><span class="accent">//</span> Tre Agenti, Stesso Documento, Tre Formati</h2>
+    <span class="section-number">Sezione 9. Lab multi-agente con Redis Streams</span>
+
+    <p>La teoria della casella vuota dice "AGD vince per editing multi-agente". Da soli quei numeri non valgono niente. Ho costruito il lab che dimostra il punto.</p>
+
+    <p>Stesso scenario operativo &mdash; un piano di risposta a un incidente di security &mdash; reso in tre formati: Markdown, HTML, AGD. Tre processi agent indipendenti (analyst, responder, auditor) emettono 12 edit operation a Redis Streams in parallelo. Tre demoni, uno per formato, consumano FIFO con <code>XREADGROUP</code>, applicano l'op alla loro versione del documento (chiave Redis Hash), fanno <code>XACK</code>. Lo stream e' l'audit trail nativo; il replay da <code>XRANGE 0 +</code> ricostruisce lo stato.</p>
+
+    <div class="agd-syntax" data-lang="text">
+                          ┌──────────────────────┐
+  agent-analyst    ──▶   │                       │ ──▶ daemon-md   ──▶ HSET md:state
+  agent-responder  ──▶   │  Redis Streams (3×)   │ ──▶ daemon-html ──▶ HSET html:state
+  agent-auditor    ──▶   │  agd-lab:&lt;fmt&gt;:ops    │ ──▶ daemon-agd  ──▶ HSET agd:state
+                          └──────────────────────┘
+                                                      ↑
+                                                      XACK + retention = audit
+    </div>
+
+    <p>Il workload contiene una operazione cattiva alla riga 4: l'analyst rinomina la sezione "Findings" in "Initial findings". Cinque secondi dopo, l'auditor aggiunge un finding tardivo targettando il <em>logical id</em> <code>findings</code>. Il punto: il rename ha cambiato il <em>nome</em> ma non l'<em>id</em>. Markdown non ha un meccanismo di stable id, HTML e AGD si'.</p>
+
+    <p>Risultato di una run reale (12 ops emesse in ~600 ms wallclock, demoni concorrenti):</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>metric (mediana di 5 run)</th>
+          <th>markdown</th>
+          <th>html</th>
+          <th>agd</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>ops applied</td><td class="num">11/12</td><td class="num"><strong>12/12</strong></td><td class="num"><strong>12/12</strong></td></tr>
+        <tr><td>ops not_found</td><td class="num">1</td><td class="num">0</td><td class="num">0</td></tr>
+        <tr><td>stream length (audit trail)</td><td class="num">12</td><td class="num">12</td><td class="num">12</td></tr>
+        <tr><td>replay reconstructs live state</td><td class="num">yes</td><td class="num">yes</td><td class="num">yes</td></tr>
+        <tr><td>final size (bytes)</td><td class="num">527</td><td class="num">895</td><td class="num"><strong>697</strong></td></tr>
+        <tr><td>avg apply latency (per op)</td><td class="num">118 &micro;s</td><td class="num">1.21 ms</td><td class="num"><strong>2.3 &micro;s</strong></td></tr>
+        <tr><td>throughput (op/sec)</td><td class="num">~8.500</td><td class="num">~830</td><td class="num"><strong>~430.000</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>Tre osservazioni che vale la pena fare prima di andare oltre.</p>
+
+    <p><strong>Markdown perde una op.</strong> Il regex per <code>## Findings</code> non trova piu' la sezione dopo il rename. L'op dell'auditor finisce nello stream ma il demone la registra come <code>target_not_found</code>. Lo stream e' onesto, lo stato finale e' incompleto. <strong>HTML e AGD applicano tutte e 12</strong> &mdash; gli <code>id</code> resistono alla rinominazione del titolo.</p>
+
+    <p><strong>Replay funziona ovunque.</strong> Lo stream e' authoritative: rieseguendo le ops dall'offset 0 su uno stato iniziale fresco ottengo byte-per-byte lo stesso stato live. Vale per tutti e tre i formati. Vuol dire che <em>l'audit log Redis e' l'unica cosa che devi conservare</em>: lo stato live e' una funzione del log, non un database separato. Per uno scenario di compliance &mdash; "fammi vedere come era il documento alle 14:31:07 di tre settimane fa" &mdash; basta XREAD fino a quel timestamp.</p>
+
+    <p><strong>Sulla latenza vale la pena soffermarsi.</strong> AGD applica un'op in 2,3 microsecondi mediana &mdash; <strong>500&times; piu' veloce di HTML (BeautifulSoup)</strong>, <strong>50&times; piu' veloce di Markdown (regex puro)</strong>. Non e' magia: il demone <code>agdd</code> e' scritto in Rust, parsea il documento una sola volta all'avvio, costruisce un <code>DocumentIndex</code> in memoria, applica ogni op come mutazione strutturale tipata via la library API. Niente subprocess, niente fork+exec, niente reparse tra ops. Il prezzo e' aver scritto il demone in Rust invece che Python: ~150 righe di codice in <code>src/bin/agdd.rs</code> nel repo agd.</p>
+
+    <p>HTML e MD nel lab girano in Python con BeautifulSoup e regex. Una versione Rust di entrambi (lxml-rs, regex crate) probabilmente farebbe un po' meglio, ma la differenza strutturale resta: HTML deve riserializzare l'intero DOM ad ogni mutazione, AGD muta in-place strutture tipate.</p>
+
+    <div class="warning-box">
+      <p><strong>Onestamente: il lab confronta tre demoni con livelli di engineering diversi.</strong> AGD demone Rust nativo, HTML demone Python con BS4, MD demone Python con regex. Una versione Rust dei demoni HTML e MD ridurrebbe il gap &mdash; non lo annullerebbe (HTML deve comunque riserializzare il DOM, MD deve comunque cercare per nome senza ID stabili) ma il rapporto di 500&times; e' artefatto del bridge Python tanto quanto del formato. La cifra che resta solida e' che <em>AGD ha un demone Rust di 150 righe, ben definito, che fa quello che deve in microsecondi</em>. Per il caso d'uso multi-agente e' una proprieta' rilevante: scrivere il demone e' lavoro fatto una volta, le ops sono di 2 &micro;s per sempre.</p>
+    </div>
+
+    <p>Numeri di base sul motore AGD, dal repo agd (riproducibili con <code>cargo run --release --bin agd-bench</code>): parse 60 MB/s, serialize 830 MB/s, find by ID a 100k blocchi via <code>DocumentIndex</code> in 108 ns. Vedi <a href="https://github.com/Pinperepette/agd/blob/main/benches/BENCHMARKS.md" target="_blank" rel="noopener">benches/BENCHMARKS.md</a>.</p>
+
+    <div class="warning-box">
+      <p><strong>Onestamente, cosa NON dimostra questo lab.</strong> Non dimostra il <em>lost-update problem</em>: gli agenti emettono ops semantiche (kind/target/payload), non blob, e il demone serializza via stream FIFO &mdash; quindi ogni op atterra in modo coerente. Il lab dimostra che <em>se</em> gli agenti seguono questa disciplina, AGD non perde dati. Se invece gli agenti emettono blob (es. "scrivi tutto il file con questo contenuto"), il problema dei conflitti torna in vita per qualunque formato. AGD non lo previene a livello sintattico, lo rende solo piu' facile da disciplinare a livello di Operation API.</p>
+    </div>
+
+    <p>Il codice del lab gira in cinque secondi su qualunque macchina con <code>docker</code> + <code>python3</code> + <code>cargo</code> installati: <code>scripts/ogni-blocco-ha-un-nome/v2_redis/run_lab.sh</code>. Output completo: <code>output/report.md</code>, <code>output/daemon-{md,html,agd}.log</code> con audit trail tab-separated, <code>output/final.{md,html,agd}</code> con i tre documenti finali. Tutto riproducibile, tutto sul repo del blog.</p>
+
+    <div class="warning-box">
+      <p><strong>Bug trovato dal lab.</strong> Prima versione del workload aveva <code>set_attr</code> su <code>#root</code> (un blocco <code>@h1</code>). Il parser AGD v0.1 ignora gli attributi sui blocchi inline-bearing (h1-h4, p): legge tutto come testo. Quindi <code>set_attr severity=high</code> su <code>#root</code> produceva <code>@h1 severity=high SSH brute force [#root]</code> dove "severity=high" finisce dentro il <em>titolo</em>, non come attributo. La canonical form era idempotente (riparsa identico) ma il dato semantico era sbagliato. Aggirato spostando <code>set_attr</code> su <code>#meta</code> nel workload. La fix vera del parser e' tracked per AGD v0.2 &mdash; il lab ha trovato un problema reale che lo unit test del repo agd non aveva coperto.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 10 — Riprodurre i benchmark di AGD
+         ============================================================ -->
+    <h2><span class="accent">//</span> Riprodurre I Benchmark</h2>
+    <span class="section-number">Sezione 10. Il codice e' su GitHub, i numeri sono replicabili</span>
+
+    <p>Tutto quello che hai letto e' verificabile con cinque comandi. Niente nascosto, niente hand-waved. Repository: <a href="https://github.com/Pinperepette/agd" target="_blank" rel="noopener">github.com/Pinperepette/agd</a>.</p>
+
+    <div class="agd-syntax" data-lang="bash">
+<span class="cmt"># 1. clone + build (richiede cargo)</span>
+git clone https://github.com/Pinperepette/agd.git
+<span class="fn">cd</span> agd
+cargo build --release
+
+<span class="cmt"># 2. parse e validate uno degli esempi</span>
+./target/release/agd validate examples/api-doc.agd
+./target/release/agd parse --json examples/api-doc.agd | head -30
+
+<span class="cmt"># 3. token benchmark vs MD/HTML/JSON</span>
+./target/release/agd bench examples/api-doc.agd
+
+<span class="cmt"># 4. genera il report completo (corpora 100/1k/10k/100k blocchi)</span>
+./target/release/agd-bench
+<span class="cmt"># scrive benches/BENCHMARKS.md con tutti i numeri</span>
+
+<span class="cmt"># 5. applica una edit operation per ID</span>
+./target/release/agd edit examples/multi-agent-task.agd --op '{
+  "op":    "set_attr",
+  "id":    "status-t2",
+  "key":   "flagged",
+  "value": true
+}'
+    </div>
+
+    <p>Il punto 4 e' quello che ti convince o ti smonta. Genera corpora sintetici deterministici (stesso seed, stesso byte output su qualunque macchina), parsea, serializza, edita, conta token, confronta con <code>pulldown-cmark</code>. Output finale: <a href="https://github.com/Pinperepette/agd/blob/main/benches/BENCHMARKS.md" target="_blank" rel="noopener">benches/BENCHMARKS.md</a>, lo stesso file da cui ho preso tutti i numeri di questo post.</p>
+
+    <p>Tre scoperte uniche del lab che vale la pena fissare:</p>
+
+    <div class="phase-grid">
+      <div class="phase-card pc-1">
+        <span class="ph-num">SCOPERTA 1</span>
+        <div class="ph-name">pulldown-cmark e' 2-3× piu' veloce</div>
+        <div class="ph-desc">Su documenti grandi, il parser Markdown ottimizzato vince contro il mio AGD parser. AGD parsea a ~60 MB/s, pulldown a ~150 MB/s. Era atteso (lui ha 5 anni di ottimizzazione, io un giorno). AGD non vince in velocita' assoluta, vince in determinismo.</div>
+      </div>
+      <div class="phase-card pc-3">
+        <span class="ph-num">SCOPERTA 2</span>
+        <div class="ph-name">Serialize e' 10× piu' veloce di parse</div>
+        <div class="ph-desc">~830 MB/s sostenuti. Asimmetria tipica: parsare richiede branching, serializzare e' append lineare. Conseguenza: i workflow agentici dove molte edit producono molte serializzazioni sono limitati dal parse iniziale, non dalle scritture.</div>
+      </div>
+      <div class="phase-card pc-empty">
+        <span class="ph-num">SCOPERTA 3</span>
+        <div class="ph-name">AST in memoria pesa 4× la source</div>
+        <div class="ph-desc">11.9 MB di AGD source diventano 49.8 MB di Document parseato. Costante a tutte le scale. Per documenti enormi (gigabyte) significa che non li tieni tutti in memoria, ti serve uno streaming parser. Per ora non c'e'.</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 10 — Vale la pena?
+         ============================================================ -->
+    <h2><span class="accent">//</span> Vale La Pena Spendere Piu' Token?</h2>
+    <span class="section-number">Sezione 11. La risposta secca, in due numeri</span>
+
+    <p>Il "+20% di token" l'abbiamo gia' detto sei volte. Misurato di nuovo, su corpora controllati di 100, 1.000 e 10.000 blocchi, e' confermato: AGD costa il <strong>+18-22%</strong> in piu' di Markdown quando carichi <em>l'intero documento</em>. Banda stretta, scala ortogonale, niente sorprese.</p>
+
+    <p>Quello che il post ha taciuto fino a qui e' che il +20% e' solo meta' della storia. L'altra meta' e' che AGD <strong>abilita una forma di richiesta che Markdown non puo' fare</strong>: caricare il <em>Table of Contents</em> (lista degli ID), scegliere il blocco, caricare solo quello. Un agente in stile Claude Code che cerca informazioni in un documento di 10.000 blocchi non deve leggerlo tutto. Pesca l'ID giusto e ne legge uno.</p>
+
+    <p>Misurato:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>blocchi</th>
+          <th>AGD selective (TOC + 1 blocco)</th>
+          <th>Markdown whole-doc</th>
+          <th>speedup</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">100</td><td class="num">231 token</td><td class="num">2.074 token</td><td class="num"><strong>9,0&times;</strong></td></tr>
+        <tr><td class="num">1.000</td><td class="num">1.720 token</td><td class="num">20.502 token</td><td class="num"><strong>11,9&times;</strong></td></tr>
+        <tr><td class="num">10.000</td><td class="num">14.902 token</td><td class="num">217.170 token</td><td class="num"><strong>14,6&times;</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>Lo speedup cresce con la scala. A 10.000 blocchi, una richiesta mirata su AGD costa <strong>1/15</strong> di un caricamento completo Markdown. A 100.000 blocchi diventa ~1/20. Il <em>crossover</em> &mdash; il punto in cui AGD ti ripaga il +20% del primo caricamento &mdash; e' dopo la <strong>seconda lookup mirata</strong> sullo stesso documento. In quasi tutti i workflow agentici reali quel breakeven arriva nei primi minuti.</p>
+
+    <p>I numeri sono nel benchmark <a href="https://github.com/Pinperepette/agd/blob/main/benches/RETRIEVAL.md" target="_blank" rel="noopener">benches/RETRIEVAL.md</a> del repo agd, riproducibili con <code>cargo run --release --bench retrieval</code>.</p>
+
+    <p>Le due cifre stanno insieme. Il +20% e' il costo che paghi quando carichi tutto, il fattore 14&times; e' lo sconto che ottieni quando leggi solo quello che ti serve. Quale dei due conta di piu' dipende dal pattern di accesso del tuo agente, non dal formato in se'.</p>
+
+    <p>Conta i casi uno per uno con questa lente.</p>
+
+    <div class="verdict-grid">
+      <div class="verdict-card lose">
+        <div class="v-tag">RAG WHOLE-DOC INGESTION</div>
+        <div class="v-body">Carichi sempre l'intero documento, non fai mai lookup mirati. Markdown vince del 20%. AGD costa di piu' senza dare niente. Cloudflare serve nativo Markdown per questo caso.</div>
+      </div>
+      <div class="verdict-card lose">
+        <div class="v-tag">OUTPUT RICCO (FASE 2)</div>
+        <div class="v-body">L'agente produce un artifact per umani. Shihipar ha ragione, HTML vince. AGD non e' renderizzabile in browser.</div>
+      </div>
+      <div class="verdict-card lose">
+        <div class="v-tag">DOCUMENTAZIONE STATICA</div>
+        <div class="v-body">README, blog, docs. Markdown ha 15 anni di tooling (Hugo, Jekyll, MDX, GitHub render). AGD ha zero ecosistema.</div>
+      </div>
+      <div class="verdict-card draw">
+        <div class="v-tag">PROMPT ENGINEERING CLAUDE</div>
+        <div class="v-body">Anthropic spinge XML tag come delimitatori. Claude e' trained su quelli. AGD potrebbe funzionare, ma non sfrutti il pretraining. Resta XML.</div>
+      </div>
+      <div class="verdict-card win">
+        <div class="v-tag">SELECTIVE RETRIEVAL (CLAUDE CODE)</div>
+        <div class="v-body">L'agente cerca un blocco specifico (<code>#auth-flow</code>) in un documento di 10k+ blocchi. AGD: TOC + 1 blocco = 14k token. Markdown: 217k token interi. <strong>14&times; meno token, scala con la dimensione</strong>.</div>
+      </div>
+      <div class="verdict-card win">
+        <div class="v-tag">MULTI-AGENT EDIT (FASE 3)</div>
+        <div class="v-body">Cinque agenti aggiornano una checklist d'incidente, un piano operativo, una specifica RFC. Audit, replay, merge per ID. AGD vince perche' Markdown non e' strutturato e HTML non e' canonicalizzabile.</div>
+      </div>
+      <div class="verdict-card win">
+        <div class="v-tag">DOCUMENTI DI LUNGA VITA</div>
+        <div class="v-body">Knowledge base aggiornate da agenti per mesi. La forma canonica byte-stabile rende i diff utili in code review. Markdown drifta.</div>
+      </div>
+      <div class="verdict-card win">
+        <div class="v-tag">REPLAY E AUDIT</div>
+        <div class="v-body">Workflow dove le edit operations vanno loggate, replicate, audit-trailed. Le ops AGD sono JSON puri serializzabili.</div>
+      </div>
+    </div>
+
+    <p>Conta i casi: 3 dove altri formati vincono, 1 pareggio, 4 dove AGD vince. La proporzione e' cambiata rispetto a quello che pensavo all'inizio &mdash; il selective retrieval e' una vittoria che il post non aveva contato. Pragmatica: <strong>se il tuo agente carica sempre tutto, usa Markdown. Se fa lookup mirati, AGD si ripaga dopo due query.</strong> Il salto di costo non e' lineare, e' di natura: passi dal regime "leggi tutto, paga proporzionale" al regime "leggi solo l'indice, paga la lista".</p>
+
+    <p>Nota di realta': se vuoi il 90% del valore di AGD senza buttarti su un formato nuovo, prova Markdown + kramdown anchors:</p>
+
+    <div class="agd-syntax">
+<span class="cmt"># Section title {#stable-id}</span>
+
+Body of the section.
+
+<span class="cmt">## Subsection {#sub-id}</span>
+
+More body.
+    </div>
+
+    <p>Hai gli ID, resti dentro l'ecosistema Markdown, GitHub li renderizza, Pandoc li capisce. Perdi la forma canonica rigorosa e il parser LL(1) puro, ma probabilmente non li userai mai. AGD ha senso quando perdere quei due e' un costo reale, non teorico — e oggi quei costi pochi li sentono.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 12 — Conclusione
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quello Che Mi Resta In Mano</h2>
+    <span class="section-number">Sezione 12. Cosa e' uscito dopo una settimana di numeri</span>
+
+    <p>La polemica MD vs HTML di questa settimana e' viva e fondata, ma confonde tre fasi diverse del workflow degli agenti. C'e' la fase di ingestion (Markdown vince, e Cloudflare la serve nativa), la fase di output ricco per umani (HTML vince, e Anthropic la spinge), e una terza fase &mdash; l'editing collaborativo di documenti che durano nel tempo &mdash; per cui adesso non c'e' un formato dedicato. AGD e' un esperimento che prova a riempire quel buco.</p>
+
+    <p>Funziona, nei limiti che si pone. 89 test su 10 suite, proptest robusto, un lab Redis multi-agente che gira in cinque secondi, benchmark riproducibili sul repo. Costa il 20% di token in piu' di Markdown se carichi tutto il documento e ne risparmia un fattore 14 se cerchi un blocco specifico. Pulldown-cmark resta 2-3 volte piu' veloce nel parsing su file grandi, ma quel campionato AGD non lo sta giocando: scrivendo il demone in Rust e tenendo il documento in memoria la latenza per op va a 2,3 microsecondi, e a quel punto la velocita' assoluta del parser conta poco perche' parsi una volta sola.</p>
+
+    <p>Quello che mi porto a casa pero' non sono i numeri. E' una mappa del design space che a inizio settimana non avevo. Il +20% di token cambia segno appena l'agente smette di leggere tutto e inizia a chiedere blocchi specifici, e questo non lo si capisce finche' non si misura. Il determinismo del parser e' una proprieta' che non sapevo di volere finche' non ho visto un regex Markdown rompersi su un rename in produzione. Capire dove conviene combattere e dove no, prima di adottare qualcosa, e' tutto il valore di questa settimana.</p>
+
+    <p>Se ti capita davvero il problema dell'editing multi-agente, AGD e' un punto di partenza riproducibile da cui rubare idee, fare fork, oppure semplicemente buttare via tutto e tornare a Markdown con kramdown anchors sapendo cosa stai perdendo. Il valore del prototipo per me e' stato quello: rendere visibile un trade-off che senza misurarlo restava una sensazione.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Codice del lab:</strong> tutto sta in <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/ogni-blocco-ha-un-nome" target="_blank" rel="noopener">scripts/ogni-blocco-ha-un-nome</a>. Due versioni accanto: <code>lab.py</code> sequenziale single-process (richiede solo Python 3.9+, BeautifulSoup, lxml, agd CLI) e <code>v2_redis/run_lab.sh</code> con tre processi concorrenti, Redis Streams, demone <code>agdd</code> nativo (richiede in piu' Docker per il container Redis 8). I numeri citati nell'articolo vengono dalla v2.</p>
+      <p style="margin-top: 0.5rem;"><strong>Codice del prototipo AGD:</strong> il formato e il toolchain sono su <a href="https://github.com/Pinperepette/agd" target="_blank" rel="noopener">github.com/Pinperepette/agd</a> (Rust, MIT). Benchmark in <a href="https://github.com/Pinperepette/agd/blob/main/benches/BENCHMARKS.md" target="_blank" rel="noopener">benches/BENCHMARKS.md</a> e <a href="https://github.com/Pinperepette/agd/blob/main/benches/RETRIEVAL.md" target="_blank" rel="noopener">benches/RETRIEVAL.md</a>, riproducibili con <code>cargo run --release --bin agd-bench</code> e <code>cargo run --release --bench retrieval</code>. La spec e' dogfooded in <a href="https://github.com/Pinperepette/agd/blob/main/spec/AGD-SPEC.agd" target="_blank" rel="noopener">spec/AGD-SPEC.agd</a> &mdash; scritta in AGD, non in Markdown.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Riferimenti.</strong></p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+        ⊕ <a href="https://simonwillison.net/2026/May/8/unreasonable-effectiveness-of-html/" target="_blank" rel="noopener">simonwillison.net/2026/May/8/unreasonable-effectiveness-of-html</a>: Simon Willison riprende e amplifica il post di Thariq Shihipar (Claude Code team, Anthropic) — 8 maggio 2026. Polo OUTPUT.<br>
+        ⊕ <a href="https://www.blog.brightcoding.dev/2026/05/05/mdream-the-revolutionary-html-to-markdown-converter-for-llms" target="_blank" rel="noopener">blog.brightcoding.dev/2026/05/05/mdream</a>: Harlan Zw, mdream — converter HTML→MD ottimizzato per LLM, 50% fewer tokens, 3× faster di Turndown. 5 maggio 2026. Polo INPUT.<br>
+        ⊕ <a href="https://www.infoq.com/news/2026/03/cloudflare-crawler/" target="_blank" rel="noopener">infoq.com/news/2026/03/cloudflare-crawler</a>: Cloudflare lancia Markdown for Agents (header <code>Accept: text/markdown</code>) — 5 marzo 2026. Polo INPUT.<br>
+        ⊕ <a href="https://www.blog.brightcoding.dev/2026/04/17/markitdown-transform-any-file-into-llm-ready-markdown" target="_blank" rel="noopener">blog.brightcoding.dev/2026/04/17/markitdown</a>: Microsoft MarkItDown, converter universale → MD — 17 aprile 2026. Polo INPUT.<br>
+        ⊕ <a href="https://codersera.com/blog/llms-txt-complete-guide-2026/" target="_blank" rel="noopener">codersera.com/blog/llms-txt-complete-guide-2026</a>: stato di llms.txt nel 2026 — 10.13% di adoption, nessun effetto SEO misurabile, ma "every serious devtool ships one anyway".<br>
+        ⊕ <a href="https://github.com/Pinperepette/agd" target="_blank" rel="noopener">github.com/Pinperepette/agd</a>: il prototipo AGD, Rust, MIT.
+      </p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
