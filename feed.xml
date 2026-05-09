@@ -8,14 +8,6 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
-    <title>Ogni Blocco Ha Un Nome</title>
-    <link>https://pinperepette.github.io/signal.pirate/articoli/ogni-blocco-ha-un-nome.html</link>
-    <guid>https://pinperepette.github.io/signal.pirate/articoli/ogni-blocco-ha-un-nome.html</guid>
-    <pubDate>Sat, 09 May 2026 00:00:00 +0200</pubDate>
-    <description>La polemica Markdown vs HTML per gli LLM e' viva e ha tre poli: il consenso mainstream dice Markdown vince per il -20% di token, HtmlRAG (paper di novembre 2024) ribatte che HTML pulito batte Markdown su sei dataset QA con LLM grandi, Anthropic spinge XML perche' Claude e' trained su quello. Tutti misurano la domanda single-shot. Nessuno misura quella dei prossimi due anni: qual e' il formato giusto quando piu' agenti modificano lo stesso documento nel tempo? Ho costruito un prototipo in Rust (AGD, Agent Document) per esplorare quel buco. Sintassi line-oriented, ID stabili per blocco, parser LL(1) in 1000 righe. 89 test, 4 bug colti dai proptest, una scoperta architetturale: l'index O(1) sui block IDs vince 583x sul find lineare a 10k blocchi. Onesto: per il 95% dei casi reali Markdown resta la scelta giusta. AGD ha senso solo nel 5% del multi-agent edit. Repo su GitHub, benchmark riproducibili, lab in cinque comandi.</description>
-  </item>
-
-  <item>
     <title>L'Agente Non Ha Una Forma</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/l-agente-non-ha-una-forma.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/l-agente-non-ha-una-forma.html</guid>

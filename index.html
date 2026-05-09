@@ -55,35 +55,6 @@
 
     <div class="articles-grid">
 
-      <!-- Article Card: Ogni Blocco Ha Un Nome -->
-      <a href="articoli/ogni-blocco-ha-un-nome.html" class="article-card" style="text-decoration:none">
-        <div class="article-card-date">2026-05-09</div>
-        <h3 class="article-card-title">Ogni Blocco Ha Un Nome</h3>
-        <p class="article-card-abstract">
-          La polemica Markdown vs HTML per gli LLM e' viva e ha tre poli: il
-          consenso mainstream dice Markdown vince per il -20% di token, HtmlRAG
-          (paper di novembre 2024) ribatte che HTML pulito batte Markdown su
-          sei dataset QA con LLM grandi, Anthropic spinge XML perche' Claude
-          e' trained su quello. Tutti misurano la domanda single-shot: qual e'
-          il formato giusto per dare contesto all'LLM? Nessuno misura la
-          domanda dei prossimi due anni: qual e' il formato giusto quando
-          piu' agenti modificano lo stesso documento nel tempo? Ho costruito
-          un prototipo in Rust (AGD, Agent Document) per esplorare quel buco.
-          Sintassi line-oriented, ID stabili per blocco, parser LL(1) in 1000
-          righe. 89 test, 4 bug colti dai proptest, una scoperta architetturale:
-          l'index O(1) sui block IDs vince 583x sul find lineare a 10k blocchi.
-          Onesto: per il 95% dei casi reali Markdown resta la scelta giusta.
-          AGD ha senso solo nel 5% del multi-agent edit. Repo, benchmark
-          riproducibili, lab in cinque comandi.
-        </p>
-        <div class="article-card-tags">
-          <span class="tag tag-attention">Document Format</span>
-          <span class="tag tag-highlight">LLM Tokens</span>
-          <span class="tag tag-reaction">Multi-Agent Edit</span>
-          <span class="tag tag-amplification">Rust</span>
-        </div>
-      </a>
-
       <!-- Article Card: L'Agente Non Ha Una Forma -->
       <a href="articoli/l-agente-non-ha-una-forma.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-05-04</div>
