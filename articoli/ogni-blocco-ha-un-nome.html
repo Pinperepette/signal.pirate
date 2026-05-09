@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ogni Blocco Ha Un Nome | Signal Pirate</title>
+  <meta name="description" content="La polemica Markdown vs HTML per gli LLM e' viva: HtmlRAG dice che HTML pulito batte Markdown su sei dataset QA, Anthropic spinge XML, il consenso mainstream resta su Markdown per il -20% di token. Ma tutti misurano la domanda single-shot: quale formato fa rispondere meglio l'LLM? Nessuno misura la domanda dei prossimi due anni: quale formato sopravvive all'editing multi-agente nel tempo? Ho costruito un prototipo in Rust (AGD, Agent Document) per esplorare quel buco. 89 test, 4 bug colti dai proptest, una scoperta che cambia tutto: l'index O(1) sui block IDs vince 583x sul find lineare. Verdetto onesto: per il 95% dei casi reali Markdown resta la scelta giusta. AGD ha senso solo nel 5% dove agenti diversi modificano lo stesso documento di lunga vita.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .iola-box {
+      background: #0d1117;
+      border-left: 3px solid #b5cea8;
+      border-radius: 0 10px 10px 0;
+      padding: 1.4rem 1.8rem;
+      margin: 2rem 0;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      font-style: italic;
+    }
+    .iola-box .iola-attr {
+      display: block;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+      font-style: normal;
+      font-size: 0.7rem;
+      color: #6a6a8a;
+      letter-spacing: 0.05em;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      padding: 1rem 1.4rem;
+      white-space: pre;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .strategy-table .num { text-align: right; font-family: var(--font-mono); }
+
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.5;
+    }
+
+    .pole-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pole-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      border-left: 3px solid var(--accent-attention);
+    }
+    .pole-card .pn-num {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--accent-attention);
+      margin-bottom: 0.4rem;
+    }
+    .pole-card .pn-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .pole-card .pn-claim {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-highlight);
+      margin-bottom: 0.6rem;
+    }
+    .pole-card .pn-desc {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .pc-1 { border-left-color: #4ecdc4; }
+    .pc-1 .pn-num { color: #4ecdc4; }
+    .pc-2 { border-left-color: #ff6b6b; }
+    .pc-2 .pn-num { color: #ff6b6b; }
+    .pc-3 { border-left-color: #f5c518; }
+    .pc-3 .pn-num { color: #f5c518; }
+
+    .agd-syntax {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.4rem 1.8rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+    .agd-syntax .at  { color: #00ff88; font-weight: 700; }
+    .agd-syntax .id  { color: #f5c518; }
+    .agd-syntax .at-key { color: #4ecdc4; }
+    .agd-syntax .str { color: #b5cea8; }
+    .agd-syntax .cmt { color: #6a6a8a; font-style: italic; }
+    .agd-syntax .fn  { color: #7c4dff; }
+
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .verdict-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+    }
+    .verdict-card.win { border-left: 3px solid #00ff88; }
+    .verdict-card.lose { border-left: 3px solid #ff6b6b; }
+    .verdict-card.draw { border-left: 3px solid #f5c518; }
+    .verdict-card .v-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .verdict-card.win .v-tag { color: #00ff88; }
+    .verdict-card.lose .v-tag { color: #ff6b6b; }
+    .verdict-card.draw .v-tag { color: #f5c518; }
+    .verdict-card .v-body { font-size: 0.88rem; line-height: 1.55; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-05-09 | Pinperepette</p>
+    <h1 class="article-page-title">Ogni Blocco <span class="accent">Ha Un Nome</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Markdown vince. HTML perde. Nessuno guarda il problema dei prossimi due anni.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Document Format</span>
+      <span class="tag tag-highlight">LLM Tokens</span>
+      <span class="tag tag-reaction">Multi-Agent Edit</span>
+      <span class="tag tag-amplification">Rust</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <div style="border-left: 2px solid var(--border-subtle); padding: 0.4rem 1.4rem 0.8rem; margin: 0 0 2.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7;">
+      <span style="display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-attention); margin-bottom: 0.6rem;">Premessa</span>
+      <p style="margin: 0 0 0.8rem;">Mi sono trovato a leggere per la decima volta in un mese un thread su X dove qualcuno argomenta che HTML batte Markdown per gli LLM, qualcun altro risponde che 20% di token in meno e' un argomento definitivo, e un terzo cita un paper di novembre che dice il contrario. Mi sono accorto di avere un'opinione confusa, e quando capita o studio o sto zitto. Ho studiato.</p>
+      <p style="margin: 0;">Quello che leggi qui parte dalla polemica reale (sezione 1), prova a smontarla (sezione 2), e finisce con un prototipo in Rust che ho scritto in un giorno per testare un'idea che la polemica non tocca. Spoiler: il prototipo funziona, ma non risolve il problema della polemica. Risolve un problema diverso, che probabilmente non e' ancora vostro. Forse lo diventera'.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 1 — La polemica
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Polemica</h2>
+    <span class="section-number">Sezione 1. Markdown contro HTML, e nessuno sta misurando la stessa cosa</span>
+
+    <p>Apri un blog tecnico qualsiasi del 2025-2026, cerchi "best format for LLM context" e trovi tre risposte diverse, tutte motivate, tutte misurate, tutte parzialmente vere.</p>
+
+    <p>La <strong>prima posizione</strong> e' il consenso mainstream, quello che leggi sui blog dei vendor (Webex, Wetrocloud, Maxun, Searchcans). Suona cosi': Markdown e' il formato giusto per gli LLM. Risparmia 20-30% di token vs HTML. Conversioni HTML→Markdown comprimono pagine web di un fattore 20× (40k → 2k token). Aumenti il context window utilizzabile di 25× a parita' di costo. Nei sistemi RAG, Markdown ben formattato porta fino al 35% in piu' di accuratezza. <em>Markdown vince. Punto.</em></p>
+
+    <p>La <strong>seconda posizione</strong> e' un paper di novembre 2024 che sta facendo rumore: <a href="https://arxiv.org/html/2411.02959v1" target="_blank" rel="noopener">HtmlRAG</a> di Tan et al. Il titolo e' provocatorio: <em>HTML is Better Than Plain Text for Modeling Retrieved Knowledge in RAG Systems</em>. I numeri sono solidi: su sei dataset QA, HTML pulito batte Markdown e plain text. Su HotpotQA il vantaggio e' di 4.5 punti percentuali in EM (46.25% vs 41.75%), su ASQA +0.5pp. La condizione: l'HTML deve essere stato ripulito (90% del DOM e' rumore CSS/JS che va via) e l'LLM deve essere grande, con context window da 128k+. Il messaggio del paper: <em>HTML pulito conserva relazioni gerarchiche e semantiche che Markdown butta via nella conversione</em>.</p>
+
+    <p>La <strong>terza posizione</strong> e' la piu' silenziosa, e per questo la piu' interessante: Anthropic non si schiera. La <a href="https://docs.anthropic.com/claude/docs/use-xml-tags" target="_blank" rel="noopener">documentazione ufficiale di Claude</a> dice esplicitamente di usare <strong>XML</strong> per strutturare i prompt. Non MD, non HTML. Tag come <code>&lt;instructions&gt;</code>, <code>&lt;context&gt;</code>, <code>&lt;documents&gt;</code>, usati come delimitatori semantici. Anthropic dichiara: <em>"Claude e' trained su questa struttura, risponde meglio cosi'"</em>. E quando MDEval (gennaio 2025) ha misurato chi tra i modelli produce <em>meglio</em> Markdown, Claude 3.5 Sonnet e' arrivato terzo con 0.569, sotto Deepseek (0.946) e GPT-4o (0.865). Coerente con la scelta di spingere XML.</p>
+
+    <p>Tre poli. Tre claim. Tutti supportati da numeri. Tutti incompatibili.</p>
+
+    <div class="iola-box">
+      Quando piu' osservatori onesti misurano la stessa cosa con strumenti diversi e ottengono risposte diverse, di solito non stanno misurando la stessa cosa. Stanno guardando facce diverse di un oggetto che hanno chiamato con lo stesso nome.
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 2 — I tre poli, in dettaglio
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Tre Poli</h2>
+    <span class="section-number">Sezione 2. Cosa stanno davvero misurando</span>
+
+    <p>Mettili uno accanto all'altro e si vede che non parlano dello stesso problema.</p>
+
+    <div class="pole-grid">
+      <div class="pole-card pc-1">
+        <span class="pn-num">POLO 1 · MAINSTREAM</span>
+        <div class="pn-name">Markdown</div>
+        <div class="pn-claim">−20% token vs HTML, +35% RAG accuracy</div>
+        <div class="pn-desc">Misura: <em>quanto costa in token dare un documento all'LLM?</em> Risposta: meno con Markdown. Vero. Ma il problema implicito e' "input single-shot per generazione o retrieval". Non c'e' editing, non c'e' stato, non c'e' coordinazione fra agenti.</div>
+      </div>
+      <div class="pole-card pc-2">
+        <span class="pn-num">POLO 2 · HtmlRAG</span>
+        <div class="pn-name">HTML pulito</div>
+        <div class="pn-claim">+4.5pp EM su HotpotQA, ma con LLM 70B+</div>
+        <div class="pn-desc">Misura: <em>quanto si recupera meglio sapendo la struttura?</em> Risposta: meglio HTML, dopo cleaning. Vero. Ma serve un LLM grande che riesca a sfruttare gli attributi e la gerarchia. Su modelli piccoli i vantaggi spariscono.</div>
+      </div>
+      <div class="pole-card pc-3">
+        <span class="pn-num">POLO 3 · ANTHROPIC</span>
+        <div class="pn-name">XML come delimitatore</div>
+        <div class="pn-claim">Claude e' trained su XML tags</div>
+        <div class="pn-desc">Misura: <em>come fa l'LLM a distinguere istruzioni da dati?</em> Risposta: con XML semantico, perche' il modello e' stato esposto a quel pattern. Vero per Claude. Non si generalizza ad altri modelli, ed e' irrilevante per il problema dell'editing.</div>
+      </div>
+    </div>
+
+    <p>Aggiungi un quarto data point: il <a href="https://www.improvingagents.com/blog/best-input-data-format-for-llms/" target="_blank" rel="noopener">benchmark di Improving Agents</a> ha testato 11 formati su dati tabulari. Vince <strong>Markdown-KV</strong> (key-value, non tabella) con 60.7% di accuratezza. Markdown-Table tradizionale e' al 51.9%. HTML al 53.6%. JSON al 52.3%. CSV peggio di tutti, 44.3%, ma <em>2.7× piu' efficiente in token</em> del vincitore.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Formato</th>
+          <th>Accuratezza</th>
+          <th>Token usati</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Markdown-KV</strong> (vincitore)</td><td class="num">60.7%</td><td class="num">52.104</td></tr>
+        <tr><td>XML</td><td class="num">56.0%</td><td class="num">76.114</td></tr>
+        <tr><td>YAML</td><td class="num">54.7%</td><td class="num">55.395</td></tr>
+        <tr><td>HTML</td><td class="num">53.6%</td><td class="num">75.204</td></tr>
+        <tr><td>JSON</td><td class="num">52.3%</td><td class="num">66.396</td></tr>
+        <tr><td>Markdown-Table</td><td class="num">51.9%</td><td class="num">25.140</td></tr>
+        <tr><td>Natural language</td><td class="num">49.6%</td><td class="num">43.411</td></tr>
+        <tr><td>CSV (piu' compatto)</td><td class="num">44.3%</td><td class="num">19.524</td></tr>
+        <tr><td>Pipe-delimited (peggiore)</td><td class="num">41.1%</td><td class="num">43.098</td></tr>
+      </tbody>
+    </table>
+
+    <p>Stessa domanda ("qual e' il formato giusto?"), quattro misure diverse, quattro vincitori diversi: Markdown su prosa, HTML pulito su retrieval, XML per Claude, Markdown-KV su tabelle. Il consenso "Markdown vince" e' una semplificazione che salta in aria appena cambi il dominio.</p>
+
+    <div class="warning-box">
+      <p><strong>Onestamente, prima di andare oltre.</strong> Tutto quello che hai letto fin qui e' la polemica reale. AGD non risolve nessuna di queste quattro domande. Se ti serve la risposta a "quale formato uso oggi per dare contesto al mio LLM nel 95% dei casi", la risposta e' Markdown. Se sei in produzione e devi scegliere adesso, smetti di leggere e scegli Markdown. Quello che segue e' una domanda diversa, che la polemica non tocca.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 3 — La domanda mancante
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Domanda Mancante</h2>
+    <span class="section-number">Sezione 3. Il problema che nessuno sta misurando</span>
+
+    <p>Tutta la letteratura della sezione precedente misura la stessa famiglia di problema: <em>l'LLM riceve un documento, deve rispondere</em>. Input single-shot, generazione o retrieval, una passata. Per quel mestiere Markdown e' la scelta giusta.</p>
+
+    <p>Esiste un secondo mestiere che non e' nei benchmark, e non e' ancora un commodity production pattern, ma sta arrivando: <em>piu' agenti diversi modificano lo stesso documento nel tempo</em>. Non e' fantascienza. Antirez l'ha detto esplicitamente sul thread del 3 maggio quando ha annunciato l'Array type di Redis: <em>"diversi documenti markdown vengono utilizzati e aggiornati collettivamente da una moltitudine di agenti remoti"</em>. Lo scenario operativo e' vicino, e non c'e' un formato dedicato.</p>
+
+    <p>Cambia tutto. Se piu' agenti devono editare lo stesso documento, ti serve:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Proprieta'</th>
+          <th>Markdown</th>
+          <th>HTML</th>
+          <th>JSON</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>ID stabile per blocco editabile</td>
+          <td>No (heading anchors non sono universali)</td>
+          <td>Si' (<code>id="..."</code>)</td>
+          <td>Si' (chiave dell'oggetto)</td>
+        </tr>
+        <tr>
+          <td>Forma canonica (stesso AST → stessi byte)</td>
+          <td>No (CommonMark vs GFM vs MDX disagree)</td>
+          <td>No (whitespace, ordering, quoting)</td>
+          <td>Sostanzialmente si' (con sort)</td>
+        </tr>
+        <tr>
+          <td>Parser deterministico (stesso input → stesso AST)</td>
+          <td>No (ambiguita' su nesting)</td>
+          <td>Si' (DOM standard)</td>
+          <td>Si'</td>
+        </tr>
+        <tr>
+          <td>Edit operations come dati (replay, merge)</td>
+          <td>Diff testuali fragili</td>
+          <td>DOM diff (verboso)</td>
+          <td>JSON Patch</td>
+        </tr>
+        <tr>
+          <td>Leggibile in <code>cat</code></td>
+          <td>Si'</td>
+          <td>No (chiusure, attributi)</td>
+          <td>Mediocre</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Markdown e' un disastro su tutte le righe tranne l'ultima. HTML e JSON vanno bene strutturalmente ma costano caro in token. Il quadrante mancante e' "abbastanza compatto da non bruciare context window, abbastanza strutturato da permettere edit chirurgici". Nessuno dei tre formati popolari ci sta dentro.</p>
+
+    <p>La domanda diventa: <em>qual e' il formato giusto per un documento di lunga vita editato da piu' agenti?</em></p>
+
+    <p>Per la mia testa, la risposta e' un formato che eredita il line-oriented di Markdown e ci aggiunge tre cose: ID di blocco stabili, sintassi LL(1) deterministica, operazioni di edit come dati JSON. Il prototipo si chiama <strong>AGD</strong> (Agent Document) e l'ho costruito per testare l'idea, non per piazzare uno standard.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 4 — AGD, il design in tre regole
+         ============================================================ -->
+    <h2><span class="accent">//</span> Tre Regole, Un Sigillo</h2>
+    <span class="section-number">Sezione 4. La sintassi, in 60 secondi</span>
+
+    <p>Ogni blocco AGD inizia con <code>@&lt;tag&gt;</code> a colonna 0. E' l'intera storia sintattica.</p>
+
+    <div class="agd-syntax">
+<span class="cmt">// metadati del documento, attributi key=value</span>
+<span class="at">@meta</span> <span class="at-key">title</span>=<span class="str">"Welcome"</span> <span class="at-key">author</span>=<span class="str">alice</span>
+
+<span class="cmt">// heading con ID stabile in coda</span>
+<span class="at">@h1</span> Hello <span class="id">[#intro]</span>
+<span class="at">@p</span> Body text. Inline supporta *bold*, _italic_, `code`.
+
+<span class="cmt">// lista, item su righe successive</span>
+<span class="at">@ul</span> <span class="id">[#features]</span>
+- token-efficient vs HTML
+- LL(1) parser
+- stable per-block IDs
+
+<span class="cmt">// fence verbatim per codice</span>
+<span class="at">@code</span> <span class="at-key">lang</span>=<span class="str">python</span> <span class="id">[#hello]</span>
+~~~
+def hello():
+    return "world"
+~~~
+
+<span class="cmt">// cross-reference a un altro blocco</span>
+<span class="at">@ref</span> <span class="id">#hello</span>
+    </div>
+
+    <p>Tre regole, niente di piu':</p>
+
+    <div class="pole-grid">
+      <div class="pole-card pc-1">
+        <span class="pn-num">REGOLA 1</span>
+        <div class="pn-name">Un sigillo, a colonna 0</div>
+        <div class="pn-desc">L'<code>@</code> apre sempre un blocco. Markdown ha <code>#</code>, <code>*</code>, <code>&gt;</code>, <code>-</code>, spazi indentati, ognuno con regole diverse. AGD ne ha uno solo. Il lexer e' una macchina a 7 stati line-oriented in 150 righe.</div>
+      </div>
+      <div class="pole-card pc-2">
+        <span class="pn-num">REGOLA 2</span>
+        <div class="pn-name">ID opzionale, sempre in coda</div>
+        <div class="pn-desc"><code>[#nome]</code> alla fine di qualunque blocco lo rende indirizzabile. Chiunque puo' editarlo per ID, non per offset di byte. E' la feature load-bearing del formato — il resto sono accessori.</div>
+      </div>
+      <div class="pole-card pc-3">
+        <span class="pn-num">REGOLA 3</span>
+        <div class="pn-name">Niente chiusure</div>
+        <div class="pn-desc">Riga vuota o un altro <code>@</code> chiudono il blocco precedente. L'equivalente di <code>&lt;h1&gt;...&lt;/h1&gt;</code> e' solo <code>@h1 ...</code>. Niente nesting profondo, niente DOM tree, niente XML soup.</div>
+      </div>
+    </div>
+
+    <p>La grammatica completa e' frozen in <a href="https://github.com/Pinperepette/agd/blob/main/grammar/agd.ebnf" target="_blank" rel="noopener">grammar/agd.ebnf</a> — 50 righe di EBNF. Nessun backtracking, nessun lookahead oltre la riga corrente.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 5 — Promesse vs misure
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quello Che Promettevo, Quello Che E' Uscito</h2>
+    <span class="section-number">Sezione 5. La onesta' fa male e va fatta</span>
+
+    <p>Quando ho buttato giu' il design, prima di scrivere una riga di Rust, avevo fatto stime token a vista. Erano sbagliate. Lo dico subito perche' il pezzo non funziona se mento.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Promessa iniziale</th>
+          <th>Misurato (corpora 100 → 100k blocchi)</th>
+          <th>Verdetto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>−5 a −10% vs Markdown</td>
+          <td><strong>+18 a +22%</strong> (AGD costa di piu')</td>
+          <td>Sbagliato di segno</td>
+        </tr>
+        <tr>
+          <td>−30 a −40% vs HTML</td>
+          <td>−16 a −19%</td>
+          <td>Direzione giusta, ridotto a meta'</td>
+        </tr>
+        <tr>
+          <td>−50% vs JSON</td>
+          <td>−56 a −59%</td>
+          <td>Onesto, leggermente meglio del previsto</td>
+        </tr>
+        <tr>
+          <td>"Parser ~200 righe Python"</td>
+          <td>~1000 righe Rust</td>
+          <td>Equivalente a 300 Python (overhead di linguaggio)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>L'errore peggiore sta sulla riga uno. Avevo in testa che <code>@h1</code> e <code># </code> fossero entrambi 2 token. Falso: <code>@h1</code> tokenizza come 3 token (<code>@</code>, <code>h</code>, <code>1</code>) mentre <code># </code> e' 1 token. Su 1000 blocchi sono 2000 token in piu' solo per i prefissi. Misurato su corpora controllati di 100k blocchi, AGD <strong>costa stabilmente il 20% in piu'</strong> di Markdown. Sempre. A tutte le scale.</p>
+
+    <p>Vince invece contro HTML del 16-19%, contro JSON del 56-59%. Vince anche contro XML, ma niente di sensazionale. Il +20% rispetto a Markdown e' il <em>prezzo onesto</em> degli ID espliciti e dei prefissi <code>@&lt;tag&gt;</code>.</p>
+
+    <div class="iola-box">
+      Le idee sono come le navi: non sai se galleggiano finche' non le metti in acqua. Quello che hai disegnato sul foglio e quello che hai costruito non sono mai la stessa cosa, e i numeri ti puniscono nei posti dove hai mentito a te stesso.
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 6 — I bug che ho trovato (proptest)
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quattro Bug Che Senza Proptest Non Avrei Mai Trovato</h2>
+    <span class="section-number">Sezione 6. Il property testing fa quello che la testa non fa</span>
+
+    <p>Ho scritto 256 casi proptest che generano documenti random validi, li serializzano, li riparsa, e verificano l'equivalenza strutturale. Quattro bug catturati, tutti di design, tutti invisibili a un test scritto a mano.</p>
+
+    <div class="pole-grid">
+      <div class="pole-card pc-2">
+        <span class="pn-num">BUG 1 · ESCAPE</span>
+        <div class="pn-name">Quoted attr value con virgolette</div>
+        <div class="pn-desc">Il serializer scriveva <code>"\""</code> per uno string contenente <code>"</code>, ma il parser non gestiva il backslash. Rotto il roundtrip. Fix: parser di valori quoted con escape <code>\\</code>.</div>
+      </div>
+      <div class="pole-card pc-2">
+        <span class="pn-num">BUG 2 · @REF INLINE</span>
+        <div class="pn-name">Terminazione ambigua</div>
+        <div class="pn-desc">Avevo previsto <code>@ref #foo</code> anche dentro paragrafo. Proptest ha generato <code>Ref("_") + Text("0")</code> che si serializza come <code>@ref #_0</code> e riparsa come <code>Ref("_0")</code> — un solo nodo invece di due. Soluzione drastica: tolto inline ref. Restano solo come blocco.</div>
+      </div>
+      <div class="pole-card pc-2">
+        <span class="pn-num">BUG 3 · FENCE LF</span>
+        <div class="pn-name">Code block con solo \n</div>
+        <div class="pn-desc">Un blocco <code>@code</code> con content <code>"\n"</code> (un LF puro) si serializzava in modo che il parser lo restituiva come <code>""</code>. Fix: il serializer appende sempre un LF dopo il content, e il parser ne strippa esattamente uno prima del closing fence.</div>
+      </div>
+      <div class="pole-card pc-2">
+        <span class="pn-num">BUG 4 · SPAN IN ==</span>
+        <div class="pn-name">PartialEq includeva il byte span</div>
+        <div class="pn-desc">Due AST logicamente identici ma da input con whitespace diverso non comparavano uguali. Lo span e' metadata, non identita'. Fix: PartialEq manuale che esclude span dall'uguaglianza strutturale.</div>
+      </div>
+    </div>
+
+    <p>Tutti e quattro i bug erano "errori di design che si manifestano solo con input casuali". Test scritti a mano coprono le forme che ti aspetti. Proptest copre quelle che non avresti mai immaginato. Investimento ripagato, in un'ora di codice.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 7 — DocumentIndex, la scoperta
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Scoperta Vera</h2>
+    <span class="section-number">Sezione 7. L'index batte il find lineare di 2625x</span>
+
+    <p>Il valore di AGD e' indicizzare i blocchi per ID. Il primo design ingenuo era <code>Document::find(&amp;id)</code> con linear scan: O(n). Per 100 blocchi va bene. Per 100k inizia a fare male. Quanto male? Misurato:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Blocchi</th>
+          <th>Linear find</th>
+          <th>Indexed find</th>
+          <th>Speedup</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">100</td><td class="num">80 ns</td><td class="num">25 ns</td><td class="num">3×</td></tr>
+        <tr><td class="num">1.000</td><td class="num">1.6 µs</td><td class="num">26 ns</td><td class="num"><strong>62×</strong></td></tr>
+        <tr><td class="num">10.000</td><td class="num">21 µs</td><td class="num">36 ns</td><td class="num"><strong>583×</strong></td></tr>
+        <tr><td class="num">100.000</td><td class="num">283 µs</td><td class="num">108 ns</td><td class="num"><strong>2625×</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p>Senza l'index, ogni edit operation costa 283 µs solo per <em>trovare</em> il blocco target su un documento da 100k entries. Con l'index, 108 ns. Differenza di tre ordini di grandezza.</p>
+
+    <p>La conseguenza architetturale e' importante e l'avevo sottovalutata: <strong>chiunque usi AGD seriamente deve costruirsi un indice</strong>. Non e' un'ottimizzazione, e' la differenza tra "usabile" e "inutilizzabile". Il codice del client ideale e' questo:</p>
+
+    <div class="agd-syntax">
+<span class="fn">use</span> agd::{parse, edit::Operation, index::DocumentIndex};
+
+<span class="cmt">// parse una volta sola</span>
+<span class="fn">let mut</span> doc = parse(&amp;source)?;
+<span class="fn">let</span> idx = DocumentIndex::build(&amp;doc);  <span class="cmt">// O(n) una volta</span>
+
+<span class="cmt">// applica N edit, lookup costa O(1)</span>
+<span class="fn">for</span> op <span class="fn">in</span> ops {
+    <span class="fn">if</span> idx.position(op.target_id()).is_some() {
+        doc.apply(op)?;
+    }
+}
+    </div>
+
+    <p>Il pattern "parse-once, edit-many" gira a 500k op/sec via library API. Lo stesso flow via CLI subprocess (un <code>agd edit</code> per operazione) gira a 76 op/sec. Differenza: <strong>6500×</strong>. Implicazione: AGD ha senso solo se mantieni il documento parseato in memoria in un servizio, non se invochi la CLI in loop.</p>
+
+    <div class="warning-box">
+      <p><strong>Conseguenza per l'architettura.</strong> Qualunque adozione seria di AGD deve avere la forma di un demone (chiamiamolo <code>agdd</code>) che mantiene i documenti in memoria, espone le edit operations via socket o RPC, ricostruisce l'index dopo ogni write batch. Senza questo strato, AGD non vale il +20% di token che paga rispetto a Markdown. Con questo strato, vale per il 5% dei casi dove l'editing multi-agente conta davvero.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 8 — Il lab
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab: Riprodurre Tutto In Cinque Minuti</h2>
+    <span class="section-number">Sezione 8. Il codice e' su GitHub, i numeri sono replicabili</span>
+
+    <p>Tutto quello che hai letto e' verificabile con cinque comandi. Non c'e' niente di nascosto, niente di hand-waved. Repository: <a href="https://github.com/Pinperepette/agd" target="_blank" rel="noopener">github.com/Pinperepette/agd</a>.</p>
+
+    <div class="agd-syntax" data-lang="bash">
+<span class="cmt"># 1. clone + build (richiede cargo)</span>
+git clone https://github.com/Pinperepette/agd.git
+<span class="fn">cd</span> agd
+cargo build --release
+
+<span class="cmt"># 2. parse e validate uno degli esempi</span>
+./target/release/agd validate examples/api-doc.agd
+./target/release/agd parse --json examples/api-doc.agd | head -30
+
+<span class="cmt"># 3. token benchmark vs MD/HTML/JSON</span>
+./target/release/agd bench examples/api-doc.agd
+
+<span class="cmt"># 4. genera il report completo (corpora 100/1k/10k/100k blocchi)</span>
+./target/release/agd-bench
+<span class="cmt"># scrive benches/BENCHMARKS.md con tutti i numeri</span>
+
+<span class="cmt"># 5. applica una edit operation per ID</span>
+./target/release/agd edit examples/multi-agent-task.agd --op '{
+  "op":    "set_attr",
+  "id":    "status-t2",
+  "key":   "flagged",
+  "value": true
+}'
+    </div>
+
+    <p>Il punto 4 e' quello che ti convince o ti smonta. Genera corpora sintetici deterministici (stesso seed, stesso byte output su qualunque macchina), parsea, serializza, edita, conta token, confronta con <code>pulldown-cmark</code>. Output finale: <a href="https://github.com/Pinperepette/agd/blob/main/benches/BENCHMARKS.md" target="_blank" rel="noopener">benches/BENCHMARKS.md</a>, lo stesso file da cui ho preso tutti i numeri di questo post.</p>
+
+    <p>Tre scoperte uniche del lab che vale la pena fissare:</p>
+
+    <div class="pole-grid">
+      <div class="pole-card pc-1">
+        <span class="pn-num">SCOPERTA 1</span>
+        <div class="pn-name">pulldown-cmark e' 2-3× piu' veloce</div>
+        <div class="pn-desc">Su documenti grandi, il parser Markdown ottimizzato di Marco Tholen batte il mio AGD parser. AGD parsea a ~60 MB/s, pulldown a ~150 MB/s. Era atteso (lui ha 5 anni di ottimizzazione, io un giorno) ma e' importante saperlo: AGD non vince in velocita' assoluta, vince in determinismo.</div>
+      </div>
+      <div class="pole-card pc-3">
+        <span class="pn-num">SCOPERTA 2</span>
+        <div class="pn-name">Serialize e' 10× piu' veloce di parse</div>
+        <div class="pn-desc">~830 MB/s sostenuti. Asimmetria tipica: parsare richiede branching, serializzare e' append lineare. La conseguenza pratica: i workflow agentici dove molte edit producono molte serializzazioni sono limitati dal parse iniziale, non dalle scritture.</div>
+      </div>
+      <div class="pole-card pc-2">
+        <span class="pn-num">SCOPERTA 3</span>
+        <div class="pn-name">AST in memoria pesa 4× la source</div>
+        <div class="pn-desc">11.9 MB di AGD source diventano 49.8 MB di Document parseato. Costante a tutte le scale. Non e' poco: per documenti molto grandi (gigabyte) significa che non li tieni tutti in memoria, ti serve uno streaming parser. Per ora non c'e'.</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 9 — Vale la pena?
+         ============================================================ -->
+    <h2><span class="accent">//</span> Vale La Pena Spendere Piu' Token?</h2>
+    <span class="section-number">Sezione 9. La risposta secca</span>
+
+    <p>No, per il 95% dei casi reali. Si', per il 5% dove l'editing multi-agente di documenti di lunga vita e' la realta' operativa.</p>
+
+    <p>Vediamo i casi uno per uno. Quando AGD aiuta davvero, e quando paghi il +20% di token per niente.</p>
+
+    <div class="verdict-grid">
+      <div class="verdict-card lose">
+        <div class="v-tag">RAG / RETRIEVAL</div>
+        <div class="v-body">L'agente legge documentazione, risponde. Markdown vince ovunque. AGD costa di piu' senza dare niente.</div>
+      </div>
+      <div class="verdict-card lose">
+        <div class="v-tag">ONE-SHOT GENERATION</div>
+        <div class="v-body">L'LLM scrive una risposta, l'utente la legge, fine. I modelli sono trained su Markdown, ne capiscono la sintassi nativamente. AGD richiederebbe few-shot prompting.</div>
+      </div>
+      <div class="verdict-card lose">
+        <div class="v-tag">DOCUMENTAZIONE STATICA</div>
+        <div class="v-body">README, blog, docs. Markdown ha 15 anni di tooling (Hugo, Jekyll, MDX, GitHub render). AGD non si renderizza nel browser e ha zero ecosistema.</div>
+      </div>
+      <div class="verdict-card lose">
+        <div class="v-tag">TABELLE COMPLESSE</div>
+        <div class="v-body">Markdown-KV vince contro tutti su questo dominio (60.7%). AGD non ha sintassi tabella nativa in v0.1, useresti <code>@code lang=csv</code>. Markdown e' meglio.</div>
+      </div>
+      <div class="verdict-card draw">
+        <div class="v-tag">PROMPT ENGINEERING CLAUDE</div>
+        <div class="v-body">Anthropic e' chiara: usa XML tag. Claude e' trained su quelli. AGD potrebbe funzionare ma non sfrutti il pretraining. Resta XML.</div>
+      </div>
+      <div class="verdict-card win">
+        <div class="v-tag">MULTI-AGENT EDIT (AUDIT)</div>
+        <div class="v-body">Cinque agenti aggiornano una checklist d'incidente, un piano operativo, una specifica RFC. Devi sapere chi ha cambiato cosa. AGD vince — ID stabili, edit ops come dati, audit trail naturale.</div>
+      </div>
+      <div class="verdict-card win">
+        <div class="v-tag">DOCUMENTI DI LUNGA VITA</div>
+        <div class="v-body">Knowledge base interne aggiornate da agenti per mesi. La forma canonica byte-stabile rende i diff utili in code review. Markdown drifta.</div>
+      </div>
+      <div class="verdict-card win">
+        <div class="v-tag">REPLAY E DEBUG</div>
+        <div class="v-body">Workflow dove le edit operations vanno loggate, replicate, replicabili. Le ops AGD sono JSON puri serializzabili.</div>
+      </div>
+    </div>
+
+    <p>Conta i casi: 4-5 dove Markdown vince, 1 dove XML vince, 3 dove AGD vince. Il rapporto e' chiaro: AGD e' un formato di nicchia per un mestiere di nicchia.</p>
+
+    <p>La mossa <em>realmente</em> intelligente, per chi vuole il 90% del valore di AGD senza buttarsi su un formato nuovo, probabilmente e' Markdown + kramdown anchors:</p>
+
+    <div class="agd-syntax">
+<span class="cmt"># Section title {#stable-id}</span>
+
+Body of the section.
+
+<span class="cmt">## Subsection {#sub-id}</span>
+
+More body.
+    </div>
+
+    <p>Hai gli ID, resti dentro l'ecosistema Markdown, GitHub li renderizza, Pandoc li capisce. Perdi la forma canonica rigorosa, perdi il parser LL(1) puro, ma probabilmente non li userai mai. AGD ha senso quando perdere quei due e' un costo reale, non teorico — e oggi quei costi pochi li sentono.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10 — Conclusione
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Documento Vuole Un Indirizzo</h2>
+    <span class="section-number">Sezione 10. Il punto vero, in tre righe</span>
+
+    <p>La polemica MD vs HTML vs XML e' viva e ha tre poli, tutti supportati da numeri reali. Ma misurano tutti la stessa famiglia di problema: <em>quanto bene legge l'LLM</em>. Per quel mestiere Markdown vince in quasi tutto.</p>
+
+    <p>C'e' un secondo mestiere all'orizzonte — <em>quanto bene piu' agenti coordinano modifiche allo stesso documento nel tempo</em> — che la polemica non sta misurando. AGD e' un esperimento per quello spazio. Funziona, e' verificato (89 test su 9 suite, proptest robusto, benchmark riproducibili). Costa il 20% di token in piu' rispetto a Markdown e a parita' di scenario non vince in velocita' contro pulldown-cmark.</p>
+
+    <p>La mossa onesta non e' "usate AGD". E' "se vi capita davvero il problema dell'editing multi-agente, sapete che ha una forma di soluzione, e ne avete un prototipo riproducibile da cui partire o di cui rubare le idee".</p>
+
+    <p style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-attention); line-height: 1.6; margin: 1.6rem 0; text-align: center;">
+      Il documento non e' un testo.<br>
+      E' uno spazio di blocchi indirizzabili.<br>
+      Il +20% paga questa idea, niente altro.
+    </p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">
+        "Markdown vince per chi legge.<br>
+        HTML vince per chi cerca con un LLM grande.<br>
+        XML vince per chi parla con Claude.<br>
+        Nessuno ha ancora vinto per chi edita."
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Codice e numeri.</strong> Il prototipo e' su <a href="https://github.com/Pinperepette/agd" target="_blank" rel="noopener">github.com/Pinperepette/agd</a> (Rust, MIT, v0.1.0 taggata). Tutti i benchmark di questo articolo arrivano da <a href="https://github.com/Pinperepette/agd/blob/main/benches/BENCHMARKS.md" target="_blank" rel="noopener">benches/BENCHMARKS.md</a>, riproducibili con <code>cargo run --release --bin agd-bench</code>. La spec del formato e' dogfooded in <a href="https://github.com/Pinperepette/agd/blob/main/spec/AGD-SPEC.agd" target="_blank" rel="noopener">spec/AGD-SPEC.agd</a> — scritta in AGD, non in Markdown.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Riferimenti.</strong></p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+        ⊕ <a href="https://arxiv.org/html/2411.02959v1" target="_blank" rel="noopener">arxiv.org/html/2411.02959v1</a>: HtmlRAG, il paper che dice HTML pulito batte Markdown su sei dataset QA (Tan et al, 11/2024).<br>
+        ⊕ <a href="https://arxiv.org/html/2501.15000v1" target="_blank" rel="noopener">arxiv.org/html/2501.15000v1</a>: MDEval, benchmark sulla capacita' degli LLM di produrre Markdown ben strutturato (01/2025).<br>
+        ⊕ <a href="https://www.improvingagents.com/blog/best-input-data-format-for-llms/" target="_blank" rel="noopener">improvingagents.com/blog/best-input-data-format-for-llms</a>: 11 formati testati su tabular data, vince Markdown-KV con 60.7%.<br>
+        ⊕ <a href="https://docs.anthropic.com/claude/docs/use-xml-tags" target="_blank" rel="noopener">docs.anthropic.com/claude/docs/use-xml-tags</a>: la doc ufficiale di Anthropic sull'uso di XML tag con Claude.<br>
+        ⊕ <a href="https://news.ycombinator.com/item?id=41043771" target="_blank" rel="noopener">news.ycombinator.com/item?id=41043771</a>: il thread HN su dom-to-semantic-markdown, con il dibattito MD vs HTML in piccolo.<br>
+        ⊕ <a href="https://github.com/Pinperepette/agd" target="_blank" rel="noopener">github.com/Pinperepette/agd</a>: il prototipo AGD, Rust, MIT.
+      </p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
