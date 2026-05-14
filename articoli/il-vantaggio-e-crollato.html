@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Vantaggio E' Crollato | Signal Pirate</title>
+  <meta name="description" content="L'11 maggio 2026 Google annuncia di aver beccato il primo zero-day scritto da un'AI usato in un attacco reale: bypass 2FA su una piattaforma di amministrazione web, gruppo cybercrime che stava per fare un mass exploitation event. Tre giorni dopo questo post. Cinque settimane prima Anthropic aveva annunciato Claude Mythos Preview: internamente ha trovato migliaia di zero-day in ogni OS e browser, oltre mille critical in coda da disclosure. Non lo vendono, lo mettono dietro Project Glasswing in uso difensivo. XBOW sta al numero uno di HackerOne US, 200 zero-day con zero falsi positivi, batte un veterano di 20 anni in 28 minuti contro 40 ore. Big Sleep di Google nel 2025 trovava la CVE-2025-6965 in SQLite gia' conosciuta dagli attaccanti. Trovare vulnerabilita' e' sempre stato un problema combinatorio O(b^d) che gli umani non possono esaurire. Un LLM trasforma il codice in geometria statistica e riconosce pattern che ha gia' visto in migliaia di CVE. Il punto non e' che lo fa, e' che costa 50 dollari al giorno. Non serve l'AGI per fare danni, basta automatizzare il 20% piu' costoso del lavoro offensivo.">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    .iola-box {
+      background: #0d1117;
+      border-left: 3px solid #b5cea8;
+      border-radius: 0 10px 10px 0;
+      padding: 1.4rem 1.8rem;
+      margin: 2rem 0;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      font-style: italic;
+    }
+
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 10px;
+      padding: 1.4rem 1.8rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      line-height: 1.9;
+      text-align: center;
+      color: #c8c8d8;
+    }
+    .formula-box .fm-label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-attention);
+      margin-bottom: 0.8rem;
+    }
+    .formula-box .fm-eq {
+      font-size: 1.4rem;
+      color: var(--accent-highlight);
+      font-weight: 700;
+    }
+    .formula-box .fm-note {
+      display: block;
+      margin-top: 0.8rem;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .strategy-table .num { text-align: right; font-family: var(--font-mono); }
+
+    .phase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .phase-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      border-left: 3px solid var(--accent-attention);
+    }
+    .phase-card .ph-num {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--accent-attention);
+      margin-bottom: 0.4rem;
+    }
+    .phase-card .ph-name {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .phase-card .ph-claim {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-highlight);
+      margin-bottom: 0.6rem;
+    }
+    .phase-card .ph-desc {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .pc-1 { border-left-color: #4ecdc4; }
+    .pc-1 .ph-num { color: #4ecdc4; }
+    .pc-2 { border-left-color: #00ff88; }
+    .pc-2 .ph-num { color: #00ff88; }
+    .pc-3 { border-left-color: #f5c518; }
+    .pc-3 .ph-num { color: #f5c518; }
+    .pc-red { border-left-color: #ff6b6b; }
+    .pc-red .ph-num { color: #ff6b6b; }
+
+    .timeline {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.4rem 1.8rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.9;
+    }
+    .timeline .t-row {
+      display: flex;
+      gap: 1.4rem;
+      align-items: baseline;
+    }
+    .timeline .t-date {
+      min-width: 6.5rem;
+      color: var(--accent-attention);
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    .timeline .t-body {
+      flex: 1;
+      color: var(--text-secondary);
+    }
+    .timeline .t-actor {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      padding: 1rem 1.4rem;
+      white-space: pre;
+    }
+    .code-block .cmt { color: #6a6a8a; font-style: italic; }
+    .code-block .kw  { color: #7c4dff; }
+    .code-block .str { color: #b5cea8; }
+    .code-block .id  { color: #f5c518; }
+
+    .key-line {
+      border-left: 4px solid var(--accent-highlight);
+      background: linear-gradient(90deg, rgba(124,77,255,0.10), rgba(0,255,136,0.04));
+      padding: 1.6rem 2rem;
+      margin: 2.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--accent-attention);
+      border-radius: 0 8px 8px 0;
+    }
+    .key-line p { margin: 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-05-14 | Pinperepette</p>
+    <h1 class="article-page-title">Il Vantaggio <span class="accent">E' Crollato</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Per anni trovare vulnerabilita' costava sei mesi di un essere umano caro. Adesso costa 50 dollari di GPU.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">AI Security</span>
+      <span class="tag tag-highlight">Vulnerability Discovery</span>
+      <span class="tag tag-reaction">Asimmetria Offesa/Difesa</span>
+      <span class="tag tag-amplification">LLM</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <div style="border-left: 2px solid var(--border-subtle); padding: 0.4rem 1.4rem 0.8rem; margin: 0 0 2.5rem; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7;">
+      <span style="display: block; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-attention); margin-bottom: 0.6rem;">Premessa</span>
+      <p style="margin: 0 0 0.8rem;">Per decenni trovare vulnerabilita' nel software e' stato un lavoro da esseri umani ossessivi. Reverse engineer che passano notti su assembly, debugger aperto, IDA su un monitor e Ghidra sull'altro. Caffeina. Pattern mentali costruiti in anni. Una vulnerabilita' seria su un browser moderno o un kernel costa ai migliori sei mesi di lavoro a tempo pieno, e infatti i prezzi sui broker grigi lo dicono chiaro: una zero-click su Safari sta sopra il milione di dollari perche' l'offerta e' minuscola.</p>
+      <p style="margin: 0;">Nel 2026 qualcosa sta cambiando. I modelli AI iniziano a trovare bug che nessuno aveva cercato. Non sempre, non in tutti i casi, e non sempre con eleganza: spesso ci picchiano dentro come uno script kiddie con il manuale di <em>Smashing the Stack for Fun and Profit</em> aperto e troppa Red Bull. Ma con una proprieta' che cambia il gioco: non si stancano, non perdono concentrazione, e li puoi replicare praticamente senza costo marginale. Questo pezzo non e' un pezzo di apocalisse, e' il tentativo di capire per cosa sta cambiando il prezzo, perche' sta cambiando matematicamente, e cosa significa per chi difende.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 1 — La settimana
+         ============================================================ -->
+    <h2><span class="accent">//</span> Tre Giorni Fa, Una Cosa Che Non Era Mai Successa</h2>
+    <span class="section-number">Sezione 1. La scena di questa settimana</span>
+
+    <p>L'11 maggio 2026, tre giorni fa, il <a href="https://cloud.google.com/blog/topics/threat-intelligence/ai-vulnerability-exploitation-initial-access" target="_blank" rel="noopener">Google Threat Intelligence Group</a> pubblica un report che andra' a finire sui libri di storia della security. Hanno beccato il primo zero-day scritto da un'AI <em>usato davvero in un attacco</em>. Non un proof of concept, non un benchmark su CTF. Un exploit pronto, dentro l'infrastruttura di un gruppo cybercrime, in attesa di essere lanciato.</p>
+
+    <p>Il target era un bypass 2FA su una piattaforma open source di amministrazione web. Il gruppo stava preparando quello che Google chiama un "mass exploitation event", cioe' un'unica campagna che colpisce in parallelo tutte le installazioni vulnerabili nel mondo. Big Sleep, l'agente di Google DeepMind + Project Zero, lo ha trovato per primo, e ha aiutato a disinnescare la finestra. Letteralmente: AI offensiva contro AI difensiva, e la difensiva e' arrivata prima.</p>
+
+    <p>La parte buffa, se si puo' dire cosi', e' come hanno capito che il codice non era umano. L'AI dell'attaccante aveva lasciato firme stupide nel codice: docstring Python che spiegavano in inglese cosa fa la funzione, un punteggio CVSS allucinato e inesistente, codice troppo annotato. Un essere umano che scrive exploit non commenta i suoi tool, e non si inventa un CVSS score. In pratica l'AI si e' firmata da sola, tipo lo script kiddie del 2009 che metteva <code>// ownz3d by xXxBugSlayerxXx</code> alla fine del payload. Ma piu' fessa: l'umano almeno sapeva di star piantando una bandierina, l'AI ci credeva davvero che quel CVSS score esistesse.</p>
+
+    <p>Cinque settimane prima, il 7 aprile 2026, Anthropic annuncia <a href="https://red.anthropic.com/2026/mythos-preview/" target="_blank" rel="noopener">Claude Mythos Preview</a>. Il nome fa cagare, sembra una skin di League of Legends. I numeri pero' sono brutali.</p>
+
+    <div class="phase-grid">
+      <div class="phase-card pc-2">
+        <span class="ph-num">SCOPO</span>
+        <div class="ph-name">Migliaia di zero-day</div>
+        <div class="ph-claim">ogni OS, ogni browser principale</div>
+        <div class="ph-desc">Internamente Mythos ha trovato un volume di bug high-severity senza precedenti in OSS critico. Windows, macOS, Linux, Chrome, Safari, Firefox.</div>
+      </div>
+      <div class="phase-card pc-3">
+        <span class="ph-num">CODA</span>
+        <div class="ph-name">1000+ critical</div>
+        <div class="ph-claim">in disclosure responsabile</div>
+        <div class="ph-desc">Vulnerabilita' di gravita' critica in attesa di patch upstream. La coda da sola e' piu' lunga di tutto quello che NVD ha pubblicato in mesi.</div>
+      </div>
+      <div class="phase-card pc-1">
+        <span class="ph-num">ACCURACY</span>
+        <div class="ph-name">89% match esatto</div>
+        <div class="ph-claim">98% entro un livello</div>
+        <div class="ph-desc">Su 198 report verificati a mano da security contractor umani, la severity assessment di Mythos coincide esattamente con quella umana 9 volte su 10.</div>
+      </div>
+    </div>
+
+    <p>Va detta una cosa onesta prima di andare avanti: di quelle mille critical in coda, parecchie finiranno ridimensionate o duplicate durante il responsible disclosure. Chi ha lavorato in security sa che la severity iniziale e' quasi sempre gonfiata, anche quella umana. Dividi per cinque se vuoi essere severo. Anche cosi', l'ordine di grandezza non si muove e il punto non cambia.</p>
+
+    <p>La parte importante, pero', e' un'altra, e secondo me molti la stanno leggendo male. Mythos probabilmente non e' neanche particolarmente "intelligente" nel senso fantascientifico del termine. Le vulnerabilita' che trova appartengono quasi tutte a famiglie gia' esistenti: integer overflow, auth bypass, desync, use-after-free, race condition, path traversal. Roba che esiste da vent'anni, scritta su Phrack quando ancora non eravamo nati la meta' di noi. Probabilmente puoi farti intervistare da Mythos su Heidegger e ti risponde educato come uno stagista da Veltroni. Il problema non e' lui, e' la pipeline che gli gira intorno.</p>
+
+    <p>Ed e' proprio questo il punto inquietante.</p>
+
+    <div class="key-line">
+      <p>Non serve inventare nuove classi di exploit per cambiare il mercato della sicurezza.</p>
+    </div>
+
+    <p>Basta industrializzare il riconoscimento di pattern vecchi, orchestrare bene i tool esistenti, e farli girare in continuo su scala enorme. Il salto non e' "un'AI che inventa vulnerabilita' impossibili". Il salto e' una pipeline che prende tecniche offensive note, le automatizza, le parallelizza, e abbassa il costo cognitivo quasi a zero.</p>
+
+    <div class="iola-box">
+      Non mi interessa se la trivella non inventa nuovi tipi di petrolio. Mi interessa che adesso trivella cento volte piu' veloce. La paura non e' nella novita' del bug, e' nel throughput.
+    </div>
+
+    <p>E infatti Anthropic <strong>ha deciso di non venderlo</strong>. Mythos resta dietro <a href="https://www.anthropic.com/news/claude-code-security" target="_blank" rel="noopener">Project Glasswing</a>, dato a partner difensivi sotto NDA per chiudere bug prima che escano. Il 30 aprile rilasciano Claude Security in beta pubblica per Enterprise, che e' una versione molto piu' depotenziata della stessa pipeline. Il modello capace di trovare migliaia di zero-day esiste, ma lo tengono in cassaforte. Vuol dire che hanno paura di cosa puo' succedere se la stessa pipeline finisce ovunque. E hanno ragione di averla, perche' tecnicamente quella pipeline non e' complicatissima da replicare.</p>
+
+    <p>E poi c'e' <a href="https://xbow.com/" target="_blank" rel="noopener">XBOW</a>, che e' la cosa che secondo me piu' spaventa perche' e' commercialmente disponibile adesso. Startup, $120M di Series C a marzo. In 90 giorni e' arrivata al <strong>numero uno della leaderboard HackerOne US</strong>, che e' la classifica dei migliori bug bounty hunter del mondo. 200+ zero-day, zero falsi positivi. Su un benchmark di 104 challenge security, XBOW li ha chiusi tutti in 28 minuti, contro le 40 ore di un veterano umano di 20 anni di mestiere. A RSAC 2026 hanno annunciato l'integrazione dentro Microsoft Security Copilot e Sentinel.</p>
+
+    <p>XBOW non sembra il prototipo di Skynet. Sembra una cosa molto piu' realistica e pericolosa: un team di vuln researcher mediocri che lavorano 24/7 senza stancarsi mai. Non e' piu' un esperimento di lab, e' un prodotto.</p>
+
+    <div class="timeline">
+      <div class="t-row">
+        <div class="t-date">nov 2024</div>
+        <div class="t-body"><span class="t-actor">Google Big Sleep</span> &middot; primo bug real-world trovato da LLM agent, stack buffer underflow in SQLite pre-release. Project Zero + DeepMind. Il momento in cui tutti smettono di chiamarli "esperimenti".</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">lug 2025</div>
+        <div class="t-body"><span class="t-actor">Big Sleep + GTI</span> &middot; trova <code>CVE-2025-6965</code> in SQLite, critica, gia' conosciuta da threat actor, a un passo dall'essere usata in attacco.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">ago 2025</div>
+        <div class="t-body"><span class="t-actor">DARPA AIxCC, DEF CON 33</span> &middot; finale dell'AI Cyber Challenge, sistemi autonomi trovano e patchano zero-day in OSS critico in tempo reale. Codice rilasciato open source a fine anno.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">mar 2026</div>
+        <div class="t-body"><span class="t-actor">XBOW</span> &middot; raise $120M Series C, sale al numero uno di HackerOne US in 90 giorni, 200+ zero-day. Integrazione Microsoft a RSAC 2026.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">7 apr 2026</div>
+        <div class="t-body"><span class="t-actor">Anthropic</span> &middot; annuncia Claude Mythos Preview, migliaia di zero-day in ogni OS e browser, oltre mille critical in coda. Non lo vendono, lo mettono dietro Project Glasswing per uso difensivo.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">30 apr 2026</div>
+        <div class="t-body"><span class="t-actor">Anthropic</span> &middot; Claude Security in beta pubblica per Enterprise. Versione depotenziata di Mythos, accessibile.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">11 mag 2026</div>
+        <div class="t-body"><span class="t-actor">Google GTIG</span> &middot; primo zero-day scritto da AI <em>usato</em> in attacco, bypass 2FA, mass exploitation pianificato. Big Sleep aiuta a disinnescarlo prima del lancio.</div>
+      </div>
+      <div class="t-row">
+        <div class="t-date">14 mag 2026</div>
+        <div class="t-body"><span class="t-actor">questo post</span> &middot; finora niente "AGI offensiva". Solo il 20% piu' costoso del lavoro umano che si automatizza.</div>
+      </div>
+    </div>
+
+    <p>Sette eventi diversi. Tutti nella stessa direzione. Per vent'anni la cybersecurity ha avuto un vantaggio strutturale: la difesa scala con il numero di sviluppatori, l'offesa scala con il numero di reverse engineer bravi disposti a passare mesi su un binario. Quel rapporto e' sempre stato favorevole alla difesa solo perche' i bravi reverse engineer erano pochi e costosi. Quel vincolo, nel 2026, sta saltando.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 2 — Perche' e' un problema matematico
+         ============================================================ -->
+    <h2><span class="accent">//</span> Trovare Vulnerabilita' E' Un Problema Combinatorio</h2>
+    <span class="section-number">Sezione 2. Il codice moderno e' troppo grande per gli esseri umani</span>
+
+    <p>Per capire perche' i modelli stanno vincendo, devi prima capire perche' gli umani perdevano. Un browser moderno e' attorno ai 30 milioni di linee di C++. Un kernel Linux poco sotto. Un'auto di fascia media e' sopra i 100 milioni. Nessun essere umano ha mai letto un browser intero. Per "letto" intendo davvero letto, capito, ricordato il punto in cui in <code>render/paint/PaintLayerScrollableArea.cpp</code> qualcuno scarica un riferimento prematuro.</p>
+
+    <p>Trovare un bug non e' leggere, e' esplorare un grafo. Ogni funzione e' un nodo, ogni chiamata e' un arco. Ogni cammino dal punto in cui un input non fidato entra fino al punto in cui un allocator scrive in heap e' un potenziale percorso di exploitation. Il numero di percorsi cresce in modo combinatorio:</p>
+
+    <div class="formula-box">
+      <span class="fm-label">Complessita' di esplorazione del grafo di chiamata</span>
+      <span class="fm-eq">O(b<sup>d</sup>)</span>
+      <span class="fm-note">b = branching factor (funzioni richiamabili da un punto)<br>d = profondita' (livelli di call dal source al sink)</span>
+    </div>
+
+    <p>Numeri concreti, terra-terra. In un parser di formato non banale, tipo libxml2 o un decoder di font, b sta tra 8 e 15 chiamate uscenti per nodo critico. La profondita' d dal punto di parsing al punto in cui una scrittura in heap puo' essere influenzata dall'input e' tra 6 e 12 livelli. Significa che lo spazio dei cammini interessanti sta tra 10<sup>5</sup> e 10<sup>13</sup>. Anche al limite basso, e' uno spazio in cui un essere umano puo' al massimo campionare. Mai esaurire.</p>
+
+    <p>Questa cosa ha un nome formale, si chiama <em>path explosion</em>. Strumenti di esecuzione simbolica come KLEE, angr, Mayhem la conoscono dal 2005 e ci convivono con strategie di pruning. Il vantaggio fondamentale di un LLM non e' che risolve il path explosion, perche' non lo risolve. E' che usa <em>statistica appresa</em> per stimare quali rami valga la pena seguire.</p>
+
+    <p>Un fuzzer cieco prova mutazioni a caso a costo costante. Un solver simbolico prova esaustivamente ma soffoca presto. Un LLM agent prova selettivamente, e la sua selezione e' informata da milioni di pattern di bug visti durante il training. E' la differenza tra un investigatore che apre tutti i fascicoli in ordine alfabetico e uno che ha gia' indagato su mille casi simili e sa dove guardare per primo.</p>
+
+    <div class="phase-grid">
+      <div class="phase-card pc-1">
+        <span class="ph-num">FUZZER (AFL, libFuzzer)</span>
+        <div class="ph-name">Esplorazione cieca</div>
+        <div class="ph-claim">Mutazione random + coverage feedback</div>
+        <div class="ph-desc">Bravo dove il bug e' raggiungibile con piccole mutazioni di input. Cieco su bug semantici (logica autenticazione, race, use-after-free di livello alto). Il bug SQLite di Big Sleep era irraggiungibile da OSS-Fuzz: la copertura non ci arrivava.</div>
+      </div>
+      <div class="phase-card pc-2">
+        <span class="ph-num">SYMBOLIC (KLEE, angr)</span>
+        <div class="ph-name">Esplorazione esaustiva</div>
+        <div class="ph-claim">SMT solver + path enumeration</div>
+        <div class="ph-desc">Garanzie formali sui rami coperti. Soffoca per path explosion oltre target medi. Ottimo per crypto e parser piccoli, inadatto a 30M di linee.</div>
+      </div>
+      <div class="phase-card pc-3">
+        <span class="ph-num">LLM AGENT</span>
+        <div class="ph-name">Esplorazione selettiva</div>
+        <div class="ph-claim">Prior statistici su pattern di bug</div>
+        <div class="ph-desc">Decide quali percorsi seguire in base alla similarita' con bug storici. Niente garanzie formali, ma scala su codebase enormi. Vince dove i fuzzer non arrivano e gli umani non hanno tempo.</div>
+      </div>
+    </div>
+
+    <p>I tre approcci non si sostituiscono, si compongono. La pipeline di Big Sleep mette il fuzzer a coprire il triviale, il solver simbolico a verificare i candidati, e l'LLM a fare triage e prioritizzazione. Quello che cambia rispetto al 2018 e' che adesso il terzo strato esiste, funziona, e costa abbastanza poco da girare in continuo.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 3 — Come ragiona il modello
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Codice Diventa Geometria</h2>
+    <span class="section-number">Sezione 3. Il modello non capisce, riconosce</span>
+
+    <p>L'errore peggiore che leggi sui media quando parlano di AI offensiva e' la frase "il modello capisce il codice". Non capisce niente. Fa una cosa molto piu' utile per il caso specifico: trasforma il codice in geometria statistica, e cerca pattern in quello spazio.</p>
+
+    <p>Funziona cosi'. Un tokenizer rompe il sorgente in token di alto livello (identificatori, chiamate, costanti). Un encoder, cioe' la prima meta' di un transformer, converte ogni finestra di codice in un vettore in uno spazio ad alta dimensionalita', tipicamente 1024 o 4096 dimensioni. Quel vettore in isolamento non significa niente. Significa in relazione agli altri. Due frammenti di codice che fanno cose simili finiscono <em>vicini</em> nello spazio. La metrica standard di vicinanza e' la similarita' del coseno:</p>
+
+    <div class="formula-box">
+      <span class="fm-label">Similarita' del coseno tra due frammenti di codice</span>
+      <span class="fm-eq">cos(&theta;) = (A &middot; B) / (&Vert;A&Vert; &middot; &Vert;B&Vert;)</span>
+      <span class="fm-note">A, B sono i vettori embedding di due frammenti<br>cos(&theta;) = 1 vuol dire identici nello spazio semantico, cos(&theta;) = 0 vuol dire ortogonali</span>
+    </div>
+
+    <p>Esempio terra-terra. Decine di migliaia di CVE storiche su parser di immagini hanno questa struttura:</p>
+
+    <div class="code-block"><span class="cmt">// pattern ricorrente in CVE di parser binari</span>
+width  = read_u32(input);
+height = read_u32(input);
+buf    = malloc(width * height * 4);   <span class="cmt">// overflow se width * height &gt; 2^30</span>
+<span class="kw">for</span> (i = 0; i &lt; width * height; i++) {
+    buf[i] = read_pixel(input);        <span class="cmt">// heap OOB write</span>
+}</div>
+
+    <p>Il modello, durante il training, ha visto questa struttura migliaia di volte. Annotata come "integer overflow porta a heap corruption" in CVE pubblici, in commit di fix, in writeup di exploit. Quando incontra una struttura sintatticamente diversa ma <em>semanticamente vicina</em> nel codice di un target nuovo, il vettore embedding di quel frammento atterra nello stesso cluster. La similarita' del coseno con il centroide del cluster "integer overflow precedente a malloc" e' alta. Il modello segnala il punto.</p>
+
+    <div class="iola-box">
+      Non e' che il modello "capisca" che <code>width * height</code> puo' fare wrap. E' che ha visto cinquemila bug in cui esattamente quella sequenza di token aveva fatto wrap, e in quello spazio vettoriale la geometria del bug e' un vicinato denso. Quando un nuovo frammento entra in quel vicinato, il sospetto e' una conseguenza statistica, non un ragionamento.
+    </div>
+
+    <p>Per chi ha fatto reverse engineering a mano, questo modo di guardare il codice e' familiare. Un buon analista non legge linearmente, scorre cercando <em>shape</em>: una <code>memcpy</code> con il terzo argomento attaccato a una <code>strlen</code> dell'input, una <code>strcpy</code> appena dopo una <code>recv</code>, un <code>system()</code> con concatenazione di stringhe. Il modello fa la stessa cosa, su scala diversa. Ha visto piu' shape di quante un essere umano ne possa ricordare in una vita, e le ha indicizzate spazialmente.</p>
+
+    <p>Il limite di questa modalita', che e' anche la sua difesa naturale contro la paranoia, e' che il modello vince dove c'e' un cluster denso di bug analoghi nel training. Le vulnerabilita' davvero <em>nuove</em>, classi che non erano nel training (un side channel nuovo su un'architettura inedita, una primitive su una syscall appena introdotta), continuano a richiedere intuizione umana. Il modello e' un moltiplicatore di pattern noti, non un inventore di pattern nuovi. E' importante tenerselo a mente, perche' molte panoramiche allarmate confondono i due piani.</p>
+
+    <div class="warning-box">
+      <p>Nota di onesta'. Il bug del 2FA bypass beccato da Google l'11 maggio non era un bug nuovo come categoria. Era una catena di flaw conosciuti, applicata in modo combinato a una piattaforma specifica. L'AI ha fatto exactly questo: ha riconosciuto un pattern di vulnerabilita' gia' visto migliaia di volte, lo ha applicato a un target nuovo, e ha generato l'exploit completo. Non e' invenzione. E' riconoscimento su larga scala, automatizzato.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 4 — La scala
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Problema Vero Non E' Trovare Un Bug</h2>
+    <span class="section-number">Sezione 4. E' automatizzare la scala</span>
+
+    <p>Concentrarsi sul singolo bug trovato e' il modo sbagliato di leggere quello che sta succedendo. Anche un ricercatore umano molto bravo trova bug. Quello che cambia non e' la presenza del bug, e' l'<em>economia</em> della caccia.</p>
+
+    <p>Un ricercatore in carne e ossa, di fascia alta, trova un bug serio ogni qualche settimana. Si stanca. Ha bias di selezione, cerca dove ha gia' trovato. Dorme. Costa, tra stipendio, benefit, tempo, attorno ai 250-400 mila dollari l'anno se sta in US, meno se sta in Europa o Est. Una buona vulnerabilita' su un target hard equivale facilmente a sei mesi di lavoro: il break-even rispetto al prezzo che il mercato grigio paga lo conoscono tutti.</p>
+
+    <p>Un cluster di GPU che gira un agente offensivo H24, invece:</p>
+
+    <ul>
+      <li>analizza migliaia di repository GitHub in parallelo, ognuno come job indipendente;</li>
+      <li>genera varianti di payload e le manda al fuzzer come seed semanticamente plausibili;</li>
+      <li>correla CVE storiche cross-progetto, perche' lo stesso pattern di bug vive in quaranta librerie che condividono un'antenata;</li>
+      <li>non ha bias di stanchezza, non dimentica, non si annoia di un target dopo tre giorni.</li>
+    </ul>
+
+    <p>Il costo orario di una GPU H100 noleggiata sul mercato spot sta a 2-3 dollari. Un agente che gira 24 ore costa 50-70 dollari. Il giorno in cui quel costo produce statisticamente piu' di un bug serio al mese, il prezzo di mercato delle vulnerabilita' implode dal lato dell'offerta. Quel giorno, secondo i numeri di Mythos e XBOW, e' adesso. Cazzo.</p>
+
+    <p>La parte importante per chi difende: il modello non deve avere ragione su ogni bug candidato. Deve <em>ordinare</em>. Migliaia di alert al giorno sono inutili se non sono prioritizzati. La probabilita' che un bug candidato V sia davvero exploitable, dato l'evidence E che il modello ha raccolto (path, sanitizer trigger, contesto), si scrive in forma bayesiana:</p>
+
+    <div class="formula-box">
+      <span class="fm-label">Probabilita' bayesiana di exploitability</span>
+      <span class="fm-eq">P(E|V) = P(V|E) &middot; P(E) / P(V)</span>
+      <span class="fm-note">P(V|E) = quante volte storicamente quel pattern di evidence ha portato a un exploit reale<br>P(E) = quanto e' frequente quel pattern in generale<br>P(V) = base rate di vulnerabilita' nella codebase</span>
+    </div>
+
+    <p>Senza ranking hai diecimila <em>maybe</em>. Con ranking hai venti <em>probably</em> ordinati dal piu' grave. Il modello non risolve la cybersecurity, fa una cosa piu' modesta e piu' pericolosa: rende economicamente sensato setacciare ogni progetto open source di un certo peso, una volta a settimana, in cerca di bug. La caccia diventa un cron job.</p>
+
+    <div class="warning-box">
+      <p>La conseguenza che pochi misurano: <strong>il numero di vulnerabilita' scoperte cresce piu' velocemente della capacita' umana di correggerle</strong>. NVD ha gia' un backlog importante dal 2024, gli SOC enterprise stanno gestendo allarmi al 60% del budget di tempo. Se aggiungi un fattore 5x alla pipeline di discovery senza aggiungere capacita' di patching, la finestra media tra disclosure e mitigazione si allunga, non si accorcia. Mythos ha "oltre mille critical in coda di disclosure": sara' una coda lunga, mesi.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 5 — Il 20%
+         ============================================================ -->
+    <h2><span class="accent">//</span> Non Serve L'AGI</h2>
+    <span class="section-number">Sezione 5. Basta automatizzare il 20% piu' costoso</span>
+
+    <p>Buona parte del discorso pubblico sull'AI offensiva e' tossico per due motivi opposti. Da una parte il dismissivo: "il modello allucina, non puo' fare reverse engineering serio". Vero per il singolo prompt, falso per un agente con tool, sandbox, fuzzer, debugger sotto mano. Dall'altra l'apocalittico: "siamo a un passo dall'AGI offensiva, l'AI scrivera' worm autonomi". Sbagliato per ragioni strutturali, perche' un worm davvero autonomo richiede pianificazione long-horizon che oggi i modelli non hanno, e che probabilmente non avranno prima di altri salti architetturali.</p>
+
+    <p>La verita' operativa sta in mezzo, e ha una formulazione precisa: <strong>i modelli non devono diventare AGI per fare danni enormi. Basta che siano abbastanza bravi da automatizzare il 20% piu' costoso del lavoro offensivo</strong>. Quel 20% e' molto specifico:</p>
+
+    <div class="phase-grid">
+      <div class="phase-card pc-red">
+        <span class="ph-num">TRIAGE</span>
+        <div class="ph-name">Decidere dove guardare</div>
+        <div class="ph-desc">Su 30M di linee di codice, scegliere le 50.000 che valgono attenzione umana e' un lavoro di settimane. Un LLM con il prompt giusto lo fa in ore. Questo solo moltiplica per 50 il volume di codice realisticamente analizzabile.</div>
+      </div>
+      <div class="phase-card pc-red">
+        <span class="ph-num">PATTERN MATCHING</span>
+        <div class="ph-name">Cross-progetto</div>
+        <div class="ph-desc">Una CVE su una libreria foglia significa il 90% delle volte la stessa CVE in tutte le librerie che la importano e in tutti i fork sopravvissuti su GitHub. Un essere umano apre un repo alla volta. Un agente apre diecimila repo in parallelo.</div>
+      </div>
+      <div class="phase-card pc-red">
+        <span class="ph-num">VARIANT GENERATION</span>
+        <div class="ph-name">Mutazione di payload</div>
+        <div class="ph-desc">Dato un proof-of-concept che innesca un crash, generare 200 varianti che esplorano corner case adiacenti era lavoro manuale di giorni. Un modello che produce input strutturalmente validi (formato file, protocollo) lo fa in minuti.</div>
+      </div>
+      <div class="phase-card pc-red">
+        <span class="ph-num">CONTEXT RECONSTRUCTION</span>
+        <div class="ph-name">Capire il binary a freddo</div>
+        <div class="ph-desc">Decompilare un binario stripped, dare nomi ragionevoli a funzioni, ricostruire strutture dati: un'ora di lavoro umano ogni cento funzioni. Un LLM con Ghidra in loop lo fa in minuti, accuratezza sufficiente per il triage.</div>
+      </div>
+    </div>
+
+    <p>Notare cosa <em>non</em> c'e' in questa lista. Non c'e' "scrivere l'exploit da zero per una primitive completamente nuova". Non c'e' "trovare un side channel su un'architettura inedita". Non c'e' "violare assunzioni crittografiche di RSA-2048". Per quelle cose servono ancora ricercatori molto bravi e un modello LLM continua a essere un assistente, non un sostituto.</p>
+
+    <p>Il punto e' che il 20% che <em>si</em> automatizza copre la maggior parte del costo cognitivo del lavoro offensivo medio. Vuol dire che un ricercatore singolo equipaggiato con XBOW o equivalente opera con la produttivita' di un team di cinque persone dell'era pre-AI. La curva di esperienza si appiattisce: oggi un buon vuln researcher si forma in 8-10 anni, fra 24 mesi potrebbe formarsi in 3, perche' lo strumento copre il pezzo che richiedeva il maggior numero di ore di pratica, cioe' il riconoscimento di pattern noti in contesti nuovi.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 6 — Cosa cambia per la difesa
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quello Che Cambia Per Chi Difende</h2>
+    <span class="section-number">Sezione 6. AI contro AI, ma la geometria favorisce l'attacco</span>
+
+    <p>Tre cose da dire prima di chiudere, perche' "l'AI ci uccidera' tutti" e "l'AI difensiva ci salvera'" sono entrambe scorciatoie.</p>
+
+    <p>La buona notizia: <strong>i tool di discovery automatica funzionano anche per la difesa, e Anthropic ne e' la prova</strong>. Mythos non e' un'arma in vendita, e' un sistema che gira <em>dentro</em> Project Glasswing per chiudere bug prima che escano, e nel beta di Claude Security per Enterprise. Big Sleep ha gia' aiutato Google a disinnescare il primo zero-day AI-generato prima che venisse usato. OSS-Fuzz integra un layer LLM per i seed. Per la prima volta da vent'anni, il difensore ha lo stesso strumento dell'attaccante. Per i bug "shallow", quelli a profondita' bassa nel grafo, la pipeline difensiva chiudera' il gap.</p>
+
+    <p>La cattiva notizia: <strong>la geometria del problema favorisce strutturalmente l'attacco</strong>. Per attaccare basta trovare <em>un</em> bug. Per difendere bisogna trovarli <em>tutti</em>. Se entrambe le parti hanno lo stesso strumento con uguale efficacia, la parte che doveva trovarne uno vince. Vale anche con i tool di prima, la differenza e' che adesso lo stesso strumento gira piu' veloce e piu' largo, quindi il vantaggio strutturale dell'attaccante si amplifica nel volume assoluto di bug trovati.</p>
+
+    <p>La parte che mi tiene piu' attento, pero', non e' la quantita' di bug. E' la <strong>finestra temporale</strong>. Storicamente un bug nuovo veniva trovato, segnalato, patchato in un ciclo di settimane o mesi. La patch raggiungeva il fleet in mesi ancora. La finestra di sfruttabilita' tra public knowledge e patched system era ampia ma stabile, e i difensori la conoscevano. Con discovery automatica su entrambi i lati succedono due cose insieme: il numero di disclosure cresce, e il tempo medio fra una disclosure e il primo tentativo di exploitation si comprime. La finestra non si chiude, si moltiplica in tante finestre piccole, tutte aperte contemporaneamente.</p>
+
+    <p>La conseguenza pragmatica per chi gestisce sicurezza in produzione: il modello operativo "patchiamo entro 30 giorni le critical" diventa insostenibile quando le critical sono 10x. O si automatizza la pipeline di patching alla stessa velocita' della discovery (esiste, AIxCC ha mostrato i pezzi), o si accetta che la finestra di esposizione media si allarghi. Altre strade non ce ne sono.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 7 — Chiusura
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quello Che Mi Resta In Mano</h2>
+    <span class="section-number">Sezione 7. Cinque righe oneste, senza apocalisse</span>
+
+    <p>Trovare vulnerabilita' nel software e' sempre stato un problema combinatorio O(b<sup>d</sup>), e l'unica ragione per cui la difesa ha tenuto e' che gli umani capaci di esplorare quello spazio erano pochi e costosi. Per anni la cybersecurity ha avuto un vantaggio naturale: trovare bug era difficile, lento, costoso. Il costo non sta crollando tutto, il top del lavoro offensivo continuera' a richiedere intuizione umana, ma il <em>20% piu' costoso</em>, quello del triage, del pattern matching cross-progetto, della variant generation, sta diventando un cron job da decine di dollari al giorno.</p>
+
+    <p>L'11 maggio Google ha mostrato la prima prova concreta che il giro e' chiuso: un'AI scrive un exploit, un'altra AI lo trova prima che venga lanciato. Dieci mesi prima, ad agosto 2025, AIxCC aveva mostrato i sistemi autonomi vincere DEF CON. Cinque settimane prima Anthropic ha messo Mythos in cassaforte invece di venderlo, perche' anche loro hanno capito che a un certo costo per trovare zero-day l'industria non e' pronta. XBOW sta in cima a HackerOne e si integra in Sentinel. Sette segnali diversi, una direzione sola.</p>
+
+    <p>La conseguenza non e' la fine di internet, e' una fase diversa di internet. Una in cui il numero di vulnerabilita' scoperte cresce piu' velocemente della capacita' umana di correggerle, e la finestra media tra disclosure e patch si allarga invece di chiudersi. Per anni il difensore ha avuto un vantaggio naturale. Quel vantaggio era fatto di costo cognitivo e di scarsita' di ricercatori bravi. Adesso quel costo crolla, e la scarsita' si ribalta: bug ovunque, mani per patcharli sempre uguali.</p>
+
+    <p>La cosa importante da capire, e che si perde quando si parla di "AGI" o di scenari hollywoodiani, e' che non serve niente di rivoluzionario perche' tutto questo succeda. Non serve un modello che ragiona come un umano. Bastano modelli che riconoscono pattern visti, applicati su scala, a 50 dollari al giorno per istanza, in parallelo su diecimila repository. Quella soglia non e' nel futuro, e' qui, e i numeri di Mythos e XBOW di queste settimane lo dicono in chiaro.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il punto, in due righe.</strong> Gli LLM non devono diventare AGI per cambiare il prezzo della sicurezza. Basta che automatizzino il 20% del lavoro offensivo che oggi richiede piu' ore di esperienza. Quella soglia non e' nel futuro. E' gia' dentro la pipeline, e i report di Anthropic Mythos, di Google GTIG e di XBOW di queste settimane ne sono la prova.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Riferimenti.</strong></p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+        &oplus; <a href="https://cloud.google.com/blog/topics/threat-intelligence/ai-vulnerability-exploitation-initial-access" target="_blank" rel="noopener">Google GTIG, 11 maggio 2026</a>: primo zero-day AI-generato beccato in attacco reale, bypass 2FA, mass exploitation pianificato.<br>
+        &oplus; <a href="https://red.anthropic.com/2026/mythos-preview/" target="_blank" rel="noopener">red.anthropic.com/2026/mythos-preview</a>: Claude Mythos Preview, 7 aprile 2026. Migliaia di zero-day high-severity, mille critical in coda. Non venduto, dietro Project Glasswing.<br>
+        &oplus; <a href="https://www.anthropic.com/news/claude-code-security" target="_blank" rel="noopener">anthropic.com/news/claude-code-security</a>: Claude Security in beta pubblica per Enterprise, 30 aprile 2026.<br>
+        &oplus; <a href="https://xbow.com/" target="_blank" rel="noopener">xbow.com</a>: numero uno HackerOne US, 200+ zero-day zero falsi positivi, $120M Series C a marzo 2026, integrazione Microsoft Security Copilot a RSAC.<br>
+        &oplus; <a href="https://googleprojectzero.blogspot.com/2024/10/from-naptime-to-big-sleep.html" target="_blank" rel="noopener">Project Zero blog, nov 2024</a>: primo bug Big Sleep in SQLite, l'inizio della curva.<br>
+        &oplus; <a href="https://aicyberchallenge.com/" target="_blank" rel="noopener">aicyberchallenge.com</a>: DARPA AIxCC, finale DEF CON 33 ago 2025, sistemi autonomi di find+patch su OSS critico.<br>
+        &oplus; <a href="https://github.com/google/oss-fuzz-gen" target="_blank" rel="noopener">github.com/google/oss-fuzz-gen</a>: il layer LLM di OSS-Fuzz per la generazione di seed semanticamente plausibili.<br>
+        &oplus; Su questo blog: <a href="il-fuzzer-scrive-l-exploit.html">Il Fuzzer Scrive L'Exploit</a> (pipeline AFL++ + angr) e <a href="il-bug-diventa-arma.html">Il Bug Diventa Arma</a> (finestra temporale CVE-exploit pubblico).
+      </p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Laboratorio di un pirata</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
