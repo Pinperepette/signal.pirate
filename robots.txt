@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pinperepette.github.io/signal.pirate/sitemap.xml
