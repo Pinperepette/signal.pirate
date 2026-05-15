@@ -18,7 +18,9 @@ ROOT = Path(__file__).resolve().parents[2]
 ARTICOLI_DIR = ROOT / "articoli"
 INDEX_HTML = ROOT / "index.html"
 SITE_URL = "https://pinperepette.github.io/signal.pirate"
-OG_IMAGE = f"{SITE_URL}/assets/og-image.png"
+OG_IMAGE = f"{SITE_URL}/assets/og-image.jpg"
+OG_IMAGE_W = 1200
+OG_IMAGE_H = 800
 AUTHOR = "Andrea Amani"
 SITE_NAME = "Signal Pirate"
 
@@ -105,8 +107,9 @@ def build_seo_block(
   <meta property="og:description" content="{desc_esc}">
   <meta property="og:url" content="{url}">
   <meta property="og:image" content="{OG_IMAGE}">
-  <meta property="og:image:width" content="1536">
-  <meta property="og:image:height" content="1024">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="{OG_IMAGE_W}">
+  <meta property="og:image:height" content="{OG_IMAGE_H}">
   <meta property="og:image:alt" content="Signal Pirate - logo">{og_article}
 
   <meta name="twitter:card" content="summary_large_image">
