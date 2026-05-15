@@ -279,7 +279,8 @@ img { max-width: 100%; }
 
 .hero-image {
   display: block;
-  width: clamp(280px, 55vw, 520px);
+  width: 100%;
+  max-width: 960px;
   height: auto;
   margin: 0 auto 2.5rem;
   border-radius: 14px;
