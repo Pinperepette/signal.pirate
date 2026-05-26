@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Ape Sta Nel Polinomio | Signal Pirate</title>
+  <meta name="description" content="Reed-Solomon su GF(2^8) smontato pezzo per pezzo. Perch&eacute; un'ape disegnata in mezzo a un QR code non rompe il link. 112 byte di parit&agrave;, polinomio generatore di grado 28, limite di Singleton al 32.5%.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text { font-size: 1rem; text-align: center; }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .ct { color: #4ec9b0; }   /* type */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .pipeline-step:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+    .pipeline-step .step-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-attention);
+      opacity: 0.3;
+    }
+    .pipeline-step .step-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      margin-top: 0.3rem;
+      font-weight: 600;
+    }
+    .pipeline-step .step-detail {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/l-ape-sta-nel-polinomio.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="L'Ape Sta Nel Polinomio">
+  <meta property="og:description" content="Reed-Solomon su GF(2^8) smontato pezzo per pezzo. Perch&eacute; un'ape disegnata in mezzo a un QR code non rompe il link.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/l-ape-sta-nel-polinomio.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/immagini/qr-ape/og-l-ape-sta-nel-polinomio.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Tre QR Signal Pirate con ape di tre dimensioni, cliff empirico fra 35% e 55% lineare">
+  <meta property="article:published_time" content="2026-05-26">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="L'Ape Sta Nel Polinomio">
+  <meta name="twitter:description" content="Reed-Solomon su GF(2^8) smontato pezzo per pezzo. Perch&eacute; un'ape disegnata in mezzo a un QR code non rompe il link.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/immagini/qr-ape/og-l-ape-sta-nel-polinomio.png">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"L'Ape Sta Nel Polinomio","description":"Reed-Solomon su GF(2^8) smontato pezzo per pezzo. Perch&eacute; un'ape disegnata in mezzo a un QR code non rompe il link.","image":"https://pinperepette.github.io/signal.pirate/immagini/qr-ape/og-l-ape-sta-nel-polinomio.png","datePublished":"2026-05-26","dateModified":"2026-05-26","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/l-ape-sta-nel-polinomio.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-05-26 | Pinperepette</p>
+  <h1 class="article-page-title">L'Ape Sta <span class="accent">Nel Polinomio</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+    Reed-Solomon su GF(2&#8312;) smontato pezzo per pezzo. Perch&eacute; un'ape disegnata in mezzo a un QR code non rompe il link. 112 byte di parit&agrave;, limite di Singleton al 32.5%, cliff empirico al 45%.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Reed-Solomon</span>
+    <span class="tag tag-highlight">GF(2&#8312;)</span>
+    <span class="tag tag-reaction">QR Code</span>
+    <span class="tag tag-amplification">Singleton</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — L'APE SUL CARTELLINO                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Ape sul Cartellino</h2>
+<span class="section-number">Sezione 01. La domanda della iena</span>
+
+<p>
+  Siamo a cena. Fra una fetta e l'altra di pizza, la iena tira fuori il telefono e mi mostra una foto che si era salvata tre giorni prima. Un cartellino legato al manico di un'arnia, con sopra un QR code. Dentro il QR, una piccola ape colorata. La iena fa l'apicoltrice da quattro anni. Quel cartellino lo scansiona ogni volta che le arriva un'arnia nuova, &egrave; sempre funzionato. Lei vuole sapere come.
+</p>
+
+<p>
+  &laquo;Se ci metti un disegno sopra, non dovrebbe rompersi?&raquo;. Dovrebbe. Eppure quel codice porta a un URL del produttore, e il telefono lo legge anche con l'ape al centro. Tutti i QR con un logo dentro funzionano cos&igrave;, in pizzeria, nei wallet, sui biglietti del treno. Sembra un dettaglio. Non lo &egrave;. &Egrave; un teorema del 1960.
+</p>
+
+<p>
+  Sei pagine su <em>Journal of the SIAM</em>, due ricercatori americani di nome Irving Reed e Gustave Solomon, e una struttura algebrica che fa sopravvivere i byte alle macchie di inchiostro. Si chiama codice Reed-Solomon. Lavora su un campo finito di 256 elementi. Il cartellino della iena contiene quattro polinomi distinti che reggono anche se ne cancelli un pezzo. L'ape sta dentro al polinomio. Stanotte la tiro fuori.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="1681" data-suffix="">0</div>
+    <div class="stat-label">Moduli (matrice 41x41)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="172" data-suffix="">0</div>
+    <div class="stat-label">Byte codeword</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="56" data-suffix="">0</div>
+    <div class="stat-label">Byte di errori correggibili</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="325" data-suffix="" data-divider="10">0.0%</div>
+    <div class="stat-label">Limite Singleton (32.5%)</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — ANATOMIA DI UN QR CODE                        -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Anatomia di un QR Code</h2>
+<span class="section-number">Sezione 02. Cosa c'&egrave; dentro quella matrice</span>
+
+<p>
+  Un QR code &egrave; una matrice di moduli, i quadratini neri o bianchi che si vedono a occhio nudo. La dimensione varia in funzione della <strong>Version</strong>: dalla 1 (21x21 moduli) alla 40 (177x177). Codifico l'URL <code>https://pinperepette.github.io/signal.pirate/</code> al livello di correzione massimo, e la libreria sceglie la Version 6: 41 moduli per lato, 1681 moduli totali.
+</p>
+
+<p>
+  Non tutti quei moduli portano dati. Una parte fa da impalcatura geometrica per far funzionare la scansione:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li>Tre <strong>finder patterns</strong> agli angoli (alto-sinistra, alto-destra, basso-sinistra), 7x7 moduli ciascuno con separatori, totale 192 moduli. Servono al telefono per trovare il codice nell'immagine e raddrizzare la prospettiva.</li>
+  <li>Un <strong>alignment pattern</strong> centrale, 5x5 moduli. Corregge distorsioni residue.</li>
+  <li>Due <strong>timing patterns</strong> (le righe a scacchi che collegano i finder), 60 moduli.</li>
+  <li>Bit di <strong>format info</strong>, 30 moduli, codificati con BCH(15,5) e replicati due volte per ridondanza.</li>
+</ul>
+
+<p>
+  Quello che resta &egrave; l'area dati, raggruppata a blocchi di 8 moduli in <strong>byte di codeword</strong>. Per la version 6 sono 172 byte. Quei 172 byte cambiano significato al variare del <strong>livello di correzione errori</strong>. I quattro livelli sono fissati nella specifica ISO/IEC 18004:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Livello</th>
+      <th>Byte dati (k)</th>
+      <th>Byte parit&agrave; (n-k)</th>
+      <th>Blocchi RS</th>
+      <th>Correggibili</th>
+      <th>% byte</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>L</td>
+      <td>136</td>
+      <td>36</td>
+      <td>2 x (86,68)</td>
+      <td>18</td>
+      <td>10.5%</td>
+    </tr>
+    <tr>
+      <td>M</td>
+      <td>108</td>
+      <td>64</td>
+      <td>4 x (43,27)</td>
+      <td>32</td>
+      <td>18.6%</td>
+    </tr>
+    <tr>
+      <td>Q</td>
+      <td>76</td>
+      <td>96</td>
+      <td>4 x (43,19)</td>
+      <td>48</td>
+      <td>27.9%</td>
+    </tr>
+    <tr>
+      <td><strong>H</strong></td>
+      <td><strong>60</strong></td>
+      <td><strong>112</strong></td>
+      <td><strong>4 x (43,15)</strong></td>
+      <td><strong>56</strong></td>
+      <td><strong>32.5%</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Il cartellino della iena, e il QR che generer&ograve; pi&ugrave; avanti per il suo blog preferito, sono livello H. Quattro blocchi indipendenti, ognuno con 15 byte di dati e 28 byte di parit&agrave;, ciascuno capace di correggere fino a 14 byte sbagliati. Sommati: 56 byte su 172, esattamente il 32.5%. Quei 112 byte di parit&agrave; sono dove vive il resto dell'articolo.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — IL PROBLEMA FORMALE                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Problema Formale</h2>
+<span class="section-number">Sezione 03. r = c + e</span>
+
+<p>
+  Il telefono inquadra il cartellino. La camera prende una foto a colori, la converte in scala di grigi, la binarizza con una soglia adattiva, ritrova la matrice di moduli usando i finder patterns, raddrizza la prospettiva. Tutto questo &egrave; computer vision, non &egrave; il tema dell'articolo. Alla fine di quel processo il telefono ha un vettore di 172 byte. Lo chiamo \(r\).
+</p>
+
+<p>
+  Il vettore originale, quello che il tipografo del cartellino voleva trasmettere, si chiama \(c\). Tra i due c'&egrave; un polinomio di errore \(e\) tale che:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$r = c + e \quad \text{in} \;\; \text{GF}(2^8)^{172}$$</div>
+  <p class="formula-label">r &egrave; ricevuto, c &egrave; originale, e &egrave; ignoto.</p>
+</div>
+
+<p>
+  Le componenti non nulle di \(e\) sono i byte sbagliati. Le loro posizioni non sono note. I loro valori non sono noti. Le cause sono: l'ape disegnata sopra, la stampa imperfetta, il riflesso della luce sul cellophane, la foto storta. Per il decoder &egrave; tutto rumore indistinguibile.
+</p>
+
+<p>
+  La domanda della codifica si riformula cos&igrave;. Posso scegliere un sottoinsieme \(C \subset \text{GF}(2^8)^{172}\) di <em>codeword ammessi</em>, tale che ogni \(r\) con al massimo \(t\) byte sbagliati abbia un solo \(c \in C\) pi&ugrave; vicino, da cui ricostruire univocamente \(c\)? Se s&igrave;, il codice ha <strong>capacit&agrave; correttiva</strong> \(t\). La risposta storica &egrave; data dai codici lineari, di cui Reed-Solomon &egrave; la versione che satura il miglior compromesso possibile fra dati e parit&agrave;.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Distanza di Hamming.</strong> Per due vettori \(u, v\) in \(\text{GF}(2^8)^n\), \(d(u,v)\) &egrave; il numero di posizioni in cui differiscono. La <strong>distanza minima</strong> di un codice \(C\) &egrave; il minimo di \(d(c_1, c_2)\) per \(c_1, c_2 \in C\) distinti. Se \(d_{\min} = 2t+1\), il decoder pu&ograve; correggere fino a \(t\) errori per nearest-neighbor. La distanza minima &egrave; tutto.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — GF(2^8): LA MATEMATICA DEI BYTE              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> GF(2&#8312;): La Matematica dei Byte</h2>
+<span class="section-number">Sezione 04. Un campo finito di 256 elementi</span>
+
+<p>
+  Per costruire un codice lineare su byte serve un'algebra in cui ogni byte non nullo abbia un inverso moltiplicativo. Gli interi modulo 256 non funzionano: \(2 \times 128 = 256 \equiv 0 \pmod{256}\), quindi 2 non &egrave; invertibile. Lo stesso vale per ogni divisore di 256. L'anello \(\mathbb{Z}/256\mathbb{Z}\) non &egrave; un campo.
+</p>
+
+<p>
+  La costruzione corretta &egrave; un campo di Galois di 256 elementi, \(\text{GF}(2^8)\). Si prende l'insieme dei polinomi di grado al massimo 7 a coefficienti in \(\text{GF}(2)\), si quoziente rispetto a un polinomio <em>irriducibile</em> di grado 8. La specifica QR fissa:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$p(x) = x^8 + x^4 + x^3 + x^2 + 1, \quad \text{in esadecimale} \;\; \texttt{0x11D}$$</div>
+  <p class="formula-label">Polinomio primitivo standard ISO/IEC 18004.</p>
+</div>
+
+<p>
+  Ogni byte \(b_7 b_6 \ldots b_1 b_0\) rappresenta il polinomio \(b_7 x^7 + b_6 x^6 + \ldots + b_1 x + b_0\).
+</p>
+
+<p>
+  A questo punto il byte smette di comportarsi come un numero normale. Niente +1 +2, niente carry, niente intuizione decimale. Sono tre operazioni e basta:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Addizione</strong>: XOR bit a bit. In caratteristica 2 la somma &egrave; la sua stessa inversa: \(a + a = 0\).</li>
+  <li><strong>Moltiplicazione</strong>: prodotto polinomiale (con XOR), ridotto modulo \(p(x)\).</li>
+  <li><strong>Inverso</strong>: ogni elemento non nullo si scrive come \(\alpha^k\) per \(\alpha = 2\) e qualche \(k \in \{0, 1, \ldots, 254\}\). L'inverso di \(\alpha^k\) &egrave; \(\alpha^{255 - k}\).</li>
+</ul>
+
+<p>
+  Le implementazioni reali precalcolano due tabelle: \(\text{exp}[k] = \alpha^k\) e \(\text{log}[\alpha^k] = k\). Le moltiplicazioni diventano somme di logaritmi modulo 255. Il costo passa da una decina di cicli a due lookup e una somma.
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Tabelle exp/log in GF(2^8), generatore alpha=2, primitive 0x11D</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">def</span> <span class="cf">build_tables</span>():</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">exp</span> = [<span class="cn">0</span>] * <span class="cn">512</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">log</span> = [<span class="cn">0</span>] * <span class="cn">256</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cv">x</span> = <span class="cn">1</span></td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">255</span>):</td></tr>
+<tr><td class="ln">7</td><td class="code">        <span class="cv">exp</span>[<span class="cv">i</span>] = <span class="cv">x</span></td></tr>
+<tr><td class="ln">8</td><td class="code">        <span class="cv">log</span>[<span class="cv">x</span>] = <span class="cv">i</span></td></tr>
+<tr><td class="ln">9</td><td class="code">        <span class="cv">x</span> <span class="co">&lt;&lt;=</span> <span class="cn">1</span></td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="ck">if</span> <span class="cv">x</span> <span class="co">&amp;</span> <span class="cn">0x100</span>:</td></tr>
+<tr><td class="ln">11</td><td class="code">            <span class="cv">x</span> <span class="co">^=</span> <span class="cn">0x11D</span></td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">255</span>, <span class="cn">512</span>):</td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="cv">exp</span>[<span class="cv">i</span>] = <span class="cv">exp</span>[<span class="cv">i</span> <span class="co">-</span> <span class="cn">255</span>]</td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="ck">return</span> <span class="cv">exp</span>, <span class="cv">log</span></td></tr>
+<tr><td class="ln">15</td><td class="code"></td></tr>
+<tr><td class="ln">16</td><td class="code"><span class="ck">def</span> <span class="cf">gf_mul</span>(<span class="cv">a</span>, <span class="cv">b</span>):</td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="ck">if</span> <span class="cv">a</span> == <span class="cn">0</span> <span class="ck">or</span> <span class="cv">b</span> == <span class="cn">0</span>: <span class="ck">return</span> <span class="cn">0</span></td></tr>
+<tr><td class="ln">18</td><td class="code">    <span class="ck">return</span> <span class="cv">exp</span>[<span class="cv">log</span>[<span class="cv">a</span>] <span class="co">+</span> <span class="cv">log</span>[<span class="cv">b</span>]]</td></tr>
+  </table></div>
+</div>
+
+<p>
+  Verifica canonica: <code>gf_mul(0x53, 0xCA) = 0x01</code>. Quindi <code>0xCA</code> &egrave; l'inverso moltiplicativo di <code>0x53</code> in \(\text{GF}(2^8)\). Si pu&ograve; verificare anche a mano espandendo i prodotti polinomiali e riducendo modulo <code>0x11D</code>. Sono otto operazioni di XOR, niente di trascendente.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — REED-SOLOMON: LA CODIFICA                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Reed-Solomon: La Codifica</h2>
+<span class="section-number">Sezione 05. Il messaggio &egrave; un polinomio</span>
+
+<p>
+  Reed e Solomon, 1960, sei pagine. L'idea, riformulata in versione moderna: rappresentare il messaggio come un polinomio a coefficienti in \(\text{GF}(2^8)\), e costruire il codeword come un polinomio pi&ugrave; lungo che &egrave; divisibile per un <em>polinomio generatore</em> noto.
+</p>
+
+<p>
+  Sia \(n\) la lunghezza del codeword in byte, \(k\) il numero di byte di dati, \(2t = n - k\) il numero di byte di parit&agrave;. Per il blocco di QR version 6 livello H: \(n=43\), \(k=15\), \(2t=28\). Definisco il polinomio generatore come prodotto di fattori lineari nelle prime potenze di \(\alpha\):
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$g(x) = (x - \alpha^0)(x - \alpha^1) \cdots (x - \alpha^{2t-1})$$</div>
+  <p class="formula-label">Polinomio generatore di grado 2t=28.</p>
+</div>
+
+<p>
+  Il messaggio \(m(x)\) di grado \(k-1=14\) ha come coefficienti i 15 byte di dati. La codifica costruisce un codeword \(c(x)\) di grado \(n-1=42\):
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$c(x) = m(x) \cdot x^{2t} + \big[\, m(x) \cdot x^{2t} \mod g(x) \,\big]$$</div>
+  <p class="formula-label">Encoding sistematico: dati nei primi k coefficienti, parit&agrave; negli ultimi 2t.</p>
+</div>
+
+<p>
+  Per costruzione \(c(\alpha^i) = 0\) per ogni \(i = 0, 1, \ldots, 2t-1\). In pratica stai dicendo che ogni codeword valido deve rispettare \(2t\) vincoli simultaneamente: valutato in \(\alpha^0\) deve dare zero, in \(\alpha^1\) deve dare zero, e cos&igrave; via fino a \(\alpha^{2t-1}\). Tradotto in algebra lineare: i codeword vivono in un sottospazio di \(\text{GF}(2^8)^n\) di dimensione \(k\), e quei \(2t\) annullamenti sono il fulcro di tutta la decodifica.
+</p>
+
+<p>
+  In codice il calcolo &egrave; una divisione polinomiale lunga, riga per riga sui coefficienti, con XOR al posto della sottrazione. Costo \(O(k \cdot 2t)\) operazioni in \(\text{GF}(2^8)\). Per un blocco (43, 15) sono 420 moltiplicazioni e altrettanti XOR. Su un microcontrollore qualsiasi gira in microsecondi.
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Encoder Reed-Solomon sistematico su GF(2^8)</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">def</span> <span class="cf">rs_generator_poly</span>(<span class="cv">nsym</span>):</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cc"># g(x) = (x - alpha^0)(x - alpha^1) ... (x - alpha^(nsym-1))</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">g</span> = [<span class="cn">1</span>]</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cv">nsym</span>):</td></tr>
+<tr><td class="ln">6</td><td class="code">        <span class="cv">g</span> = <span class="cf">gf_poly_mul</span>(<span class="cv">g</span>, [<span class="cn">1</span>, <span class="cv">exp</span>[<span class="cv">i</span>]])</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="ck">return</span> <span class="cv">g</span></td></tr>
+<tr><td class="ln">8</td><td class="code"></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="ck">def</span> <span class="cf">rs_encode</span>(<span class="cv">msg</span>, <span class="cv">nsym</span>):</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="cc"># msg: k byte di dati. nsym = 2t byte di parita'.</span></td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="cv">gen</span> = <span class="cf">rs_generator_poly</span>(<span class="cv">nsym</span>)</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="cv">out</span> = <span class="cf">list</span>(<span class="cv">msg</span>) <span class="co">+</span> [<span class="cn">0</span>] * <span class="cv">nsym</span></td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cf">len</span>(<span class="cv">msg</span>)):</td></tr>
+<tr><td class="ln">14</td><td class="code">        <span class="cv">coef</span> = <span class="cv">out</span>[<span class="cv">i</span>]</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="ck">if</span> <span class="cv">coef</span> != <span class="cn">0</span>:</td></tr>
+<tr><td class="ln">16</td><td class="code">            <span class="ck">for</span> <span class="cv">j</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">1</span>, <span class="cf">len</span>(<span class="cv">gen</span>)):</td></tr>
+<tr><td class="ln">17</td><td class="code">                <span class="cv">out</span>[<span class="cv">i</span> <span class="co">+</span> <span class="cv">j</span>] <span class="co">^=</span> <span class="cf">gf_mul</span>(<span class="cv">gen</span>[<span class="cv">j</span>], <span class="cv">coef</span>)</td></tr>
+<tr><td class="ln">18</td><td class="code">    <span class="ck">return</span> <span class="cf">list</span>(<span class="cv">msg</span>) <span class="co">+</span> <span class="cv">out</span>[<span class="cf">len</span>(<span class="cv">msg</span>):]</td></tr>
+  </table></div>
+</div>
+
+<p>
+  Test su un blocco (43, 15): seed dei 15 byte di dati con qualcosa di riconoscibile (per esempio i primi 15 byte di <code>b"L'ape sta nel poli"</code>), invoco <code>rs_encode(msg, 28)</code>, ottengo 43 byte. Verifica algebrica: per il codeword <code>c</code> risultante, <code>c(alpha^i) == 0</code> per <code>i = 0, ..., 27</code>. Calcolo le 28 sindromi a mano sul codeword pulito, sono tutte zero. La codifica &egrave; corretta per costruzione.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — SINGLETON: PERCHÉ ESISTE IL 32.5%             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Singleton: Perch&eacute; Esiste il 32.5%</h2>
+<span class="section-number">Sezione 06. Il teorema che chiude la stanza</span>
+
+<p>
+  Il livello H del QR code recupera "circa il 30%". Quel numero non &egrave; ingegneria, &egrave; un teorema. Si chiama <strong>limite di Singleton</strong>, dimostrato da Richard Singleton nel 1964. Per ogni codice lineare \((n, k)\) a coefficienti in qualunque campo finito vale:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$d_{\min} \le n - k + 1$$</div>
+  <p class="formula-label">Limite di Singleton. d_min &egrave; il numero massimo di posizioni in cui due codeword distinti possono differire minimamente.</p>
+</div>
+
+<p>
+  La dimostrazione &egrave; un argomento di conteggio. Se proietto un codice lineare sui suoi primi \(k-1\) coefficienti, ho \(|\text{GF}(2^8)|^{k-1} = 256^{k-1}\) possibili proiezioni. I codeword sono \(256^k\), e ne sto proiettando ognuno in uno spazio pi&ugrave; piccolo. Quindi almeno due codeword distinti hanno la stessa proiezione, e differiscono solo sugli ultimi \(n - k + 1\) coefficienti. Da cui \(d_{\min} \le n - k + 1\). Tre righe.
+</p>
+
+<p>
+  Reed-Solomon satura il limite. Vale l'uguaglianza:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$d_{\min}^{\text{RS}} = n - k + 1$$</div>
+  <p class="formula-label">RS &egrave; un codice MDS (Maximum Distance Separable).</p>
+</div>
+
+<p>
+  Per il blocco (43, 15) di V6-H: \(d_{\min} = 43 - 15 + 1 = 29\). La capacit&agrave; correttiva senza informazione sulle posizioni degli errori &egrave;:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$t = \left\lfloor \frac{d_{\min} - 1}{2} \right\rfloor = \left\lfloor \frac{28}{2} \right\rfloor = 14$$</div>
+  <p class="formula-label">Errori correggibili per blocco.</p>
+</div>
+
+<p>
+  Quattro blocchi indipendenti su Version 6 H: \(4 \times 14 = 56\) byte di errori correggibili su 172 byte totali. La frazione &egrave; \(56/172 = 0.3256\), cio&egrave; il 32.5% che la specifica QR arrotonda a "circa 30%". Non esiste codice lineare su \(\text{GF}(2^8)\) di parametri (43, 15) che corregga pi&ugrave; di 14 errori. Quel numero non si pu&ograve; aumentare. &Egrave; un teorema.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Quattro livelli, quattro scelte di k.</strong> I livelli L, M, Q, H del QR code non sono codici diversi: sono tutti Reed-Solomon su \(\text{GF}(2^8)\), con lo stesso \(n\) (fissato dalla version) e \(k\) diverso. Ridurre \(k\) significa pagare meno dati in cambio di pi&ugrave; parit&agrave;, e quindi un \(t\) pi&ugrave; grande. Il livello H paga la met&agrave; dei byte di dati per il doppio degli errori correggibili. Il prezzo &egrave; lineare. Cambia solo dove decidi di tagliare, non come la matematica reagisce.</p>
+</div>
+
+<p>
+  Pausa. Fin qui abbiamo costruito il codice. \(n\) byte per blocco, \(k\) di dati e \(2t\) di parit&agrave;, immersi in un sottospazio di \(\text{GF}(2^8)^n\) di dimensione \(k\). Limite di Singleton saturato, \(t\) errori correggibili. Tutto teorico. Adesso il codice bisogna prenderlo e vederlo respirare: l'ape sul cartellino della iena &egrave; una macchia reale che cancella moduli reali, e le sindromi mute non si calcolano da sole. I prossimi quattro passi sono come si recupera \(c(x)\) da \(r(x)\) quando non si sa n&eacute; dove n&eacute; quanto si &egrave; sbagliato.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — DECODIFICA: QUATTRO PASSI                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Decodifica: Quattro Passi</h2>
+<span class="section-number">Sezione 07. Sindromi, Berlekamp-Massey, Chien, Forney</span>
+
+<p>
+  Il telefono ha \(r(x) = c(x) + e(x)\). Non conosce nulla di \(e(x)\), n&eacute; posizioni n&eacute; valori. La decodifica in quattro passi sfrutta solo il fatto che \(c(\alpha^i) = 0\) per i primi \(2t\) esponenti.
+</p>
+
+<div class="pipeline-steps fade-in">
+  <div class="pipeline-step">
+    <div class="step-num">01</div>
+    <div class="step-name">Sindromi</div>
+    <div class="step-detail">S_i = r(&alpha;^i)</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">02</div>
+    <div class="step-name">Berlekamp-Massey</div>
+    <div class="step-detail">trova &sigma;(x)</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">03</div>
+    <div class="step-name">Chien Search</div>
+    <div class="step-detail">posizioni errori</div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">04</div>
+    <div class="step-name">Forney</div>
+    <div class="step-detail">valori errori</div>
+  </div>
+</div>
+
+<h3 style="color: var(--accent-highlight);">7a. Sindromi</h3>
+<p>
+  Si valuta il polinomio ricevuto nelle prime \(2t\) potenze di \(\alpha\):
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$S_i = r(\alpha^i) = c(\alpha^i) + e(\alpha^i) = e(\alpha^i), \quad i = 1, \ldots, 2t$$</div>
+  <p class="formula-label">Le sindromi dipendono solo da e(x), non da c(x).</p>
+</div>
+
+<p>
+  Se tutte le \(S_i\) sono nulle, \(e(x)\) ha le stesse 2t valutazioni di un codeword. Si conclude \(e = 0\) e \(r = c\). Altrimenti le 2t sindromi formano un sistema di equazioni non lineari nelle posizioni e nei valori degli errori, che andiamo a risolvere indirettamente.
+</p>
+
+<h3 style="color: var(--accent-highlight);">7b. Polinomio locatore degli errori</h3>
+<p>
+  Sia \(v \le t\) il numero effettivo di errori in \(e(x)\), siano \(j_1, \ldots, j_v\) le loro posizioni. Definisco il <strong>polinomio locatore degli errori</strong> come il polinomio di grado \(v\) le cui radici sono \(\alpha^{-j_1}, \ldots, \alpha^{-j_v}\):
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\sigma(x) = \prod_{i=1}^{v} (1 - \alpha^{j_i} x)$$</div>
+  <p class="formula-label">Le radici di &sigma; codificano le posizioni degli errori.</p>
+</div>
+
+<p>
+  L'algoritmo di <strong>Berlekamp-Massey</strong> ricostruisce \(\sigma(x)\) dalle 2t sindromi. Lavora iterativamente: a ogni passo calcola la discrepanza fra una sindrome attesa e quella ricevuta, e aggiorna \(\sigma\) in modo da annullare la discrepanza. Il risultato &egrave; il pi&ugrave; corto LFSR che genera la sequenza di sindromi. Costo: \(O(t^2)\) operazioni in \(\text{GF}(2^8)\).
+</p>
+
+<p>
+  Esiste una formulazione equivalente via algoritmo di Euclide esteso applicato a \(S(x) = S_1 + S_2 x + \ldots + S_{2t} x^{2t-1}\) e \(x^{2t}\). Stesso costo asintotico, geometria diversa.
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Berlekamp-Massey su GF(2^8): ricostruisce sigma(x) dalle sindromi</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">def</span> <span class="cf">berlekamp_massey</span>(<span class="cv">syn</span>):</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">sigma</span>, <span class="cv">B</span> = [<span class="cn">1</span>], [<span class="cn">1</span>]</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">L</span>, <span class="cv">m</span>, <span class="cv">b</span> = <span class="cn">0</span>, <span class="cn">1</span>, <span class="cn">1</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="ck">for</span> <span class="cv">n</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cf">len</span>(<span class="cv">syn</span>)):</td></tr>
+<tr><td class="ln">6</td><td class="code">        <span class="cc"># 1. discrepanza tra sindrome ricevuta e attesa</span></td></tr>
+<tr><td class="ln">7</td><td class="code">        <span class="cv">delta</span> = <span class="cv">syn</span>[<span class="cv">n</span>]</td></tr>
+<tr><td class="ln">8</td><td class="code">        <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cn">1</span>, <span class="cv">L</span> <span class="co">+</span> <span class="cn">1</span>):</td></tr>
+<tr><td class="ln">9</td><td class="code">            <span class="cv">delta</span> <span class="co">^=</span> <span class="cf">gf_mul</span>(<span class="cv">sigma</span>[<span class="cv">i</span>], <span class="cv">syn</span>[<span class="cv">n</span> <span class="co">-</span> <span class="cv">i</span>])</td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="ck">if</span> <span class="cv">delta</span> == <span class="cn">0</span>:</td></tr>
+<tr><td class="ln">11</td><td class="code">            <span class="cv">m</span> <span class="co">+=</span> <span class="cn">1</span></td></tr>
+<tr><td class="ln">12</td><td class="code">            <span class="ck">continue</span></td></tr>
+<tr><td class="ln">13</td><td class="code">        <span class="cc"># 2. aggiornamento: sigma(x) += (delta/b) * x^m * B(x)</span></td></tr>
+<tr><td class="ln">14</td><td class="code">        <span class="cv">scale</span> = <span class="cf">gf_mul</span>(<span class="cv">delta</span>, <span class="cf">gf_inv</span>(<span class="cv">b</span>))</td></tr>
+<tr><td class="ln">15</td><td class="code">        <span class="cv">new_sigma</span> = <span class="cf">list</span>(<span class="cv">sigma</span>)</td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="ck">for</span> <span class="cv">i</span>, <span class="cv">c</span> <span class="ck">in</span> <span class="cf">enumerate</span>(<span class="cv">B</span>):</td></tr>
+<tr><td class="ln">17</td><td class="code">            <span class="ck">while</span> <span class="cf">len</span>(<span class="cv">new_sigma</span>) &lt;= <span class="cv">i</span> <span class="co">+</span> <span class="cv">m</span>:</td></tr>
+<tr><td class="ln">18</td><td class="code">                <span class="cv">new_sigma</span>.<span class="cf">append</span>(<span class="cn">0</span>)</td></tr>
+<tr><td class="ln">19</td><td class="code">            <span class="cv">new_sigma</span>[<span class="cv">i</span> <span class="co">+</span> <span class="cv">m</span>] <span class="co">^=</span> <span class="cf">gf_mul</span>(<span class="cv">scale</span>, <span class="cv">c</span>)</td></tr>
+<tr><td class="ln">20</td><td class="code">        <span class="ck">if</span> <span class="cn">2</span> * <span class="cv">L</span> &lt;= <span class="cv">n</span>:</td></tr>
+<tr><td class="ln">21</td><td class="code">            <span class="cv">B</span>, <span class="cv">b</span> = <span class="cf">list</span>(<span class="cv">sigma</span>), <span class="cv">delta</span></td></tr>
+<tr><td class="ln">22</td><td class="code">            <span class="cv">L</span> = <span class="cv">n</span> <span class="co">+</span> <span class="cn">1</span> <span class="co">-</span> <span class="cv">L</span></td></tr>
+<tr><td class="ln">23</td><td class="code">            <span class="cv">m</span> = <span class="cn">1</span></td></tr>
+<tr><td class="ln">24</td><td class="code">        <span class="ck">else</span>:</td></tr>
+<tr><td class="ln">25</td><td class="code">            <span class="cv">m</span> <span class="co">+=</span> <span class="cn">1</span></td></tr>
+<tr><td class="ln">26</td><td class="code">        <span class="cv">sigma</span> = <span class="cv">new_sigma</span></td></tr>
+<tr><td class="ln">27</td><td class="code">    <span class="ck">return</span> <span class="cv">sigma</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  A esaurimento delle 2t sindromi, \(\sigma(x)\) ha grado pari al numero di errori e radici nelle inverse delle loro posizioni.
+</p>
+
+<h3 style="color: var(--accent-highlight);">7c. Chien Search</h3>
+<p>
+  Trovo le radici di \(\sigma(x)\) per enumerazione. Per ogni \(j = 0, 1, \ldots, n-1\) calcolo \(\sigma(\alpha^{-j})\). I valori di \(j\) per cui \(\sigma(\alpha^{-j}) = 0\) sono le posizioni degli errori. Costo: \(O(n \cdot v)\). Nessuna fattorizzazione esplicita, solo valutazioni successive che condividono i monomi.
+</p>
+
+<h3 style="color: var(--accent-highlight);">7d. Algoritmo di Forney</h3>
+<p>
+  Resta da calcolare i valori degli errori, una volta note le posizioni. Definisco il polinomio valutatore degli errori:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\Omega(x) = \big[\, S(x) \cdot \sigma(x) \,\big] \mod x^{2t}$$</div>
+  <p class="formula-label">Polinomio valutatore degli errori.</p>
+</div>
+
+<p>
+  Il valore di errore in posizione \(j_i\) si ricava da:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$e_{j_i} = - \frac{\Omega(\alpha^{-j_i})}{\sigma'(\alpha^{-j_i})} \cdot \alpha^{j_i}$$</div>
+  <p class="formula-label">Forney. &sigma;'(x) &egrave; la derivata formale.</p>
+</div>
+
+<p>
+  In caratteristica 2 vale \(1 + 1 = 0\) nel campo, quindi quando si deriva \(\sigma(x)\) ogni coefficiente di indice pari sparisce (la derivata di \(x^{2k}\) sarebbe \(2k \cdot x^{2k-1}\), e \(2k\) &egrave; zero). Restano solo i monomi di grado dispari. La derivata formale si calcola in tre righe. Sottraggo \(e\) da \(r\) e recupero \(c\). I primi \(k=15\) byte di ogni blocco sono il messaggio originale. Concateno i quattro blocchi, ottengo i 60 byte di dati, decodifico la stringa UTF-8. Esce <code>https://pinperepette.github.io/signal.pirate/</code>.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — INTERLACCIAMENTO E L'APE                      -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Interlacciamento e L'Ape al Centro</h2>
+<span class="section-number">Sezione 08. Perch&eacute; il danno geometrico non distrugge il messaggio</span>
+
+<p>
+  Singleton dice che il blocco RS(43, 15) corregge fino a 14 errori. Ma l'ape sul cartellino della iena non causa "14 errori sparsi". L'ape occulta una <em>regione contigua</em> di moduli al centro della matrice. Se i quattro blocchi RS fossero memorizzati in fila sulla matrice (prima il blocco 1, poi il 2, eccetera), l'ape colpirebbe in pieno uno o due blocchi e li distruggerebbe oltre il limite correggibile. Gli altri due resterebbero intatti, e il decoder fallirebbe lo stesso, perch&eacute; manca un blocco intero.
+</p>
+
+<p>
+  La specifica QR risolve questo con l'<strong>interleaving</strong>. La sequenza fisica dei 172 byte di codeword sulla matrice non &egrave; "blocco 1, blocco 2, blocco 3, blocco 4" in fila. &Egrave; intrecciata: il byte fisico in posizione \(i\) appartiene al blocco logico \(i \bmod 4\). I 43 byte del primo blocco sono sparsi sulle posizioni \(\{0, 4, 8, 12, \ldots\}\), il secondo sulle posizioni \(\{1, 5, 9, 13, \ldots\}\), e cos&igrave; via.
+</p>
+
+<p>
+  Conseguenza: un danno spaziale concentrato che occulta \(N\) byte fisici consecutivi si distribuisce in \(N/4\) byte mancanti per ciascun blocco logico. Ogni blocco corregge fino a 14 errori. L'ape funziona finch&eacute;:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\frac{N}{4} \le 14 \;\; \Longleftrightarrow \;\; N \le 56$$</div>
+  <p class="formula-label">Limite geometrico dell'occlusione contigua.</p>
+</div>
+
+<p>
+  Stesso 56 di prima, ottenuto dalla geometria invece che dall'algebra. Non &egrave; coincidenza. L'interleaving &egrave; stato progettato a posteriori (e poi standardizzato) per far coincidere il limite algebrico di Singleton con il limite pratico delle macchie reali. Il livello H del QR code esiste <em>esattamente</em> per ospitare un logo nel mezzo. Un produttore di arnie e un'agenzia di branding usano la stessa propriet&agrave; matematica per due motivi diversi.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il caso medio &egrave; pi&ugrave; clemente del peggiore.</strong> Singleton garantisce 14 errori per blocco <em>nel caso peggiore</em>, quando posizioni e valori sono scelti dall'avversario. Per errori distribuiti uniformemente, la decodifica riesce con probabilit&agrave; alta anche oltre il 14, ma senza garanzia. Per macchie concentrate, l'interleaving lavora a favore del decoder: il caso peggiore non si materializza quasi mai.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — IL LAB: L'APE NEL POLINOMIO                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Lab: L'Ape nel Polinomio</h2>
+<span class="section-number">Sezione 09. Generazione e verifica</span>
+
+<p>
+  Genero il QR per <code>https://pinperepette.github.io/signal.pirate/</code> a livello H. Ci disegno sopra un'ape stilizzata con primitive PIL: corpo giallo ellittico, due strisce nere, ali bianche, antenne, un occhio nero. L'ape sta dentro un cerchio bianco contornato che fa da "zona logo" pulita. Poi sweepo la dimensione lineare dell'ape dal 25% al 70% del lato del QR, e verifico la decodifica con <code>pyzbar</code> a ogni passo.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/qr-ape/qr-ape.png" alt="QR code di signal.pirate con ape disegnata al centro, livello di correzione H, decodificabile" style="max-width: 480px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); background: white;">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">QR Version 6 livello H, ape al 45% lineare. Decodifica verificata: <code>https://pinperepette.github.io/signal.pirate/</code>.</figcaption>
+</figure>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># sweep dimensione ape vs decodifica</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">from</span> <span class="cv">qrcode</span> <span class="ck">import</span> <span class="ct">QRCode</span></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="ck">from</span> <span class="cv">qrcode</span>.<span class="cv">constants</span> <span class="ck">import</span> <span class="cv">ERROR_CORRECT_H</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="ck">from</span> <span class="cv">pyzbar</span>.<span class="cv">pyzbar</span> <span class="ck">import</span> <span class="cf">decode</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cv">qr</span> = <span class="ct">QRCode</span>(<span class="cv">error_correction</span>=<span class="cv">ERROR_CORRECT_H</span>, <span class="cv">box_size</span>=<span class="cn">20</span>, <span class="cv">border</span>=<span class="cn">4</span>)</td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cv">qr</span>.<span class="cf">add_data</span>(<span class="cs">"https://pinperepette.github.io/signal.pirate/"</span>)</td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cv">qr</span>.<span class="cf">make</span>(<span class="cv">fit</span>=<span class="ck">True</span>)</td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="cv">base</span> = <span class="cv">qr</span>.<span class="cf">make_image</span>(<span class="cv">fill_color</span>=<span class="cs">"black"</span>, <span class="cv">back_color</span>=<span class="cs">"white"</span>).<span class="cf">convert</span>(<span class="cs">"RGB"</span>)</td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="ck">for</span> <span class="cv">frac</span> <span class="ck">in</span> (<span class="cn">0.25</span>, <span class="cn">0.30</span>, <span class="cn">0.35</span>, <span class="cn">0.40</span>, <span class="cn">0.45</span>, <span class="cn">0.50</span>, <span class="cn">0.55</span>, <span class="cn">0.60</span>):</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="cv">img</span> = <span class="cf">overlay_bee</span>(<span class="cv">base</span>, <span class="cv">fraction</span>=<span class="cv">frac</span>)</td></tr>
+<tr><td class="ln">13</td><td class="code">    <span class="cv">res</span> = <span class="cf">decode</span>(<span class="cv">img</span>)</td></tr>
+<tr><td class="ln">14</td><td class="code">    <span class="cv">ok</span> = <span class="cf">bool</span>(<span class="cv">res</span>) <span class="ck">and</span> <span class="cv">res</span>[<span class="cn">0</span>].<span class="cv">data</span>.<span class="cf">decode</span>() == <span class="cv">URL</span></td></tr>
+<tr><td class="ln">15</td><td class="code">    <span class="cf">print</span>(<span class="cs">f"ape al {int(frac*100)}% lineare -&gt; {'ok' if ok else 'FAIL'}"</span>)</td></tr>
+  </table></div>
+</div>
+
+<p>
+  Output dello sweep, sweep ripetuto dieci volte per controllo:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Dimensione ape (lineare)</th>
+      <th>Area occlusa</th>
+      <th>Decodifica</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>25%</td><td>6.25%</td><td>ok</td><td>logo molto piccolo</td></tr>
+    <tr><td>30%</td><td>9.00%</td><td>ok</td><td>logo piccolo</td></tr>
+    <tr><td>35%</td><td>12.25%</td><td>ok</td><td>logo medio</td></tr>
+    <tr><td>40%</td><td>16.00%</td><td>ok</td><td>logo grande</td></tr>
+    <tr><td><strong>45%</strong></td><td><strong>20.25%</strong></td><td><strong>ok (limite empirico)</strong></td><td>cliff</td></tr>
+    <tr><td>50%</td><td>25.00%</td><td><strong>FAIL</strong></td><td>oltre cliff</td></tr>
+    <tr><td>55%</td><td>30.25%</td><td>FAIL</td><td></td></tr>
+    <tr><td>60%</td><td>36.00%</td><td>FAIL</td><td></td></tr>
+  </tbody>
+</table>
+
+<p>
+  Ok, teoria finita. Adesso proviamo a romperlo davvero. Sweep fine al livello H: ape al centro con dimensione crescente, 20 prove per ogni size con posizione randomizzata di &plusmn;15 px per misurare stabilit&agrave;. Decoder pyzbar e cv2.QRCodeDetector in parallelo. Risultati nudi:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Ape lineare</th>
+      <th>Area occlusa</th>
+      <th>pyzbar (20 prove)</th>
+      <th>cv2 (20 prove)</th>
+      <th>Stato</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>30%</td><td>9.0%</td><td>20/20 OK</td><td>20/20 OK</td><td>robusto</td></tr>
+    <tr><td>35%</td><td>12.2%</td><td>20/20 OK</td><td>20/20 OK</td><td>robusto</td></tr>
+    <tr><td>40%</td><td>16.0%</td><td>20/20 OK</td><td>20/20 OK</td><td>robusto</td></tr>
+    <tr><td>42%</td><td>17.6%</td><td>20/20 OK</td><td>20/20 OK</td><td>al margine</td></tr>
+    <tr><td>44%</td><td>19.4%</td><td>13/20</td><td>20/20 OK</td><td><strong>instabile</strong></td></tr>
+    <tr><td>45%</td><td>20.2%</td><td>9/20</td><td>20/20 OK</td><td><strong>cliff</strong></td></tr>
+    <tr><td>46%</td><td>21.2%</td><td>1/20</td><td>18/20</td><td><strong>quasi morto</strong></td></tr>
+    <tr><td>48%</td><td>23.0%</td><td>0/20</td><td>0/20</td><td>morto</td></tr>
+    <tr><td>50%</td><td>25.0%</td><td>0/20</td><td>0/20</td><td>morto</td></tr>
+    <tr><td>55%+</td><td>30%+</td><td>0/20</td><td>0/20</td><td>morto</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Prima di parlare del cliff, una nota di calcolo che vale oro: <strong>"lineare" non significa "area"</strong>. Un'ape al 45% del lato non copre il 45% del QR, ne copre il quadrato:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{area occlusa} = (\text{lato})^2 = 0.45^2 = 20.2\%$$</div>
+  <p class="formula-label">Il numero da confrontare con Singleton e' l'area, non il lato.</p>
+</div>
+
+<p>
+  Per questo un logo che a occhio sembra <em>enorme</em> coesiste senza contraddizioni con "il livello H corregge il 30%": un'ape al 45% lineare sta gi&agrave; sotto al 32.5% di Singleton, perch&eacute; l'area occlusa &egrave; 20.2%, non 45%. Tutta la confusione sui QR con logo "esagerato" che funzionano lo stesso nasce da qui.
+</p>
+
+<p>
+  Il secondo punto: il cliff empirico cade comunque <em>prima</em> del 32.5%. La transizione da "robusto" a "morto" succede in 4 punti percentuali di lato, fra il 42% e il 46% lineare. Roba di mezzo centimetro, in un QR di 5 cm. La curva &egrave; quasi una step function, non una sigmoide morbida.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/qr-ape/break-cliff.png" alt="Probabilita' di decodifica vs dimensione dell'ape al centro, livello H, 20 prove per punto" style="max-width: 700px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); background: white;">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Probabilit&agrave; di decodifica vs dimensione dell'ape (% del lato QR), 20 prove per punto, jitter posizione &plusmn;15 px. La linea rossa tratteggiata segna Singleton teorico (57.0% lineare = 32.5% area); il cliff empirico cade nettamente prima.</figcaption>
+</figure>
+
+<p>
+  Terzo punto: <strong>pyzbar e cv2 muoiono in tempi diversi</strong>. Al 46% lineare, pyzbar (libzbar, decoder strict) &egrave; gi&agrave; al 5% di prob. di successo, ma cv2 (la libreria che gira sotto Apple Camera e Google Lens) tiene ancora al 90%. cv2 ha tolleranza maggiore sui pattern strutturali, fa pi&ugrave; lavoro di binarizzazione adattiva, perdona ape leggermente fuori centro. Il "QR funziona col telefono" vive proprio in quei due punti percentuali di gap fra i due decoder.
+</p>
+
+<p>
+  Tre QR a confronto, stessa generazione, ape al 35% / 45% / 55% lineare:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/qr-ape/break-comparison.png" alt="Tre QR con ape al 35%, 45%, 55%: sempre decodificabile, instabile al cliff, sempre morto" style="max-width: 900px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); background: white;">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Stessa generazione QR, ape di tre dimensioni. A sinistra robusto (20/20 OK), al centro al cliff (9/20 pyzbar), a destra morto. La transizione fra il verde e il rosso &egrave; di 10 punti percentuali di lato, ~18% di area. Inquadra la verde col telefono per verificarlo dal vivo.</figcaption>
+</figure>
+
+<p>
+  Quarto punto: <strong>la posizione conta quanto la dimensione</strong>. Stessa ape al 44% lineare (la zona "instabile" del cliff), spostata in giro per il QR:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Posizione</th>
+      <th>Cosa colpisce</th>
+      <th>pyzbar</th>
+      <th>cv2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>centro</td><td>alignment pattern</td><td>10/20</td><td>20/20</td></tr>
+    <tr><td>offset 200 px a sinistra</td><td>solo dati</td><td><strong>20/20</strong></td><td><strong>20/20</strong></td></tr>
+    <tr><td>offset 200 px sopra</td><td>timing pattern sfiorato</td><td>19/20</td><td>0/20</td></tr>
+    <tr><td>offset 100 px alto-sx</td><td>finder top-left</td><td>0/20</td><td>0/20</td></tr>
+    <tr><td>offset 100 px alto-dx</td><td>finder top-right</td><td>0/20</td><td>0/20</td></tr>
+    <tr><td>offset 100 px sotto</td><td>finder bottom-left</td><td>0/20</td><td>0/20</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Stessa identica ape, stesso identico QR: spostata in alto a sinistra muore istantaneamente, spostata 200 px a sinistra (zona di dati pura) decoda 20 volte su 20. La differenza fra "funziona sempre" e "non funziona mai" &egrave; 30 pixel in alto a sinistra. C'&egrave; anche un caso buffo: spostata sopra-centro, pyzbar tiene (19/20) e cv2 muore (0/20). Stesso pixel, due decoder, due verdetti opposti. Sono motori diversi che inciampano su angoli diversi.
+</p>
+
+<p>
+  L'esperimento parallelo sul <strong>rumore sparso</strong> conferma la stessa lezione: 50 prove per soglia, ogni prova flippa un sottoinsieme casuale di moduli (qualunque posizione, anche strutturali). La probabilit&agrave; di decodifica per tutti i quattro livelli L/M/Q/H scende sotto 0.5 gi&agrave; al <strong>3.3% di moduli flippati</strong>. Su 2025 moduli totali, 67 flip random bastano per uccidere il QR. Motivo: ogni flip ha il 14.7% di probabilit&agrave; di colpire uno dei 297 moduli strutturali (finder, timing, alignment, format info), e basta UN finder rotto perch&eacute; il decoder rinunci.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>La lezione tecnica.</strong> Il 32.5% del livello H esiste solo nel mondo platonico dove gli errori sono distribuiti uniformemente sui 1728 moduli dati, e nessuno tocca i 297 strutturali. Nel mondo reale (logo, macchia, graffio, foto storta) il cliff cade nettamente prima. Per il livello H su Version 6 il cliff effettivo &egrave; <strong>~20% di area centrale</strong>, ben sotto il 32.5% teorico. Reed-Solomon protegge il messaggio, non il foglio. Singleton vale solo per Reed-Solomon, e Reed-Solomon vale solo per la zona dati.
+</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — IL POLINOMIO DIVENTA ARTE                     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Polinomio Diventa Arte</h2>
+<span class="section-number">Sezione 10. Quando il 32.5% diventa una tela</span>
+
+<p>
+  L'ape della sezione 9 occupava il 20% di area, sotto al 32.5% di Singleton. C'era margine. Quel margine, qualcuno ha avuto l'idea di spenderlo tutto, non per nascondere un logo, ma per fare arte. Il risultato &egrave; un genere visivo nato attorno al 2023: <strong>QR code art</strong>, immagini che a occhio sembrano dipinti, fotografie o scene fantasy, ma che inquadrate con un telefono scansionano regolarmente.
+</p>
+
+<p>
+  Se ne sono visti in giro parecchi: gatti dove la pelliccia &egrave; il pattern del QR, samurai in cui l'armatura &egrave; fatta di moduli scuri e chiari, citt&agrave; viste dall'alto dove le case formano il codice. Sembrano impossibili. Non lo sono. Sono Reed-Solomon che lavora ai limiti del suo teorema, con una mano che spinge sulla parte artistica.
+</p>
+
+<h3 style="color: var(--accent-highlight);">10a. La tecnica: ControlNet su Stable Diffusion</h3>
+
+<p>
+  La pipeline standard usa due reti neurali che lavorano insieme.
+</p>
+
+<p>
+  La prima &egrave; <strong>Stable Diffusion</strong>, un modello di diffusion (gi&agrave; <a href="il-rumore-diventa-arte.html">smontato pezzo per pezzo</a>): parte da rumore gaussiano e in 30 passi lo trasforma in un'immagine guidata da un prompt testuale ("a pirate captain with a red bandana"). Il prompt influenza il sampling tramite cross-attention con CLIP. Senza altro intervento, l'output non ha nulla a che fare con un QR.
+</p>
+
+<p>
+  La seconda &egrave; <strong>ControlNet</strong>, una rete di condizionamento aggiuntiva. Prende come input un'immagine guida (nel nostro caso il QR puro generato con <code>qrcode</code>), e a ogni passo di denoising inietta un bias nel latente di Stable Diffusion: dove la guida &egrave; scura, spinge i pixel verso valori scuri; dove &egrave; chiara, verso valori chiari. L'intensit&agrave; di questa spinta &egrave; il parametro <code>controlnet_conditioning_scale</code>, tipicamente fra 1.0 e 1.6.
+</p>
+
+<p>
+  Per i QR esiste un ControlNet specializzato, <strong>QR Code Monster</strong> di monster-labs, addestrato su un dataset di immagini-QR <em>che decodificano</em>. Implicitamente, la rete ha imparato a stare sotto il 32.5% di errore. Non conosce il teorema di Singleton, ma il loss di training l'ha forzata a rispettarlo statisticamente: ogni immagine del dataset era una prova empirica del teorema, e il gradiente l'ha incorporata nei pesi.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Singleton come priore di rete.</strong> Da un punto di vista bayesiano, ControlNet QR Monster ha un priore implicito sulla soglia di errore. Quando genera, non massimizza la similarit&agrave; col QR (sarebbe un QR puro), ma massimizza la qualit&agrave; estetica vincolata al fatto che la decodifica funzioni. Quel vincolo nascosto &egrave; il teorema di Singleton, mediato da migliaia di esempi di training.</p>
+</div>
+
+<h3 style="color: var(--accent-highlight);">10b. La pipeline: img2img con un init reale</h3>
+
+<p>
+  Per controllare meglio la palette e gli elementi del soggetto, conviene partire da una <strong>immagine di riferimento</strong> invece che da un prompt testuale puro. Si usa <code>StableDiffusionControlNetImg2ImgPipeline</code>: SD parte dal latente codificato dell'init image, e ControlNet impone la struttura QR sopra. Il parametro <code>strength</code> controlla quanto SD si allontana dall'init (0.0 = init intatto, 1.0 = generazione da zero).
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># SD 1.5 + ControlNet QR Monster, in modalita' img2img su CPU</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cv">controlnet</span> = <span class="ct">ControlNetModel</span>.<span class="cf">from_pretrained</span>(</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cs">"monster-labs/control_v1p_sd15_qrcode_monster"</span>)</td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">pipe</span> = <span class="ct">StableDiffusionControlNetImg2ImgPipeline</span>.<span class="cf">from_pretrained</span>(</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cs">"runwayml/stable-diffusion-v1-5"</span>, <span class="cv">controlnet</span>=<span class="cv">controlnet</span>).<span class="cf">to</span>(<span class="cs">"cpu"</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cv">init</span> = <span class="ct">Image</span>.<span class="cf">open</span>(<span class="cs">"pirata-source.jpg"</span>).<span class="cf">resize</span>((<span class="cn">768</span>, <span class="cn">768</span>))</td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cv">qr</span>   = <span class="cf">build_qr</span>(<span class="cs">"https://pinperepette.github.io/signal.pirate/"</span>, <span class="cn">768</span>)</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cv">img</span> = <span class="cv">pipe</span>(<span class="cv">prompt</span>=<span class="cs">"cartoon pirate with eye patch and skull"</span>,</td></tr>
+<tr><td class="ln">11</td><td class="code">           <span class="cv">image</span>=<span class="cv">init</span>, <span class="cv">control_image</span>=<span class="cv">qr</span>,</td></tr>
+<tr><td class="ln">12</td><td class="code">           <span class="cv">strength</span>=<span class="cn">0.92</span>,                  <span class="cc"># reinvenzione massima preservando palette</span></td></tr>
+<tr><td class="ln">13</td><td class="code">           <span class="cv">controlnet_conditioning_scale</span>=<span class="cn">1.65</span>, <span class="cc"># forza QR</span></td></tr>
+<tr><td class="ln">14</td><td class="code">           <span class="cv">num_inference_steps</span>=<span class="cn">30</span>).<span class="cv">images</span>[<span class="cn">0</span>]</td></tr>
+  </table></div>
+</div>
+
+<p>
+  Tempi su CPU a 48 thread: ~14 minuti per immagine a 768x768. Memoria: picco 6-8 GB. Modelli scaricati una volta sola (~6 GB) e cachati in <code>~/.cache/huggingface/</code>. Con la configurazione qui sopra il modello riusa dal pirata sorgente la palette di colori (rosso, ocra, nero) e gli elementi iconografici (skull, occhi, denti), ma riorganizza il layout per accomodare la struttura modulare del QR.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/qr-ape/qr-pirata-ai-pure.png" alt="Output img2img puro: palette pirata e skull preservati, struttura QR visibile ma decodifica al limite" style="max-width: 380px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); background: white;">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Output img2img con l'avatar Signal Pirate come init, strength 0.92, cn-scale 1.65. La palette rosso/ocra/nero e gli skull sono passati dall'init. La struttura QR &egrave; presente ma sotto soglia di decodifica: serve un secondo passaggio.</figcaption>
+</figure>
+
+<p>
+  Il sample sopra ha gli ingredienti giusti, ma cade fuori dalla regione decodificabile: il decoder rifiuta di leggerlo. ControlNet QR Monster &egrave; addestrato a stare sotto il limite di Singleton in distribuzione, non in garanzia per il singolo seed. Si pu&ograve; rigenerare con altri seed e parametri, oppure portare il sample <em>dentro</em> al teorema con un passaggio deterministico.
+</p>
+
+<h3 style="color: var(--accent-highlight);">10c. Refinement chirurgico: forza solo la struttura</h3>
+
+<p>
+  Un QR non &egrave; un blocco uniforme di moduli liberi. Una parte di moduli &egrave; <strong>strutturale</strong>: serve al decoder per <em>trovare</em> il codice nell'immagine e calibrare la griglia. Senza quei moduli, anche un sample con i dati perfetti &egrave; invisibile.
+</p>
+
+<p>
+  I moduli strutturali sono: i tre <strong>finder pattern</strong> (i quadrati concentrici negli angoli, 7x7 ciascuno, pi&ugrave; il separator bianco di 1 modulo intorno), il <strong>timing pattern</strong> (le righe alternate che collegano i finder, in riga e colonna 6), il <strong>pattern di allineamento</strong> centrale (5x5 in posizione (22,22) per Version 6), il <strong>dark module</strong> (uno specifico modulo sempre nero in (4V+9, 8), dove V=6), e i <strong>format info bit</strong> (30 moduli, codificati BCH(15,5) e replicati attorno ai finder, contengono livello ECC e mask pattern). In tutto: 297 moduli su 2025 (14.7%). I rimanenti 1728 sono area dati, dove vale Reed-Solomon.
+</p>
+
+<p>
+  La pipeline di refinement: il sample AI viene sovrapposto alla griglia del QR canonico. Per ogni modulo strutturale si applica un push forte verso il valore corretto. Per i moduli dati si pesa diversamente in base alla luminanza media del patch: se la media combacia col valore canonico, il modulo riceve un nudge leggero (preserva texture); se non combacia, riceve un push pi&ugrave; deciso (correzione).
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$R_{ij} = \begin{cases} (1 - f_s) \cdot A_{ij} + f_s \cdot Q_{ij} & \text{strutturale} \\ (1 - f_w) \cdot A_{ij} + f_w \cdot T_{ij} & \text{data, sbagliato} \\ (1 - f_r) \cdot A_{ij} + f_r \cdot T_{ij} & \text{data, corretto} \end{cases}$$</div>
+  <p class="formula-label">f_s, f_w, f_r: forze diverse per ogni classe. T_ij = nero o bianco a seconda del modulo canonico.</p>
+</div>
+
+<p>
+  Valori operativi: \(f_s = 0.75\) sui strutturali, \(f_w = 0.85\) sui dati sbagliati, \(f_r = 0.20\) sui dati corretti. Il refinement gira in RGB (non grayscale): per scurire si moltiplica il pixel per \((1 - f)\), per schiarire si applica \(p + (255 - p) \cdot f\). Cos&igrave; la luminanza diventa QR-compliant ma la tinta del pirata sopravvive. Al risultato finale si applica un blur gaussiano \(\sigma = 1.5\) per ammorbidire i bordi e si aggiunge una quiet zone bianca di 80 px.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/qr-ape/qr-pirata-ai.png" alt="QR del pirata di Signal Pirate dopo refinement chirurgico in RGB: palette preservata, skull visibili, decodifica verificata" style="max-width: 520px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); background: white;">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Sample img2img dopo refinement chirurgico in RGB. Struttura QR forzata sui 297 moduli framework, dati ritoccati con peso adattivo, blur \(\sigma = 1.5\). Palette rosso/ocra/nero e skull del Signal Pirate sopravvissuti. <strong>Decodifica verificata con cv2.QRCodeDetector e pyzbar</strong>: <code>https://pinperepette.github.io/signal.pirate/</code>. Inquadra col telefono.</figcaption>
+</figure>
+
+<p>
+  Il refinement non &egrave; un trucco contrario al teorema, &egrave; il teorema in azione. Singleton dice che <em>quali</em> 56 byte si possono sbagliare nei dati &egrave; libero, ma i 297 moduli strutturali <em>non sono codeword</em>: appartengono alla cornice, e ogni decoder li pretende esatti. Reed-Solomon non li tocca, e questo passaggio nemmeno. Sui dati il refinement riporta semplicemente la frazione di errore sotto il budget. Tutte le tecniche commerciali di QR art usano qualche variante di questa separazione fra struttura e dati, anche se nessuno la documenta.</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Connessione con "Il Rumore Diventa Arte".</strong> Quando ho <a href="il-rumore-diventa-arte.html">smontato Stable Diffusion</a>, l'idea era: il modello toglie rumore da un latente gaussiano fino a una nave pirata. Qui il modello sta togliendo lo stesso rumore, ma in pi&ugrave; deve rispettare un secondo vincolo: che il risultato decodifichi. Il modello non sa che esiste un campo finito di 256 elementi e un teorema del 1964. Ma il dataset di training s&igrave;, e il gradiente glielo ha insegnato come gusto estetico. La matematica diventa un priore di rete.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 — DOVE VIVE LA STESSA MATEMATICA                -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Dove Vive la Stessa Matematica</h2>
+<span class="section-number">Sezione 11. Reed-Solomon nel mondo</span>
+
+<p>
+  Reed e Solomon hanno pubblicato sei pagine sul <em>Journal of the SIAM</em> nel 1960: "Polynomial Codes Over Certain Finite Fields". Quel paper &egrave; dietro alla maggior parte dei sistemi di memorizzazione e trasmissione costruiti dopo. Una mappa breve:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>CD audio (1982)</strong>. Codice CIRC (Cross-Interleaved Reed-Solomon), concatenazione di RS(32, 28) e RS(28, 24) su \(\text{GF}(2^8)\), con interlacciamento profondo a quattro frame. Sopporta burst di errori fino a 4000 bit, equivalenti a un graffio lineare di 2.5 mm sulla superficie del disco.</li>
+  <li><strong>DVD</strong>. Codice prodotto bidimensionale: RS(208, 192) sulle colonne e RS(182, 172) sulle righe di una matrice 192x172. Errori isolati corretti dal codice di riga, burst su una colonna corretti dal codice di colonna.</li>
+  <li><strong>DVB-S satellitare</strong>. RS(204, 188) come outer code, codice convoluzionale rate 1/2 come inner. La concatenazione raggiunge prestazioni vicine al limite di Shannon su canale Gaussiano.</li>
+  <li><strong>Voyager 1 e 2 (1977)</strong>. Concatenated RS(255, 223) sopra Viterbi rate 1/2, constraint length 7. Voyager 2 ha trasmesso dati scientifici da Nettuno (4.5 ore-luce dalla Terra) con BER al ricevitore \(5 \times 10^{-3}\), BER residuo post-decodifica \(10^{-15}\). Quel \(10^{-15}\) &egrave; Reed-Solomon.</li>
+  <li><strong>NAND flash</strong>. Prime generazioni RS, generazioni attuali BCH o LDPC. Lo schema &egrave; cambiato perch&eacute; gli errori della NAND sono diventati troppi e troppo correlati, e RS non &egrave; pi&ugrave; ottimale. Ma per quindici anni ha retto.</li>
+  <li><strong>ADSL e DSL</strong>. RS configurabile, parametri negoziati al link-up. Lo stesso che corregge il graffio sul CD corregge l'interferenza elettrica sul doppino di rame.</li>
+</ul>
+
+<p>
+  Sei pagine, due autori, una scelta algebrica (polinomi su un campo finito). Quasi ogni dispositivo che memorizza o trasmette informazione digitale dopo il 1982 contiene una versione di quelle sei pagine.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 — CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Ape Sta Nel Polinomio</h2>
+<span class="section-number">Sezione 12. Conclusione</span>
+
+<p>
+  La iena ha finito la pizza. Le passo il telefono con il grafico delle prove a video. Quattro punti che reggono, uno che cade, una transizione netta tra il 45% e il 50%. &laquo;Vedi questo gradino? &Egrave; per quello che il cartellino delle arnie funziona. Il disegno occupa meno del 25% dell'area, e dentro al codice ci sono quattro polinomi separati che ricostruiscono i pezzi mancanti.&raquo;
+</p>
+
+<p>
+  Lei guarda il grafico mezzo secondo. Poi mi dice che la nuova arnia arriva mercoled&igrave;, che la regina &egrave; gi&agrave; arrivata in una scatola di plastica trasparente con un cartoncino bianco perforato, e che il cartoncino aveva un QR code con disegnata sopra un'altra ape. &laquo;Tutti hanno l'ape sul codice. Anche il produttore tedesco.&raquo; Quattro blocchi RS, polinomio generatore di grado 28, interleaving su mod 4. Funziona ovunque per lo stesso motivo.
+</p>
+
+<p>
+  Quattro blocchi Reed-Solomon su \(\text{GF}(2^8)\). Polinomio generatore di grado 28. Distanza minima \(d_{\min}=29\) per blocco. Limite di Singleton saturato. 56 byte di errori correggibili su 172 byte totali, esattamente il 32.5%. Sei pagine pubblicate nel 1960. Il cartellino del produttore di arnie, il CD del 1985, la foto della Voyager da Nettuno e la regina nella scatola di plastica trasparente parlano la stessa lingua. Quella lingua &egrave; un polinomio su un campo finito di 256 elementi.
+</p>
+
+<p>
+  L'ape sta nel polinomio. Sempre stata.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Il messaggio non &egrave; nei byte. &Egrave; in un polinomio di grado 42 che si rifiuta di morire."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    QR Version 6, livello H, quattro blocchi RS(43, 15) su GF(2&#8312;), polinomio generatore di grado 28.
+    Limite di Singleton: 32.5% dei byte correggibili.
+    Cliff empirico: 20-25% di area occlusa, in linea col limite teorico.
+    Sei pagine del 1960 reggono ogni cartellino di ogni arnia stampato in Europa.
+    La iena ne ha tre nuove in arrivo mercoledì.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+<script src="../js/main.js"></script>
+
+</body>
+</html>

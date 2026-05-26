@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>L'Ape Sta Nel Polinomio</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/l-ape-sta-nel-polinomio.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/l-ape-sta-nel-polinomio.html</guid>
+    <pubDate>Tue, 26 May 2026 00:00:00 +0200</pubDate>
+    <description>La iena apicoltrice mi mostra il QR di un cartellino arnia con un'ape disegnata in mezzo. Funziona. Smonto Reed-Solomon su GF(2^8) pezzo per pezzo: campo finito di 256 elementi, polinomio generatore di grado 28, Berlekamp-Massey, Singleton al 32.5%. Poi lo rompo davvero: sweep di 20 prove per dimensione, cliff netto fra 42% e 46% lineare (4 punti percentuali di lato, ~18% di area), pyzbar e cv2 muoiono in tempi diversi, la posizione conta quanto la dimensione (offset 100 px verso un finder = 0/20, offset 200 px in zona dati = 20/20), rumore sparso che uccide tutti i livelli al 3.3%. In coda un esperimento di QR art con Stable Diffusion + ControlNet QR Monster: il pirata di Signal Pirate diventa il QR via img2img + refinement chirurgico. Tutto riproducibile su CPU. Reed-Solomon protegge il messaggio, non il foglio.</description>
+  </item>
+
+  <item>
     <title>Il Vantaggio E' Crollato</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-vantaggio-e-crollato.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-vantaggio-e-crollato.html</guid>
