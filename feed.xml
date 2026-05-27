@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>La Crittografia Ha Cambiato Geometria</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-ha-cambiato-geometria.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-ha-cambiato-geometria.html</guid>
+    <pubDate>Wed, 27 May 2026 00:00:00 +0200</pubDate>
+    <description>La iena sta facendo il corso di aggiornamento online della PA e in un quesito sbuca ML-KEM-768, una sigla che in italiano non spiega nessuno. Stanotte rimedio io. Smonto lattice-based cryptography pezzo per pezzo: reticoli ad alta dimensione, LLL in pure-Python (n=60 in 126 secondi su laptop Intel x86_64), il muro di BKZ, concentrazione di misura empirica con 50.000 campioni per dim 1/10/100/768 che mostra il rumore gaussiano vivere su una buccia di raggio sqrt(n) e spessore O(1). Poi LWE come "caos controllato" (Regev 2005, Premio Godel 2018), Kyber768 reale via pyca/cryptography (1184 byte PK, 157 microsecondi encapsulation), e finestra di sicurezza visualizzata come istogrammi del valore decifrato per sigma 3.2/30/120. Marzo 2026 Google Quantum AI taglia di 20x i requisiti quantistici per ECC-256 (1200 qubit logici, sotto 500k fisici, sotto 9 minuti). Aprile 2026 il Q-Day Prize di Project Eleven (Giancarlo Lelli, 1 BTC) per il primo recovery quantistico di chiave su curva ellittica a 15 bit. Ethereum risponde con EIP-8141 (signature agility via account abstraction) per l'hard fork Hegota in discussione per H2 2026. Chiusura sporca su KyberSlash, fine 2023: timing leak su divisione intera nella reference implementation Kyber, patch nel primo trimestre 2024. Sette script Python eseguibili replicano tutto.</description>
+  </item>
+
+  <item>
     <title>L'Ape Sta Nel Polinomio</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/l-ape-sta-nel-polinomio.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/l-ape-sta-nel-polinomio.html</guid>

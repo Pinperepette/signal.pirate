@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Crittografia Ha Cambiato Geometria | Signal Pirate</title>
+  <meta name="description" content="Lattice-based cryptography smontata pezzo per pezzo. Reticoli, SVP, LWE, Kyber. Perché il NIST nel 2024 ha standardizzato un algoritmo che non vive nei numeri primi ma in 768 dimensioni.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <style>
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text { font-size: 1rem; text-align: center; }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    .ck { color: #7c4dff; }   /* keyword */
+    .cs { color: #00ff88; }   /* string */
+    .cn { color: #b5cea8; }   /* number */
+    .cc { color: #6a6a8a; }   /* comment */
+    .cf { color: #4ecdc4; }   /* function */
+    .cv { color: #9cdcfe; }   /* variable */
+    .ct { color: #4ec9b0; }   /* type */
+    .co { color: #d4d4d4; }   /* operator */
+    .cw { color: #ff6b6b; }   /* warning */
+
+    .strategy-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+      font-size: 0.85rem;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      color: var(--accent-attention);
+      font-family: var(--font-mono);
+      font-weight: 600;
+      padding: 0.8rem;
+      text-align: left;
+      border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td {
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent-attention);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-ha-cambiato-geometria.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="La Crittografia Ha Cambiato Geometria">
+  <meta property="og:description" content="Lattice-based cryptography smontata pezzo per pezzo. Reticoli, SVP, LWE, Kyber. Perché il NIST nel 2024 ha standardizzato un algoritmo che non vive nei numeri primi ma in 768 dimensioni.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-ha-cambiato-geometria.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-05-27">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="La Crittografia Ha Cambiato Geometria">
+  <meta name="twitter:description" content="Lattice-based cryptography smontata pezzo per pezzo. Reticoli, SVP, LWE, Kyber. Perché il NIST nel 2024 ha standardizzato un algoritmo che non vive nei numeri primi ma in 768 dimensioni.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"La Crittografia Ha Cambiato Geometria","description":"Lattice-based cryptography smontata pezzo per pezzo. Reticoli, SVP, LWE, Kyber. Perché il NIST nel 2024 ha standardizzato un algoritmo che non vive nei numeri primi ma in 768 dimensioni.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-05-27","dateModified":"2026-05-27","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-ha-cambiato-geometria.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-05-27 | Pinperepette</p>
+  <h1 class="article-page-title">La Crittografia <span class="accent">Ha Cambiato Geometria</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+    Lattice-based cryptography smontata pezzo per pezzo. Reticoli, LLL, LWE, Kyber. Perch&eacute; il NIST nel 2024 ha standardizzato un algoritmo che non vive nei numeri primi ma in 768 dimensioni. E perch&eacute; nessuno se n'&egrave; accorto.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Lattice Crypto</span>
+    <span class="tag tag-highlight">LWE</span>
+    <span class="tag tag-reaction">Kyber / ML-KEM</span>
+    <span class="tag tag-amplification">Post-Quantum</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 — IL CIFRARIO CHE NESSUNO HA VISTO ARRIVARE     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Cifrario Che Nessuno Ha Visto Arrivare</h2>
+<span class="section-number">Sezione 01. La iena e il corso di aggiornamento</span>
+
+<p>
+  La iena ha un posto fisso. Quello tipo da film di Zalone, pubblica amministrazione. Come ogni posto fisso che si rispetti, una volta all'anno la mandano a fare il corso di aggiornamento online. Cybersecurity, GDPR, sicurezza informatica, codice etico. Lezioni registrate, quesiti a risposta multipla, attestato in PDF da stampare e portare al protocollo.
+</p>
+
+<p>
+  Stasera sta sul divano con l'iPad e le cuffie. Io accanto, col laptop sulle ginocchia, a cazzeggiare su Twitter cercando di non guardare il grafico del Bitcoin. Ogni tanto si toglie una cuffia e mi tira una domanda dal corso. Di solito sono cose viste e riviste: differenza fra simmetrico e asimmetrico, lunghezza minima delle chiavi RSA per la PA, perch&eacute; MD5 e SHA-1 non si usano pi&ugrave;. Roba dei manuali NIST tradotta negli anni Duemila. Le rispondo distratto, "tranello, vai al quesito dopo".
+</p>
+
+<p>
+  Stasera per&ograve; in una delle multiple choice spunta una sigla che non avevo mai sentito menzionare in un corso italiano:
+</p>
+
+<blockquote style="border-left: 3px solid var(--accent-highlight); padding-left: 1.2rem; margin: 1.5rem 0; color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.8;">
+  &laquo;Quale dei seguenti NON &egrave; uno standard crittografico approvato dal NIST?&raquo;<br>
+  &nbsp;A) AES-256<br>
+  &nbsp;B) SHA-3<br>
+  &nbsp;C) ML-KEM-768<br>
+  &nbsp;D) DES
+</blockquote>
+
+<p>
+  "Andre, che cos'&egrave; ML-KEM-768? Nel materiale non c'&egrave;".
+</p>
+
+<p>
+  Le rispondo al volo, mezzo distratto: "Tranello del questionario, roba vecchia rinominata. La risposta &egrave; D, DES &egrave; deprecato dal 2005. Vai avanti".
+</p>
+
+<p>
+  Non le basta. Mette gi&ugrave; l'iPad, apre Safari, digita "<em>ML-KEM-768 cos'&egrave;</em>" in italiano. Non trova un cazzo. Comunicati NIST tradotti male, due articoli Medium di consulenti che vendono corsi, una pagina di Wikipedia che rimanda all'inglese, un thread su Reddit in cui qualcuno linka un paper di 47 pagine. Mi guarda. "Andre, e poi sarei io quella che non si aggiorna".
+</p>
+
+<p>
+  Stasera rimedio io. Apro un terminale e le faccio vedere la cosa concreta. Lancio <code>openssl s_client</code> verso un server qualsiasi, e fra le righe di output salta fuori questa:
+</p>
+
+<div style="font-family: var(--font-mono); background: #0d1117; border: 1px solid rgba(0,255,136,0.18); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 1.2rem auto; color: var(--accent-attention); max-width: 560px; text-align: center; font-size: 0.95rem;">
+  Server Temp Key: X25519MLKEM768
+</div>
+
+<p>
+  "Vedi questa? &Egrave; quello che protegge il login al tuo portale, l'app di Signal aperta nell'altra mano, il pagamento PagoPA di stamattina. La prima met&agrave;, <code>X25519</code>, &egrave; la crittografia su curve ellittiche che esiste dal 1985. La seconda met&agrave;, <code>MLKEM768</code>, &egrave; la sigla che il tuo corso ti chiede di riconoscere ma non ti spiega: standardizzata dal NIST il 13 agosto 2024 con il nome FIPS 203".
+</p>
+
+<p>
+  &Egrave; il primo algoritmo a chiave pubblica con standard federale americano che <em>non vive nei numeri primi</em>. Niente fattorizzazione, niente logaritmo discreto, niente curve ellittiche. Vive in un <strong>reticolo a 768 dimensioni</strong>. &Egrave; il cambio crittografico pi&ugrave; profondo dal 1977, l'anno in cui Rivest, Shamir e Adleman hanno pubblicato RSA.
+</p>
+
+<p style="font-family: var(--font-mono); color: var(--accent-attention); text-align: center; font-size: 1.05rem; margin: 1.8rem 0;">
+  Quarant'anni di aritmetica modulare, finiti.
+</p>
+
+<p>
+  &Egrave; gi&agrave; sotto al telefono che la iena ha in mano, ai DM di iMessage e Signal, ai login SSH dei server della sua amministrazione. Chrome lo serve di default da agosto 2023, OpenSSH 9.9 da settembre 2024. Il browser con cui stai leggendo questa pagina lo sta probabilmente usando per parlarci. Solo che in italiano, come ha scoperto la iena due minuti fa, davvero non lo racconta nessuno. Stanotte tiro fuori cosa c'&egrave; dentro quella seconda met&agrave; del nome.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="768" data-suffix="">0</div>
+    <div class="stat-label">Dimensioni reticolo Kyber768</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="3329" data-suffix="">0</div>
+    <div class="stat-label">Modulo q (primo, 12 bit)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan" data-count="1184" data-suffix=" B">0</div>
+    <div class="stat-label">Public key (vs 32 B di ECC)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="192" data-suffix=" bit">0</div>
+    <div class="stat-label">Security level (NIST cat. 3)</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 — IL VECCHIO MONDO: ARITMETICA                  -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Vecchio Mondo: Aritmetica</h2>
+<span class="section-number">Sezione 02. Quarantasette anni di numeri primi</span>
+
+<p>
+  Per capire perch&eacute; il salto &egrave; grosso, bisogna ricordarsi su cosa stava in piedi tutto fino a ieri. Ogni cifrario a chiave pubblica usato su Internet negli ultimi quarantasette anni &egrave; uno dei tre seguenti, tutti basati su problemi di <strong>aritmetica</strong>:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Anno</th>
+      <th>Problema sottostante</th>
+      <th>Oggetti matematici</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Diffie-Hellman</strong></td>
+      <td>1976</td>
+      <td>Logaritmo discreto in \(\mathbb{Z}_p^*\)</td>
+      <td>Interi modulo un primo</td>
+    </tr>
+    <tr>
+      <td><strong>RSA</strong></td>
+      <td>1977</td>
+      <td>Fattorizzazione di interi</td>
+      <td>Prodotto di due primi grandi</td>
+    </tr>
+    <tr>
+      <td><strong>ECC</strong></td>
+      <td>1985</td>
+      <td>Logaritmo discreto su curva ellittica</td>
+      <td>Punti su una curva su \(\mathbb{F}_p\)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Tutti e tre sono problemi <em>aritmetici</em>. Dato \(N = pq\) con \(p, q\) primi di 1024 bit, fattorizzare \(N\) richiede oggi tempo subesponenziale tramite il <strong>General Number Field Sieve</strong>, complessit&agrave; \(\exp\!\big(c \cdot (\log N)^{1/3} (\log\log N)^{2/3}\big)\). Per \(N\) di 2048 bit si stimano circa \(2^{112}\) operazioni. Su un cluster classico, qualche miliardo di anni. La banca dorme tranquilla.
+</p>
+
+<p>
+  Dato \(g^x \bmod p\) con \(p\) primo di 2048 bit, ricavare \(x\) ha la stessa complessit&agrave; del precedente. Su curva ellittica il problema &egrave; ancora pi&ugrave; secco: dato \(P, Q = xP\) su una curva tipo Curve25519, ricavare \(x\) richiede \(O(\sqrt{n})\) operazioni con l'algoritmo di Pollard rho, dove \(n\) &egrave; l'ordine del gruppo. Per Curve25519, \(n \approx 2^{252}\), quindi serve circa \(2^{126}\) operazioni. La stessa banca dorme pi&ugrave; tranquilla con chiavi di 32 byte invece che 256.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Aritmetica vuol dire una cosa precisa.</strong> Vuol dire che il segreto vive in un anello o in un gruppo di interi (o di punti di una curva). Le operazioni sono somma e prodotto modulo qualcosa. La sicurezza dipende dal fatto che <em>invertire</em> una certa funzione su quel gruppo (estrarre log, fattorizzare, decomporre un punto) sia computazionalmente duro. Questo modello &egrave; durato 47 anni esatti. Il 13 agosto 2024 il NIST ha pubblicato lo standard che dice: non basta pi&ugrave;.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 — SHOR ROMPE TUTTO                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Shor Rompe Tutto</h2>
+<span class="section-number">Sezione 03. 1994, sette pagine, un disastro</span>
+
+<p>
+  Nel 1994 Peter Shor pubblica un articolo da sette pagine, <em>Algorithms for Quantum Computation</em>. L'articolo descrive un algoritmo che, dato un computer quantistico abbastanza grande, fattorizza interi di \(n\) bit in tempo \(O(n^3)\). Lo stesso algoritmo, con piccole modifiche, calcola il logaritmo discreto in qualsiasi gruppo finito abeliano. Quindi: RSA, Diffie-Hellman, ECC. Tutti rotti, simultaneamente, da un singolo algoritmo.
+</p>
+
+<p>
+  Il trucco &egrave; questo: Shor non attacca RSA direttamente, attacca il <strong>problema del periodo</strong>. Trova in tempo polinomiale il periodo della funzione \(f(x) = a^x \bmod N\) (per RSA) o \(f(x) = g^x\) in un gruppo (per Diffie-Hellman, ECC). Da quel periodo si ricavano direttamente i fattori di \(N\) o l'esponente segreto. &Egrave; per quello che fattorizzazione e logaritmo discreto cadono entrambi: sotto, sono lo stesso problema computazionale. E sotto un computer quantistico, &egrave; il problema su cui la quantum Fourier transform brilla.
+</p>
+
+<p>
+  La cosa importante non &egrave; <em>quando</em> arriva il computer quantistico grande abbastanza. La cosa importante &egrave; che esiste l'algoritmo. Significa che la sicurezza della crittografia classica non sta in un teorema, sta in un <strong>limite ingegneristico temporaneo</strong>. Il traffico cifrato oggi, registrato da chi ne ha interesse, sar&agrave; decifrabile retroattivamente quando la macchina arriva. Si chiama <strong>harvest now, decrypt later</strong>. Detto in italiano: il traffico che oggi sembra sicuro potrebbe essere solo in freezer.
+</p>
+
+<p>
+  Quanto manca? Le stime continuano a stringersi. Nel 2023 servivano milioni di qubit fisici, finestra credibile 2030-2040. Nel marzo 2026 Google Quantum AI pubblica un paper che taglia i requisiti di un fattore 20 per attaccare ECC su 256 bit: bastano circa 1.200 qubit logici, sotto 500.000 fisici, tempo di esecuzione stimato sotto i 9 minuti. La finestra si sposta a "potenzialmente fine decennio nel migliore caso ingegneristico".
+</p>
+
+<p>
+  Il <strong>24 aprile 2026</strong> arriva anche il primo brick concreto: Giancarlo Lelli vince il <em>Q-Day Prize</em> di Project Eleven (1 BTC) recuperando una chiave privata da una pubblica su curva ellittica a 15 bit con hardware quantistico cloud. Quindici bit non sono 256, si rompono classicamente con un Raspberry Pi in millisecondi. Il senso del premio &egrave; un altro: prima dimostrazione pubblica e verificata che il principio funziona sul ferro vero, non solo in simulazione.
+</p>
+
+<p>
+  Niente di tutto questo rompe Ethereum, Bitcoin o RSA <em>oggi</em>. Ma il NIST nel 2016 aveva gi&agrave; lanciato il bando per la crittografia post-quantum proprio per questo: il dato cifrato oggi deve sopravvivere ai vent'anni a venire, e le stime continuano a stringersi.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\text{Shor}(N) \;:\; \text{tempo } O\!\left((\log N)^3\right) \;\;\text{su computer quantistico}$$</div>
+  <p class="formula-label">Polinomiale invece di subesponenziale, su un computer quantistico abbastanza grande.</p>
+</div>
+
+<p>
+  L'aritmetica modulare &egrave; rotta. Servono problemi che <em>Shor non sa attaccare</em>. Il candidato pi&ugrave; serio, e quello che ha vinto, viene dalla geometria dei numeri.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 — IL SALTO: DAI NUMERI ALLA GEOMETRIA           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Salto: Dai Numeri Alla Geometria</h2>
+<span class="section-number">Sezione 04. Cos'&egrave; un reticolo</span>
+
+<p>
+  Un <strong>reticolo</strong> in \(\mathbb{R}^n\) &egrave; l'insieme di tutte le combinazioni a coefficienti <em>interi</em> di una base. Date \(n\) colonne linearmente indipendenti \(\mathbf{b}_1, \ldots, \mathbf{b}_n \in \mathbb{R}^n\), il reticolo che generano &egrave;:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathcal{L}(\mathbf{B}) = \left\{ \sum_{i=1}^{n} a_i \mathbf{b}_i \;:\; a_i \in \mathbb{Z} \right\}$$</div>
+  <p class="formula-label">Combinazioni intere, non reali. Cambia tutto.</p>
+</div>
+
+<p>
+  Spazio vettoriale: combinazioni a coefficienti reali, ottieni una superficie continua (un piano, un iperpiano). Reticolo: combinazioni a coefficienti interi, ottieni un insieme <em>discreto</em> di punti che riempiono lo spazio come una griglia (in generale storta). Sembra una differenza minuta. Non lo &egrave;. La geometria del discreto in alta dimensione &egrave; un altro pianeta rispetto a quella del continuo.
+</p>
+
+<p>
+  Lo stesso reticolo si pu&ograve; descrivere con basi diverse. Prendi \(\mathbf{b}_1 = (1, 0)\) e \(\mathbf{b}_2 = (0, 1)\): il reticolo &egrave; \(\mathbb{Z}^2\), la griglia di tutti i punti a coordinate intere. Ora prendi \(\mathbf{b}_1' = (101, 100)\) e \(\mathbf{b}_2' = (100, 99)\). Il reticolo generato &egrave; <em>esattamente lo stesso</em>: ogni punto a coordinate intere si pu&ograve; scrivere come combinazione a coefficienti interi delle due nuove basi (l'esercizio &egrave; banale dato \(\det \mathbf{B}' = -1\)). Ma le due basi <em>guardate</em> sono molto diverse: la prima &egrave; corta e ortogonale, la seconda &egrave; lunga e quasi parallela.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>La distinzione che regge tutta la crittografia post-quantum.</strong> Lo stesso reticolo ammette infinite basi. Avere una <em>base buona</em> (corta, ortogonale) significa poter risolvere problemi geometrici facilmente. Avere una <em>base cattiva</em> (lunga, quasi-collineare) significa non vedere niente. La chiave segreta in lattice-crypto &egrave;: la base buona. La chiave pubblica &egrave;: una base cattiva dello stesso reticolo. Chi conosce la base buona decifra. Chi vede solo la base cattiva, no.</p>
+</div>
+
+<p>
+  La storia tecnica che porta a Kyber &egrave; densa di nomi e di tentativi falliti. Vale qualche riga per ricordarli, perch&eacute; il lattice-paradigma non &egrave; arrivato per ispirazione:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.0; padding-left: 1.5rem;">
+  <li><strong>LLL (1982)</strong>. Lenstra, Lenstra, Lov&aacute;sz. Primo algoritmo polinomiale per ridurre basi di reticolo. Nasce per fattorizzare polinomi, finisce per attaccare crittografia.</li>
+  <li><strong>NTRU (1996)</strong>. Hoffstein, Pipher, Silverman. Schema lattice che sembrava borderline e sopravvive trent'anni. Tuttora in produzione.</li>
+  <li><strong>Ajtai (1996)</strong>. <em>Worst-case to average-case reduction</em>: basta che SVP sia hard nel caso peggiore perch&eacute; reticoli random lo siano in media. Fondamento matematico di tutta la PQC.</li>
+  <li><strong>GGH (1997)</strong>. Primo schema lattice "completo" (Goldreich, Goldwasser, Halevi). Distrutto da Phong Nguyen due anni dopo.</li>
+  <li><strong>LWE (2005)</strong>. Oded Regev introduce <em>Learning With Errors</em> e ne riduce la durezza a SVP. Premio G&ouml;del 2018. &Egrave; il problema su cui sta Kyber.</li>
+  <li><strong>NIST PQC (2017-2024)</strong>. Otto anni di competizione pubblica, due finalisti rotti durante il processo (Rainbow, SIKE). Vince la famiglia dei reticoli.</li>
+</ul>
+
+<p>
+  La lezione operativa di questa lista &egrave; che il vincitore (Module-LWE) non &egrave; arrivato per eleganza, &egrave; arrivato perch&eacute; tutto il resto &egrave; stato testato in pubblico. In \(\mathbb{R}^n\) i due problemi geometrici fondamentali sui reticoli sono:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\textbf{SVP} \;:\; \min_{\mathbf{v} \in \mathcal{L} \setminus \{0\}} \|\mathbf{v}\| \qquad \textbf{CVP} \;:\; \min_{\mathbf{v} \in \mathcal{L}} \|\mathbf{v} - \mathbf{t}\|$$</div>
+  <p class="formula-label">Shortest Vector Problem e Closest Vector Problem.</p>
+</div>
+
+<p>
+  SVP: trova il vettore pi&ugrave; corto, non nullo, del reticolo. CVP: dato un punto qualsiasi \(\mathbf{t}\) (non necessariamente sul reticolo), trova il punto del reticolo pi&ugrave; vicino a \(\mathbf{t}\). Tutto qua, formalmente.
+</p>
+
+<p>
+  Detto in modo viscerale: <strong>SVP &egrave; cercare un ago geometrico dentro un'esplosione combinatoria</strong>. Il reticolo &egrave; discreto ma illimitato, lo spazio dei candidati cresce esponenziale con la dimensione, e in alta dimensione la nozione stessa di &ldquo;corto&rdquo; smette di comportarsi come ti aspetti (lo vediamo fra una sezione). Senza una base buona che indichi la direzione, non hai bussola. Per questo in 2D ci riesci a occhio. In 500D no.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 — RETICOLI IN 2D: DOVE IL CERVELLO FUNZIONA     -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Reticoli In 2D: Dove Il Cervello Funziona</h2>
+<span class="section-number">Sezione 05. Il caso che vedi a occhio</span>
+
+<p>
+  Apro Python, scelgo una base buona e una base cattiva dello stesso reticolo, e plottiamo. La base buona: \(\mathbf{b}_1 = (1, 0)\), \(\mathbf{b}_2 = (0, 1)\). La base cattiva del medesimo reticolo \(\mathbb{Z}^2\): \(\mathbf{b}_1' = (101, 100)\), \(\mathbf{b}_2' = (100, 99)\). Determinante \(-1\), quindi i due reticoli coincidono. Lo verifichiamo:
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">import</span> <span class="cv">numpy</span> <span class="ck">as</span> <span class="cv">np</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">import</span> <span class="cv">matplotlib.pyplot</span> <span class="ck">as</span> <span class="cv">plt</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">B_good</span> = <span class="cv">np</span>.<span class="cf">array</span>([[<span class="cn">1</span>, <span class="cn">0</span>], [<span class="cn">0</span>, <span class="cn">1</span>]])               <span class="cc"># base ortogonale</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cv">B_bad</span>  = <span class="cv">np</span>.<span class="cf">array</span>([[<span class="cn">101</span>, <span class="cn">100</span>], [<span class="cn">100</span>, <span class="cn">99</span>]])         <span class="cc"># stesso reticolo, base quasi-collineare</span></td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cf">print</span>(<span class="cs">"det(B_good) ="</span>, <span class="cf">int</span>(<span class="cv">np</span>.<span class="cv">linalg</span>.<span class="cf">det</span>(<span class="cv">B_good</span>)))   <span class="cc"># 1</span></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cf">print</span>(<span class="cs">"det(B_bad)  ="</span>, <span class="cf">int</span>(<span class="cv">np</span>.<span class="cv">linalg</span>.<span class="cf">det</span>(<span class="cv">B_bad</span>)))    <span class="cc"># -1</span></td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cc"># Pi&ugrave; lo stesso det in modulo, pi&ugrave; il reticolo &egrave; lo stesso (a meno di base).</span></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cc"># Volume fondamentale identico, geometria globale identica, percezione opposta.</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  Adesso il gioco di SVP. Dato \(\mathbb{Z}^2\), il vettore pi&ugrave; corto non nullo &egrave; banalmente \((1, 0)\) o \((0, 1)\), norma 1. Con la base buona, &egrave; un coefficiente della base. Con la base cattiva, devi trovare interi \(a, b\) tali che \(101 a + 100 b = 1\) e \(100 a + 99 b = 0\). Risolvi: \(a = -99, b = 100\). Quindi \(-99\,\mathbf{b}_1' + 100\,\mathbf{b}_2' = (1, 0)\), vettore di norma 1. A occhio non lo vedi: stai sommando due vettori da \(\approx 141\) ciascuno per ottenere un vettore lungo 1. Devi <em>cancellare</em> 140 unit&agrave; su 141 in entrambe le coordinate.
+</p>
+
+<p>
+  Visualizziamolo. Su 100 punti del reticolo generati come \(\mathbf{B} \cdot \mathbf{x}\) con \(\mathbf{x} \in \{-5, \ldots, 5\}^2\), il plot della base buona &egrave; una griglia ordinata. Il plot della base cattiva &egrave; due freccione lunghe e quasi parallele, e i punti del reticolo che ricadono in un cerchio attorno all'origine sembrano sparsi a casaccio.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/la-crittografia-ha-cambiato-geometria/lattice_2d.png" alt="Reticolo Z&sup2; con base buona (1,0)/(0,1) a sinistra e base cattiva (101,100)/(100,99) a destra. Stesso reticolo, geometria percepita opposta." style="max-width: 880px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Lo stesso reticolo Z&sup2;, due basi. A sinistra: ortogonale, SVP banale, ||b1||=1. A destra: base \(\mathbf{b}_1' = (101,100)\), \(\mathbf{b}_2' = (100,99)\), entrambi di norma &asymp; 141, ma il SVP &egrave; ancora 1 (cerchiato in rosso). Per ottenerlo servono i coefficienti \(-99\,\mathbf{b}_1' + 100\,\mathbf{b}_2'\). La crittografia a reticoli sta tutta in questa asimmetria.</figcaption>
+</figure>
+
+<p>
+  In due dimensioni questa asimmetria si pu&ograve; comunque <em>annullare</em>: un algoritmo del 1773 di Joseph-Louis Lagrange, perfezionato poi da Gauss, prende una base cattiva 2D e in poche iterazioni la trasforma in una base ridotta (la pi&ugrave; corta ortogonale possibile). In 2D SVP &egrave; <em>facile</em>, sempre, comunque parta la base. Il problema diventa duro quando la dimensione cresce.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 — IL MURO: DA 50 DIMENSIONI IN SU              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Muro: Da 50 Dimensioni In Su</h2>
+<span class="section-number">Sezione 06. L'intuizione si sgretola</span>
+
+<p>
+  In dimensione 2 SVP &egrave; banale. In dimensione 3 ancora si vede. Da dimensione 4 in poi il cervello smette di funzionare visivamente, e bisogna fidarsi degli algoritmi. Da dimensione ~70 in poi smettono di funzionare anche gli algoritmi.
+</p>
+
+<p>
+  Prima di guardare la complessit&agrave; sul tavolo, una sosta di un minuto. In alta dimensione la <em>geometria</em> stessa diventa aliena, ancora prima del calcolo. Tre fatti che servono per il resto del pezzo:
+</p>
+
+<div class="insight-box fade-in">
+  <p style="margin-bottom: 0.7rem;"><strong>1. Quasi tutto il volume di una sfera vive vicino alla superficie.</strong> In \(n = 768\), il 99.99% del volume sta nel 2% di guscio esterno. Il centro &egrave; quasi vuoto.</p>
+  <p style="margin-bottom: 0.7rem;"><strong>2. Due vettori casuali sono quasi sempre ortogonali.</strong> Il prodotto scalare di due vettori uniformi sulla sfera unitaria ha modulo \(\sim 1/\sqrt{n}\). In \(n = 768\), \(\approx 0.036\). "A caso" vuol dire "perpendicolare".</p>
+  <p><strong>3. Il rumore gaussiano non vive all'origine.</strong> Un vettore gaussiano isotropo in dim \(n\) ha norma concentrata su \(\sqrt{n}\), spessore O(1). La "palla di rumore" in alta dimensione &egrave; una buccia.</p>
+</div>
+
+<p>
+  Ed &egrave; qui che il cervello inizia a tradirti, perch&eacute; continui a immaginarti sfere piene come se fossi ancora in 3D. Prova a sentirla fisicamente: il rumore di cifratura che in 2D ti immagini come una nuvoletta sfocata attorno all'origine, in 768D non &egrave; una nuvoletta. <strong>&Egrave; una bolla cava.</strong> Una buccia di spessore O(1) attorno a una sfera di raggio \(\sqrt{768} \approx 27.7\). Il centro &egrave; vuoto. Il 99% del rumore vive a distanza 27-28 dall'origine, sparpagliato su una superficie sottile come carta velina. La &laquo;palla di rumore&raquo; piena al centro, l'intuizione che useresti istintivamente in 3D, semplicemente non esiste in 768D. Non &egrave; metafora: &egrave; aritmetica di concentrazione di misura. Lattice-crypto costruisce il segreto dentro quella buccia.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/la-crittografia-ha-cambiato-geometria/high_dim_geometry.png" alt="Otto pannelli: in alto istogrammi della norma di un vettore gaussiano N(0,I_n) per n=1,10,100,768, che collassano in un picco stretto centrato su sqrt(n); in basso istogrammi del prodotto scalare di due vettori uniformi sulla sfera, che collassano in una delta in 0."
+       style="max-width: 960px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Concentrazione di misura, prova empirica (50.000 campioni per cella, <code>05_high_dim_geometry.py</code>). Sopra: la norma di un gaussiano isotropo collassa esponenzialmente su \(\sqrt{n}\). In dim 768, media = 27.71, std = 0.71. La "palla di rumore" &egrave; una buccia O(1)/&radic;n. Sotto: il prodotto scalare di due vettori uniformi sulla sfera collassa su 0; in dim 768 il modulo medio &egrave; 0.029. Praticamente, in alta dimensione "a caso" significa "perpendicolare".</figcaption>
+</figure>
+
+<p>
+  Detto a parole: <strong>la dimensione prima distrugge l'intuizione, poi distrugge il calcolo</strong>. Il tavolone qui sotto fa vedere quanto in fretta. Il problema &egrave; <strong>NP-hard sotto riduzioni randomizzate</strong> (Ajtai, 1998). Gli algoritmi esatti migliori conosciuti hanno costo:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Algoritmo</th>
+      <th>Costo per SVP esatto in dim \(n\)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Enumeration (Kannan)</td>
+      <td>\(2^{O(n \log n)}\)</td>
+    </tr>
+    <tr>
+      <td>Sieving classico (best known)</td>
+      <td>circa \(2^{0.29\,n}\)</td>
+    </tr>
+    <tr>
+      <td>Sieving quantistico</td>
+      <td>circa \(2^{0.27\,n}\)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Tradotto in numeri reali: per \(n = 512\) anche l'algoritmo migliore richiede attorno a \(2^{150}\) operazioni, fuori portata di qualsiasi calcolo classico. Per Kyber768 i parametri sono dimensionati per dare 192 bit di sicurezza nominale, e qui sta la differenza pi&ugrave; importante con il vecchio mondo: <strong>il computer quantistico non sa attaccare i reticoli con un colpo di teorema</strong>. Lo speedup esiste, ma &egrave; un fattore costante nell'esponente, non polinomiale come Shor su RSA. La macchina quantistica grande romperebbe i reticoli poco peggio di una macchina classica.
+</p>
+
+<p>
+  Mostriamo il muro empiricamente. Implementiamo LLL (l'algoritmo polinomiale che approssima SVP) in pure-Python e plottiamo tempo e qualit&agrave; dell'output al crescere di \(n\). Lo script reale &egrave; in <code>scripts/la-crittografia-ha-cambiato-geometria/02_lll_scaling.py</code>:
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># estratto: LLL pure-Python su basi q-ary, delta=0.75</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">def</span> <span class="cf">lll</span>(<span class="cv">B</span>, <span class="cv">delta</span>=<span class="cn">0.75</span>):</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cv">B</span> = <span class="cv">B</span>.<span class="cf">astype</span>(<span class="cv">np</span>.<span class="cv">int64</span>).<span class="cf">copy</span>()</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cv">n</span> = <span class="cv">B</span>.<span class="cv">shape</span>[<span class="cn">0</span>]</td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cv">Bstar</span>, <span class="cv">mu</span> = <span class="cf">gram_schmidt</span>(<span class="cv">B</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cv">norms2</span> = <span class="cv">np</span>.<span class="cf">array</span>([<span class="cv">np</span>.<span class="cf">dot</span>(<span class="cv">Bstar</span>[<span class="cv">i</span>], <span class="cv">Bstar</span>[<span class="cv">i</span>]) <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cv">n</span>)])</td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cv">k</span> = <span class="cn">1</span></td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="ck">while</span> <span class="cv">k</span> <span class="co">&lt;</span> <span class="cv">n</span>:</td></tr>
+<tr><td class="ln">9</td><td class="code">        <span class="ck">for</span> <span class="cv">j</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cv">k</span> <span class="co">-</span> <span class="cn">1</span>, <span class="co">-</span><span class="cn">1</span>, <span class="co">-</span><span class="cn">1</span>):     <span class="cc"># size reduction</span></td></tr>
+<tr><td class="ln">10</td><td class="code">            <span class="cv">q</span> = <span class="cf">round</span>(<span class="cv">mu</span>[<span class="cv">k</span>, <span class="cv">j</span>])</td></tr>
+<tr><td class="ln">11</td><td class="code">            <span class="ck">if</span> <span class="cv">q</span>: <span class="cv">B</span>[<span class="cv">k</span>] <span class="co">-=</span> <span class="cv">q</span> <span class="co">*</span> <span class="cv">B</span>[<span class="cv">j</span>]; <span class="cv">mu</span>[<span class="cv">k</span>, :<span class="cv">j</span><span class="co">+</span><span class="cn">1</span>] <span class="co">-=</span> <span class="cv">q</span> <span class="co">*</span> <span class="cv">mu</span>[<span class="cv">j</span>, :<span class="cv">j</span><span class="co">+</span><span class="cn">1</span>]</td></tr>
+<tr><td class="ln">12</td><td class="code">        <span class="ck">if</span> <span class="cv">norms2</span>[<span class="cv">k</span>] <span class="co">&gt;=</span> (<span class="cv">delta</span> <span class="co">-</span> <span class="cv">mu</span>[<span class="cv">k</span>, <span class="cv">k</span><span class="co">-</span><span class="cn">1</span>]<span class="co">**</span><span class="cn">2</span>) <span class="co">*</span> <span class="cv">norms2</span>[<span class="cv">k</span><span class="co">-</span><span class="cn">1</span>]:</td></tr>
+<tr><td class="ln">13</td><td class="code">            <span class="cv">k</span> <span class="co">+=</span> <span class="cn">1</span>                              <span class="cc"># Lovasz OK</span></td></tr>
+<tr><td class="ln">14</td><td class="code">        <span class="ck">else</span>:</td></tr>
+<tr><td class="ln">15</td><td class="code">            <span class="cv">B</span>[[<span class="cv">k</span><span class="co">-</span><span class="cn">1</span>, <span class="cv">k</span>]] = <span class="cv">B</span>[[<span class="cv">k</span>, <span class="cv">k</span><span class="co">-</span><span class="cn">1</span>]]    <span class="cc"># swap e ricomincia</span></td></tr>
+<tr><td class="ln">16</td><td class="code">            <span class="cv">Bstar</span>, <span class="cv">mu</span> = <span class="cf">gram_schmidt</span>(<span class="cv">B</span>); <span class="cv">k</span> = <span class="cf">max</span>(<span class="cv">k</span><span class="co">-</span><span class="cn">1</span>, <span class="cn">1</span>)</td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="ck">return</span> <span class="cv">B</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  Risultato reale su MacBook Intel x86_64 (Python 3.14, numpy 2.4, base q-ary con \(q \approx 2^{20}\), seed=42):
+</p>
+
+<div class="code-block" data-lang="output">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc">  n |     t_lll  |     ||b1|| |          q</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="cc"> 10 |    0.080s  |  1.090e+03 |    1048585</span></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cc"> 20 |    1.431s  |  1.542e+03 |    1048585</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"> 30 |    7.914s  |  2.232e+03 |    1048585</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cc"> 40 |   24.613s  |  3.944e+03 |    1048585</span></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cc"> 50 |   64.953s  |  5.716e+03 |    1048585</span></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="cc"> 60 |  126.217s  |  8.269e+03 |    1048585</span></td></tr>
+  </table></div>
+</div>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/la-crittografia-ha-cambiato-geometria/lll_scaling.png" alt="Due grafici. Sinistra: tempo LLL in funzione di n in scala log, salita rapida. Destra: norma di b1 dopo LLL al crescere di n, cresce esponenziale."
+       style="max-width: 880px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Sinistra: il tempo cresce esponenziale (ricorda che pure-Python &egrave; ~10-100x pi&ugrave; lento di fpylll, ma lo scaling asintotico &egrave; lo stesso). Destra: anche la norma del vettore restituito cresce esponenziale con la dimensione. LLL approssima SVP, e l'approssimazione peggiora al crescere di n.</figcaption>
+</figure>
+
+<p>
+  Questo &egrave; un implementazione di riferimento didattica. In <code>fpylll</code> (ottimizzato, GMP per la precisione, Cython) le stesse dimensioni girerebbero in millisecondi-secondi invece che secondi-minuti. Ma il punto &egrave; lo scaling, non la costante: il tempo cresce come \(O(n^4 \log B)\) o peggio, e la <em>qualit&agrave;</em> dell'output crolla con la dimensione. In dimensione 60 la norma &egrave; gi&agrave; 8000 volte sopra il SVP atteso, e l'esponente non lo ferma nessuno. LLL approssima SVP entro un fattore \(2^{(n-1)/2}\) nel caso peggiore. In dimensione 768 quel fattore &egrave; \(2^{383}\). LLL solleva il sasso a 1 cm da terra, in \(\mathbb{R}^{768}\) il sasso pesa quanto la Luna.
+</p>
+
+<p>
+  Per vedere a colpo d'occhio cosa fa LLL su una base storta, ne ho generata una su \(\mathbb{Z}^2\) (b1 = (13, 21), b2 = (5, 8); determinante \(-1\), quindi reticolo \(\mathbb{Z}^2\) stesso) e l'ho ridotta:
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/la-crittografia-ha-cambiato-geometria/lll_visualize.png" alt="Due pannelli affiancati: a sinistra il reticolo Z^2 con una base cattiva (13,21)/(5,8), parallelogramma fondamentale lungo e storto; a destra lo stesso reticolo con la base ridotta da LLL, (0,-1)/(-1,0), parallelogramma quadrato."
+       style="max-width: 920px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">LLL su \(\mathbb{Z}^2\) (<code>06_lll_visualize.py</code>). A sinistra la base cattiva (13,21)/(5,8), norme 24.70 e 9.43. A destra la base ridotta (0,-1)/(-1,0), norme 1.00 e 1.00. Stessi punti, stesso reticolo, stessa determinante. Quel collasso da 24.7 a 1.00 in 2D &egrave; LLL al suo meglio. In 768D non funziona pi&ugrave; cos&igrave;.</figcaption>
+</figure>
+
+<p>
+  E questo &egrave; ancora il <em>caso facile</em>. Sessanta dimensioni, una base q-ary generica, LLL puro. Kyber non vive in 60 dimensioni, vive in 768. Non &egrave; una base random: ha struttura modulare (Module-LWE) pensata apposta per dare ai parametri di sicurezza un margine confortevole rispetto al miglior attacco noto. Anche con BKZ in modalit&agrave; aggressiva su cluster reali, le stime serie dicono che rompere Kyber768 richiede circa \(2^{180}\)-\(2^{200}\) operazioni. Non &egrave; questione di &laquo;basta un cluster pi&ugrave; grosso&raquo;: lo speedup ti porta da impossibile a impossibile.
+</p>
+
+<p>
+  La iena, dal divano, senza togliersi le cuffie: "Andre, venerd&igrave; si va in montagna. La nera ieri ha sgomberato di nuovo il mangime". Annuisco al laptop. La nera &egrave; una delle due galline che teniamo in montagna, esiste solo per il caos. La bianca, l'altra, fa due uova al giorno e si fa i fatti suoi. La iena non si aspetta una risposta. Si rimette la cuffia.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>L'apparente paradosso del &ldquo;LLL gira ancora&rdquo;.</strong> In crittografia non basta che l'algoritmo finisca: deve finire <em>con il vettore corto</em>. LLL in alta dimensione finisce con un vettore lungo. Per migliorare la qualit&agrave; si usa <strong>BKZ</strong> (Block Korkine-Zolotarev): rifa LLL su blocchi di dimensione \(\beta\), ricomponendo. Costo \(2^{O(\beta)}\), qualit&agrave; \(2^{O(n/\beta)}\). Per romperlo davvero servono \(\beta\) grandi, e a quel punto si torna esponenziali.</p>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 — LLL E BABAI: GLI STRUMENTI DI ATTACCO         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> LLL e Babai: Gli Strumenti</h2>
+<span class="section-number">Sezione 07. Cosa fa l'avversario quando ha la base cattiva</span>
+
+<p>
+  LLL (Lenstra, Lenstra, Lov&aacute;sz, 1982) &egrave; il punto di partenza di ogni attacco a lattice-crypto. Riceve in input una base \(\mathbf{B}\) qualsiasi e in tempo polinomiale produce una base equivalente <em>ridotta</em>, in cui i vettori sono &ldquo;corti quanto LLL sa renderli&rdquo;. Le due condizioni che definiscono una base LLL-ridotta sono:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$|\mu_{i,j}| \leq \tfrac{1}{2}, \qquad \delta \cdot \|\mathbf{b}_i^*\|^2 \leq \|\mu_{i+1,i}\mathbf{b}_i^* + \mathbf{b}_{i+1}^*\|^2$$</div>
+  <p class="formula-label">Size reduction (sinistra) e Lov&aacute;sz condition (destra). \(\mathbf{b}_i^*\) sono i Gram-Schmidt, \(\delta \in (1/4, 1)\) tipicamente 0.99.</p>
+</div>
+
+<p>
+  Tradotto: i vettori della base sono &ldquo;quasi ortogonali&rdquo; nel senso di Gram-Schmidt, e ordinati per lunghezza crescente. Il primo vettore della base ridotta soddisfa \(\lVert \mathbf{b}_1 \rVert \leq 2^{(n-1)/2} \cdot \lambda_1(\mathcal{L})\), dove \(\lambda_1\) &egrave; il vettore pi&ugrave; corto. Il fattore di approssimazione cresce esponenziale nella dimensione: in 50D &egrave; ancora gestibile (\(\approx 2^{24.5}\), corregge spesso esatto), in 500D &egrave; \(2^{249.5}\), inutile.
+</p>
+
+<p>
+  Per CVP esiste un parente: l'algoritmo <strong>nearest-plane di Babai</strong> (1986). Dato un target \(\mathbf{t}\) e una base LLL-ridotta \(\mathbf{B}\), proietta \(\mathbf{t}\) iterativamente sugli iperpiani della base e ritorna un vettore del reticolo vicino. Approssima CVP entro un fattore \(2^{n/2}\).
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># Babai nearest-plane, implementazione semplificata (Galbraith 18.1)</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">def</span> <span class="cf">babai_nearest_plane</span>(<span class="cv">B</span>, <span class="cv">t</span>):</td></tr>
+<tr><td class="ln">3</td><td class="code">    <span class="cc"># B: base LLL-ridotta come matrice numpy n x n (riga = vettore)</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="cc"># t: target in R^n</span></td></tr>
+<tr><td class="ln">5</td><td class="code">    <span class="cv">n</span> = <span class="cf">len</span>(<span class="cv">B</span>)</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="cv">Bstar</span>, _ = <span class="cv">np</span>.<span class="cv">linalg</span>.<span class="cf">qr</span>(<span class="cv">B</span>.<span class="cv">T</span>)               <span class="cc"># Gram-Schmidt ortonormale</span></td></tr>
+<tr><td class="ln">7</td><td class="code">    <span class="cv">Bstar</span> = <span class="cv">Bstar</span>.<span class="cv">T</span> <span class="co">*</span> <span class="cv">np</span>.<span class="cv">linalg</span>.<span class="cf">norm</span>(<span class="cv">B</span>, <span class="cv">axis</span>=<span class="cn">1</span>)[:, <span class="cn">None</span>]</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cv">b</span> = <span class="cv">t</span>.<span class="cf">copy</span>().<span class="cf">astype</span>(<span class="cf">float</span>)</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="ck">for</span> <span class="cv">i</span> <span class="ck">in</span> <span class="cf">range</span>(<span class="cv">n</span> <span class="co">-</span> <span class="cn">1</span>, <span class="co">-</span><span class="cn">1</span>, <span class="co">-</span><span class="cn">1</span>):</td></tr>
+<tr><td class="ln">10</td><td class="code">        <span class="cv">c</span> = <span class="cf">round</span>(<span class="cv">np</span>.<span class="cf">dot</span>(<span class="cv">b</span>, <span class="cv">Bstar</span>[<span class="cv">i</span>]) <span class="co">/</span> <span class="cv">np</span>.<span class="cf">dot</span>(<span class="cv">Bstar</span>[<span class="cv">i</span>], <span class="cv">Bstar</span>[<span class="cv">i</span>]))</td></tr>
+<tr><td class="ln">11</td><td class="code">        <span class="cv">b</span> = <span class="cv">b</span> <span class="co">-</span> <span class="cv">c</span> <span class="co">*</span> <span class="cv">B</span>[<span class="cv">i</span>]</td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">return</span> <span class="cv">t</span> <span class="co">-</span> <span class="cv">b</span>                                  <span class="cc"># elemento del reticolo vicino a t</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  Babai vince contro CVP quando il target &egrave; molto vicino al reticolo (entro un fattore <em>polinomiale</em> dal vettore pi&ugrave; corto). Quando il target &egrave; troppo lontano, Babai d&agrave; comunque un punto del reticolo, ma quello sbagliato. La crittografia sceglie il rumore in modo che Babai con la base buona ce la faccia e Babai con la base cattiva no. &Egrave; il dettaglio centrale.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 — LWE: IL RUMORE COME SICUREZZA                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> LWE: Il Rumore Come Sicurezza</h2>
+<span class="section-number">Sezione 08. Learning With Errors, Regev 2005</span>
+
+<p style="font-family: var(--font-mono); color: var(--accent-attention); text-align: center; font-size: 1rem; margin: 1.8rem 0;">
+  Fino a qui stiamo ancora solo cercando vettori corti. Adesso entra il rumore.
+</p>
+
+<p>
+  Il problema su cui sta in piedi Kyber non &egrave; SVP esatto, &egrave; un cugino pi&ugrave; addomesticato e con un dettaglio rivoluzionario: <strong>il rumore stesso &egrave; ingrediente attivo</strong>. Si chiama <strong>Learning With Errors</strong>, lo ha introdotto Oded Regev nel 2005, e nel 2018 ha vinto il Premio G&ouml;del per quel paper. La definizione sembra innocua:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathbf{A} \in \mathbb{Z}_q^{m \times n} \text{ uniforme}, \;\; \mathbf{s} \in \mathbb{Z}_q^n \text{ segreto}, \;\; \mathbf{e} \in \mathbb{Z}_q^m \text{ piccolo gaussiano}$$ $$\mathbf{b} = \mathbf{A}\mathbf{s} + \mathbf{e} \pmod{q}$$</div>
+  <p class="formula-label">Dato (A, b), recuperare s. Senza rumore: sistema lineare, banale. Con rumore: durissimo.</p>
+</div>
+
+<p>
+  Senza il termine \(\mathbf{e}\), la cosa &egrave; algebra del primo anno: \(\mathbf{s} = \mathbf{A}^{-1} \mathbf{b}\) (se \(m \geq n\) e \(\mathbf{A}\) ha rango pieno). Con \(\mathbf{e}\) gaussiano piccolo (deviazione standard tipicamente attorno a 1-2 in \(\mathbb{Z}_q\)), il sistema diventa <em>approssimativamente</em> lineare, e tutta la struttura collassa. Il problema diventa equivalente a un'istanza di CVP su un reticolo costruito a partire da \(\mathbf{A}\), e quel reticolo vive in dimensione \(\geq n\). LWE &egrave; almeno tanto duro quanto trovare il vettore pi&ugrave; corto in quel reticolo (worst-case to average-case reduction, Regev 2005).
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Questa &egrave; la frase pi&ugrave; importante del pezzo.</strong> Per la prima volta nella storia della crittografia, la sicurezza non viene da un problema duro &ldquo;naturale&rdquo; (come fattorizzare un intero). Viene da un problema duro <em>perturbato di rumore</em>. Aggiungere gaussiano scelto bene &egrave; ci&ograve; che rende un sistema lineare un problema NP. La sicurezza diventa una grandezza fisica: la <strong>magnitudine del rumore</strong>. Troppo poco rumore &rarr; rotto. Troppo rumore &rarr; il legittimo destinatario non decifra. C'&egrave; una finestra precisa.</p>
+</div>
+
+<p>
+  Detto dal punto di vista dell'attaccante, il cambio &egrave; ancora pi&ugrave; secco. <strong>L'attaccante non sta pi&ugrave; invertendo una funzione elegante. Sta cercando struttura dentro rumore geometrico in 768 dimensioni.</strong> Sono due lavori diversi: il primo &egrave; algebra esatta con backdoor matematici noti, il secondo &egrave; inferenza statistica in alta dimensione, su vettori che vivono in geometrie dove l'intuizione umana ha smesso di funzionare cinque sezioni fa.
+</p>
+
+<p>
+  La iena, una cuffia abbassata: "Andre, &egrave; come quando metti l'ape disegnata sopra il QR code e il telefono lo legge lo stesso?". Quasi, le dico, ma rovesciato. L&igrave; <a href="../articoli/l-ape-sta-nel-polinomio.html">Reed-Solomon corregge gli errori</a> introdotti dal disegno. Qui invece l'errore &egrave; <em>esattamente</em> ci&ograve; che protegge il segreto. &Egrave; la differenza fra cancellare il rumore e cifrare dentro al rumore. Provo a spiegarglielo. Lei alza il sopracciglio destro, che &egrave; il suo modo di dirmi "Andre, ne dai per scontate troppe".
+</p>
+
+<p>
+  Implementiamo un giocattolo. Schema: l'utente Bob ha una chiave segreta \(\mathbf{s} \in \mathbb{Z}_q^n\) e una chiave pubblica \((\mathbf{A}, \mathbf{b}) = (\mathbf{A}, \mathbf{A}\mathbf{s} + \mathbf{e})\) con \(\mathbf{e}\) piccolo. Alice vuole inviare un bit \(\mu \in \{0, 1\}\). Calcola \(\mathbf{r} \in \{0,1\}^m\) sparso, e produce il cifrato:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$u = \mathbf{r}^\top \mathbf{A} \pmod{q}, \qquad v = \mathbf{r}^\top \mathbf{b} + \mu \cdot \lfloor q/2 \rfloor \pmod{q}$$</div>
+  <p class="formula-label">Cifrato (u, v) &isin; Z_q^n x Z_q. Encoding del bit dentro il modulo.</p>
+</div>
+
+<p>
+  L'idea, raccontata a voce, &egrave; quasi pigra: spingi il bit a met&agrave; del modulo e lascia che il rumore lo nasconda. Chi ha la chiave \(\mathbf{s}\) sa togliere il rumore senza far cadere il bit. Chi non ce l'ha, no.
+</p>
+
+<p>
+  Bob calcola \(v - u^\top \mathbf{s} = \mathbf{r}^\top \mathbf{b} + \mu \cdot \lfloor q/2 \rfloor - \mathbf{r}^\top \mathbf{A}\mathbf{s} = \mathbf{r}^\top \mathbf{e} + \mu \cdot \lfloor q/2 \rfloor\). Se il termine \(\mathbf{r}^\top \mathbf{e}\) ha modulo molto pi&ugrave; piccolo di \(q/4\), allora Bob recupera \(\mu\) guardando se il risultato &egrave; pi&ugrave; vicino a \(0\) oppure a \(\lfloor q/2 \rfloor\). Cifrato e decifrato:
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># 03_lwe_toy.py: LWE giocattolo, un bit per volta</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">import</span> <span class="cv">numpy</span> <span class="ck">as</span> <span class="cv">np</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cv">n</span>, <span class="cv">m</span>, <span class="cv">q</span> = <span class="cn">256</span>, <span class="cn">512</span>, <span class="cn">3329</span>     <span class="cc"># parametri stile Kyber-toy</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cv">sigma</span> = <span class="cn">3.2</span>                       <span class="cc"># deviazione standard del rumore</span></td></tr>
+<tr><td class="ln">6</td><td class="code"></td></tr>
+<tr><td class="ln">7</td><td class="code"><span class="ck">def</span> <span class="cf">keygen</span>():</td></tr>
+<tr><td class="ln">8</td><td class="code">    <span class="cv">A</span> = <span class="cv">np</span>.<span class="cv">random</span>.<span class="cf">randint</span>(<span class="cn">0</span>, <span class="cv">q</span>, <span class="cv">size</span>=(<span class="cv">m</span>, <span class="cv">n</span>))</td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="cv">s</span> = <span class="cv">np</span>.<span class="cv">random</span>.<span class="cf">randint</span>(<span class="cn">0</span>, <span class="cv">q</span>, <span class="cv">size</span>=<span class="cv">n</span>)</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="cv">e</span> = <span class="cv">np</span>.<span class="cf">round</span>(<span class="cv">np</span>.<span class="cv">random</span>.<span class="cf">normal</span>(<span class="cn">0</span>, <span class="cv">sigma</span>, <span class="cv">m</span>)).<span class="cf">astype</span>(<span class="cf">int</span>)</td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="cv">b</span> = (<span class="cv">A</span> @ <span class="cv">s</span> <span class="co">+</span> <span class="cv">e</span>) % <span class="cv">q</span></td></tr>
+<tr><td class="ln">12</td><td class="code">    <span class="ck">return</span> (<span class="cv">A</span>, <span class="cv">b</span>), <span class="cv">s</span>                <span class="cc"># pk, sk</span></td></tr>
+<tr><td class="ln">13</td><td class="code"></td></tr>
+<tr><td class="ln">14</td><td class="code"><span class="ck">def</span> <span class="cf">encrypt</span>(<span class="cv">pk</span>, <span class="cv">mu</span>):</td></tr>
+<tr><td class="ln">15</td><td class="code">    <span class="cv">A</span>, <span class="cv">b</span> = <span class="cv">pk</span></td></tr>
+<tr><td class="ln">16</td><td class="code">    <span class="cv">r</span> = <span class="cv">np</span>.<span class="cv">random</span>.<span class="cf">randint</span>(<span class="cn">0</span>, <span class="cn">2</span>, <span class="cv">size</span>=<span class="cv">m</span>)        <span class="cc"># vettore sparso 0/1</span></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="cv">u</span> = (<span class="cv">r</span> @ <span class="cv">A</span>) % <span class="cv">q</span></td></tr>
+<tr><td class="ln">18</td><td class="code">    <span class="cv">v</span> = (<span class="cv">r</span> @ <span class="cv">b</span> <span class="co">+</span> <span class="cv">mu</span> <span class="co">*</span> (<span class="cv">q</span> <span class="co">//</span> <span class="cn">2</span>)) % <span class="cv">q</span></td></tr>
+<tr><td class="ln">19</td><td class="code">    <span class="ck">return</span> <span class="cv">u</span>, <span class="cv">v</span></td></tr>
+<tr><td class="ln">20</td><td class="code"></td></tr>
+<tr><td class="ln">21</td><td class="code"><span class="ck">def</span> <span class="cf">decrypt</span>(<span class="cv">sk</span>, <span class="cv">ct</span>):</td></tr>
+<tr><td class="ln">22</td><td class="code">    <span class="cv">u</span>, <span class="cv">v</span> = <span class="cv">ct</span></td></tr>
+<tr><td class="ln">23</td><td class="code">    <span class="cv">d</span> = (<span class="cv">v</span> <span class="co">-</span> <span class="cv">u</span> @ <span class="cv">sk</span>) % <span class="cv">q</span></td></tr>
+<tr><td class="ln">24</td><td class="code">    <span class="ck">return</span> <span class="cn">1</span> <span class="ck">if</span> <span class="cf">abs</span>(<span class="cv">d</span> <span class="co">-</span> <span class="cv">q</span><span class="co">//</span><span class="cn">2</span>) <span class="co">&lt;</span> <span class="cf">abs</span>(<span class="cv">d</span>) <span class="ck">else</span> <span class="cn">0</span></td></tr>
+<tr><td class="ln">25</td><td class="code"></td></tr>
+<tr><td class="ln">26</td><td class="code"><span class="cv">pk</span>, <span class="cv">sk</span> = <span class="cf">keygen</span>()</td></tr>
+<tr><td class="ln">27</td><td class="code"><span class="ck">for</span> <span class="cv">mu</span> <span class="ck">in</span> [<span class="cn">0</span>, <span class="cn">1</span>] <span class="co">*</span> <span class="cn">500</span>:</td></tr>
+<tr><td class="ln">28</td><td class="code">    <span class="ck">assert</span> <span class="cf">decrypt</span>(<span class="cv">sk</span>, <span class="cf">encrypt</span>(<span class="cv">pk</span>, <span class="cv">mu</span>)) == <span class="cv">mu</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  Mille bit cifrati e decifrati, zero errori (verificato con <code>03_lwe_toy.py</code>, seed=2026, sigma=3.2: <code>Errori: 0</code>). Adesso, l'esperimento istruttivo: cambia <code>sigma</code> e misura il failure rate. Lo script <code>03_lwe_toy.py</code> fa un sigma-sweep su \(\sigma \in \{0.5, 1, 2, 3.2, 5, 8, 15, 30, 60, 120\}\), 1000 bit ciascuno:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr><th>Sigma</th><th>Errori / 1000</th><th>Failure rate</th><th>Stato</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0.5</td><td>0</td><td>0.0%</td><td>OK ma poco rumore = poca sicurezza</td></tr>
+    <tr><td>3.2 (Kyber-like)</td><td>0</td><td>0.0%</td><td><strong>Sweet spot</strong></td></tr>
+    <tr><td>8.0</td><td>0</td><td>0.0%</td><td>OK</td></tr>
+    <tr><td>15.0</td><td>1</td><td>0.1%</td><td>Limite</td></tr>
+    <tr><td>30.0</td><td>58</td><td>5.8%</td><td>Decryption rotta</td></tr>
+    <tr><td>60.0</td><td>199</td><td>19.9%</td><td>Inutile</td></tr>
+    <tr><td>120.0</td><td>519</td><td>51.9%</td><td>Indistinguibile da random</td></tr>
+  </tbody>
+</table>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/la-crittografia-ha-cambiato-geometria/lwe_sigma_sweep.png" alt="Failure rate empirico di LWE in scala log al variare di sigma. Plateau a 0 fino a sigma=8, salita ripida da sigma=15 in poi, asintoto a 50% (random guess) per sigma>100."
+       style="max-width: 760px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La finestra di LWE in azione. Sotto \(\sigma \approx 15\) il rumore non &egrave; abbastanza da rompere la decifratura. Sopra \(\sigma \approx 30\) le componenti di rumore sommate cominciano a saltare oltre \(q/4\) e i bit si invertono. A \(\sigma = 120\) la rate &egrave; il 52%: indistinguibile dal lancio di una moneta. Il sweet spot &egrave; stretto, e Kyber lo coglie.</figcaption>
+</figure>
+
+<p>
+  Per vedere <em>dove</em> il rumore mangia il bit, plottiamo gli istogrammi del valore decifrato \(d = (v - u^\top \mathbf{s}) \;\mathrm{mod}\; q\) per i due valori di \(\mu\), al variare di \(\sigma\). Cinquemila cifrature per \(\mu=0\) e cinquemila per \(\mu=1\), per ogni \(\sigma\):
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/la-crittografia-ha-cambiato-geometria/lwe_window.png" alt="Tre pannelli con istogrammi di d=(v-u^T s) mod q. Sigma 3.2: due cluster sottili separati attorno a 0 e q/2. Sigma 30: cluster larghi ma ancora distinti. Sigma 120: distribuzioni quasi uniformi su [0,q), indistinguibili."
+       style="max-width: 960px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">La finestra come distribuzioni (<code>07_lwe_window.py</code>). \(\sigma=3.2\): due cluster sottili ben separati attorno a 0 (verde, \(\mu=0\)) e \(q/2 = 1664\) (viola, \(\mu=1\)). Bob distingue a colpo d'occhio. \(\sigma=30\): cluster pi&ugrave; larghi, qualcuno comincia a sconfinare oltre la soglia \(q/4\) (linea tratteggiata grigia). \(\sigma=120\): le due distribuzioni sono praticamente uniformi su \([0, q)\), indistinguibili. La &laquo;finestra&raquo; di LWE &egrave; lo stretto intervallo di \(\sigma\) in cui il primo pannello continua a funzionare e l'attaccante non ce la fa.</figcaption>
+</figure>
+
+<p>
+  La cifratura funziona <em>sempre</em>, indipendentemente da \(\sigma\). Quello che cambia &egrave; la <em>decifratura</em>. Per garantire al destinatario legittimo di leggere il messaggio bisogna che il rumore stia entro una forbice precisa. Per garantire all'attaccante di <em>non</em> leggerlo, bisogna che il rumore sia abbastanza grande da rendere intrattabile il problema di reticolo sottostante. La sicurezza vive nella forbice, e quando l'analisi crittoanalitica si raffina, la forbice si stringe ulteriormente.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Connection con il vecchio mondo.</strong> In RSA il rumore non esiste: la cifratura &egrave; deterministica algebra (poi randomizzata con padding tipo OAEP). In ECDH il rumore non esiste. Tutto il passaggio &egrave; algebra esatta. In LWE il rumore <em>&egrave; il segreto</em>. Cambiare un singolo bit del seed di \(\mathbf{e}\) produce un cifrato completamente diverso. La sicurezza &egrave; <strong>statistica</strong>, non aritmetica. &Egrave; questo lo shift di paradigma.</p>
+</div>
+
+<p>
+  Vale la pena fermarsi un istante, perch&eacute; l'inversione &egrave; gigantesca. Per quarant'anni nell'informatica seria l'errore &egrave; stato il nemico: bit flip in memoria, rumore termico nei canali, perturbazione sui dati in transito. Tutta la teoria dell'informazione di Shannon, i codici Reed-Solomon che ho smontato su questo blog (<a href="../articoli/l-ape-sta-nel-polinomio.html">L'Ape Sta Nel Polinomio</a>), l'ECC nelle RAM dei server, gli hash di verifica, i parity check: <strong>tutto progettato per cancellare il rumore</strong>. La crittografia stessa &egrave; sempre stata algebra esatta in cui un bit sbagliato faceva fallire la decifratura, punto.
+</p>
+
+<p>
+  In LWE quel paradigma si rovescia. L'errore smette di essere il nemico e diventa <strong>infrastruttura</strong>. Aggiungi un gaussiano piccolo a un sistema lineare e quello che era un esercizio del primo anno diventa un problema NP-hard. La sicurezza non resiste al rumore: <em>nasce dal rumore</em>. Non &egrave; mai successo prima nella storia della crittografia. &Egrave; il fatto pi&ugrave; strano del pezzo, ed &egrave; anche il motivo per cui lattice-crypto regge dove l'aritmetica modulare cade. Per quarant'anni abbiamo combattuto il rumore. Adesso lo cifriamo dentro.
+</p>
+
+<p>
+  Detto pi&ugrave; brutalmente: la crittografia ha smesso di fidarsi della <em>purezza matematica</em> e ha cominciato a usare il <strong>caos controllato</strong>. RSA era una funzione precisa, deterministica, invertibile con una chiave e non invertibile senza. LWE &egrave; una distribuzione statistica: ogni cifratura del medesimo bit produce un cifrato diverso, ogni decifratura &egrave; una stima sotto soglia, il segreto &egrave; un'eco gaussiana dentro un sistema lineare quasi-rotto. &Egrave; il primo cifrario a chiave pubblica che assomiglia pi&ugrave; al machine learning che all'algebra esatta. Non &egrave; un caso che a vincere il bando NIST sia stato proprio lo schema costruito sul concetto pi&ugrave; <em>sporco</em> di tutta la famiglia post-quantum.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 — KYBER IN PRATICA                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Kyber In Pratica</h2>
+<span class="section-number">Sezione 09. Module-LWE, NTT, 1184 byte di chiave pubblica</span>
+
+<p>
+  Kyber non &egrave; LWE puro. Sarebbe troppo lento (matrici \(m \times n\) intere) e troppo grosso (chiavi pubbliche da centinaia di KB). Kyber usa una variante chiamata <strong>Module-LWE</strong>: invece di lavorare su \(\mathbb{Z}_q\), lavora su un <em>anello di polinomi</em> \(R_q = \mathbb{Z}_q[x] / (x^{256} + 1)\). I &ldquo;vettori&rdquo; sono vettori di polinomi, le &ldquo;matrici&rdquo; sono matrici \(k \times k\) di polinomi. Stesso problema sottostante (CVP/SVP su un reticolo di dimensione \(256 k\)), ma con struttura algebrica che permette la moltiplicazione veloce via <strong>NTT (Number Theoretic Transform)</strong>, l'analogo intero della FFT.
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Parametro</th>
+      <th>Kyber512</th>
+      <th><strong>Kyber768</strong></th>
+      <th>Kyber1024</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sicurezza NIST</td>
+      <td>Cat. 1 (AES-128)</td>
+      <td><strong>Cat. 3 (AES-192)</strong></td>
+      <td>Cat. 5 (AES-256)</td>
+    </tr>
+    <tr>
+      <td>k (rank modulo)</td>
+      <td>2</td>
+      <td><strong>3</strong></td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>Dimensione reticolo</td>
+      <td>512</td>
+      <td><strong>768</strong></td>
+      <td>1024</td>
+    </tr>
+    <tr>
+      <td>q (modulo)</td>
+      <td>3329</td>
+      <td><strong>3329</strong></td>
+      <td>3329</td>
+    </tr>
+    <tr>
+      <td>Chiave pubblica (B)</td>
+      <td>800</td>
+      <td><strong>1184</strong></td>
+      <td>1568</td>
+    </tr>
+    <tr>
+      <td>Cifrato (B)</td>
+      <td>768</td>
+      <td><strong>1088</strong></td>
+      <td>1568</td>
+    </tr>
+    <tr>
+      <td>Chiave privata (B)</td>
+      <td>1632</td>
+      <td><strong>2400</strong></td>
+      <td>3168</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Curve25519 ha chiave pubblica e privata di 32 byte ciascuna. Kyber768 sta a 1184 + 2400 byte. Trenta volte di pi&ugrave;. &Egrave; il prezzo del cambio di geometria. Il payload TLS aumenta di circa 2 KB per handshake, motivo per cui Chrome serve <em>Kyber + X25519</em> in hybrid: se Kyber dovesse risultare rotto domani, il livello classico tiene; e viceversa.
+</p>
+
+<p>
+  Il modulo \(q = 3329\) &egrave; primo, 12 bit, e \(3329 = 2^{8} \cdot 13 + 1\). Questa scelta non &egrave; estetica: \(q\) divide \(2 \cdot 256\), quindi esiste una radice 256-esima primitiva dell'unit&agrave; in \(\mathbb{Z}_q\), e l'NTT in dimensione 256 si pu&ograve; fare modulo \(q\) con la trasformata di Cooley-Tukey identica a una FFT. La moltiplicazione di due polinomi di grado 255 passa da \(O(256^2)\) a \(O(256 \log 256)\). Su CPU moderne, Kyber768 fa una key encapsulation in centinaia di microsecondi (pyca/cryptography sopra OpenSSL), e scende a 25-50 &micro;s con implementazioni di riferimento AVX2 ottimizzate come PQClean o AWS-LC.
+</p>
+
+<div class="code-block" data-lang="python">
+  <div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># 04_kyber_demo.py: ML-KEM-768 reale via pyca/cryptography</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">from</span> <span class="cv">cryptography.hazmat.primitives.asymmetric</span> <span class="ck">import</span> <span class="cv">mlkem</span></td></tr>
+<tr><td class="ln">3</td><td class="code"></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"># Bob genera coppia</span></td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="cv">sk</span> = <span class="cv">mlkem</span>.<span class="cv">MLKEM768PrivateKey</span>.<span class="cf">generate</span>()</td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cv">pk</span> = <span class="cv">sk</span>.<span class="cf">public_key</span>()</td></tr>
+<tr><td class="ln">7</td><td class="code"></td></tr>
+<tr><td class="ln">8</td><td class="code"><span class="cc"># Alice incapsula. L'API ritorna (shared_secret, ciphertext)</span></td></tr>
+<tr><td class="ln">9</td><td class="code"><span class="cv">ss_alice</span>, <span class="cv">ct</span> = <span class="cv">pk</span>.<span class="cf">encapsulate</span>()       <span class="cc"># ss=32 B, ct=1088 B</span></td></tr>
+<tr><td class="ln">10</td><td class="code"></td></tr>
+<tr><td class="ln">11</td><td class="code"><span class="cc"># Bob decapsula con la sua chiave privata</span></td></tr>
+<tr><td class="ln">12</td><td class="code"><span class="cv">ss_bob</span> = <span class="cv">sk</span>.<span class="cf">decapsulate</span>(<span class="cv">ct</span>)</td></tr>
+<tr><td class="ln">13</td><td class="code"></td></tr>
+<tr><td class="ln">14</td><td class="code"><span class="ck">assert</span> <span class="cv">ss_alice</span> == <span class="cv">ss_bob</span>            <span class="cc"># entrambi hanno la stessa chiave di sessione</span></td></tr>
+  </table></div>
+</div>
+
+<p>
+  L'API a Encapsulate/Decapsulate &egrave; deliberata: Kyber non cifra messaggi di lunghezza arbitraria, restituisce solo una chiave simmetrica di 32 byte (256 bit), su cui poi si fa AES-GCM o ChaCha20-Poly1305 per cifrare il payload reale. Questa &egrave; la struttura di ogni KEM moderno. Il segreto condiviso &egrave; derivato dalla parte determinata della cifratura, poi passato per SHAKE256 per ottenere un'uscita uniforme indipendente dai dettagli interni.
+</p>
+
+<p>
+  Benchmark mediano su 2000 run, stesso laptop di sopra (Intel x86_64, Python 3.14, cryptography 47, OpenSSL backend), confronto con X25519 (curve ellittiche pre-quantum):
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Metrica</th>
+      <th>X25519</th>
+      <th><strong>Kyber768</strong></th>
+      <th>Rapporto</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>Public key (byte)</td><td>32</td><td><strong>1184</strong></td><td>37&times;</td></tr>
+    <tr><td>Wire (ct / DH msg, byte)</td><td>32</td><td><strong>1088</strong></td><td>34&times;</td></tr>
+    <tr><td>KeyGen (&micro;s)</td><td>113</td><td><strong>592</strong></td><td>5.2&times;</td></tr>
+    <tr><td>Encap / Exchange (&micro;s)</td><td>41</td><td><strong>157</strong></td><td>3.8&times;</td></tr>
+    <tr><td>Decap (&micro;s)</td><td>n/a</td><td><strong>235</strong></td><td>n/a</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Trenta volte di dati in pi&ugrave; sul filo, 3-5 volte di CPU. &Egrave; <em>il prezzo della geometria</em>. Per un handshake TLS in pi&ugrave; servono ~2 KB in pi&ugrave; e ~150 &micro;s in pi&ugrave; di CPU. Per la maggior parte dei carichi reali &egrave; rumore di fondo. Per data center ad alto QPS con TLS resumption assente, &egrave; un costo che si misura. Motivo per cui Chrome serve <em>Kyber + X25519</em> in hybrid: se Kyber dovesse risultare rotto domani, il livello classico tiene; e viceversa.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Tutto il codice di questo articolo &egrave; replicabile.</strong> Cartella <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/la-crittografia-ha-cambiato-geometria" target="_blank" rel="noopener">scripts/la-crittografia-ha-cambiato-geometria</a> su GitHub. Quattro script auto-contenuti:</p>
+  <ul style="margin: 0.6rem 0 0; padding-left: 1.4rem; line-height: 2.0;">
+    <li><code>01_lattice_2d.py</code>: genera la figura del reticolo Z&sup2; con base buona vs cattiva (sez. 5).</li>
+    <li><code>02_lll_scaling.py</code>: LLL pure-Python e benchmark, produce i numeri reali della tabella (sez. 6).</li>
+    <li><code>03_lwe_toy.py</code>: LWE giocattolo, round-trip 1000 bit e sigma sweep (sez. 8).</li>
+    <li><code>04_kyber_demo.py</code>: ML-KEM-768 reale via <code>pyca/cryptography</code>, benchmark vs X25519 (questa sezione).</li>
+    <li><code>05_high_dim_geometry.py</code>: concentrazione di misura empirica (sez. 6, figura della bolla cava).</li>
+    <li><code>06_lll_visualize.py</code>: LLL before/after su \(\mathbb{Z}^2\) (sez. 6, figura del collasso 24.7 &rarr; 1).</li>
+    <li><code>07_lwe_window.py</code>: istogrammi della finestra di LWE per &sigma; ∈ {3.2, 30, 120} (sez. 8).</li>
+  </ul>
+  <p style="margin: 0.8rem 0 0;">Dipendenze: <code>numpy</code>, <code>matplotlib</code>, <code>cryptography</code> &ge; 44. README della cartella con istruzioni complete. Niente <code>fpylll</code>, niente <code>oqs-python</code>, niente compilazione di librerie C: tutto gira su un Python 3.10+ vuoto.</p>
+</div>
+
+<p>
+  La iena, dall'altra stanza: "Andre, mercoled&igrave; smielo. Telaio 3 e 4 dell'arnia in fondo sono gi&agrave; pieni". Annuisco al monitor. Annuisco automaticamente, lo so. Lei lo sa benissimo che non ho registrato. Continua a parlare, credo per registrare il fatto che non ho ascoltato.
+</p>
+
+<p>
+  Tutto quello che ho scritto fin qui &egrave; il <em>livello teorico</em>: reticolo, rumore, modulo, NTT. Sotto vive un altro livello, quello <em>implementativo</em>: sampling discreti, divisioni intere, accessi in cache, timing del decapsulation. Nella storia della crittografia &egrave; <strong>sempre</strong> in quello strato che nascono i guai veri, e Kyber non fa eccezione. Ci torno tra due sezioni.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 10 — DOVE VIVE GIÀ                                 -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Dove Vive Gi&agrave;</h2>
+<span class="section-number">Sezione 10. ML-KEM nel mondo, da agosto 2023</span>
+
+<p>
+  Il NIST ha pubblicato FIPS 203 il 13 agosto 2024. L'implementazione concreta &egrave; partita molto prima del bollino federale. Ecco una mappa dello stato di adozione che ho potuto verificare:
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Chrome 116 (agosto 2023)</strong>. <code>X25519Kyber768Draft00</code> attivo di default nelle connessioni TLS 1.3 verso server che lo supportano. Da Chrome 124 (aprile 2024) il default &egrave; <code>X25519MLKEM768</code>, versione standardizzata. Centinaia di milioni di handshake al giorno.</li>
+  <li><strong>Cloudflare</strong>. Server-side post-quantum TLS hybrid dal 2023. Statistiche pubbliche: a giugno 2024 oltre il 30% delle connessioni TLS verso Cloudflare usava lattice-crypto.</li>
+  <li><strong>iMessage / PQ3 (febbraio 2024)</strong>. Apple ha aggiunto Kyber al protocollo di iMessage. Lo chiama Post-Quantum Level 3. &Egrave; il pi&ugrave; grande deployment messaging di sempre. Funziona sopra il sistema di identit&agrave; iCloud, periodic re-keying con CRYSTALS-Kyber.</li>
+  <li><strong>Signal / PQXDH (settembre 2023)</strong>. Signal ha esteso X3DH (lo scambio chiavi iniziale del protocollo Double Ratchet) con Kyber. Il pirata mancato dell'articolo <a href="../articoli/la-crittografia-non-basta.html">La Crittografia Non Basta</a> ha gi&agrave; lattice nel taschino.</li>
+  <li><strong>OpenSSH 9.9 (settembre 2024)</strong>. Default key exchange: <code>mlkem768x25519-sha256</code>. Quando entri in un server con <code>ssh user@host</code>, il segreto di sessione viene ora derivato da Kyber + Curve25519 in hybrid.</li>
+  <li><strong>AWS KMS (post-quantum API endpoint, 2024)</strong>. Le chiavi master di KMS sono incapsulate via ML-KEM.</li>
+  <li><strong>Google Workspace e Drive (PQ in transit)</strong>. Annunciato a met&agrave; 2024.</li>
+</ul>
+
+<p>
+  Sul telefono che hai in tasca, oggi, c'&egrave; pi&ugrave; lattice-crypto che curve ellittiche se misuri in cifrato che passa. Ma se chiedi alla gente per strada qual &egrave; l'algoritmo che protegge i loro DM, nessuno risponde &ldquo;Module-LWE su \(\mathbb{Z}_{3329}[x]/(x^{256}+1)\) in dimensione 768&rdquo;. Il cambio &egrave; avvenuto a porte chiuse, in commit pubblici che non sono diventati news. La crittografia &egrave; un'infrastruttura silenziosa anche quando cambia paradigma.
+</p>
+
+<p>
+  Un capitolo a parte sono le <strong>blockchain</strong>. Bitcoin ed Ethereum firmano ogni transazione con ECDSA su <code>secp256k1</code>, esattamente la curva che il paper Google di marzo 2026 ha messo in cima alla lista degli obiettivi quantistici credibili. Il rischio specifico &egrave; <em>harvest now, decrypt later</em>: ogni indirizzo che ha gi&agrave; <em>mandato</em> almeno una transazione ha esposto la propria chiave pubblica on-chain, e quando arriver&agrave; la macchina quantistica abbastanza grande, quelle pub key diventano private. Gli indirizzi che hanno solo ricevuto, no, perch&eacute; mostrano l'hash della pub key, non la pub key.
+</p>
+
+<p>
+  La risposta di Ethereum &egrave; <strong>EIP-8141</strong> (signature agility tramite account abstraction), in discussione per l'hard fork <em>Hegot&aacute;</em> previsto nel secondo semestre del 2026. L'idea &egrave; chirurgica: ogni wallet decide individualmente se restare su ECDSA o migrare a una firma post-quantum (probabili candidati ML-DSA / Dilithium, oppure SLH-DSA / SPHINCS+, entrambi standardizzati dal NIST nel 2024). Niente fork del protocollo che forzi tutti a muoversi insieme, niente flag day. Migrazione opt-in, vagliata dal mercato. &Egrave; lo stesso pattern dell'hybrid TLS di Chrome, traslato sul livello "ogni utente per s&eacute;". Bitcoin sta discutendo schemi analoghi (BIP-360 e successori), pi&ugrave; lentamente.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 11 — LA MATEMATICA REGGE, IL SOFTWARE NO           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Matematica Regge, Il Software No</h2>
+<span class="section-number">Sezione 11. Quello che il bollino NIST non garantisce</span>
+
+<p>
+  Prima di chiudere serve un'avvertenza. Tutto il pezzo &egrave; raccontato col tono dello standard che si afferma, e l'impressione che pu&ograve; restare &egrave; che &ldquo;Kyber = sicurezza definitiva&rdquo;. Non &egrave; cos&igrave;. Lattice-based crypto &egrave; oggi la <em>migliore candidata disponibile</em> per il post-quantum, ed &egrave; quella su cui ha scommesso il NIST. Ma la storia della crittografia &egrave; piena di schemi che sembravano solidi finch&eacute; non sono crollati per un dettaglio inatteso. Tre cose vale la pena tenere a mente.
+</p>
+
+<p>
+  <strong>La storia recente della PQC &egrave; un cimitero.</strong> Nella stessa competizione NIST in cui Kyber ha vinto, altri due finalisti seri sono caduti tra il 2022 e il 2023. <strong>Rainbow</strong>, schema di firme multivariate, &egrave; stato rotto da Ward Beullens nel febbraio 2022 con un attacco da poche ore di laptop. <strong>SIKE</strong>, schema di key exchange basato su isogenie di curve ellittiche supersingolari, &egrave; stato rotto da Castryck e Decru in un weekend nel luglio 2022, mentre era al quarto round della competizione. Entrambi erano arrivati a un passo dalla standardizzazione. Lattice-based &egrave; di gran lunga il pi&ugrave; studiato e il pi&ugrave; in piedi tra i candidati, ma il messaggio di SIKE &egrave; chiaro: <em>la durezza di un problema crittografico &egrave; uno stato dell'arte, non un teorema chiuso</em>.
+</p>
+
+<p>
+  <strong>La matematica regge, ma il software ci sta in mezzo.</strong> Anche dando per buono che Module-LWE sia tanto duro quanto crediamo, fra il teorema e il binario in produzione c'&egrave; un'implementazione, e le implementazioni si rompono altrimenti. Il caso pi&ugrave; istruttivo &egrave; <strong>KyberSlash</strong>, scoperto da Daniel J. Bernstein e collaboratori a fine 2023, divulgato a inizio 2024.
+</p>
+
+<p>
+  Pensaci concretamente. Un server da qualche parte gira il decapsulation di Kyber. Riceve un cifrato, restituisce la chiave di sessione, l'handshake TLS prosegue. Il risultato &egrave; sempre quello giusto. La matematica del paper Crystals-Kyber funziona alla perfezione. Solo che dentro al codice, in un punto preciso, c'&egrave; una <em>divisione intera</em> con il divisore che dipende dai bit della chiave privata. Sulle CPU reali (Intel, ARM, RISC-V indifferentemente) la divisione non gira a tempo costante: a seconda dell'operando, impiega <em>qualche ciclo in pi&ugrave; o in meno</em>.
+</p>
+
+<p>
+  L'attaccante non rompe niente. Non fattorizza, non risolve LWE, non riduce un reticolo. Si limita a misurare il tempo. Dieci microsecondi, undici microsecondi, dodici. Da remoto, su rete, in mezzo al rumore di Internet. Mille richieste, diecimila, un milione. Le distribuzioni statistiche cominciano a separarsi. Bit dopo bit, esce la chiave privata da 2400 byte. La matematica del paper era intatta. Il C, no. La <em>sicurezza non viveva in</em> \(\mathbb{Z}_{3329}[x]/(x^{256}+1)\), <em>viveva nel timing della divisione</em>. Quello stava sulla CPU di chiunque, e si misurava da fuori.
+</p>
+
+<p>
+  La patch &egrave; arrivata in poche settimane su tutte le librerie (libcrux, pq-crystals, oqs, BoringSSL, Open Quantum Safe). Hanno sostituito la divisione con una sequenza di shift e moltiplicazioni a tempo costante. Ma per i mesi prima della disclosure, ogni server che girasse l'implementazione di riferimento del NIST <em>era vulnerabile</em>. Lo standard FIPS 203 era pubblicato. Il bollino federale c'era. E perdeva la chiave per microsecondi.
+</p>
+
+<p>
+  La famiglia di problemi &egrave; pi&ugrave; ampia di KyberSlash. <strong>Sampling gaussiano</strong>: per generare il rumore \(\mathbf{e}\) servono campioni da una distribuzione discreta, e i metodi non a tempo costante leakano via cache timing. <strong>NTT timing</strong>: la trasformata interna ha pattern di accesso alla memoria che dipendono dai coefficienti. <strong>Decapsulation failures</strong>: con probabilit&agrave; piccolissima il rumore esce dalla forbice e la decifratura fallisce; sono state pubblicate famiglie di <em>chosen ciphertext attacks</em> che inducono fallimenti per estrarre informazione sulla chiave. Tutti questi attacchi sono <em>side-channel</em>, non rompono il problema sottostante. Ma la chiave la portano via lo stesso.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Perch&eacute; l'hybrid con X25519 non &egrave; eccesso di zelo.</strong> Quando Chrome serve <code>X25519MLKEM768</code> con due algoritmi in parallelo, non sta solo coprendosi contro il computer quantistico. Sta coprendosi anche contro il caso in cui domani esca un paper che indebolisce Kyber, o un nuovo KyberSlash su un'implementazione diversa. L'hybrid &egrave; una scommessa <em>congiunta</em>: per leggere il traffico devi rompere entrambi. Una mossa difensiva onesta, in un momento in cui il nuovo paradigma ha ancora pochi anni di crittoanalisi sulle spalle.</p>
+</div>
+
+<p>
+  Quindi: la geometria che ha vinto al NIST &egrave; la cosa migliore che oggi sappiamo costruire. Non &egrave; una garanzia eterna. La differenza fra un teorema e uno standard sta tutta qui.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 12 — CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> La Crittografia Ha Cambiato Geometria</h2>
+<span class="section-number">Sezione 12. Conclusione</span>
+
+<p>
+  Chiudo il terminale. Ricapitoliamo la riga di output da cui sono partito: <code>X25519MLKEM768</code>. Quattro parole gettate dentro un handshake TLS. La prima met&agrave;, <code>X25519</code>, &egrave; aritmetica modulare su una curva ellittica scoperta nel 1985, che vive in un campo di 256 bit. La seconda met&agrave;, <code>MLKEM768</code>, &egrave; geometria su un reticolo di 768 dimensioni costruito sopra un anello di polinomi modulo \(x^{256}+1\). La prima &egrave; rotta da Shor in tempo polinomiale. La seconda no, perch&eacute; Shor non sa attaccare CVP/SVP.
+</p>
+
+<p>
+  Tra i due algoritmi c'&egrave; il punto di flesso di mezzo secolo di crittografia moderna. Prima la sicurezza nasceva dalla durezza di un'<em>operazione algebrica</em>: fattorizzare, estrarre logaritmi. Adesso la sicurezza nasce dalla durezza di un <em>problema geometrico</em>: trovare il vettore pi&ugrave; corto, trovare il punto pi&ugrave; vicino. La differenza non &egrave; cosmetica. &Egrave; una migrazione dell'oggetto matematico: dai numeri interi alla geometria dei numeri.
+</p>
+
+<p>
+  Stessa migrazione, in altra forma, &egrave; gi&agrave; in corso da anni nell'AI. Gli embeddings non sono numeri, sono vettori in spazi ad alta dimensione (toccato in <a href="../articoli/vicino-vuol-dire-vettore.html">Vicino Vuol Dire Vettore</a> e <a href="../articoli/il-volto-e-un-vettore.html">Il Volto &Egrave; Un Vettore</a>). Il senso di una parola, di un volto, di una canzone, di una pagina web vive in geometrie da 512, 1024, 4096 dimensioni. La crittografia post-quantum vive in geometrie da 768, 1024 dimensioni. Sono cugine pi&ugrave; di quanto sembri: stessa famiglia di intuizione spezzata, stessa famiglia di matematica che la sostituisce.
+</p>
+
+<p>
+  L'informatica moderna sta migrando da un mondo dove la matematica utile era quella che si poteva fare a mente (somme, prodotti, divisioni, congruenze) a un mondo dove la matematica utile &egrave; quella che <em>il cervello non sa visualizzare</em>. Distanze in 768 dimensioni, rumore gaussiano come ingrediente attivo, reticoli storti dove il vettore pi&ugrave; corto si trova solo se gi&agrave; conosci la base buona. &Egrave; un'informatica che chiede strumenti diversi per essere capita.
+</p>
+
+<p>
+  Il NIST ha standardizzato il 13 agosto 2024. Chrome lo serve di default da quasi tre anni. Signal e iMessage lo usano per i tuoi DM da due. OpenSSH lo usa quando entri su un server da venti mesi. La crittografia ha cambiato geometria nel 2023, lo standard l'ha ratificato nel 2024, oggi &egrave; il 2026 e tutto questo &egrave; <em>infrastruttura ordinaria</em>. Solo che nessuno l'ha detto a voce.
+</p>
+
+<p>
+  E poi c'&egrave; il resto. Tutta questa geometria gigantesca (il reticolo di Module-LWE che Shor non sa attaccare, le 768 dimensioni dove &laquo;corto&raquo; smette di voler dire quello che vuol dire in tre, il rumore gaussiano che &egrave; diventato il materiale stesso del segreto) sta in piedi solo finch&eacute; regge il silicio sotto. Un branch predictor che indovina male, una divisione intera che impiega dodici nanosecondi in pi&ugrave; del previsto, una cache che leakà bit per millisecondi sul singolo decapsulation: e la chiave svanisce dalla CPU senza che la matematica abbia perso un capello. KyberSlash &egrave; successo. Ne succederanno altri. <strong>Il teorema regge. Il binario perde.</strong> La crittografia ha cambiato geometria, ma alla fine si rompe ancora esattamente dove si rompeva quarant'anni fa: nel ferro.
+</p>
+
+<p style="border-left: 3px solid var(--accent-attention); padding-left: 1.2rem; margin: 2rem 0; font-style: italic; color: var(--text-primary);">
+  Letta brutalmente: 768 dimensioni, reticoli q-ary, worst-case-to-average-case di Ajtai, BKZ tunato a mano, sieving quantistico, otto anni di competizione NIST, FIPS 203. E poi perdi la chiave perch&eacute; una divisione intera impiega 20 nanosecondi in pi&ugrave; del previsto. Questa &egrave; la crittografia reale del 2026: una corda tesa fra una geometria che il cervello non sa visualizzare e un silicio che nessuno sa garantire.
+</p>
+
+<p>
+  Riapro il terminale. La riga <code>Server Temp Key: X25519MLKEM768</code> &egrave; ancora l&igrave;, identica a un'ora fa. Stessi caratteri, stesso handshake. Solo che adesso so cosa nascondono quelle quattordici lettere e cifre: un reticolo a 768 dimensioni, un anello \(\mathbb{Z}_{3329}[x]/(x^{256}+1)\), un rumore gaussiano calibrato per vivere in una buccia di carta velina, una storia di tentativi falliti e di un solo sopravvissuto. So anche cosa pu&ograve; rompersi nel prossimo handshake: non la matematica, che &egrave; impeccabile. Una cache line. Un branch predictor. Una divisione intera che impiega 20 nanosecondi in pi&ugrave; del previsto.
+</p>
+
+<p>
+  Il prossimo pacchetto TLS parte fra un istante.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"Il segreto non &egrave; pi&ugrave; un primo grosso. &Egrave; un vettore corto in un reticolo storto, annaffiato di rumore."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Module-LWE su \(\mathbb{Z}_{3329}[x]/(x^{256}+1)\), rank 3, dimensione reticolo 768, sicurezza nominale 192 bit contro attacchi classici e quantistici noti.
+    Chiave pubblica 1184 byte (37x rispetto a Curve25519), encapsulation 157 &micro;s mediana su pyca/cryptography, 25-50 &micro;s con AVX2 ottimizzato.
+    FIPS 203 dal 13 agosto 2024. Chrome, Signal, iMessage, OpenSSH gi&agrave; in produzione da pi&ugrave; di due anni.
+    Vulnerabilit&agrave; implementative documentate: KyberSlash, fine 2023, patch su tutte le librerie nel primo trimestre 2024.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+<script src="../js/main.js"></script>
+
+</body>
+</html>
