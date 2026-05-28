@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Tramonto Ha un Indirizzo</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-tramonto-ha-un-indirizzo.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-tramonto-ha-un-indirizzo.html</guid>
+    <pubDate>Thu, 28 May 2026 00:00:00 +0200</pubDate>
+    <description>Faccio pulizia sul disco e ritrovo Find Gnagna, un tool del 2022 che da un profilo su un'app di incontri stimava dove abita una persona. Lo rilancio nel 2026: non trova piu' niente, perche' la piattaforma si e' difesa (distanza arrotondata al miglio, niente repliche dello stesso profilo, risposte imbottite di testo-spazzatura per battere la traffic-analysis). Ma le difese mitigano, non proteggono. Smonto la matematica: trilaterazione come stima ai minimi quadrati non lineari pesati sui range, errore di quantizzazione (sigma circa 465 m, limite assoluto 805 m), GDOP e collasso della regione compatibile man mano che arrivano misure da direzioni diverse. Risultati misurati su una sola citta', poche ore di dati: best 115 m, mediana circa 1,3 km, circa 28% entro 500 m, circa 44% entro 1 km. Un RANSAC sequenziale separa casa e lavoro da solo, via orari. Il muro del miglio non e' il pavimento: piu' misure ben distribuite angolarmente lo abbassano. La difesa vera e' comportamentale (non aprire l'app da casa, ripulire bio e foto). L'ultimo pezzo, dal quartiere al portone, lo aggiunge una foto disattenta dalla finestra.</description>
+  </item>
+
+  <item>
     <title>La Crittografia Ha Cambiato Geometria</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-ha-cambiato-geometria.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/la-crittografia-ha-cambiato-geometria.html</guid>

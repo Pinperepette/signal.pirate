@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Tramonto Ha un Indirizzo | Signal Pirate</title>
+  <meta name="description" content="La matematica di quanto un'app di incontri ti localizza: minimi quadrati, GDOP, quantizzazione al miglio, clustering. Il muro lo alza la piattaforma, l'ultimo pezzo lo metti tu con una foto.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0; padding: 1.2rem 1.5rem; margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block; font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem;
+    }
+    .dialogue {
+      border-left: 3px solid var(--accent-attention); padding: 0.4rem 0 0.4rem 1.2rem;
+      margin: 1.4rem 0; color: var(--text-primary); font-style: italic; line-height: 1.7;
+    }
+    .dialogue .who { color: var(--accent-attention); font-style: normal; font-weight: 600; }
+    .formula {
+      background: #0d1117; border: 1px solid rgba(124,77,255,0.25); border-radius: 10px;
+      padding: 1rem 1.4rem; margin: 1.4rem 0; font-family: var(--font-mono);
+      font-size: 0.95rem; color: #d8d8e8; text-align: center; overflow-x: auto;
+    }
+    .formula .var { color: var(--accent-highlight); }
+    .formula small { display:block; color: var(--text-secondary); font-size: 0.72rem; margin-top: 0.6rem; }
+    .code-block {
+      background: #0d1117; border: 1px solid rgba(0,255,136,0.12); border-radius: 10px;
+      margin: 1.5rem 0; overflow-x: auto; font-family: var(--font-mono);
+      font-size: 0.78rem; line-height: 1.7; color: #c8c8d8; position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang); position: absolute; top: 0.5rem; right: 0.8rem;
+      font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase;
+      letter-spacing: 0.1em; opacity: 0.5; z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em; padding: 0.2em 0.8em 0.2em 0.6em; text-align: right; color: #3a3a5a;
+      user-select: none; border-right: 1px solid #1a1a2e; background: #090d14; font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; } .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; } .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; } .code-block .dc { color: #8b949e; font-style: italic; }
+    .strategy-table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 1.5rem 0; font-size: 0.85rem; }
+    .strategy-table th {
+      background: var(--bg-tertiary); color: var(--accent-attention); font-family: var(--font-mono);
+      font-weight: 600; padding: 0.8rem; text-align: left; border-bottom: 2px solid rgba(0,255,136,0.2);
+    }
+    .strategy-table td { padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono); font-size: 1.2rem; color: var(--accent-attention); line-height: 1.6; margin-bottom: 1rem;
+    }
+    .defense-list { list-style: none; padding: 0; margin: 1.5rem 0; }
+    .defense-list li {
+      background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 10px;
+      padding: 1rem 1.2rem; margin-bottom: 0.7rem; line-height: 1.6;
+    }
+    .defense-list li strong { color: var(--accent-attention); }
+    figure { margin: 2rem 0; text-align: center; }
+    figure img { max-width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    figure figcaption { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem; font-family: var(--font-mono); }
+    .shot-placeholder {
+      border: 1px dashed rgba(0,255,136,0.4); border-radius: 12px; padding: 3rem 1rem;
+      color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.8rem; background: rgba(0,255,136,0.02);
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono); font-size: 0.85em; background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent-attention);
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/il-tramonto-ha-un-indirizzo.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Il Tramonto Ha un Indirizzo">
+  <meta property="og:description" content="La matematica di quanto un&#x27;app di incontri ti localizza: minimi quadrati, GDOP, quantizzazione al miglio, clustering. Il muro lo alza la piattaforma, l&#x27;ultimo pezzo lo metti tu con una foto.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/il-tramonto-ha-un-indirizzo.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-05-28">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Il Tramonto Ha un Indirizzo">
+  <meta name="twitter:description" content="La matematica di quanto un&#x27;app di incontri ti localizza: minimi quadrati, GDOP, quantizzazione al miglio, clustering. Il muro lo alza la piattaforma, l&#x27;ultimo pezzo lo metti tu con una foto.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Il Tramonto Ha un Indirizzo","description":"La matematica di quanto un'app di incontri ti localizza: minimi quadrati, GDOP, quantizzazione al miglio, clustering. Il muro lo alza la piattaforma, l'ultimo pezzo lo metti tu con una foto.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-05-28","dateModified":"2026-05-28","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/il-tramonto-ha-un-indirizzo.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../index.html" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<header class="article-header">
+  <p class="article-meta">2026-05-28 | Pinperepette</p>
+  <h1 class="article-page-title">Il Tramonto Ha un <span class="accent">Indirizzo</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+    La matematica di quanto un'app di incontri ti localizza. E perche' l'ultimo pezzo, di solito, ce lo metti tu.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Privacy</span>
+    <span class="tag tag-highlight">Trilaterazione</span>
+    <span class="tag tag-reaction">OSINT</span>
+    <span class="tag tag-amplification">Least Squares</span>
+  </div>
+</header>
+
+<article class="article-content">
+
+<!-- ===== 00 ===== -->
+<h2><span class="accent">//</span> Il Cassetto Digitale</h2>
+<span class="section-number">Sezione 00. L'antefatto</span>
+
+<p>
+  Facevo pulizia sul disco. Di quelle in cui cancelli venti giga di roba morta e ne ritrovi una che avevi dimenticato. In una cartella del 2022, sepolto tra script che non girano piu', c'era un vecchio tool che avevo scritto e battezzato, con tutta la finezza del caso, <strong>Find Gnagna</strong>.
+</p>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/find-gnagna-logo.png" alt="Logo del tool Find Gnagna" style="max-width: 440px;">
+  <figcaption>Il logo. Le aspettative sull'eleganza del progetto erano calibrate di conseguenza.</figcaption>
+</figure>
+
+<p>
+  Faceva una cosa sola: dato un profilo su un'app di incontri, provava a stimare dove abitava la persona. Triangolazione. Nel 2022 funzionava. L'ho riguardato e mi e' venuta la curiosita': dopo tutti questi anni, saranno cambiate le cose?
+</p>
+
+<p>
+  Quindi oggi parliamo di <strong>OSINT</strong> e dei pericoli nascosti delle app di incontri. Il punto e' scomodo: le difese ci sono, e sono migliorate parecchio, ma <strong>non bastano</strong>. Se qualcuno vuole, ti trova lo stesso. E non si ferma a un puntino sulla mappa: ti <strong>scheda</strong>. La zona dove vivi (non il civico, ma il tuo isolato), dove lavori, le strade che percorri, i posti che frequenti, la faccia, gli orari. Tutto da un semplice profilo, con la geometria e un paio di errori che continui a fare tu. E' piu' pericoloso di quanto pensi.
+</p>
+
+<!-- ===== 01 ===== -->
+<h2><span class="accent">//</span> Tre Cerchi, Un Punto</h2>
+<span class="section-number">Sezione 01. La trilaterazione, sul serio</span>
+
+<p>
+  Trilaterazione e' quello che fa il GPS. Se conosci la tua distanza da tre punti noti, sei sull'unico punto dove tre cerchi si incontrano. Il problema e' che le distanze reali non sono mai esatte: sono misure, con rumore. Quindi i tre cerchi non passano mai per uno stesso punto preciso, e non risolvi un sistema, lo <strong>approssimi ai minimi quadrati</strong>: cerchi la posizione che meglio spiega tutte le distanze osservate.
+</p>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/01-trilaterazione.png" alt="Infografica: tre cerchi neon attorno a tre punti di misura, l'intersezione e' la posizione stimata. La distanza la fornisce l'app, non un tempo di volo.">
+  <figcaption>Ogni distanza definisce un cerchio di posizioni possibili. L'intersezione e' la stima. E la distanza la fornisce l'app, non un tempo di volo.</figcaption>
+</figure>
+
+<p>
+  Formalmente e' una <strong>stima ai minimi quadrati non lineari pesati</strong> sui range (le distanze), la stessa famiglia di tecniche usata in radiolocalizzazione e nel GPS: niente di inventato per l'articolo. La posizione stimata e' quella che minimizza la somma dei residui, dando piu' peso agli avvistamenti recenti (una persona si muove, quelli vecchi contano meno).
+</p>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/01b-funzione-obiettivo.png" alt="Infografica della funzione obiettivo J(x) ai minimi quadrati pesati: residuo per ogni ping, peso di recency esponenziale, superficie di costo con il minimo.">
+  <figcaption>La funzione obiettivo: la stima e' la posizione che minimizza la somma dei residui pesati, dando piu' peso ai ping recenti.</figcaption>
+</figure>
+
+<p>
+  Sotto il cofano e' codice da manuale: minimizzazione su griglia piu' raffinamento locale.
+</p>
+
+<div class="code-block" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">def</span> <span class="fn">costo</span>(x, avvistamenti, t_now, tau=<span class="nb">1800</span>):</td></tr>
+<tr><td class="ln">2</td><td class="code">    <span class="dc">"""Somma dei residui pesati: piu' bassa = posizione piu' probabile."""</span></td></tr>
+<tr><td class="ln">3</td><td class="code">    J = <span class="nb">0.0</span></td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="kw">for</span> s <span class="kw">in</span> avvistamenti:</td></tr>
+<tr><td class="ln">5</td><td class="code">        d = haversine_m(x, s.ping)            <span class="cm"># distanza candidata-ping</span></td></tr>
+<tr><td class="ln">6</td><td class="code">        r = s.distance_mi * <span class="nb">1609.344</span>        <span class="cm"># raggio dichiarato (centro fascia)</span></td></tr>
+<tr><td class="ln">7</td><td class="code">        w = exp(-(t_now - s.ts) / tau)        <span class="cm"># peso: piu' recente, piu' conta</span></td></tr>
+<tr><td class="ln">8</td><td class="code">        J += w * (d - r)**<span class="nb">2</span></td></tr>
+<tr><td class="ln">9</td><td class="code">    <span class="kw">return</span> J</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  Nel 2022 questo bastava. Rilancio quel codice nel 2026. Non trova niente. Perche' dall'altra parte, nel frattempo, hanno lavorato.
+</p>
+
+<!-- ===== 02 ===== -->
+<h2><span class="accent">//</span> Il Muro Della Quantizzazione</h2>
+<span class="section-number">Sezione 02. Le difese, e quanto sbagli davvero</span>
+
+<p>
+  Tre contromisure, messe li' apposta contro gente come il me del 2022. Sono reali e hanno ucciso il metodo vecchio. Ma mettiamoci d'accordo subito sul registro: sono <strong>mitigazioni</strong>, alzano il muro, non chiudono la porta. Lo dimostro piu' avanti.
+</p>
+
+<ul class="defense-list">
+  <li><strong>La distanza e' arrotondata al miglio.</strong> Quel "2 km" non e' 2,0: e' "da qualche parte in una fascia spessa un miglio e mezzo". Hanno spuntato la precisione alla fonte.</li>
+  <li><strong>Lo stesso profilo non te lo rimostrano.</strong> Una volta visto, sparisce dal mazzo per quella sessione. Niente avvistamenti ripetuti gratis.</li>
+  <li><strong>Le risposte sono imbottite di spazzatura.</strong> Dentro i dati ho trovato pezzi di documentazione a caso su un parco di New York, infilati apposta per confondere chi prova a leggere il traffico in base alla dimensione delle risposte.</li>
+</ul>
+
+<p>
+  Ma quanto sbagli, di preciso, se la distanza e' arrotondata? Si calcola, e il numero spiega tutto. Se ti dicono "1 miglio", la distanza vera sta in una fascia larga <code>&Delta; = 1609 m</code>. Modello l'errore come uniforme su quella fascia. La varianza di una distribuzione uniforme e' <code>&Delta;<sup>2</sup>/12</code>, quindi:
+</p>
+
+<div class="formula">
+  &sigma;<sub>misura</sub> = &Delta; / &radic;12 = 1609 / 3,46 &approx; <span class="var">465 m</span>
+  <small>errore tipico di ogni singola lettura di distanza · limite assoluto ±805 m (mezza fascia)</small>
+</div>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/02-quantizzazione.png" alt="Infografica: una misura non e' un cerchio ma una fascia spessa ±805 m attorno alla distanza dichiarata. Box con raggio 1.609 m, mezza fascia ±805 m e scarto tipico sigma circa 465 m.">
+  <figcaption>"1 miglio" non e' una circonferenza, e' una fascia spessa ±805 m. Questo e' il rumore su ogni misura.</figcaption>
+</figure>
+
+<p>
+  Una precisazione, perche' un occhio tecnico la nota subito: e' una stima <em>semplificata</em>. Assume un errore uniforme e indipendente, mentre quello vero e' discretizzato e dipende anche dalla geometria dei ping e da come la piattaforma arrotonda. Serve a dare l'ordine di grandezza, non il valore esatto.
+</p>
+
+<p>
+  Ecco il muro: ogni misura, da sola, ti colloca al massimo dentro una fascia di ottocento metri. Per anni ho creduto fosse il pavimento invalicabile. Sbagliavo, e lo dimostro tra poco. Ma intanto: il vecchio metodo "tre ping vicini, stessa distanza" contro questa difesa muore. Servono misure piu' furbe.
+</p>
+
+<!-- ===== 03 ===== -->
+<h2><span class="accent">//</span> Geometria &gt; Numero</h2>
+<span class="section-number">Sezione 03. GDOP e la regione che collassa</span>
+
+<p>
+  Quanto bene localizzi non dipende solo da quanto e' preciso ogni cerchio, ma da <strong>dove stanno i punti</strong>. E' lo stesso principio per cui il GPS funziona male in un canyon, quello che li' si chiama <em>GDOP</em> (geometric dilution of precision): l'errore di posizione e' l'errore di misura moltiplicato per un fattore puramente geometrico.
+</p>
+
+<div class="formula">
+  &sigma;<sub>posizione</sub> &approx; GDOP &middot; &sigma;<sub>misura</sub>
+  &nbsp;&nbsp;con&nbsp;&nbsp; GDOP = &radic; tr( (H<sup>T</sup>H)<sup>&minus;1</sup> )
+  <small>H = matrice dei versori di direzione dal bersaglio a ciascun ping. E' la parte spaziale del fattore (analoga a PDOP/HDOP), senza il termine di clock del GPS completo.</small>
+</div>
+
+<p>
+  Se i punti circondano il bersaglio, <code>GDOP &approx; 1</code> e l'incertezza e' un cerchietto. Se i punti sono tutti dallo stesso lato (il caso di un bersaglio lontano sondato da una zona ristretta), il GDOP esplode lungo la direzione perpendicolare e l'incertezza diventa un'ellisse lunga e stretta. Tradotto: la direzione la sai, la distanza lungo quella direzione no. In pratica, dopo abbastanza misure la domanda non e' piu' <em>in quale quartiere sei</em>, ma <em>quale dei tre campi da basket dentro quell'ellisse frequenti davvero</em>.
+</p>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/06-gdop.png" alt="Due scenari: ping che circondano il bersaglio danno incertezza circolare, ping da un lato danno un'ellisse allungata">
+  <figcaption>Stesso errore di misura, geometria diversa. A sinistra GDOP 1,0. A destra 4,7: la stessa precisione diventa un'ellisse.</figcaption>
+</figure>
+
+<p>
+  E qui crolla il "muro" degli 805 metri. Quel limite vale per <strong>una</strong> misura. Ma se accumulo tante letture intere in miglia da <strong>direzioni diverse</strong>, ognuna taglia via una fetta di mappa, e l'intersezione di tutti gli anelli collassa in una cella molto piu' piccola della singola fascia. Non e' magia, e' che ogni vincolo arriva da un'angolazione nuova. Con un avvertimento, pero': conta <strong>da quante direzioni diverse stai osservando</strong>, non il numero di misure. Dieci letture dalla stessa direzione valgono molto meno di quattro ben distribuite angolarmente.
+</p>
+
+<p>
+  E conviene cambiare immagine mentale. Non stai cercando un punto, come il pallino blu del GPS. Stai <strong>eliminando</strong>: ogni misura cancella le zone incompatibili con quello che osservi, finche' la citta' smette lentamente di avere alternative.
+</p>
+
+
+<p>
+  Sui dati veri lo vedi succedere sotto gli occhi. Con tre misure avevo ancora mezzo quartiere. Alla sesta era rimasto un gruppo di palazzi. Alla dodicesima il problema non era piu' "dove vive", ma <em>quale finestra guarda il tramonto</em>.
+</p>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/08-citta.png" alt="Una griglia di isolati: a ogni misura si spengono le zone incompatibili, da un anello acceso fino a pochi isolati">
+  <figcaption>Ogni misura spegne le zone incompatibili. Da un anello acceso, alla sesta restano pochi isolati. E' pruning geometrico: ogni misura aggiorna cio' che e' ancora compatibile con la realta'.</figcaption>
+</figure>
+
+<p>
+  Ed e' qui che ho cambiato idea su una cosa. Pensavo che il rumore rendesse <em>impossibile</em> localizzare qualcuno. In realta' non lo impedisce: lo <strong>rallenta</strong>. Ogni lettura sporca conta un po' meno di una pulita, ma conta. La convergenza diventa piu' lenta, non assente.
+</p>
+
+<!-- ===== 04 ===== -->
+<h2><span class="accent">//</span> I Numeri Veri</h2>
+<span class="section-number">Sezione 04. Campagna Piacenza</span>
+
+<p>
+  Ho riscritto lo strumento da zero. Non un colpo solo: <strong>una rete che accumula nel tempo</strong>. Ogni scansione sonda decine di posizioni, salva ogni avvistamento, e chi ricompare si stratifica. I numeri qui sotto vengono da <strong>pochissimo tempo</strong>: diverse scansioni ravvicinate, con i filtri attivi, su una <strong>sola citta'</strong> (per non sporcare la statistica mescolando zone e condizioni diverse). In forma aggregata e anonima:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr><th>Quanto stringe</th><th>Quante volte</th><th>Tradotto</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>115 m</strong></td><td>best assoluto</td><td>il portone, o quasi</td></tr>
+    <tr><td>≤ 300 m</td><td>~16%</td><td>l'isolato</td></tr>
+    <tr><td>≤ 500 m</td><td>~28%</td><td>poche vie</td></tr>
+    <tr><td>≤ 1 km</td><td>~44%</td><td>il quartiere stretto</td></tr>
+    <tr><td>mediana ~1,3 km</td><td>il caso tipico</td><td>la zona</td></tr>
+  </tbody>
+</table>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/03-distribuzione.png" alt="Istogramma della percentuale di profili localizzati entro varie soglie di distanza, campagna Piacenza">
+  <figcaption>La distribuzione reale. Quasi meta' dei profili entro un chilometro. E questo con poche ore di dati.</figcaption>
+</figure>
+
+<p>
+  Attenzione a non leggere quel "best 115 m, raro" come "tanto e' raro, sono al sicuro". <strong>Non e' una probabilita' di salvezza, e' il pavimento dello sforzo.</strong> Questi sono i numeri di poche ore di raccolta. Quando ho iniziato il migliore era 290 metri; <strong>mentre i dati crescevano e' sceso a 115</strong>. Non per fortuna: per quanto detto nella sezione prima, piu' avvistamenti da direzioni diverse stringono la cella.
+</p>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/05-pavimento.png" alt="L'incertezza migliore cala all'aumentare degli avvistamenti coerenti dello stesso luogo">
+  <figcaption>Piu' avvistamenti coerenti, piu' stringi. Il pavimento non e' fisso: scende con i dati.</figcaption>
+</figure>
+
+<p>
+  E non scende in modo lineare: all'inizio ogni nuova misura taglia via enormi regioni compatibili, poi i miglioramenti si fanno sempre piu' piccoli. E' il comportamento geometrico tipico di questa stima, non un accumulo magico che cala all'infinito. Si guadagna molto in fretta, fino a un punto, e poi serve geometria nuova (direzioni nuove) piu' che misure in piu'.
+</p>
+
+<div class="insight-box">
+  <p><strong>Dove sta andando:</strong> questi sono numeri di poche ore. I dati suggeriscono che, aumentando la copertura temporale e soprattutto <strong>angolare</strong>, il pavimento continui a scendere sensibilmente. Non e' un valore gia' misurato, e' la direzione del trend: ed e' il motivo per cui leggere "tanto e' raro" come "sono al sicuro" e' un errore.</p>
+</div>
+
+<p>
+  Ed ecco il punto che conta, ed e' vero: <strong>non serve la precisione, serve la scala.</strong> Non si tratta di beccare te a cinquanta metri. Si tratta di <strong>schedare</strong> diecimila persone in automatico, ognuna con la faccia, la citta', l'universita', gli orari e la zona di casa. Il tempo lavora per chi raccoglie: piu' giorni passano, piu' il quadro si riempie.
+</p>
+
+<p>
+  La parte inquietante e' che il bersaglio non deve fare niente. Basta esistere nel tempo. Ogni volta che apri l'app aggiungi un vincolo geometrico nuovo, e la regione compatibile si restringe anche se in quel momento nessuno ti sta "seguendo" attivamente. Tu dimentichi l'app. Il sistema continua a restringere.
+</p>
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/tool-mappa.png" alt="Mappa dello scanner Find Gnagna: decine di pin, ognuno un profilo, sparsi su una citta'. Volti, nomi e coordinate oscurati.">
+  <figcaption>Find Gnagna: ogni pin e' un profilo, ogni profilo un punto sulla mappa. Volti, nomi e posizione oscurati.</figcaption>
+</figure>
+
+<!-- ===== 05 ===== -->
+<h2><span class="accent">//</span> Casa e Lavoro Si Separano da Soli</h2>
+<span class="section-number">Sezione 05. Clustering</span>
+
+<p>
+  Guardando i dati grezzi salta all'occhio una cosa banale: siamo abitudinari. Gli stessi profili ricompaiono alle stesse ore, sempre negli stessi due o tre posti. Quella regolarita' e' leggibile, ma va trattata con un po' di attenzione.
+</p>
+
+<p>
+  Perche' c'e' un problema: tra un posto e l'altro ci si sposta, e avvistamenti presi in momenti diversi appartengono a luoghi diversi. Se li forzo tutti in una stima sola ottengo un <strong>punto fantasma</strong>, la media pesata tra casa e ufficio, un posto dove la persona non e' mai stata. La soluzione non e' buttare i dati che non tornano, e' <strong>raggrupparli</strong>. Cerco il punto che mette d'accordo piu' avvistamenti possibile, lo estraggo, e ripeto sui rimanenti. Ogni gruppo coerente e' un luogo abituale.
+</p>
+
+<div class="code-block" data-lang="python">
+<div class="code-wrap"><table><tbody>
+<tr><td class="ln">1</td><td class="code"><span class="kw">def</span> <span class="fn">luoghi</span>(avvistamenti):</td></tr>
+<tr><td class="ln">2</td><td class="code">    rimasti = [s <span class="kw">for</span> s <span class="kw">in</span> avvistamenti <span class="kw">if</span> s.distance_mi &lt; <span class="nb">100</span>]  <span class="cm"># via i Passport</span></td></tr>
+<tr><td class="ln">3</td><td class="code">    out = []</td></tr>
+<tr><td class="ln">4</td><td class="code">    <span class="kw">while</span> len(rimasti) &gt;= <span class="nb">2</span>:</td></tr>
+<tr><td class="ln">5</td><td class="code">        x = punto_che_massimizza_inlier(rimasti)   <span class="cm"># quanti anelli lo contengono</span></td></tr>
+<tr><td class="ln">6</td><td class="code">        inlier = [s <span class="kw">for</span> s <span class="kw">in</span> rimasti <span class="kw">if</span> dentro_fascia(x, s)]</td></tr>
+<tr><td class="ln">7</td><td class="code">        <span class="kw">if</span> len(inlier) &lt; <span class="nb">2</span>: <span class="kw">break</span></td></tr>
+<tr><td class="ln">8</td><td class="code">        out.append(stima(inlier))                  <span class="cm"># un luogo</span></td></tr>
+<tr><td class="ln">9</td><td class="code">        rimasti = [s <span class="kw">for</span> s <span class="kw">in</span> rimasti <span class="kw">if</span> s <span class="kw">not in</span> inlier]</td></tr>
+<tr><td class="ln">10</td><td class="code">    <span class="kw">return</span> out</td></tr>
+</tbody></table></div>
+</div>
+
+<p>
+  E' un RANSAC sequenziale. Gli avvistamenti serali finiscono in un gruppo, quelli diurni in un altro: <strong>casa</strong> e <strong>lavoro</strong> emergono separati, ognuno con il suo orario. E quando i luoghi diventano tre, quattro, non sai piu' solo "dove abita": sai dove vive. I posti che frequenta, le strade che collegano quei punti, le ore in cui c'e'. Una mappa delle sue abitudini, cioe' tutto quello che serve a qualcuno per aspettarla nel posto giusto.
+</p>
+
+
+<figure>
+  <img src="../immagini/tramonto-indirizzo/tool-scheda.png" alt="Scheda di un profilo nello scanner: due luoghi abituali rilevati con qualita' e fascia oraria (giorno = possibile lavoro), incertezza in metri. Nome, volto, coordinate e dati sensibili oscurati.">
+  <figcaption>La scheda di un profilo: due luoghi abituali, con qualita', incertezza in metri e fascia oraria ("di giorno: possibile lavoro/studio"). Nome, volto e coordinate oscurati.</figcaption>
+</figure>
+
+<!-- ===== 06 ===== -->
+<h2><span class="accent">//</span> Il Tramonto</h2>
+<span class="section-number">Sezione 06. L'ultimo pezzo</span>
+
+<p>
+  Restano poche centinaia di metri, nei casi migliori meno di cento. Un pugno di palazzi. Come si chiude il cerchio? Non con la matematica. Con una foto.
+</p>
+
+<p>
+  Scorrendo i profili raccolti, parecchi avevano foto scattate da casa: un balcone, una finestra, lo scorcio sul palazzo di fronte, un campo sportivo, una montagna riconoscibile sullo sfondo. Quando c'e' un dettaglio cosi', chiudere da "zona di poche centinaia di metri" a "quel palazzo" e' banale. Apri la mappa satellitare, cerchi il campo da calcio dentro il cerchio, e ci sei. Non serve essere esperti, servono tre minuti.
+</p>
+
+<p>
+  E qui c'e' il motivo per cui la gente si sente al sicuro, e sbaglia. Pensiamo che la foto venga vista un attimo, durante lo swipe, e poi sparisca. <strong>Non e' cosi'.</strong> Quella foto si scarica e si salva: quello che credi effimero diventa un file permanente, che qualcuno puo' riaprire con calma, ingrandire, studiare nello sfondo, mesi dopo. Il match dura un secondo. L'archivio no.
+</p>
+
+<div class="insight-box">
+  <p>A tradirti e' prima di tutto <strong>l'algoritmo</strong>: con qualche chiamata sei gia' nel tuo isolato, in parecchi casi a poche centinaia di metri. Il <strong>mosaico</strong> fa il resto e chiude il cerchio: la bio che nomina la palestra, l'universita' tra le foto, l'orario in cui sei sempre online, lo skyline dietro la spalla. Ogni pezzo, da solo, e' innocuo. La matematica ti mette nell'isolato; la foto ti mette al portone.</p>
+</div>
+
+<p>
+  Quel tramonto che hai sul profilo, bellissimo, con lo scorcio dietro: sommato a una zona larga poche centinaia di metri, e' la freccia che indica il portone. Guardalo di nuovo, prima di lasciarlo li'.
+</p>
+
+<!-- ===== 07 ===== -->
+<h2><span class="accent">//</span> Cosa Ho Imparato</h2>
+<span class="section-number">Sezione 07. I limiti, onesti</span>
+
+<p>
+  <strong>Tinder mitiga, non protegge.</strong> Quantizzazione, niente repliche dello stesso profilo, risposte offuscate: hanno ucciso il metodo del 2022, e non e' poco. Ma "piu' difficile" non e' "impossibile". Quelle contromisure si aggirano accumulando misure da direzioni diverse, e lo abbiamo fatto: 115 metri. Non e' una protezione, e' un rallentamento. Chi te lo vende come "sicuro" ti sta tranquillizzando, non difendendo.
+</p>
+
+<p>
+  <strong>Il muro del miglio non e' il pavimento.</strong> Lo credevo, mi sbagliavo. Una misura sola ti da' ±805 m, ma tante misure da direzioni diverse collassano la regione molto sotto: 115 metri, misurati. Piu' dati non rendono il risultato solo "affidabile", lo rendono piu' fine.</p>
+
+<p>
+  <strong>Piu' account non servono a granche'.</strong> Aiutano a misurare in fretta, non a battere la geometria. Il limite e' nei dati e nella loro distribuzione angolare, non negli strumenti.
+</p>
+
+<p>
+  <strong>La parte ironica</strong> e' questa: difendere una posizione e stimarla sono quasi lo stesso problema matematico. Le contromisure di una piattaforma e le tecniche per aggirarle sono parenti strette.
+</p>
+
+<p>
+  <strong>Il pericolo e' strutturale, non eccezionale.</strong> Non serve un genio che pedina una persona di notte. Basta una rete paziente che scheda una citta' intera, volto per volto, isolato per isolato, abitudine per abitudine. E quando quei dati esistono, basta che qualcuno con cattive intenzioni ci metta le mani. Per chi viene perseguitato, non e' teoria: e' la differenza tra "non mi trovera' mai" e "sa gia' dove aspettarmi".
+</p>
+
+<div class="conclusion-box">
+  <div class="quote">"Le difese ci sono. Non bastano. Se qualcuno vuole, ti trova: la zona di casa, il lavoro, le strade che fai, la faccia, gli orari. Mitigare non e' proteggere."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">Signal Pirate</p>
+</div>
+
+<h2><span class="accent">//</span> Come Non Farti Trovare</h2>
+<span class="section-number">Sezione 08. La parte pratica</span>
+
+<p>
+  Parliamo di Tinder, quindi niente illusioni: la difesa piu' ovvia, "nascondi la distanza", <strong>non ce l'hai</strong>. Non c'e' un interruttore per spegnere quel numero, e anche se l'interfaccia lo nascondesse, il valore continua a uscire nei dati. Quindi la vera difesa e' un'altra: controllare <strong>da dove</strong> trasmetti la posizione e <strong>cosa</strong> regali nel profilo.
+</p>
+
+<ul class="defense-list">
+  <li><strong>Non aprire l'app da casa o dal lavoro.</strong> La tua posizione viene trasmessa quando usi l'app: e' quella che gli altri vedono come distanza. Se la apri solo in posti neutri (un bar, il centro) la triangolazione converge li', non sul tuo portone. E nei permessi del telefono nega la posizione in background, lascia solo "mentre usi l'app", altrimenti la aggiorna lo stesso. E' l'unica leva che hai davvero sulla distanza.</li>
+  <li><strong>Non collegare gli account.</strong> Quello che colleghi (musica, social) puo' diventare pubblico nel profilo, spesso senza che tu te ne accorga.</li>
+  <li><strong>Pulisci la bio.</strong> Palestra, universita', quartiere, posto di lavoro: ognuno e' un tassello del mosaico.</li>
+  <li><strong>Guarda cosa c'e' dietro le tue foto</strong> prima di postarle: finestre, scorci, insegne, campi sportivi, palazzi riconoscibili.</li>
+  <li><strong>Ragiona col mosaico.</strong> Ogni dettaglio da solo e' niente. Sommati, sei tu.</li>
+</ul>
+
+</article>
+
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<script src="../js/main.js"></script>
+
+</body>
+</html>
