@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Numero Ti Riconosce | Signal Pirate</title>
+  <meta name="description" content="Riconoscimento facciale smontato: dall'hash percettivo all'embedding a 512 numeri. Perché su Instagram non puoi salvare le foto ma chiunque può salvare i vettori, e ritrovarti in mezzo a 412.000 volti. Matematica, caso Clearview, buco giuridico GDPR.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/il-numero-ti-riconosce.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Il Numero Ti Riconosce">
+  <meta property="og:description" content="Riconoscimento facciale smontato: dall&#x27;hash percettivo all&#x27;embedding a 512 numeri. Perché su Instagram non puoi salvare le foto ma chiunque può salvare i vettori, e ritrovarti in mezzo a 412.000 volti. Matematica, caso Clearview, buco giuridico GDPR.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/il-numero-ti-riconosce.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-05-29">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Il Numero Ti Riconosce">
+  <meta name="twitter:description" content="Riconoscimento facciale smontato: dall&#x27;hash percettivo all&#x27;embedding a 512 numeri. Perché su Instagram non puoi salvare le foto ma chiunque può salvare i vettori, e ritrovarti in mezzo a 412.000 volti. Matematica, caso Clearview, buco giuridico GDPR.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Il Numero Ti Riconosce","description":"Riconoscimento facciale smontato: dall'hash percettivo all'embedding a 512 numeri. Perché su Instagram non puoi salvare le foto ma chiunque può salvare i vettori, e ritrovarti in mezzo a 412.000 volti. Matematica, caso Clearview, buco giuridico GDPR.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-05-29","dateModified":"2026-05-29","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/il-numero-ti-riconosce.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+<!-- ======================== NAV ======================== -->
+<nav class="nav">
+  <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+  <ul class="nav-links">
+    <li><a href="../">Home</a></li>
+    <li><a href="../index.html#articoli">Articoli</a></li>
+    <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+  </ul>
+  <button id="theme-toggle" aria-label="Cambia tema">
+    <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </button>
+</nav>
+
+<!-- ======================== HEADER ======================== -->
+<header class="article-header">
+  <p class="article-meta">2026-05-29 | Pinperepette</p>
+  <h1 class="article-page-title">Il Numero <span class="accent">Ti Riconosce</span></h1>
+  <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+    Su Instagram non puoi salvare le foto. Ma nessuno ti vieta di salvare i numeri. Un volto diventa un punto in 512 dimensioni, e quel punto ti ritrova in mezzo a 412.000 facce. Dall'hash percettivo all'embedding, la matematica del riconoscimento facciale e il buco giuridico che ci sta dentro.
+  </p>
+  <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+    <span class="tag tag-attention">Face Embedding</span>
+    <span class="tag tag-highlight">FaceNet512</span>
+    <span class="tag tag-reaction">Clearview</span>
+    <span class="tag tag-amplification">GDPR Art. 9</span>
+  </div>
+</header>
+
+<!-- ======================== ARTICLE ======================== -->
+<article class="article-content">
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 01 - LA DOMANDA DEL ROSPO                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> «Tanto devi conoscermi»</h2>
+<span class="section-number">Sezione 01. La domanda del rospo</span>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/il-numero-ti-riconosce/papi-rospo.jpg" alt="L'autore e sua figlia, il rospo del male, in una via di un paese sul lago" style="max-width: 430px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Io e il rospo del male, un giorno sul lago. Due facce qualunque, una foto qualunque. Fra poche righe diventano numeri, e i numeri non si cancellano.</figcaption>
+</figure>
+
+<p>
+  Il rospo del male, mia figlia, venticinque anni, che mi chiama Papi e mi tratta come un reperto, ha letto <a href="il-tramonto-ha-un-indirizzo.html">il pezzo sulla trilaterazione delle app di incontri</a> e ha sentenziato: «Per fortuna io quelle app non le uso». Tono di chi ha appena vinto una discussione che non era cominciata.
+</p>
+
+<p>
+  Le ho detto che usa Instagram, e che Instagram è peggio. Mi ha guardato come si guarda un padre. Allora le ho aperto sul telefono una mappa con dei puntini: Milano, Parma, Formentera, la Costa Azzurra, le Seychelles del mese scorso. I suoi spostamenti, ricostruiti da sessantadue luoghi taggati nei suoi post pubblici. Non gliel'avevo chiesto. Era tutto lì, in chiaro.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/il-numero-ti-riconosce/mappa-spostamenti.jpg" alt="Mappa dei luoghi taggati nei post pubblici: decine di punti in tutta Europa e uno nell'Oceano Indiano" style="max-width: 880px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Sessantadue luoghi taggati nei suoi post pubblici: tutta Europa e un punto solitario nell'Oceano Indiano. A livello di città, ricostruiti senza chiedere niente a nessuno.</figcaption>
+</figure>
+
+<p>
+  «Vabbè, i posti dove sono stata. Ma devi <em>conoscermi</em>, Papi. Non è che mi vedi per strada e risali al mio profilo». Si è seduta sicura, gambe incrociate, l'aria di chi ha chiuso la discussione.
+</p>
+
+<p>
+  «Quindi mi stai dicendo che uno mi fotografa in metropolitana e trova il mio Instagram».<br>
+  «Esatto».<br>
+  «Ma dai, Papi. Non esiste».
+</p>
+
+<p>
+  Esiste. È esattamente ciò che oggi un estraneo qualsiasi può fare: una foto scattata per strada, e in mezzo secondo nome, profilo, e i sessantadue posti dove sei stata. Stanotte glielo dimostro. Non sto parlando di teoria: fra qualche ora una sua foto qualunque finirà dentro un archivio di centinaia di migliaia di volti, e il sistema tirerà fuori il suo profilo. Ma per arrivarci serve capire una cosa che sembra banale e non lo è: <strong>come fa un computer a dire che due facce sono la stessa faccia</strong>.
+</p>
+
+<div class="stats-row fade-in">
+  <div class="stat-card">
+    <div class="stat-number green" data-count="412741" data-suffix="">0</div>
+    <div class="stat-label">Volti raccolti in una notte scrapando Instagram</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number purple" data-count="512" data-suffix="">0</div>
+    <div class="stat-label">Numeri per descrivere una faccia</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number cyan">0.86</div>
+    <div class="stat-label">Similarità del match (su 1.0)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number red" data-count="48" data-suffix="">0</div>
+    <div class="stat-label">Sue foto ritrovate da una sola probe</div>
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 02 - L'HASH SBAGLIATO                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Hash Che Non Serve</h2>
+<span class="section-number">Sezione 02. Perché la crittografia qui fallisce</span>
+
+<p>
+  Primo tentativo, quello istintivo: calcolo l'<strong>hash</strong> delle due immagini e li confronto. SHA-256 prende un file e ne sputa 256 bit; se due file hanno lo stesso hash, sono lo stesso file. Ma SHA è fatto apposta per l'opposto di quello che mi serve: ha l'<strong>effetto valanga</strong>, cambi un solo bit e metà dell'output si ribalta. Ho preso una foto del rospo e l'ho ritoccata in sei modi banali, quelli che subisce ogni immagine su Instagram. Ecco gli SHA reali:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Ritocco</th>
+      <th>SHA-256 (primi 16 hex)</th>
+      <th>Distanza pHash</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>originale</td><td><code>43a820923c52dd70…</code></td><td>0</td></tr>
+    <tr><td>JPEG qualità 30</td><td><code>b3806e9e3cb88416…</code></td><td>0</td></tr>
+    <tr><td>ridimensionata 50%</td><td><code>819ca28fc81106c3…</code></td><td>0</td></tr>
+    <tr><td>ruotata 4°</td><td><code>9842c5e1dc042cf3…</code></td><td>6</td></tr>
+    <tr><td>ritagliata 8%</td><td><code>1de42eaf9335c776…</code></td><td>14</td></tr>
+    <tr><td>bianco e nero</td><td><code>c1110a4377309387…</code></td><td>0</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Sei hash completamente diversi: per SHA quelle sono sei immagini estranee, anche se a occhio sono la stessa foto. Basta che Instagram ricomprima il JPEG e l'hash non combacia più con niente. La crittografia risponde alla domanda sbagliata, «è lo stesso <em>file</em>?», quando a me serve «è la stessa <em>persona</em>?».
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 03 - L'HASH PERCETTIVO                             -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> L'Hash Che Perdona</h2>
+<span class="section-number">Sezione 03. pHash: la stessa immagine, non la stessa persona</span>
+
+<p>
+  La risposta a «è la stessa immagine?» si chiama <strong>hash percettivo</strong> (pHash). L'idea è ribaltare la logica di SHA: invece di esplodere a ogni minimo cambiamento, deve restare <em>stabile</em> finché l'immagine, per un occhio umano, è la stessa. La ricetta del pHash più diffuso:
+</p>
+
+<ol style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li>Riduci l'immagine a 32×32 pixel in scala di grigi. La compressione butta via i dettagli e tiene la struttura grossa.</li>
+  <li>Applica la <strong>DCT</strong> (Discrete Cosine Transform, la stessa trasformata che sta dentro il JPEG): scompone l'immagine in frequenze spaziali.</li>
+  <li>Tieni solo il blocco 8×8 in alto a sinistra, le frequenze più basse, cioè la forma generale, non il rumore.</li>
+  <li>Per ognuno dei 64 coefficienti: 1 se è sopra la mediana, 0 se sotto. Ecco 64 bit.</li>
+</ol>
+
+<p>
+  Due immagini si confrontano con la <strong>distanza di Hamming</strong>: quanti dei 64 bit differiscono. Convenzione comune: sotto i 10 bit, stessa immagine.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$d_H(a, b) = \sum_{i=1}^{64} \big[\,a_i \neq b_i\,\big]$$</div>
+  <p class="formula-label">Distanza di Hamming fra due pHash. ≤ 10 ⇒ stessa immagine.</p>
+</div>
+
+<p>
+  Torna alla tabella di prima, colonna destra. JPEG al 30%, ridimensionamento, perfino il bianco e nero: <strong>distanza 0</strong>. Il pHash non si accorge nemmeno. La rotazione di 4° costa 6 bit, il ritaglio dell'8% ne costa 14, e qui il pHash comincia a cedere, perché le trasformazioni <em>geometriche</em> spostano la struttura, non solo i colori. Questo è il limite che conta:
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>Il pHash riconosce la foto, non la persona.</strong> Se qualcuno ripubblica <em>quel preciso scatto</em>, lo ritrovi anche dopo recompressione. Ma se il rospo posta un'altra foto, stessa faccia, luce diversa, altro vestito, tre anni dopo, il pHash non c'entra niente: è un'immagine nuova, struttura diversa, distanza enorme. Per inseguire la <em>persona</em> e non il <em>file</em> serve salire di un piano. Serve un modello che guardi la faccia e non i pixel.</p>
+</div>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/il-numero-ti-riconosce/01_sha_vs_phash.png" alt="Confronto fra distanza pHash e bit diversi di SHA-256 sulla stessa foto sottoposta a sei ritocchi banali" style="max-width: 920px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Stessa foto, sei ritocchi. A sinistra il <strong>pHash</strong> (su 64 bit): resta a 0 con JPEG, ridimensionamento e bianco e nero, sale solo con rotazione (6) e ritaglio (14). A destra <strong>SHA-256</strong>: ogni ritocco ribalta circa metà dei 256 bit. La crittografia esplode, il percettivo regge. Numeri reali.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 04 - IL VOLTO COME PUNTO                           -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Volto Diventa Un Punto</h2>
+<span class="section-number">Sezione 04. L'embedding: 512 numeri</span>
+
+<p>
+  Il salto concettuale è del 2015, paper di Google: <em>FaceNet</em>. L'idea: addestrare una rete neurale a trasformare l'immagine di un volto in un <strong>vettore</strong>, una lista di numeri, con una regola sola. Due foto della <em>stessa</em> persona devono finire vicine nello spazio dei vettori; due foto di persone <em>diverse</em> devono finire lontane. Niente regole sui nasi e sulle distanze fra gli occhi: la rete impara da sola cosa rende un volto quel volto.
+</p>
+
+<p>
+  Lo strumento di addestramento è la <strong>triplet loss</strong>. Si prendono tre foto alla volta: un'ancora \(a\) (una faccia), un positivo \(p\) (stessa persona), un negativo \(n\) (un'altra persona). La rete viene spinta a fare in modo che l'ancora sia più vicina al positivo che al negativo, con un margine \(\alpha\):
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\mathcal{L} = \sum \Big[\; \lVert f(a) - f(p) \rVert^2 \;-\; \lVert f(a) - f(n) \rVert^2 \;+\; \alpha \;\Big]_+$$</div>
+  <p class="formula-label">f() è la rete. Avvicina te-a-te, allontana te-dagli-altri. Ripetuto su milioni di triplette.</p>
+</div>
+
+<p>
+  Dopo milioni di triplette, la rete \(f\) è una funzione che mangia un volto e restituisce un punto in uno spazio a molte dimensioni. Il modello che ho usato qui, <em>Facenet512</em>, erede diretto di quel paper, produce <strong>512 numeri</strong>.
+</p>
+
+<p>
+  Cosa vuol dire «512 dimensioni»? Immagina un foglio con due coordinate, X e Y: ogni punto è una coppia di numeri. Aggiungi una terza coordinata e sei nello spazio; una quarta, una quinta, e smetti di poterlo disegnare. Vai avanti fino a 512. Non c'è più niente da immaginare, ma la matematica non se ne accorge: ogni volto resta un punto, e di due punti puoi sempre misurare <em>quanto sono vicini</em>. Quella distanza è tutto. La vicinanza fra due volti si misura col <strong>coseno</strong> dell'angolo fra i loro vettori: 1.0 = identici, 0 = nessuna relazione.
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text visible">$$\cos(\theta) = \frac{\mathbf{u} \cdot \mathbf{v}}{\lVert \mathbf{u} \rVert \, \lVert \mathbf{v} \rVert}$$</div>
+  <p class="formula-label">Similarità coseno fra due embedding. Con vettori normalizzati, è solo il prodotto scalare.</p>
+</div>
+
+<p>
+  La differenza con il pHash è tutta qui: l'embedding è (in larga misura) <strong>invariante</strong> a luce, posa, taglio di capelli, qualche anno in più, una mascherina, un paio di occhiali. Non guarda i pixel: guarda l'identità che i pixel suggeriscono. È per questo che riconosce la persona dove il pHash vede solo due file diversi.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/il-numero-ti-riconosce/03_embedding_map.png" alt="Proiezione 2D t-SNE: 800 volti estranei come nuvola grigia, le 48 foto del rospo raggruppate in un cluster verde fitto e separato" style="max-width: 640px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Ogni volto è un punto in 512 dimensioni, qui schiacciato in 2D con t-SNE. In grigio 800 volti estranei presi a caso dal database, in verde le 48 foto del rospo. Epoche, pose e luci diverse, eppure cadono tutte nello stesso angolo: stessa identità, stesso punto.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 05 - ECCO COSA SALVO DI TE                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Ecco Cosa Salvo Di Te</h2>
+<span class="section-number">Sezione 05. La foto è loro, il numero è mio</span>
+
+<p>
+  Questo è il volto del rospo, dato in pasto a Facenet512. Non ti mostro la foto. Ti mostro quello che <em>resta</em> della foto dopo che la rete l'ha digerita, i primi 16 dei suoi 512 numeri:
+</p>
+
+<div class="formula-box fade-in">
+  <div class="formula-text" style="font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.8; word-break: break-word;">
+    [ 0.0543, 0.0581, 0.0636, 0.0111, 0.0540, 0.0247, −0.1136, 0.0087,<br>
+    &nbsp; 0.0523, −0.0649, 0.0307, 0.0025, −0.0276, −0.0274, −0.0094, −0.0546, … ]
+  </div>
+  <p class="formula-label">Vettore L2-normalizzato (norma 1.0), 512 componenti, valori in [−0.12, +0.13]. Questo è il rospo, secondo la macchina.</p>
+</div>
+
+<p>
+  Sembrano numeri innocui. Sono il punto più pericoloso dell'articolo, per un motivo che è giuridico prima che tecnico.
+</p>
+
+<div class="insight-box fade-in">
+  <p><strong>La foto resta loro, il numero diventa mio.</strong> Le condizioni di Instagram e il diritto d'autore proteggono <em>l'immagine</em>: non puoi scaricarla, ripubblicarla, rivenderla. Ma l'immagine io la cancello. Tengo questi 512 numeri, che non <em>sono</em> la foto: sono una misura estratta da essa. Il copyright protegge l'opera, non la misura. È un buco: aggiri il divieto di salvare le foto semplicemente non salvandole, salvi i vettori.</p>
+</div>
+
+<p>
+  Tranne che il buco si richiude da un'altra parte, e di colpo. Per il GDPR quel vettore, calcolato <em>al fine di identificare in modo univoco una persona</em>, è un <strong>dato biometrico</strong>: articolo 9, «categoria particolare». Il regime più severo che esista in Europa: vietato trattarlo salvo basi giuridiche strettissime, consenso esplicito in testa. Quindi la posizione di chi costruisce un database così è schizofrenica per legge: <em>grigia</em> dal lato copyright (non ho copiato nessuna opera), <em>nera</em> dal lato privacy (ho schedato la biometria di una persona). Lo stesso file di numeri, due rami del diritto che dicono il contrario.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 06 - TROVARTI TRA 412.741                          -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Trovarti In Mezzo A 412.741</h2>
+<span class="section-number">Sezione 06. La ricerca, e la dimostrazione</span>
+
+<p>
+  Avere il vettore di un volto è metà del lavoro. L'altra metà: data una faccia nuova, trovarla in un archivio di centinaia di migliaia. Confrontarla una a una con 412.741 vettori a ogni ricerca sarebbe lento. Si usa una struttura ad <strong>indice approssimato</strong> (HNSW: un grafo navigabile a più livelli): invece di guardare tutti, si <em>cammina</em> nel grafo verso i vicini sempre più simili, e si arriva ai più prossimi in millisecondi visitandone una manciata.
+</p>
+
+<p>
+  Ho un database personale di 412.741 volti, ognuno un vettore Facenet512, messo insieme in una notte raschiando profili Instagram pubblici. Che siano quattrocentomila o quaranta milioni cambia poco: la matematica è identica, scala soltanto la dimensione del pagliaio. Ho preso <strong>una</strong> foto qualsiasi del rospo, ne ho estratto il vettore, e ho cercato. Risultato reale, soglia di match a 0.6 di coseno:
+</p>
+
+<table class="strategy-table">
+  <thead>
+    <tr>
+      <th>Soglia coseno</th>
+      <th>Volti trovati</th>
+      <th>Profili distinti</th>
+      <th>Lettura</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>≥ 0.85</td><td>2</td><td><strong>1</strong></td><td>certezza assoluta, è lei</td></tr>
+    <tr><td>≥ 0.75</td><td>15</td><td><strong>1</strong></td><td>sempre e solo il suo profilo</td></tr>
+    <tr><td>≥ 0.60</td><td>50</td><td>3</td><td>48 lei + 2 sosia casuali</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Una foto sola, e ne escono <strong>48 sue</strong>, tutte dallo stesso account, con punteggi fino a 0.86. Non le ho cercate per nome: le ha trovate la geometria. E nel risultato, accanto a ogni match, c'è il <code>post_url</code> e l'<code>username</code>: dal numero si torna al profilo, e dal profilo al nome. Io qui ti mostro solo i numeri. Il ponte verso l'identità, però, è quei numeri.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/il-numero-ti-riconosce/face-search-demo.jpg" alt="Il motore di ricerca facciale in funzione: caricata una foto del rospo, restituisce le sue foto dal database con le percentuali di similarità" style="max-width: 860px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Il motore in funzione: carico una foto qualunque del rospo e in cima alla classifica escono le sue foto, pescate dalle 412.741. Ogni miniatura è lei, con la similarità accanto. Una probe, mezzo minuto.</figcaption>
+</figure>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/il-numero-ti-riconosce/02_match_distribution.png" alt="Distribuzione dei punteggi di similarità coseno dei primi 50 risultati: 48 dello stesso profilo in verde, 2 sosia in rosso vicino alla soglia 0.60" style="max-width: 920px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Una foto qualsiasi del rospo cercata fra 412.741 volti. Ogni pallino è un risultato, ordinato per similarità coseno. In verde le 48 foto dello stesso profilo, in rosso i 2 sosia casuali che entrano solo sfiorando la soglia 0.60. Sopra 0.75 il sistema non sbaglia profilo.</figcaption>
+</figure>
+
+<div class="insight-box fade-in">
+  <p><strong>I due sosia sono la lezione, non un errore.</strong> Sopra 0.75 il sistema è chirurgico: un solo profilo. Ma abbassando la soglia a 0.60 entrano due volti di persone diverse. È il <strong>trade-off</strong> di ogni sistema biometrico: alza la soglia e rischi di non riconoscere te stesso con la luce sbagliata (falso negativo); abbassala e cominci a confondere estranei (falso positivo). Non esiste una soglia «giusta»: esiste solo dove decidi di sbagliare. Clearview, la polizia, lo sblocco del telefono, ognuno taglia in un punto diverso della stessa curva.</p>
+</div>
+
+<p>
+  «Sì, vabbè, ma sbaglia». Certo che sbaglia. Non è magia: i falsi positivi esistono, i gemelli lo ingannano, una faccia sfocata o di tre quarti peggiora tutto. Ma il punto non è che sia perfetto. Il punto è che funziona <em>abbastanza</em> bene da girare già oggi negli aeroporti, nelle questure e nel telefono che sblocchi con la faccia. Per essere un problema non deve essere infallibile: deve solo essere abbastanza buono. E lo è.
+</p>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 07 - CLEARVIEW E LO SCARTO                         -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Non L'Ho Inventato Io</h2>
+<span class="section-number">Sezione 07. Clearview, e il grigio legale</span>
+
+<p>
+  Il mio database casalingo da 412.741 facce è un giocattolo. La versione industriale si chiama <strong>Clearview AI</strong>: oltre 30 miliardi di volti raschiati da social e siti pubblici, venduti come motore di ricerca facciale alle forze dell'ordine. Esattamente la stessa pipeline, volto → embedding → ricerca per similarità, moltiplicata per cinque ordini di grandezza. In Europa è stata multata a ripetizione: il Garante italiano, quello francese, quello greco, l'olandese, ognuno milioni di euro, proprio sull'articolo 9.
+</p>
+
+<p>
+  Lo scarto giuridico che li tiene in piedi è quello del rospo: scaricare dati <em>pubblici</em> è una zona grigia che negli USA una corte (<em>hiQ v. LinkedIn</em>) ha in parte tollerato, e «noi non conserviamo le foto, conserviamo vettori» è la difesa ricorrente. In Europa quella difesa non regge, il vettore biometrico è dato personale e basta, ma il fatto che la discussione esista dice tutto. E si lega al <a href="il-tramonto-ha-un-indirizzo.html">pezzo sulle app di incontri</a>: lì da una manciata di distanze si arrivava al quartiere; qui da una faccia per strada si arriva al profilo, e dal profilo, coi luoghi taggati, al quartiere. La mappa dei puntini del rospo l'ho ricostruita così: città, non indirizzi, ma da una sua foto al mare il resort esatto si trovava in due clic. Due vettori OSINT diversi che convergono sulla stessa persona.
+</p>
+
+<figure class="fade-in" style="text-align: center; margin: 2rem 0;">
+  <img src="../immagini/il-numero-ti-riconosce/seychelles-resort.jpg" alt="Vista satellitare del tratto di costa di un resort alle Seychelles, individuato a partire da una foto pubblica" style="max-width: 880px; width: 100%; border-radius: 12px; border: 1px solid var(--border-subtle);">
+  <figcaption style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.8rem;">Da una foto al mare al resort esatto, in due clic. Vista satellitare del punto, alle Seychelles. Coordinate rimosse di proposito: il punto è che si arriva qui, non dove esattamente.</figcaption>
+</figure>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 08 - COME PROTEGGERTI                              -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Come Proteggerti</h2>
+<span class="section-number">Sezione 08. Cosa puoi fare davvero</span>
+
+<p>
+  Non c'è un bottone che ti cancella dai vettori già estratti: una volta che la tua faccia è in un database così, è difficile uscirne. Ma la superficie d'attacco si riduce, e alcune contromisure sono reali.
+</p>
+
+<ul style="color: var(--text-secondary); line-height: 2.2; padding-left: 1.5rem;">
+  <li><strong>Profilo privato</strong>. Lo scraping di massa colpisce i profili pubblici. Un profilo chiuso non finisce nei dataset costruiti raschiando l'aperto. È la singola mossa che pesa di più.</li>
+  <li><strong>Meno volto frontale, nitido, in chiaro</strong>. L'embedding ha bisogno di un volto ben visibile. Foto di gruppo, di tre quarti, lontane, danno vettori più rumorosi e match più deboli.</li>
+  <li><strong>Perturbazioni avversarie</strong>. Strumenti come <em>Fawkes</em> (Università di Chicago, 2020) alterano la foto in modo invisibile all'occhio ma sufficiente a spostare l'embedding: la rete vede una «faccia» diversa. Non è infallibile e invecchia man mano che i modelli migliorano, ma alza il costo.</li>
+  <li><strong>Geolocalizzazione</strong>. Togli i tag di luogo, non postare in tempo reale da dove ti trovi, controlla cosa rivela lo sfondo. La faccia ti identifica, ma sono i metadati a dire <em>dove</em> sei.</li>
+  <li><strong>Consapevolezza</strong>. La più importante. Una foto pubblica non è «solo una foto»: è una riga in un indice biometrico che non sai chi tiene. Decidere cosa è pubblico con questo in testa è già metà della difesa.</li>
+</ul>
+
+
+<!-- ======================================================= -->
+<!-- SEZ. 09 - CONCLUSIONE                                   -->
+<!-- ======================================================= -->
+<h2><span class="accent">//</span> Il Numero Ti Riconosce</h2>
+<span class="section-number">Sezione 09. Conclusione</span>
+
+<p>
+  Ho girato il telefono verso il rospo. Una sua foto qualsiasi, e sotto la lista: 0.86, 0.86, 0.82… quarantotto righe, tutte lei, pescate da un mucchio di quasi mezzo milione di facce che non sapeva esistesse. «Non ti ho cercata», le ho detto. «Ti ha trovata la matematica. Una foto per strada bastava».
+</p>
+
+<p>
+  È rimasta zitta più a lungo del solito. Poi: «Quindi quello che mi dicevi delle app di incontri…». Vale anche per quella che usi ogni giorno, sì. Anzi peggio: l'app strana la scarichi apposta, Instagram lo guardi senza pensarci. La faccia non la cambi e non la fai privata. La foto la proteggono. Il numero che ne esce, no.
+</p>
+
+<p>
+  Su Instagram non puoi salvare le foto. Ma il numero che sei, quello lo salvano tutti. Non serve che qualcuno sappia chi sei: basta che ti abbia visto una volta. La foto dura un secondo, il vettore può durare per sempre. E il numero ti riconosce.
+</p>
+
+<div class="conclusion-box fade-in">
+  <div class="quote">"La foto è loro. Il numero è mio. E il numero pesa più della foto."</div>
+  <p style="color: var(--text-secondary); margin: 1rem 0 0;">
+    Facenet512, vettore a 512 dimensioni, distanza coseno. Database di 412.741 volti raccolti in una notte da profili pubblici.
+    Una probe → 48 match dallo stesso account, fino a 0.86 di similarità.
+    SHA-256 crolla a un pixel, il pHash regge la ricompressione ma non la persona, l'embedding regge la persona.
+    Il copyright protegge l'immagine; il GDPR Art. 9 protegge te. Lo stesso file di numeri.
+    Il rospo, per la prima volta, non aveva più niente da rispondere.
+  </p>
+  <p style="color: var(--text-secondary); margin: 0.5rem 0 0; font-family: var(--font-mono); font-size: 0.8rem;">
+    Signal Pirate
+  </p>
+</div>
+
+</article>
+
+<!-- ======================== FOOTER ======================== -->
+<footer class="footer">
+  <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+</footer>
+
+<!-- ======================== SCRIPTS ======================== -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '\\(', right: '\\)', display: false }
+      ],
+      throwOnError: false
+    });
+  });
+</script>
+<script src="../js/main.js"></script>
+
+</body>
+</html>
