@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Cartelle di lavoro servite raw da GitHub Pages (.nojekyll) ma senza valore SEO:
+# lab, demo, template, output di script. Niente canonical -> Google le marca
+# come "duplicati senza canonico" / "scansionate ma non indicizzate".
+Disallow: /scripts/
+Disallow: /output/
+
 Sitemap: https://pinperepette.github.io/signal.pirate/sitemap.xml
