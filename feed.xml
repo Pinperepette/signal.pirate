@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Quanto Grave per Finire su Hacker News</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/quanto-grave-per-finire-su-hn.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/quanto-grave-per-finire-su-hn.html</guid>
+    <pubDate>Sun, 31 May 2026 00:00:00 +0200</pubDate>
+    <description>Apro Hacker News e in cima c'e' rsync sotto accusa: Andrew Tridgell, l'uomo che ha inventato rsync nel 1996, committa con Claude come co-autore (28 commit recenti su 31 firmati "tridge and claude") e la folla grida al disastro con un titolo da spogliatoio: "Please Do Not Vibe Fuck Up This Software". Ma l'evento contestato non e' una CVE: sono regressioni funzionali nelle 3.4.2/3.4.3, gravita' di sicurezza zero. Lo tratto come un problema quantitativo, con dati raccolti il 31 maggio 2026 da fonti primarie interrogabili: GitHub API (~9.549 contributi attribuiti sul ramo master, ~177 contributori, ~30 anni di codice), NVD per le CVE, Hacker News Algolia API per l'engagement. Costruisco quattro metriche. Densita' storica di vulnerabilita' (CVE per commit), da non confondere con un tasso di errore: 0,31% su tutte le CVE, 0,063% sulle sole critiche, ovvero circa una CVE critica ogni 1.592 commit attribuiti (una densita' osservata, non una garanzia sul singolo commit: una CVE puo' dipendere da piu' commit o da codice vecchio). Indice di indignazione I = commenti HN / CVSS: 184,9 per xz-utils, 70,4 per Heartbleed, 50,3 per Log4Shell, e per rsync formalmente non definito (tende a infinito) perche' il denominatore e' zero. Gravita' implicita assegnata dalla folla: invertendo il tasso di cambio medio (~101,9 commenti per punto CVSS), i 403 commenti di rsync implicano una gravita' ~4/10 su un evento da 0/10, cioe' ~4 punti CVSS di puro rumore narrativo. Probabilita' di errore per singolo commit: sotto lo 0,2%. Confronto completo con xz-utils (4.549 punti, 1.849 commenti, CVSS 10), Heartbleed (1.768/528) e Log4Shell (1.385/503), con ID dei thread e endpoint API in chiaro. Tesi difendibile coi numeri e falsificabile: l'attenzione pubblica non e' una funzione della gravita' tecnica dell'errore, ma della narrativa. Note metodologiche oneste su CVSS come proxy, namespace CVE frammentati e snapshot di engagement.</description>
+  </item>
+
+  <item>
     <title>Il Numero Ti Riconosce</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-numero-ti-riconosce.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-numero-ti-riconosce.html</guid>

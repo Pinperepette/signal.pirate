@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quanto Deve Essere Grave un Errore per Finire su Hacker News? | Signal Pirate</title>
+  <meta name="description" content="Apro Hacker News e in cima c'e' rsync sotto accusa: Andrew Tridgell, che ha inventato rsync nel 1996, committa con Claude come co-autore e la folla grida al disastro. Ma l'evento contestato non e' una CVE: sono regressioni funzionali, gravita' di sicurezza zero. Lo tratto come un problema quantitativo. Dati reali via GitHub API (~9.549 contributi, ~177 contributori, 30 anni), NVD e Hacker News Algolia API. Quattro metriche: densita' storica di vulnerabilita' (0,063% di CVE critiche per commit), indice di indignazione (commenti HN / CVSS, che per rsync e' formalmente non definito e tende a infinito), gravita' implicita assegnata dalla folla (~4/10 su un evento da 0/10), probabilita' di errore per commit. Confronto con xz-utils (4.549 punti), Heartbleed (1.768) e Log4Shell (1.385). Tesi difendibile con numeri: l'attenzione pubblica non e' una funzione della gravita' tecnica.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .formula-box .frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      margin: 0 0.3em;
+    }
+    .formula-box .frac > span:first-child {
+      border-bottom: 1px solid var(--accent-highlight);
+      padding: 0 0.4em 0.1em;
+    }
+    .formula-box .frac > span:last-child {
+      padding: 0.1em 0.4em 0;
+    }
+
+    /* === Indignation Bars === */
+    .indignation-chart {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .indignation-chart .bar-row {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+    .indignation-chart .bar-label {
+      width: 8rem;
+      color: var(--text-secondary);
+      text-align: right;
+      margin-right: 0.8rem;
+      flex-shrink: 0;
+    }
+    .indignation-chart .bar {
+      height: 1.1rem;
+      border-radius: 3px;
+      transition: width 0.3s;
+      min-width: 2px;
+    }
+    .indignation-chart .bar-value {
+      margin-left: 0.6rem;
+      color: var(--text-primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Sources === */
+    .sources-list {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+    .sources-list li { margin-bottom: 0.6rem; }
+    .sources-list a { color: var(--accent-highlight); word-break: break-all; }
+
+    /* === Chart Container === */
+    .chart-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .chart-container canvas {
+      max-height: 380px;
+    }
+    .chart-caption {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.8rem;
+      line-height: 1.5;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/quanto-grave-per-finire-su-hn.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Quanto Deve Essere Grave un Errore per Finire su Hacker News?">
+  <meta property="og:description" content="rsync sotto accusa perche' Tridgell committa con Claude. Ma l'evento non e' una CVE: gravita' zero. Lo tratto coi numeri: ~9.549 contributi, indice di indignazione non definito (tende a infinito), gravita' implicita ~4/10 su un evento da 0/10. Dati reali via GitHub API, NVD, Hacker News Algolia API.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/quanto-grave-per-finire-su-hn.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-05-31">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Quanto Deve Essere Grave un Errore per Finire su Hacker News?">
+  <meta name="twitter:description" content="rsync sotto accusa perche' Tridgell committa con Claude. Ma l'evento non e' una CVE: gravita' zero. Lo tratto coi numeri: indice di indignazione non definito (tende a infinito) su un evento da 0/10. Dati reali via GitHub API, NVD, HN Algolia API.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Quanto Deve Essere Grave un Errore per Finire su Hacker News?","description":"Analisi quantitativa del caso rsync/Claude: l'attenzione pubblica non e' una funzione della gravita' tecnica. Dati reali via GitHub API, NVD, Hacker News Algolia API.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-05-31","dateModified":"2026-05-31","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/quanto-grave-per-finire-su-hn.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-05-31 | Pinperepette</p>
+    <h1 class="article-page-title">Quanto Deve Essere Grave un Errore <span class="accent">per Finire su Hacker News?</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      rsync &egrave; diventato il caso simbolo del dibattito sull'uso degli LLM nello sviluppo software: Andrew Tridgell, che lo ha scritto nel 1996, committa con un'AI. L'evento per&ograve; non &egrave; una CVE: gravit&agrave; di sicurezza zero. Invece di discuterne, lo misuro. Dati reali via GitHub API, NVD e Hacker News Algolia API. Quattro metriche, una domanda scomoda.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Hacker News</span>
+      <span class="tag tag-highlight">rsync / Claude</span>
+      <span class="tag tag-reaction">CVSS</span>
+      <span class="tag tag-amplification">Sociologia del software</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL FATTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Prima Pagina</h2>
+    <span class="section-number">Sezione 00. Una non-falla in cima alla classifica</span>
+
+    <p>Apro Hacker News. In cima c'&egrave; rsync, sotto un titolo poco diplomatico: <em>"Please Do Not Vibe Fuck Up This Software"</em>. 391 punti, 324 commenti. Pi&ugrave; in basso il gemello, <em>"Rsync 3.4.3 has hundreds of Claude commits"</em>: altri 112 punti, 79 commenti. In totale, <strong>~503 punti e ~403 commenti</strong> in poche ore.</p>
+
+    <p>Al centro c'&egrave; <strong>Andrew Tridgell</strong>. S&igrave;, <em>quel</em> Tridgell: quello che ha inventato l'algoritmo rsync durante un dottorato, quello che ha reverse-engineerato il protocollo di BitKeeper nella vicenda da cui &egrave; poi nato Git, quello che ha scritto met&agrave; della roba che gira sulla tua macchina senza che tu lo sappia (Samba, tanto per dirne una). Da quando &egrave; tornato a metterci mano, committa con Claude come co-autore. Su 31 commit recenti, <strong>28 firmati "tridge and claude"</strong>: il 90%. Tre righe di metadati in un commit, e parte la discussione.</p>
+
+    <p>Intanto, regressioni nelle 3.4.2 e 3.4.3: backup incrementali che si rompono, carico CPU anomalo, downstream (Timeshift, Void) che aprono issue. Da qui la conclusione diffusa: <em>"rsync &egrave; vibe-coded, siamo finiti."</em></p>
+
+    <p>C'&egrave; un solo dettaglio, e su quel dettaglio si regge tutto:</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Nessuna di quelle regressioni &egrave; una CVE.</strong> Sono bug funzionali, non buchi di sicurezza. La gravit&agrave; dell'evento che ha riempito quei due thread, misurata con lo stesso metro che usiamo per tutto il resto (CVSS), &egrave; <strong>zero</strong>. Tienilo l&igrave;: tutto quello che segue gira intorno a questo numero.</p>
+    </div>
+
+    <p>La domanda non &egrave; "l'AI fa bene o male al codice". Quella &egrave; materia da commenti, non analisi. La domanda che mi interessa &egrave; un'altra:</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>L'attenzione su un errore &egrave; proporzionale al danno tecnico che quell'errore fa davvero?</strong> Se s&igrave;, i numeri si allineano. Se no, abbiamo misurato qualcosa di preciso: che l'attenzione non segue necessariamente la gravit&agrave; tecnica.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - I DATI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Dati, Verificati</h2>
+    <span class="section-number">Sezione 01. Niente aggettivi, solo conteggi</span>
+
+    <p>Niente opinioni, per un po'. Solo numeri, raccolti il <strong>31 maggio 2026</strong> da fonti interrogabili: GitHub API per il progetto, NVD per le vulnerabilit&agrave;, Hacker News Algolia API per l'engagement. Gli endpoint esatti sono in fondo, cos&igrave; chiunque pu&ograve; rifare i conti.</p>
+
+    <h3 style="font-family: var(--font-mono); color: var(--accent-amplification); font-size: 0.95rem; margin-top: 2rem;">Il progetto rsync</h3>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Metrica</th><th>Valore</th><th>Fonte</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Prima release</td><td><strong>19 giugno 1996</strong></td><td>TR-CS-96-05, ANU</td></tr>
+        <tr><td>Et&agrave; del codice</td><td><strong>&asymp; 30 anni</strong></td><td>(29,95 al mag 2026)</td></tr>
+        <tr><td>Contributi attribuiti (&asymp; commit, master)</td><td><strong>&asymp; 9.549</strong></td><td>GitHub API</td></tr>
+        <tr><td>Contributori (identit&agrave; distinte)</td><td><strong>&asymp; 177</strong></td><td>GitHub API</td></tr>
+        <tr><td>Top contributor (W. Davison, 2002&ndash;2024)</td><td>~4.822 commit</td><td>GitHub API</td></tr>
+        <tr><td>Commit recenti co-firmati con Claude</td><td><strong>28 / 31 (~90%)</strong></td><td>commit log, mag 2026</td></tr>
+      </tbody>
+    </table>
+
+    <p>Un dettaglio sul conteggio, perch&eacute; il numero va preso per quello che &egrave;: 9.549 &egrave; la somma del campo <code>contributions</code> restituito dall'API GitHub su tutte le identit&agrave; del ramo <code>master</code>. &Egrave; il totale dei <em>contributi attribuiti</em>, che approssima i commit ma non &egrave; garantito coincidere col conteggio esatto del repository: pu&ograve; escludere commit non collegati a un'identit&agrave; o aggregare pi&ugrave; email della stessa persona (Davison ha due handle). Siamo comunque nell'ordine delle 9&ndash;10 mila unit&agrave;, e nessuna delle metriche che seguono cambia se il numero vero &egrave; 9.200 o 9.800.</p>
+
+    <h3 style="font-family: var(--font-mono); color: var(--accent-amplification); font-size: 0.95rem; margin-top: 2rem;">Le CVE</h3>
+
+    <p>Qui c'&egrave; un'ambiguit&agrave; onesta da dichiarare subito: il conteggio esatto delle CVE di rsync <em>dipende da come conti</em>. I database usano namespace frammentati (<code>andrew_tridgell:rsync</code>, <code>samba:rsync</code>, <code>rsync:rsync</code>), quindi una stessa query d&agrave; numeri diversi. La ricerca per parola chiave su NVD restituisce 69 risultati (ma include software terzi che <em>menzionano</em> rsync); il match per CPE stretto ne d&agrave; pochissimi. Una stima difendibile, attribuibile a rsync <em>il software</em>, &egrave; <strong>~25&ndash;30 CVE in 30 anni</strong>, di cui una manciata (<strong>~5&ndash;8</strong>) di classe critica/RCE.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>CVE</th><th>Anno</th><th>CVSS</th><th>Tipo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>CVE-2024-12084</td><td>2024</td><td><strong>9.8</strong></td><td>Heap overflow &rarr; RCE (batch gen 2025)</td></tr>
+        <tr><td>CVE-2007-6200</td><td>2007</td><td>10.0</td><td>Bypass access control via symlink</td></tr>
+        <tr><td>CVE-2007-6199</td><td>2007</td><td>9.3</td><td>Symlink in daemon scrivibile</td></tr>
+        <tr><td>CVE-2003-0962</td><td>2003</td><td>n/d</td><td>Heap overflow &rarr; RCE</td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-size: 0.82rem; color: var(--text-secondary);">Nota sui punteggi: le CVE del 2007 usano <strong>CVSS v2</strong> (CVE-2007-6200 = 10.0, vettore <code>AV:N/AC:L/Au:N/C:C/I:C/A:C</code>, fonte primaria NVD), mentre CVE-2024-12084 = 9.8 &egrave; <strong>CVSS v3.1</strong>. Le due versioni non sono direttamente confrontabili; per il ragionamento conta solo l'ordine di grandezza, e sono tutte vulnerabilit&agrave; gravi.</p>
+
+    <div class="insight-box fade-in">
+      <p>Il punto chiave per tutto ci&ograve; che segue: <strong>l'evento che ha scatenato Hacker News non &egrave; in questa tabella.</strong> Non c'&egrave;. Non gli &egrave; stata assegnata alcuna CVE. La sua gravit&agrave; di sicurezza misurata &egrave; 0.</p>
+    </div>
+
+    <h3 style="font-family: var(--font-mono); color: var(--accent-amplification); font-size: 0.95rem; margin-top: 2rem;">I thread di confronto</h3>
+
+    <p>Per calibrare cosa significhi "grave" servono i casi-limite veri, le vulnerabilit&agrave; che hanno davvero terrorizzato l'industria, col loro engagement sul thread di disclosure principale. Numeri presi uno a uno dall'Algolia API, con l'ID del thread:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Caso</th><th>CVE</th><th>CVSS</th><th>Punti HN</th><th>Commenti HN</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>xz-utils backdoor</td><td>CVE-2024-3094</td><td>10.0</td><td><strong>4.549</strong></td><td><strong>1.849</strong></td></tr>
+        <tr><td>Heartbleed</td><td>CVE-2014-0160</td><td>~7.5</td><td>1.768</td><td>528</td></tr>
+        <tr><td>Log4Shell</td><td>CVE-2021-44228</td><td>10.0</td><td>1.385</td><td>503</td></tr>
+        <tr><td><strong>rsync / Claude</strong></td><td><em>(nessuna)</em></td><td><strong>&asymp; 0</strong></td><td>~503</td><td>~403</td></tr>
+      </tbody>
+    </table>
+
+    <div class="chart-container fade-in">
+      <canvas id="engagement-bar-chart"></canvas>
+      <p class="chart-caption">Engagement grezzo su Hacker News. xz-utils domina, ma rsync (CVSS ~0) sta nello stesso ordine di grandezza di Heartbleed e Log4Shell per commenti. Per rsync, punti = somma dei due thread.</p>
+    </div>
+
+    <p>Gi&agrave; a occhio qualcosa stona: una non-vulnerabilit&agrave; ha generato l'80% dei commenti di Log4Shell (403 contro 503) e i tre quarti di quelli di Heartbleed (528), pur avendo gravit&agrave; di sicurezza zero. Ma "a occhio" non basta. Vediamo se i numeri confermano l'impressione.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number cyan">9.549</div>
+        <div class="stat-label">Contributi (&asymp; commit)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">~30</div>
+        <div class="stat-label">Anni di et&agrave;</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">~177</div>
+        <div class="stat-label">Contributori</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">0</div>
+        <div class="stat-label">CVE dall'evento HN</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - METRICA 1
+         ============================================================ -->
+    <h2><span class="accent">//</span> Metrica 1: Densit&agrave; Storica di Vulnerabilit&agrave;</h2>
+    <span class="section-number">Sezione 02. CVE per commit, non "tasso di errore"</span>
+
+    <p>Definiamo la <em>densit&agrave; di vulnerabilit&agrave;</em> come rapporto tra CVE e volume di lavoro prodotto. Un avvertimento sul nome, perch&eacute; conta: <strong>questo non &egrave; un "tasso di errore" in senso stretto</strong>. Una CVE pu&ograve; nascere da pi&ugrave; commit, da una feature intera o da codice scritto anni prima, quindi non esiste una corrispondenza pulita uno-a-uno tra vulnerabilit&agrave; e commit. &Egrave; un rapporto CVE/commit, una densit&agrave;, e la chiamo per quello che &egrave;:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Densit&agrave; storica di vulnerabilit&agrave; (CVE per commit)</span>
+      D =
+      <span class="frac"><span>CVE</span><span>commit totali</span></span>
+    </div>
+
+    <p>Con tutte le CVE (prendiamo ~30, generosi) sui 9.549 commit:</p>
+
+    <div class="formula-box">
+      D =
+      <span class="frac"><span>30</span><span>9.549</span></span>
+      &asymp; 0,00314 = <strong style="color:var(--accent-attention)">0,31%</strong>
+    </div>
+
+    <p>Se restringiamo alle sole critiche/RCE (~6):</p>
+
+    <div class="formula-box">
+      D<sub>crit</sub> =
+      <span class="frac"><span>6</span><span>9.549</span></span>
+      &asymp; 0,00063 = <strong style="color:var(--accent-attention)">0,063%</strong>
+    </div>
+
+    <p>In pratica significa <strong>una CVE critica ogni 1.592 commit attribuiti</strong> (1 / 0,00063). &Egrave; una <em>densit&agrave; osservata</em>, non una garanzia sul singolo commit: non significa che il 99,94% dei commit sia "sicuro", perch&eacute; una CVE pu&ograve; dipendere da pi&ugrave; commit o da codice scritto anni prima. Resta comunque un tasso bassissimo, su un software che regge praticamente ogni sistema di backup del pianeta: NAS, mirror di distribuzioni, server personali.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - METRICA 2
+         ============================================================ -->
+    <h2><span class="accent">//</span> Metrica 2: Indice di Indignazione</h2>
+    <span class="section-number">Sezione 03. Commenti per unit&agrave; di gravit&agrave; reale</span>
+
+    <p>Trasformiamo il rumore in una frazione. Quanta discussione genera un caso <em>per unit&agrave; di gravit&agrave; tecnica reale</em>? CVSS come proxy della gravit&agrave;, commenti come proxy dell'attenzione:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Indice di indignazione</span>
+      I =
+      <span class="frac"><span>commenti HN</span><span>CVSS</span></span>
+    </div>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Caso</th><th>Commenti</th><th>CVSS</th><th>I = commenti / punto CVSS</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>xz-utils</td><td>1.849</td><td>10.0</td><td><strong>184,9</strong></td></tr>
+        <tr><td>Heartbleed</td><td>528</td><td>7.5</td><td><strong>70,4</strong></td></tr>
+        <tr><td>Log4Shell</td><td>503</td><td>10.0</td><td><strong>50,3</strong></td></tr>
+        <tr><td><strong>rsync / Claude</strong></td><td>403</td><td><strong>&asymp; 0</strong></td><td><strong style="color:var(--accent-reaction)">non def. (&rarr; &infin;)</strong></td></tr>
+      </tbody>
+    </table>
+
+    <div class="indignation-chart fade-in">
+      <div class="bar-row"><span class="bar-label">xz-utils</span><div class="bar" style="width:74%;background:#4ecdc4"></div><span class="bar-value">184,9</span></div>
+      <div class="bar-row"><span class="bar-label">Heartbleed</span><div class="bar" style="width:28%;background:#4ecdc4"></div><span class="bar-value">70,4</span></div>
+      <div class="bar-row"><span class="bar-label">Log4Shell</span><div class="bar" style="width:20%;background:#4ecdc4"></div><span class="bar-value">50,3</span></div>
+      <div class="bar-row"><span class="bar-label">rsync / Claude</span><div class="bar" style="width:100%;background:linear-gradient(90deg,#ff6b6b,#7c4dff)"></div><span class="bar-value">&infin;</span></div>
+    </div>
+
+    <p>Qui salta fuori un caso limite: per rsync il denominatore &egrave; zero. L'indice &egrave; <strong>formalmente non definito</strong>, e tende all'infinito se assumiamo CVSS&rarr;0&#8314;. In pratica, 403 commenti su una gravit&agrave; di sicurezza nulla. Il rapporto attenzione/impatto non &egrave; nemmeno confrontabile con gli altri casi, perch&eacute; il denominatore tende a zero e qualsiasi numeratore positivo lo manda all'infinito.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - METRICA 3
+         ============================================================ -->
+    <h2><span class="accent">//</span> Metrica 3: La Gravit&agrave; <em>Implicita</em></h2>
+    <span class="section-number">Sezione 04. Che voto avrebbe dato la folla, se fosse stata coerente</span>
+
+    <p>Possiamo ribaltare il ragionamento. Tra le vulnerabilit&agrave; <em>vere</em>, qual &egrave; il "tasso di cambio" medio tra gravit&agrave; e commenti?</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Tasso di cambio medio (CVE reali)</span>
+      I&#772; =
+      <span class="frac"><span>184,9 + 70,4 + 50,3</span><span>3</span></span>
+      &asymp; 101,9 commenti / punto CVSS
+    </div>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);">Un avvertimento prima di proseguire: &egrave; una metrica euristica costruita su <strong>tre soli eventi estremi</strong>, non una stima statistica dell'intero ecosistema di Hacker News. Serve a dare un ordine di grandezza, non &egrave; una legge.</p>
+
+    <p>Ora invertiamo. Dati i ~403 commenti di rsync, <strong>quale gravit&agrave; avrebbe dovuto avere</strong> per giustificarli, al tasso di cambio del mercato?</p>
+
+    <div class="formula-box">
+      CVSS<sub>implicito</sub> =
+      <span class="frac"><span>403</span><span>101,9</span></span>
+      &asymp; <strong style="color:var(--accent-reaction)">3,95</strong>
+    </div>
+
+    <p>La folla si &egrave; comportata come se rsync avesse una vulnerabilit&agrave; di gravit&agrave; <strong>~4/10</strong>. La gravit&agrave; misurata &egrave; <strong>0/10</strong>. Lo scarto tra l'attenzione espressa e la sostanza tecnica equivale a <strong>circa 4 punti CVSS nella metrica proposta</strong>, a fronte di una gravit&agrave; reale pari a zero.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Nell'economia dell'attenzione, la narrativa pu&ograve; contare pi&ugrave; della severit&agrave; tecnica.</strong> "L'autore di rsync usa l'AI" &egrave; un titolo che si commenta da solo. "Heap overflow nel parsing di <code>s2length</code>" &egrave; soltanto la cosa che pu&ograve; davvero aprire una shell sulla macchina. In questo caso i commenti sembrano seguire pi&ugrave; il tema della discussione che la gravit&agrave; tecnica dell'evento.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - METRICA 4
+         ============================================================ -->
+    <h2><span class="accent">//</span> Metrica 4: Probabilit&agrave; per Singolo Commit</h2>
+    <span class="section-number">Sezione 05. Una frazione minuscola del lavoro</span>
+
+    <p>Mettiamoci nei panni del maintainer. Qual &egrave; la probabilit&agrave; che un suo commit qualsiasi introduca un disastro? Con ~6 errori critici distribuiti su ~9.549 commit in 30 anni (semplificando: imputiamo ogni vulnerabilit&agrave; a un singolo commit, un'approssimazione generosa <em>verso l'accusa</em>):</p>
+
+    <div class="formula-box">
+      <span class="formula-name">P(errore critico | commit)</span>
+      P =
+      <span class="frac"><span>6</span><span>9.549</span></span>
+      &asymp; 0,00063 = <strong style="color:var(--accent-attention)">0,063%</strong>
+    </div>
+
+    <p>Circa <strong>6 commit su diecimila</strong>. E ricordiamo che l'evento di maggio 2026 non rientra nemmeno nel numeratore: &egrave; una regressione funzionale, non una vulnerabilit&agrave;. Se contiamo <em>anche</em> quella manciata di regressioni memorabili come "errori gravi" (diciamo ~16 episodi in 30 anni):</p>
+
+    <div class="formula-box">
+      P<sub>tot</sub> =
+      <span class="frac"><span>16</span><span>9.549</span></span>
+      &asymp; <strong style="color:var(--accent-attention)">0,17%</strong>
+    </div>
+
+    <p>In entrambi i casi siamo abbondantemente <strong>sotto lo 0,2% per commit</strong>. La domanda diventa difficile da evitare: stiamo giudicando un ingegnere, quello che ha <em>inventato</em> l'algoritmo che usiamo tutti, per una frazione minuscola degli esiti osservabili associati ai suoi contributi?</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - LA TESI
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Tesi, in una Riga</h2>
+    <span class="section-number">Sezione 06. Quello che abbiamo misurato</span>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">0,063%</div>
+        <div class="stat-label">CVE critiche / commit</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">1 : 1.592</div>
+        <div class="stat-label">Commit per CVE critica</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">&infin;</div>
+        <div class="stat-label">Indice di indignazione</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">~4/10</div>
+        <div class="stat-label">Gravit&agrave; implicita (reale: 0)</div>
+      </div>
+    </div>
+
+    <p>Non sto sostenendo che usare un LLM nel codice sia una buona idea. La preoccupazione per un LLM che mette le mani su infrastruttura critica &egrave; legittima, e se domani salta fuori una CVE da quell'ondata di commit la tesi cade: il denominatore di <code>I</code> smette di essere zero e l'analisi va rifatta. Ma finch&eacute; quel numero resta zero, quello che misuriamo non &egrave; un problema di sicurezza: &egrave; uno scarto tra l'attenzione ricevuta e la gravit&agrave; tecnica dell'evento.</p>
+
+    <div class="chart-container fade-in">
+      <canvas id="severity-scatter-chart"></canvas>
+      <p class="chart-caption">Gravit&agrave; tecnica (CVSS) contro attenzione (commenti HN). I tre casi reali stanno a destra, dove la gravit&agrave; &egrave; alta. rsync &egrave; il punto rosso a CVSS 0: nello stesso ordine di grandezza di Log4Shell e Heartbleed per commenti, con gravit&agrave; di sicurezza nulla.</p>
+    </div>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">"Un evento senza impatto di sicurezza documentato ha generato un'attenzione comparabile a vulnerabilit&agrave; che hanno coinvolto milioni di sistemi. Se questo sia razionale, lo decida chi legge."</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+        Su Hacker News si discute spesso di qualit&agrave; del software. Pi&ugrave; di rado si prova a misurare il rapporto tra il contributo complessivo e il singolo errore.
+      </p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - NOTE METODOLOGICHE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Limiti e Onest&agrave; Metodologica</h2>
+    <span class="section-number">Sezione 07. Dove scricchiola</span>
+
+    <p>Un pezzo che si vanta di essere rigoroso deve mostrare da dove perde acqua. Eccolo. Niente di tutto questo ribalta la conclusione: muove i decimali, non la direzione. Se vuoi smontarmi, parti da qui, non dai commenti.</p>
+
+    <div class="warning-box fade-in">
+      <p>
+        <strong>1. CVSS come proxy di gravit&agrave;</strong> comprime impatto, sfruttabilit&agrave; e diffusione in un solo numero. &Egrave; imperfetto, ma &egrave; lo standard condiviso, e meglio di un aggettivo.<br><br>
+        <strong>2. Conteggio CVE ambiguo:</strong> i namespace frammentati fanno oscillare il totale tra ~20 e ~69 a seconda della query. Ho usato una stima conservativa (~30); cambiarla del &plusmn;50% non sposta gli ordini di grandezza.<br><br>
+        <strong>3. CVSS di Heartbleed:</strong> CVE-2014-0160 &egrave; antecedente al CVSS v3.1; NVD ne riporta ufficialmente solo il v2 (base 5.0). Il 7.5 che uso &egrave; la stima v3 comunemente citata. Anche con 5.0, l'indice di Heartbleed salirebbe a 105,6 e non cambierebbe la tesi.<br><br>
+        <strong>4. Punti e commenti HN sono uno snapshot</strong> e dipendono dall'algoritmo di ranking, dal fuso orario, dalla fortuna. Confronto thread di disclosure principali, non l'intera copertura.<br><br>
+        <strong>5. Commit &ne; righe &ne; rischio.</strong> Un commit di un carattere e uno che riscrive il protocollo pesano uguale nel conteggio. &Egrave; un proxy grezzo del "volume di lavoro".<br><br>
+        <strong>6. "Gravit&agrave; &asymp; 0" per rsync/Claude &egrave; vero al momento.</strong> Nessuna CVE &egrave; stata attribuita all'ondata di commit AI. Se ne emergesse una, l'analisi va rifatta. &Egrave; il punto: la tesi &egrave; falsificabile.
+      </p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - FONTI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Fonti dei Dati</h2>
+    <span class="section-number">Sezione 08. Tutto verificabile, tutto datato 2026-05-31</span>
+
+    <p><strong>Progetto rsync (GitHub API)</strong></p>
+    <ul class="sources-list">
+      <li>Repository: <a href="https://github.com/RsyncProject/rsync" target="_blank" rel="noopener">github.com/RsyncProject/rsync</a></li>
+      <li>Commit totali e contributori (somma del campo <code>contributions</code>, ~9.549 su ~177 identit&agrave;): <a href="https://api.github.com/repos/RsyncProject/rsync/contributors?per_page=100&amp;anon=true" target="_blank" rel="noopener">api.github.com/repos/RsyncProject/rsync/contributors?per_page=100&amp;anon=true</a></li>
+      <li>Commit recenti co-firmati "tridge and claude" (28/31): <a href="https://github.com/RsyncProject/rsync/commits/master/" target="_blank" rel="noopener">github.com/RsyncProject/rsync/commits/master/</a></li>
+    </ul>
+
+    <p><strong>Storia e prima release</strong></p>
+    <ul class="sources-list">
+      <li>A. Tridgell, P. Mackerras, <em>The rsync algorithm</em>, Technical Report TR-CS-96-05, Australian National University, giugno 1996.</li>
+      <li>Wikipedia, <em>rsync</em>: prima release 19 giugno 1996; W. Davison maintainer dal 2002; rientro di Tridgell nello sviluppo (aprile 2024).</li>
+    </ul>
+
+    <p><strong>Vulnerabilit&agrave; (NVD + CERT/CC)</strong></p>
+    <ul class="sources-list">
+      <li>NVD, ricerca per parola chiave (69 risultati, include software terzi): <a href="https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=rsync" target="_blank" rel="noopener">services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=rsync</a></li>
+      <li>CERT/CC VU#952657, batch di 6 CVE rsync (gennaio 2025), tra cui CVE-2024-12084 (CVSS 9.8): <a href="https://kb.cert.org/vuls/id/952657" target="_blank" rel="noopener">kb.cert.org/vuls/id/952657</a></li>
+      <li>CVSS dei casi di confronto da NVD: CVE-2024-3094 = 10.0; CVE-2021-44228 = 10.0; CVE-2014-0160 = 5.0 (v2) / ~7.5 (stima v3).</li>
+    </ul>
+
+    <p><strong>Engagement Hacker News (Algolia API: <code>hn.algolia.com/api/v1/items/&lt;id&gt;</code>)</strong></p>
+    <ul class="sources-list">
+      <li>rsync: "Please Do Not Vibe Fuck Up This Software" (391 pt, 324 cmt), item <a href="https://news.ycombinator.com/item?id=48342705" target="_blank" rel="noopener">48342705</a></li>
+      <li>rsync: "Rsync 3.4.3 has hundreds of Claude commits" (112 pt, 79 cmt), item <a href="https://news.ycombinator.com/item?id=48334021" target="_blank" rel="noopener">48334021</a></li>
+      <li>xz-utils: "Backdoor in upstream xz/liblzma leading to SSH server compromise" (4.549 pt, 1.849 cmt, 2024-03-29), item <a href="https://news.ycombinator.com/item?id=39865810" target="_blank" rel="noopener">39865810</a></li>
+      <li>Heartbleed: "The Heartbleed Bug" (1.768 pt, 528 cmt, 2014-04-07), item <a href="https://news.ycombinator.com/item?id=7548991" target="_blank" rel="noopener">7548991</a></li>
+      <li>Log4Shell: "Log4j RCE Found" (1.385 pt, 503 cmt, 2021-12-09), item <a href="https://news.ycombinator.com/item?id=29504755" target="_blank" rel="noopener">29504755</a></li>
+    </ul>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. La frase fa una storia migliore del bug.</p>
+      <div class="footer-links">
+        <a href="../">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/charts/quanto-grave-charts.js"></script>
+</body>
+</html>
