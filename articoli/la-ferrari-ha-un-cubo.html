@@ -247,7 +247,7 @@
     <p>Il primo pezzo, la potenza per vincere l'aria, e' il cattivo della storia. Non cresce dritto con la velocita': cresce col suo <strong>cubo</strong>. (Per i pignoli, e fanno bene: la forza aerodinamica va col quadrato della velocita', ma la potenza per vincerla, quella che ti svuota la batteria, va col cubo. E' la potenza che conta, qui.)</p>
 
     <div class="formula-box">
-      <span class="formula-name">la resistenza dell'aria</span>
+      <span class="formula-name">Potenza resistente all'aria</span>
       P_aria = ½ &middot; &rho; &middot; Cx &middot; A &middot; v&sup3;
     </div>
 
@@ -256,7 +256,7 @@
     <p>Il secondo pezzo, le gomme, cresce in modo lineare con la velocita': raddoppi l'andatura, raddoppia il contributo. Niente cubo, e infatti pesa in citta' ma alle alte velocita' lo schiaccia l'aria.</p>
 
     <div class="formula-box">
-      <span class="formula-name">la resistenza al rotolamento</span>
+      <span class="formula-name">Potenza resistente al rotolamento</span>
       P_gomme = Crr &middot; m &middot; g &middot; v
     </div>
 
@@ -265,6 +265,7 @@
     <div class="formula-box">
       <span class="formula-name">quanto arrivi lontano</span>
       Autonomia = v &middot; ( E_utile / P_totale )
+      <span style="display:block; font-family:var(--font-sans); font-size:0.72rem; color:var(--text-secondary); margin-top:0.7rem; letter-spacing:0;">con v in km/h, E in kWh e P in kW, il risultato e' in km</span>
     </div>
 
     <p>Tutto qui. Nessun segreto industriale: le stesse identiche formule che descrivono la Luce descrivono un Ape Piaggio. La differenza la fanno i numeri che ci infili dentro. E i numeri, a volte, raccontano una storia diversa da quella della pubblicita'.</p>
@@ -307,7 +308,8 @@
           <tr><td>Rendimento powertrain</td><td class="r">74%</td><td class="r">84%</td></tr>
         </tbody>
       </table>
-      <p class="muted" style="font-size:.85rem; margin-top:.3rem">Non sono due misure della stessa auto: sono due <strong>insiemi di assunzioni</strong> usati per stressare il modello e vedere quanto cambiano i risultati. Non una previsione, ma due estremi plausibili. La realta' sta probabilmente nel mezzo.</p>
+      <p class="muted" style="font-size:.82rem; margin-top:.3rem">L'area <strong>2,46 m²</strong> e' la stima geometrica standard (circa 0,8 &times; larghezza 1,999 m &times; altezza 1,544 m), il <strong>2,30 m²</strong> e' l'ipotesi favorevole.</p>
+      <p class="muted" style="font-size:.85rem; margin-top:.5rem">Non sono due misure della stessa auto: sono due <strong>insiemi di assunzioni</strong> usati per stressare il modello e vedere quanto cambiano i risultati. Non una previsione, ma due estremi plausibili. La realta' sta probabilmente nel mezzo.</p>
       <p style="margin-top:1rem; font-family:var(--font-mono); font-weight:700; color:var(--accent-attention); text-align:center; font-size:1.05rem; line-height:1.5">Abbiamo provato a tirare i parametri da entrambe le parti.<br>I numeri si muovono. Il cubo resta dov'e'.</p>
       <p style="margin-top:1rem">Il <strong>74%</strong> non e' buttato li': e' la scomposizione 0,84 &times; 0,92 &times; 0,96 (carica/scarica batteria &times; azionamento elettronico &times; motore), con lo 0,84 della batteria gia' di per se' conservativo. Se i chilometri cambiano ma l'<strong>ordine di grandezza resta</strong>, la conclusione e' robusta rispetto alle ipotesi: e infatti e' cosi'. In piu' separo <strong>"carica piena"</strong> (tutto il pacco, ~110 kWh) da <strong>"tratta 10-80%"</strong> (tra due ricariche, ~77 kWh). <span style="color:var(--text-secondary)">Nel simulatore l'area e' fissa al valore favorevole e muovi solo il rendimento; qui lo scenario prudenziale alza anche l'aerodinamica.</span></p>
     </div>
@@ -365,7 +367,7 @@
         <tr><td style="color:var(--accent-reaction)">310 km/h</td><td class="r">292-352 kW</td><td class="r" style="color:var(--accent-reaction)">95-117 km</td><td class="r">68-82 km</td></tr>
       </tbody>
     </table>
-    <p class="muted" style="color: var(--text-secondary); font-size: 0.82rem;">Ogni cella e' un intervallo tra i due scenari: estremo basso = <strong>prudenziale</strong> (area 2,46 m², rendimento 74%), estremo alto = <strong>favorevole</strong> (area 2,30 m², rendimento 84%). "Carica piena" usa tutto il pacco (~110 kWh), "tratta 10-80%" e' quanto percorri tra due ricariche (~77 kWh). Cx 0,254 dichiarato; l'area frontale e' stimata dalle dimensioni (la Luce e' larga 2,0 m e alta 1,54 m).</p>
+    <p class="muted" style="color: var(--text-secondary); font-size: 0.82rem;">Ogni cella e' un intervallo tra i due scenari: estremo basso = <strong>prudenziale</strong> (area 2,46 m², rendimento 74%), estremo alto = <strong>favorevole</strong> (area 2,30 m², rendimento 84%). "Carica piena" usa tutto il pacco (~110 kWh), "tratta 10-80%" e' quanto percorri tra due ricariche (~77 kWh). Cx 0,254 dichiarato; l'area frontale e' stimata: <strong>2,46 m²</strong> e' la stima geometrica standard (circa 0,8 &times; larghezza 1,999 m &times; altezza 1,544 m), <strong>2,30 m²</strong> e' l'ipotesi favorevole.</p>
 
     <p>Leggi la tabella e fermati un attimo. Passando da 130 a 310 la velocita' sale del 138 per cento, ma l'autonomia crolla di circa il 75 per cento. E succede pure col Cx da record: l'aria non guarda il listino. Curiosita': a 310 servono dalla batteria circa 290-350 kW (a seconda dello scenario), ben sotto i 772 di picco. Vuol dire che non e' la potenza il limite, e' prima il calore e poi la batteria che si svuota. A 310 km/h, secondo questa simulazione, la carica piena si esaurisce in circa 19-23 minuti (stima del modello, non un dato ufficiale Ferrari).</p>
 
@@ -529,7 +531,7 @@
             <tr><td>Rimac Nevera</td><td class="num">120 / 107</td><td class="num">2150</td><td class="num">0,30</td><td class="num">2,10</td><td class="num">500 kW</td><td class="num">400 kW</td></tr>
           </tbody>
         </table>
-        <p class="muted" style="margin-top:.7rem">L'area frontale non e' dichiarata dalle case: e' stimata dalle dimensioni (per la Luce, 2,0 m di larghezza × 1,54 m di altezza &rarr; ~2,3 m²). La potenza di ricarica della Nevera (500 kW) nel calcolo e' capata a 350 kW per realismo infrastrutturale. I valori possono ballare un po' tra le fonti: l'auto e' nuova.</p>
+        <p class="muted" style="margin-top:.7rem">L'area frontale non e' dichiarata dalle case. La stima geometrica standard (circa 0,8 × larghezza 1,999 m × altezza 1,544 m) da' <strong>~2,46 m²</strong>; il simulatore usa il valore favorevole <strong>2,30 m²</strong>, mentre nell'articolo lo scenario prudenziale sale a 2,46. La potenza di ricarica della Nevera (500 kW) nel calcolo e' capata a 350 kW per realismo infrastrutturale. I valori possono ballare un po' tra le fonti: l'auto e' nuova.</p>
 
         <h3 style="margin-top:1.4rem">Cosa il modello NON fa</h3>
         <ul style="list-style:disc; margin:.3rem 0 0 1.3rem; color:var(--muto); font-size:.85rem; line-height:1.8;">
