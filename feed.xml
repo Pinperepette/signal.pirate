@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Cubo Che Si Mangia Le Batterie</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/la-ferrari-ha-un-cubo.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/la-ferrari-ha-un-cubo.html</guid>
+    <pubDate>Wed, 03 Jun 2026 00:00:00 +0200</pubDate>
+    <description>La Ferrari Luce fa rumore: 1035 cv, 122 kWh, 550 mila euro e mezzo internet che ne discute il design. Ma la fisica e' democratica: la potenza per vincere l'aria cresce col cubo della velocita' (la forza va col quadrato, la potenza per vincerla col cubo). Tutto parte da un post di Vincent Vega sull'autonomia della Luce, e ne nasce un articolo a quattro mani con un modello fisico documentato (resistenza aerodinamica ½·rho·Cx·A·v^2, rotolamento, pendenza, recupero in discesa, ausiliari, perdite di sistema) e un simulatore interattivo. I numeri: a 310 km/h, col Cx ufficiale da record 0,254, la carica piena si esaurisce in una ventina di minuti; e in efficienza pura (km per kWh) la Luce arriva terza, dietro Tesla Model S Plaid e Taycan Turbo GT. Niente numero secco: due scenari coerenti, prudenziale (area frontale 2,46 m^2, rendimento 74%) e favorevole (2,30 m^2, 84%), per stressare il modello. Risultato: i numeri si muovono, il cubo resta dov'e'. Il simulatore (puro HTML/JS, nessun backend) confronta Ferrari Luce, Tesla Plaid, Taycan Turbo GT e Rimac Nevera sullo stesso percorso, con mappa Leaflet, slider per velocita', temperatura, vento, passeggeri e rendimento, classifica con badge separati per efficienza e tempo, e una gara animata da Milano a Roma fino a Barcellona. Dati pubblici, area frontale stimata, tutto dichiaratamente ipotetico.</description>
+  </item>
+
+  <item>
     <title>Quanto Grave per Finire su Hacker News</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/quanto-grave-per-finire-su-hn.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/quanto-grave-per-finire-su-hn.html</guid>

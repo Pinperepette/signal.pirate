@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Cubo Che Si Mangia Le Batterie | Signal Pirate</title>
+  <meta name="description" content="La Ferrari Luce fa rumore: 550 mila euro, 1035 cv, 122 kWh. Ma la fisica e' democratica. Due formule e la potenza per vincere l'aria che cresce col cubo della velocita': a 310 km/h la Luce dura una ventina di minuti, in efficienza la batte una Tesla, e su tratte lunghe il tempo di ricarica mangia il vantaggio. Simulatore interattivo incluso. Dati pubblici, tutto ipotetico.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box { background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05)); border-left: 3px solid var(--accent-highlight); border-radius: 0 10px 10px 0; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .warning-box { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05)); border-left: 3px solid var(--accent-reaction); border-radius: 0 10px 10px 0; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+    .warning-box p { margin: 0; line-height: 1.6; }
+    .section-number { display: block; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin: 2rem 0; }
+    .stat-card { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 1.2rem; text-align: center; }
+    .stat-number { font-family: var(--font-mono); font-weight: 800; font-size: 1.8rem; }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label { font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.3rem; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; }
+    .strategy-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 1.5rem 0; }
+    .strategy-table th { background: var(--bg-tertiary); padding: 0.9rem 1rem; text-align: left; font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-attention); border-bottom: 2px solid var(--accent-attention); }
+    .strategy-table td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border-subtle); line-height: 1.5; }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .strategy-table td.r { text-align: right; font-family: var(--font-mono); }
+    .formula-box { background: var(--bg-tertiary); border: 1px solid rgba(124,77,255,0.3); border-radius: 10px; padding: 1.5rem 2rem; margin: 1.5rem 0; text-align: center; font-family: var(--font-mono); font-size: 1.05rem; color: var(--accent-highlight); line-height: 2.2; }
+    .formula-box .formula-name { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-secondary); display: block; margin-bottom: 0.5rem; }
+    .conclusion-box { background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08)); border: 1px solid rgba(0,255,136,0.2); border-radius: 12px; padding: 2rem; margin: 2rem 0; text-align: center; }
+    .conclusion-box .quote { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: var(--accent-attention); line-height: 1.4; }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: rgba(0,255,136,0.08); padding: 0.15em 0.4em; border-radius: 4px; color: var(--accent-attention); }
+    .sim-frame { width: 100%; height: 880px; border: 1px solid rgba(124,77,255,0.3); border-radius: 12px; margin: 1.5rem 0; background: #070708; box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+    .cube-chart { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 2rem 1.8rem; margin: 2.5rem 0; }
+    .cube-chart h4 { font-family: var(--font-mono); font-size: 1.25rem; color: var(--accent-reaction); margin: 0 0 1.6rem; text-align: center; letter-spacing: 0.02em; }
+    .cube-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.1rem; }
+    .cube-row .lbl { width: 92px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-secondary); text-align: right; flex: none; }
+    .cube-row .track { flex: 1; background: var(--bg-tertiary); border-radius: 8px; height: 38px; overflow: hidden; }
+    .cube-row .barf { height: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 12px; font-family: var(--font-mono); font-weight: 800; font-size: 0.9rem; color: #fff; white-space: nowrap; }
+    .cube-cap { text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-top: 1.2rem; font-family: var(--font-mono); }
+    .cube-legend { display:flex; gap:1.6rem; justify-content:center; margin-bottom:1.5rem; font-family:var(--font-mono); font-size:0.74rem; color:var(--text-secondary); flex-wrap:wrap; }
+    .cube-legend span { display:inline-flex; align-items:center; gap:0.45rem; }
+    .cube-legend i { width:13px; height:13px; border-radius:3px; display:inline-block; }
+    .cube2 { display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem; }
+    .cube2 .lbl { width:80px; text-align:right; font-family:var(--font-mono); font-size:0.85rem; color:var(--text-secondary); flex:none; }
+    .cube2 .bars { flex:1; display:flex; flex-direction:column; gap:6px; }
+    .cube2 .brow { display:flex; align-items:center; gap:0.7rem; }
+    .cube2 .track { flex:1; background:var(--bg-tertiary); border-radius:6px; height:24px; overflow:hidden; }
+    .cube2 .barf { height:100%; border-radius:6px; }
+    .cube2 .val { width:88px; font-family:var(--font-mono); font-weight:700; font-size:0.8rem; color:var(--text-primary); flex:none; }
+    .cmpchart { background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 1.8rem; margin: 1.5rem 0; }
+    .cmpchart h4 { font-family: var(--font-mono); font-size: 1.05rem; color: var(--text-primary); margin: 0 0 0.3rem; text-align: center; }
+    .cmpchart .sub { text-align: center; color: var(--text-secondary); font-size: 0.76rem; font-family: var(--font-mono); margin-bottom: 1.5rem; }
+    .cmp-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.9rem; }
+    .cmp-row .nm { width: 165px; font-size: 0.82rem; flex: none; font-weight: 600; }
+    .cmp-row .track { flex: 1; background: var(--bg-tertiary); border-radius: 6px; height: 26px; overflow: hidden; }
+    .cmp-row .barf { height: 100%; border-radius: 6px; }
+    .cmp-row .val { width: 44px; text-align: right; font-family: var(--font-mono); font-weight: 800; font-size: 0.9rem; color: var(--text-primary); flex: none; }
+    @media(max-width:640px){ .cmp-row .nm{width:110px; font-size:0.74rem} }
+    .sources-list { list-style: none; padding: 0; margin: 1rem 0; }
+    .sources-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.88rem; }
+    .sources-list a { color: var(--accent-amplification); text-decoration: none; }
+    .sources-list a:hover { text-decoration: underline; }
+    .sources-list .cat { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-right: 0.6rem; }
+    .xcard { display:block; text-decoration:none; border:1px solid var(--border-subtle); border-radius:14px; padding:1.1rem 1.3rem; margin:1.6rem 0; background:var(--bg-secondary); transition:border-color .2s; max-width:540px; }
+    .xcard:hover { border-color:var(--accent-amplification); }
+    .xcard .top { display:flex; align-items:center; gap:.7rem; margin-bottom:.7rem; }
+    .xcard .av { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#7c4dff,#36e0d0); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-family:var(--font-mono); flex:none; }
+    .xcard .nm { font-weight:700; color:var(--text-primary); line-height:1.1; }
+    .xcard .hd { color:var(--text-secondary); font-size:.85rem; }
+    .xcard .xlogo { margin-left:auto; font-weight:800; font-size:1.2rem; color:var(--text-primary); }
+    .xcard .body { color:var(--text-primary); font-size:.95rem; line-height:1.55; }
+    .xcard .cta { color:var(--accent-amplification); font-size:.85rem; margin-top:.8rem; display:inline-block; font-family:var(--font-mono); }
+  </style>
+
+  <!-- Dipendenze del simulatore inline -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ===== Race Lab, widget inline, si adatta a tema chiaro e scuro ===== */
+    .racelab{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:radial-gradient(900px 400px at 50% -120px, rgba(255,30,30,.10), transparent 60%), var(--bg-primary);
+      color:var(--text-primary); line-height:1.55; border:1px solid var(--border-subtle); border-radius:16px; padding:8px 22px 28px; margin:1.5rem 0;
+      --rosso:#ff1e1e; --bordo:var(--border-subtle); --muto:var(--text-secondary); --giallo:var(--accent-yellow); --ciano:var(--accent-amplification); --panel:var(--bg-secondary); --inset:var(--bg-tertiary); }
+    .racelab *{box-sizing:border-box; margin:0; padding:0}
+    .racelab .wrap{max-width:100%; margin:0; padding:0}
+    .racelab section{margin:32px 0}
+    .racelab h2{font-size:1.3rem; margin-bottom:6px; display:flex; align-items:center; gap:12px; font-weight:800; color:var(--text-primary); border:0}
+    .racelab h2::before{content:""; width:6px; height:24px; background:var(--rosso); border-radius:4px}
+    .racelab h3{font-size:1rem; margin:0 0 12px; color:var(--text-primary)}
+    .racelab .lead{color:var(--muto); margin-bottom:20px; max-width:860px}
+    .racelab .card{background:var(--panel); border:1px solid var(--bordo); border-radius:16px; padding:22px}
+    .racelab .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    @media(max-width:860px){.racelab .grid2{grid-template-columns:1fr}}
+    .racelab #map{height:340px; border-radius:14px; border:1px solid var(--bordo); z-index:0}
+    .racelab label.fld{display:block; font-size:.78rem; color:var(--muto); text-transform:uppercase; letter-spacing:.08em; margin:0 0 6px}
+    .racelab select{width:100%; background:var(--inset); border:1px solid var(--bordo); color:var(--text-primary); border-radius:10px; padding:11px 12px; font-size:.95rem}
+    .racelab .veh-toggle{display:flex; flex-direction:column; gap:10px}
+    .racelab .veh{display:flex; align-items:center; gap:12px; background:var(--inset); border:1px solid var(--bordo); border-radius:12px; padding:12px 14px; cursor:pointer; transition:border-color .2s}
+    .racelab .veh:hover{border-color:var(--rosso)}
+    .racelab .veh.on{border-color:var(--carcol)}
+    .racelab .veh .dot{width:14px; height:14px; border-radius:50%; background:var(--carcol); flex:none}
+    .racelab .veh .nm{font-weight:700}
+    .racelab .veh .sp{color:var(--muto); font-size:.8rem; margin-left:auto; text-align:right}
+    .racelab .veh input{accent-color:var(--rosso)}
+    .racelab .slider{margin-bottom:16px}
+    .racelab .slider label{display:flex; justify-content:space-between; font-size:.84rem; color:var(--muto); margin-bottom:7px}
+    .racelab .slider label .val{color:var(--ciano); font-weight:700}
+    .racelab input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:6px; background:var(--inset); outline:none}
+    .racelab input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--rosso); cursor:pointer; border:2px solid #fff}
+    .racelab .toggle{display:flex; align-items:center; gap:10px; font-size:.9rem; color:var(--text-primary); cursor:pointer; margin-bottom:16px}
+    .racelab .toggle input{width:18px; height:18px; accent-color:var(--rosso)}
+    .racelab .btn{display:inline-block; background:var(--rosso); color:#fff; border:none; padding:13px 24px; border-radius:12px; font-weight:800; font-size:1rem; cursor:pointer; transition:transform .15s}
+    .racelab .btn:hover{transform:translateY(-2px)}
+    .racelab table{width:100%; border-collapse:collapse; font-size:.92rem; margin:0}
+    .racelab th,.racelab td{text-align:left; padding:11px 12px; border-bottom:1px solid var(--bordo)}
+    .racelab th{color:var(--muto); font-weight:600; font-size:.74rem; text-transform:uppercase; letter-spacing:.06em; background:transparent}
+    .racelab td.num{text-align:right; font-variant-numeric:tabular-nums; font-weight:700; color:var(--text-primary)}
+    .racelab .badge-win{display:inline-block; font-size:.64rem; padding:2px 8px; border-radius:20px; margin-left:5px; background:rgba(245,197,24,.16); color:var(--accent-rejection); border:1px solid rgba(245,197,24,.4)}
+    .racelab .badge-first{background:rgba(54,224,208,.16); color:var(--accent-amplification); border-color:rgba(54,224,208,.4)}
+    .racelab .badge-eff{background:rgba(0,255,136,.16); color:var(--accent-attention); border-color:rgba(0,255,136,.4)}
+    .racelab .chart-box{position:relative; height:300px}
+    .racelab .chart-cap{font-size:.8rem; color:var(--muto); margin-top:10px; text-align:center}
+    .racelab .race-track{display:flex; flex-direction:column; gap:18px; margin-top:10px}
+    .racelab .lane .head{display:flex; justify-content:space-between; font-size:.85rem; margin-bottom:6px}
+    .racelab .lane .head b{color:var(--text-primary)}
+    .racelab .lane .head .st{color:var(--muto)}
+    .racelab .bar{position:relative; height:30px; background:var(--inset); border:1px solid var(--bordo); border-radius:16px; overflow:hidden}
+    .racelab .bar .fill{position:absolute; left:0; top:0; bottom:0; width:0%; border-radius:16px}
+    .racelab .bar .car{position:absolute; top:50%; transform:translate(-50%,-50%); font-size:1.15rem; left:0%}
+    .racelab .bar .finish{position:absolute; right:6px; top:50%; transform:translateY(-50%); font-size:.9rem; opacity:.5}
+    .racelab .note{background:rgba(245,197,24,.10); border-left:3px solid var(--accent-yellow); padding:13px 18px; border-radius:10px; font-size:.88rem; color:var(--text-primary); margin-top:18px}
+    .racelab .note b{color:var(--accent-rejection)}
+    .racelab .muted{color:var(--muto); font-size:.82rem}
+    .leaflet-container{background:var(--inset)}
+  </style>
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/la-ferrari-ha-un-cubo.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Il Cubo Che Si Mangia Le Batterie">
+  <meta property="og:description" content="550 mila euro, 1035 cv, 122 kWh. Ma la fisica e' democratica: la potenza per vincere l'aria cresce col cubo della velocita'. A 310 km/h la Luce dura una ventina di minuti, in efficienza la batte una Tesla, e su tratte lunghe il tempo di ricarica mangia il vantaggio. Simulatore incluso.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/la-ferrari-ha-un-cubo.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="article:published_time" content="2026-06-03">
+  <meta property="article:author" content="Andrea Amani">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Il Cubo Che Si Mangia Le Batterie">
+  <meta name="twitter:description" content="La fisica e' democratica. Due formule e i numeri da brochure della Ferrari Luce si sgonfiano. Simulatore interattivo incluso.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Il Cubo Che Si Mangia Le Batterie","description":"550 mila euro, 1035 cv, 122 kWh. Ma la fisica e' democratica: la potenza per vincere l'aria cresce col cubo della velocita'. A 310 km/h la Luce dura una ventina di minuti, in efficienza la batte una Tesla, e su tratte lunghe il tempo di ricarica mangia il vantaggio.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-06-03","dateModified":"2026-06-03","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/la-ferrari-ha-un-cubo.html"},"inLanguage":"it-IT"}
+  </script>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-06-03 | <a href="https://x.com/VinnieVegaPF" target="_blank" rel="noopener" style="color:var(--accent-amplification)">Vincent Vega (@VinnieVegaPF)</a> e Pinperepette</p>
+    <h1 class="article-page-title">Il Cubo Che Si Mangia <span class="accent">Le Batterie</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1.2rem; color: var(--text-primary); margin-top: 1.3rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.9;">
+      <strong style="color: var(--accent-attention)">La fisica e' democratica.</strong><br>
+      La Ferrari Luce e' solo il caso di studio.<br>
+      Il cubo non fa sconti a nessuno.
+    </p>
+    <p style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-secondary); margin-top: 1.2rem; max-width: 680px; margin-left: auto; margin-right: auto;">
+      La Ferrari Luce come scusa per parlare di una legge che vale per tutti. Due formule, un simulatore e un po' di conti fatti per davvero. Tutto ipotetico, dati raccolti in giro.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Fisica spicciola</span>
+      <span class="tag tag-highlight">v al cubo</span>
+      <span class="tag tag-reaction">Dati pubblici</span>
+      <span class="tag tag-amplification">Simulatore</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <h2><span class="accent">//</span> Raga, Ho Fatto Una Cosa</h2>
+    <span class="section-number">Sezione 00. Il trigger</span>
+
+    <p>E' uscita la Ferrari Luce, la prima Ferrari elettrica: 1035 cavalli, 0 a 100 in due secondi e mezzo, 122 kWh, 550 mila euro, disegno di Jony Ive. E poi il finimondo: linea massacrata, meme a valanga, titolo in borsa giu', mezzo paddock a dire la sua. La cronaca della polemica la trovate ovunque, non sto qui a rifarvela.</p>
+
+    <p>Una battuta sola me la tengo, perche' me la godo: Carlo Calenda l'ha definita "un insulto estetico e tecnologico per chi ama la Ferrari". Che, tra l'altro, e' probabilmente l'unica cosa detta da Calenda su cui mi sia mai trovato d'accordo.</p>
+
+    <p>Per il resto, i gusti sono soggettivi: bella o brutta, fate voi. A me della linea interessa poco. Io sono qui per i numeri, e i numeri, a differenza dei social, non sanno se una macchina e' bella.</p>
+
+    <p>Il fatto e' che i numeri da brochure sono come le foto su Instagram: veri, ma scattati nel momento migliore con la luce giusta. E a me piace controllare. Non perche' la Ferrari sia una truffa, ci mancherebbe, ma perche' c'e' una cosa bellissima della fisica: non gliene frega niente di quanto costi la macchina. Le leggi del moto sono le stesse per la Luce da mezzo milione e per la Panda di tua zia.</p>
+
+    <p>Tutto e' partito da <a href="https://x.com/VinnieVegaPF" target="_blank" rel="noopener">Vincent Vega</a>: aveva fatto due conti sull'autonomia della Luce, ci siamo scritti, e questo pezzo e' venuto fuori un po' a quattro mani. I suoi parametri di rendimento da una parte, il mio simulatore dall'altra. Da li' la voglia di provare scenari diversi, cambiare le ipotesi e mettere la Luce a confronto con altri veicoli.</p>
+
+    <a class="xcard" href="https://x.com/VinnieVegaPF/status/2061738035897581839" target="_blank" rel="noopener">
+      <img src="../immagini/ferrari-cubo/vincent-vega-luce.png" alt="Post di Vincent Vega (@VinnieVegaPF): a 140 km/h, con batteria da 122 kWh lordi, nel ciclo autostradale tipico 10-80%, la Ferrari Luce ha un'autonomia teorica di 225 km, con il motore che eroga solo 38 dei 772 kW disponibili." style="width:100%; border-radius:10px; display:block;">
+      <span class="cta">Leggi il post originale su X &rarr;</span>
+    </a>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il rendimento, spiegato da <a href="https://x.com/VinnieVegaPF" target="_blank" rel="noopener">Vincent</a>.</strong> Per passare dai kW "alle ruote" a quelli che tiri davvero dalla batteria si divide per il rendimento complessivo del powertrain: 0,84 (carica/scarica batteria) &times; 0,92 (azionamento elettronico) &times; 0,96 (motore) = <strong>0,74</strong>. Col suo conto, a 140 km/h e usando il 70% del pacco lordo (la finestra 10-80% dei 122 kWh), viene poco piu' di <strong>230 km</strong> (225 nel post, 233 col calcolo dettagliato che mi ha mandato). Sono rendimenti volutamente prudenti: con ipotesi piu' ottimistiche guadagni qualche decina di km, ma l'ordine di grandezza non cambia. Quel <strong>0,74</strong> e' l'estremo basso della banda che uso in tutto l'articolo. Una differenza c'e': Vincent ha stimato una resistenza aerodinamica un po' piu' alta (~38 kW alle ruote a 140), mentre il mio modello parte dal Cx 0,254 ufficiale da record, e quindi qui sotto i km salgono un po'. Per scrupolo abbiamo provato a sbagliare in entrambe le direzioni: assunti piu' prudenti e assunti piu' favorevoli, per vedere quanto il risultato reggesse alle ipotesi. I chilometri si spostano, a volte anche parecchio. L'ordine di grandezza, e la conclusione, molto meno.</p>
+    </div>
+
+    <p>Allora ho fatto una cosa. Ho raccattato in giro i dati pubblici di mezza concorrenza, ho riscritto le due formulette che servono, e ho costruito un simulatore con cui giocare. Spoiler: alcuni numeri reggono benissimo, altri sono pura poesia da ufficio marketing.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Tesi.</strong> La Ferrari Luce e' spettacolare nei picchi: due secondi e mezzo nello scatto, numeri da prima pagina. Ma appena la metti in autostrada vera la fisica presenta il conto: l'aria si beve tutto e l'autonomia crolla. E su una tratta molto lunga il tempo perso in ricarica puo' annullare gran parte del vantaggio prestazionale. Non e' colpa di Ferrari. E' colpa del cubo.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number red">1035</div><div class="stat-label">cavalli (picco)</div></div>
+      <div class="stat-card"><div class="stat-number green">2,5 s</div><div class="stat-label">0 a 100</div></div>
+      <div class="stat-card"><div class="stat-number cyan">310</div><div class="stat-label">km/h dichiarati</div></div>
+      <div class="stat-card"><div class="stat-number purple">122</div><div class="stat-label">kWh batteria</div></div>
+      <div class="stat-card"><div class="stat-number orange">550k</div><div class="stat-label">euro di listino</div></div>
+    </div>
+
+    <h2><span class="accent">//</span> Due Formule, Zero Magia</h2>
+    <span class="section-number">Sezione 01. Tre forze, due formule</span>
+
+    <p>A velocita' costante una macchina deve vincere tre cose, niente di piu'. L'aria che la spinge indietro, le gomme che strisciano sull'asfalto, e gli accessori che mangiano corrente (clima, fari, lo schermo gigante). La potenza che serve e' la somma di questi tre pezzi.</p>
+
+    <p>Il primo pezzo, la potenza per vincere l'aria, e' il cattivo della storia. Non cresce dritto con la velocita': cresce col suo <strong>cubo</strong>. (Per i pignoli, e fanno bene: la forza aerodinamica va col quadrato della velocita', ma la potenza per vincerla, quella che ti svuota la batteria, va col cubo. E' la potenza che conta, qui.)</p>
+
+    <div class="formula-box">
+      <span class="formula-name">la resistenza dell'aria</span>
+      P_aria = ½ &middot; &rho; &middot; Cx &middot; A &middot; v&sup3;
+    </div>
+
+    <p>Tradotto per gli amici: <code>&rho;</code> e' la densita' dell'aria, <code>Cx</code> il coefficiente di penetrazione aerodinamica (quello che gli inglesi chiamano <code>Cd</code>, stessa cosa) cioe' quanto la macchina e' aerodinamica, <code>A</code> quanto e' larga di muso, e <code>v</code> la velocita'. Quel <code>v&sup3;</code> e' tutto. Vuol dire che se <strong>raddoppi la velocita', il solo contributo aerodinamico si moltiplica per otto</strong>. Otto. Poi certo, rotolamento ed elettronica crescono piano e ammorbidiscono un po' il totale, quindi nel mondo reale non fai esattamente per otto, ma alle alte velocita' l'aria domina su tutto il resto. Ecco perche' in autostrada l'autonomia si scioglie come un gelato a Ferragosto.</p>
+
+    <p>Il secondo pezzo, le gomme, cresce in modo lineare con la velocita': raddoppi l'andatura, raddoppia il contributo. Niente cubo, e infatti pesa in citta' ma alle alte velocita' lo schiaccia l'aria.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">la resistenza al rotolamento</span>
+      P_gomme = Crr &middot; m &middot; g &middot; v
+    </div>
+
+    <p>E alla fine l'autonomia e' una banalita': quanta energia hai, diviso quanta ne bruci, per la velocita'.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">quanto arrivi lontano</span>
+      Autonomia = v &middot; ( E_utile / P_totale )
+    </div>
+
+    <p>Tutto qui. Nessun segreto industriale: le stesse identiche formule che descrivono la Luce descrivono un Ape Piaggio. La differenza la fanno i numeri che ci infili dentro. E i numeri, a volte, raccontano una storia diversa da quella della pubblicita'.</p>
+
+    <p>Parentesi onesta, perche' il credito va dato dove serve. Su quel <code>Cx</code> i compiti li hanno fatti per davvero: la Luce segna <strong>0,254</strong>, il valore piu' basso di sempre per una stradale di Maranello. Cinque anni di sviluppo, circa 6000 simulazioni CFD, centinaia di ore in galleria del vento. Hanno spinto al punto da mettere i <strong>tergicristalli in verticale ai lati del parabrezza</strong> per non sporcare i flussi, e da infilare griglie attive sui radiatori che si chiudono quando non serve raffreddare. Roba seria, niente fuffa.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Nel simulatore qui sotto uso il Cx ufficiale, 0,254.</strong> Con un valore cosi' basso, a velocita' di crociera la Luce se la cava benissimo. Il problema arriva quando spingi forte: contro la fisica del cubo non c'e' aerodinamica che tenga, nemmeno la migliore del mondo.</p>
+    </div>
+
+    <h2><span class="accent">//</span> Dichiarato Contro Reale</h2>
+    <span class="section-number">Sezione 02. Dove ti fregano (gentilmente)</span>
+
+    <p>Partiamo dall'autonomia: 529 km dichiarati. Il problema e' come si misura. Il ciclo di omologazione, il famoso WLTP, gira a una media di circa 46 all'ora, clima spento, guida da educante. Roba che in autostrada non vedrai mai. Nel mondo vero, con una macchina da 2260 kg lanciata a 130 costanti, quei 529 km diventano una banda di circa 400-475 km su carica piena, a seconda dello scenario (prudenziale o favorevole). D'inverno col riscaldamento acceso, o spingendo di piu', cala in fretta.</p>
+
+    <p>Poi c'e' il trucco piu' bello, quello dei cavalli. 1035 cv, certo. Ma di <strong>picco</strong>: la potenza massima non e' sostenibile a lungo, diminuisce con la temperatura e con lo stato di carica, perche' a un certo punto intervengono i vincoli termici ed energetici. In pista, dopo pochi giri, la spinta non e' piu' quella del primo. Il limite vero di una elettrica tirata non e' la benzina che finisce, e' il <strong>calore</strong> che sale.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Mito contro realta'.</strong> Le quattro frasi da spot, e cosa c'e' sotto:</p>
+      <p style="margin-top:.6rem">
+        &bull; <strong>"1035 cv"</strong> &rarr; sono di picco, non erogabili a lungo.<br>
+        &bull; <strong>"529 km"</strong> &rarr; solo nel ciclo WLTP, che e' blando; in autostrada vera parecchi meno.<br>
+        &bull; <strong>"ricarica a 350 kW"</strong> &rarr; e' il picco di un istante, poi la potenza cala.<br>
+        &bull; <strong>"310 km/h"</strong> &rarr; a quella velocita' la carica piena dura una ventina di minuti (lo vedi qui sotto).
+      </p>
+      <p style="margin-top:.6rem">Niente di scandaloso: funziona cosi' per qualunque elettrica. Solo che nello spot non te lo dicono.</p>
+    </div>
+
+    <h2><span class="accent">//</span> Quanto Dura A 310 All'Ora?</h2>
+    <span class="section-number">Sezione 03. La domanda che vuoi fare davvero</span>
+
+    <p>Diciamocelo, chi compra una Ferrari mica la prende per andare a 90 in tangenziale. La domanda vera e': se la tiro al massimo, quanto dura? Mettiamo i numeri nelle formule di prima e usciamo dal seminato.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Niente numeri assoluti: due scenari coerenti.</strong> Invece di spacciare un numero per verita', prendiamo due insiemi di ipotesi, uno tutto prudente e uno tutto favorevole (ma plausibile), e guardiamo quanto balla il risultato. E' uno <strong>stress test</strong> del modello, non un confronto di opinioni.</p>
+      <table class="strategy-table" style="max-width:460px; margin:1.1rem auto;">
+        <thead><tr><th>Parametro</th><th class="r">Prudenziale</th><th class="r">Favorevole</th></tr></thead>
+        <tbody>
+          <tr><td>Area frontale</td><td class="r">2,46 m²</td><td class="r">2,30 m²</td></tr>
+          <tr><td>Rendimento powertrain</td><td class="r">74%</td><td class="r">84%</td></tr>
+        </tbody>
+      </table>
+      <p class="muted" style="font-size:.85rem; margin-top:.3rem">Non sono due misure della stessa auto: sono due <strong>insiemi di assunzioni</strong> usati per stressare il modello e vedere quanto cambiano i risultati. Non una previsione, ma due estremi plausibili. La realta' sta probabilmente nel mezzo.</p>
+      <p style="margin-top:1rem; font-family:var(--font-mono); font-weight:700; color:var(--accent-attention); text-align:center; font-size:1.05rem; line-height:1.5">Abbiamo provato a tirare i parametri da entrambe le parti.<br>I numeri si muovono. Il cubo resta dov'e'.</p>
+      <p style="margin-top:1rem">Il <strong>74%</strong> non e' buttato li': e' la scomposizione 0,84 &times; 0,92 &times; 0,96 (carica/scarica batteria &times; azionamento elettronico &times; motore), con lo 0,84 della batteria gia' di per se' conservativo. Se i chilometri cambiano ma l'<strong>ordine di grandezza resta</strong>, la conclusione e' robusta rispetto alle ipotesi: e infatti e' cosi'. In piu' separo <strong>"carica piena"</strong> (tutto il pacco, ~110 kWh) da <strong>"tratta 10-80%"</strong> (tra due ricariche, ~77 kWh). <span style="color:var(--text-secondary)">Nel simulatore l'area e' fissa al valore favorevole e muovi solo il rendimento; qui lo scenario prudenziale alza anche l'aerodinamica.</span></p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number red">95-117</div><div class="stat-label">km a 310, carica piena</div></div>
+      <div class="stat-card"><div class="stat-number orange">19-23</div><div class="stat-label">minuti a 310 (stima)</div></div>
+      <div class="stat-card"><div class="stat-number cyan">94-114</div><div class="stat-label">kWh ogni 100 km</div></div>
+    </div>
+
+    <div class="cube-chart fade-in">
+      <h4>Il cubo che si mangia la batteria</h4>
+      <div class="cube-legend">
+        <span><i style="background:var(--accent-attention)"></i> carica piena (100 &rarr; 0)</span>
+        <span><i style="background:var(--accent-rejection)"></i> tratta tra due ricariche (10-80%)</span>
+      </div>
+      <div class="cube2">
+        <div class="lbl">130 km/h</div>
+        <div class="bars">
+          <div class="brow"><div class="track"><div class="barf" style="width:100%;background:linear-gradient(90deg,rgba(0,255,136,.25),var(--accent-attention))"></div></div><span class="val">400-475 km</span></div>
+          <div class="brow"><div class="track"><div class="barf" style="width:71%;background:linear-gradient(90deg,rgba(255,136,0,.25),var(--accent-rejection))"></div></div><span class="val">280-335 km</span></div>
+        </div>
+      </div>
+      <div class="cube2">
+        <div class="lbl">200 km/h</div>
+        <div class="bars">
+          <div class="brow"><div class="track"><div class="barf" style="width:53%;background:linear-gradient(90deg,rgba(0,255,136,.25),var(--accent-attention))"></div></div><span class="val">210-250 km</span></div>
+          <div class="brow"><div class="track"><div class="barf" style="width:37%;background:linear-gradient(90deg,rgba(255,136,0,.25),var(--accent-rejection))"></div></div><span class="val">145-175 km</span></div>
+        </div>
+      </div>
+      <div class="cube2">
+        <div class="lbl">250 km/h</div>
+        <div class="bars">
+          <div class="brow"><div class="track"><div class="barf" style="width:36%;background:linear-gradient(90deg,rgba(0,255,136,.25),var(--accent-attention))"></div></div><span class="val">145-170 km</span></div>
+          <div class="brow"><div class="track"><div class="barf" style="width:25%;background:linear-gradient(90deg,rgba(255,136,0,.25),var(--accent-rejection))"></div></div><span class="val">100-120 km</span></div>
+        </div>
+      </div>
+      <div class="cube2">
+        <div class="lbl">310 km/h</div>
+        <div class="bars">
+          <div class="brow"><div class="track"><div class="barf" style="width:25%;background:linear-gradient(90deg,rgba(255,107,107,.25),var(--accent-reaction))"></div></div><span class="val">95-117 km</span></div>
+          <div class="brow"><div class="track"><div class="barf" style="width:17%;background:linear-gradient(90deg,rgba(255,107,107,.25),var(--accent-reaction))"></div></div><span class="val">68-82 km</span></div>
+        </div>
+      </div>
+      <div class="cube-cap">Due grandezze a confronto, ognuna con la banda dei due scenari (prudenziale &harr; favorevole). Da 130 a 310 km/h l'autonomia crolla di circa il 75%. Cx 0,254 &middot; A 2,30-2,46 m² &middot; rendimento 74-84% &middot; 110 kWh utili. La stima di Vincent (~225 km a 140) sta sulla riga arancione, tra le ricariche.</div>
+    </div>
+
+    <table class="strategy-table">
+      <thead><tr><th>Velocita'</th><th>Potenza richiesta</th><th>Carica piena</th><th>Tratta 10-80%</th></tr></thead>
+      <tbody>
+        <tr><td>130 km/h</td><td class="r">30-36 kW</td><td class="r">400-475 km</td><td class="r">280-335 km</td></tr>
+        <tr><td>140 km/h</td><td class="r">36-42 kW</td><td class="r">365-430 km</td><td class="r">255-300 km</td></tr>
+        <tr><td>200 km/h</td><td class="r">87-105 kW</td><td class="r">210-250 km</td><td class="r">145-175 km</td></tr>
+        <tr><td>250 km/h</td><td class="r">160-192 kW</td><td class="r">145-170 km</td><td class="r">100-120 km</td></tr>
+        <tr><td style="color:var(--accent-reaction)">310 km/h</td><td class="r">292-352 kW</td><td class="r" style="color:var(--accent-reaction)">95-117 km</td><td class="r">68-82 km</td></tr>
+      </tbody>
+    </table>
+    <p class="muted" style="color: var(--text-secondary); font-size: 0.82rem;">Ogni cella e' un intervallo tra i due scenari: estremo basso = <strong>prudenziale</strong> (area 2,46 m², rendimento 74%), estremo alto = <strong>favorevole</strong> (area 2,30 m², rendimento 84%). "Carica piena" usa tutto il pacco (~110 kWh), "tratta 10-80%" e' quanto percorri tra due ricariche (~77 kWh). Cx 0,254 dichiarato; l'area frontale e' stimata dalle dimensioni (la Luce e' larga 2,0 m e alta 1,54 m).</p>
+
+    <p>Leggi la tabella e fermati un attimo. Passando da 130 a 310 la velocita' sale del 138 per cento, ma l'autonomia crolla di circa il 75 per cento. E succede pure col Cx da record: l'aria non guarda il listino. Curiosita': a 310 servono dalla batteria circa 290-350 kW (a seconda dello scenario), ben sotto i 772 di picco. Vuol dire che non e' la potenza il limite, e' prima il calore e poi la batteria che si svuota. A 310 km/h, secondo questa simulazione, la carica piena si esaurisce in circa 19-23 minuti (stima del modello, non un dato ufficiale Ferrari).</p>
+
+    <h2><span class="accent">//</span> E Gli Altri? (Spoiler: Tesla)</h2>
+    <span class="section-number">Sezione 04. Il confronto che brucia</span>
+
+    <p>Ho preso le rivali piu' cattive e le ho messe sullo stesso tavolo. Ma il numero che conta non e' la potenza, quella e' roba da bar. Il numero che conta e' l'<strong>efficienza</strong>: quanti km ti regala ogni kWh di batteria. E' li' che si vede chi ha fatto ingegneria e chi ha solo messo una batteria piu' grossa.</p>
+
+    <div class="cmpchart">
+      <h4>Efficienza: km di autonomia WLTP per ogni kWh</h4>
+      <div class="sub">piu' lunga la barra, piu' strada con la stessa batteria</div>
+      <div class="cmp-row"><span class="nm" style="color:var(--accent-amplification)">Tesla Model S Plaid</span><div class="track"><div class="barf" style="width:100%;background:linear-gradient(90deg,var(--bg-tertiary),var(--accent-amplification))"></div></div><span class="val">6,11</span></div>
+      <div class="cmp-row"><span class="nm" style="color:var(--accent-yellow)">Porsche Taycan Turbo GT</span><div class="track"><div class="barf" style="width:89%;background:linear-gradient(90deg,var(--bg-tertiary),var(--accent-yellow))"></div></div><span class="val">5,44</span></div>
+      <div class="cmp-row"><span class="nm" style="color:var(--accent-reaction)">Ferrari Luce</span><div class="track"><div class="barf" style="width:71%;background:linear-gradient(90deg,var(--bg-tertiary),var(--accent-reaction))"></div></div><span class="val">4,34</span></div>
+      <div class="cmp-row"><span class="nm" style="color:var(--accent-highlight)">Rimac Nevera</span><div class="track"><div class="barf" style="width:67%;background:linear-gradient(90deg,var(--bg-tertiary),var(--accent-highlight))"></div></div><span class="val">4,08</span></div>
+      <div class="sub" style="margin:1.2rem 0 0">La Luce e' terza: una parte della sua autonomia viene dalla batteria piu' grande, non da un vantaggio di efficienza.</div>
+    </div>
+
+    <table class="strategy-table">
+      <thead><tr><th>Auto</th><th>Batteria</th><th>Peso</th><th>Potenza</th><th>WLTP</th><th>km per kWh</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--accent-reaction)">Ferrari Luce</td><td class="r">122 kWh</td><td class="r">2260 kg</td><td class="r">1035 cv</td><td class="r">529 km</td><td class="r">4,34</td></tr>
+        <tr><td style="color:var(--accent-amplification)">Tesla Model S Plaid</td><td class="r">100 kWh</td><td class="r">2265 kg</td><td class="r">1033 cv</td><td class="r">611 km</td><td class="r" style="color:var(--accent-attention)">6,11</td></tr>
+        <tr><td>Porsche Taycan Turbo GT</td><td class="r">97 kWh</td><td class="r">2290 kg</td><td class="r">~1100 cv</td><td class="r">528 km</td><td class="r">5,44</td></tr>
+        <tr><td style="color:var(--accent-highlight)">Rimac Nevera</td><td class="r">120 kWh</td><td class="r">2150 kg</td><td class="r">1914 cv</td><td class="r">490 km</td><td class="r">4,08</td></tr>
+      </tbody>
+    </table>
+
+    <p>Guarda la Tesla. Ha 22 kWh di batteria in meno della Ferrari, e fa 82 km in piu' di autonomia dichiarata. Con meno la fai di piu'. La Luce, in classifica efficienza, arriva terza, dietro Tesla e Porsche.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Per onesta'.</strong> Una parte dell'autonomia della Luce arriva dalla batteria grossa, piu' che da un vantaggio chiaro in efficienza. E' una scelta legittima, eh: Ferrari ha puntato su capacita', potenza assoluta e raffreddamento, non sul record di consumi. Nessuno compra una Ferrari per risparmiare. Pero' "rivoluzionaria sull'autonomia" proprio no: nei dati WLTP disponibili oggi Tesla resta il riferimento in termini di efficienza.</p>
+    </div>
+
+    <h2><span class="accent">//</span> Adesso Gioca Tu</h2>
+    <span class="section-number">Sezione 05. Il simulatore</span>
+
+    <p>Basta tabelle, qui ti passo il giocattolo. Sotto c'e' il Race Lab: scegli un percorso, scegli le macchine, smanetta con velocita', temperatura, vento, passeggeri, clima e <strong>rendimento del powertrain</strong>, e guarda autonomia e consumi ricalcolarsi dal vivo. C'e' pure la gara animata: le auto avanzano sul tragitto e chi deve ricaricare si ferma davvero. Non e' un oracolo: e' un <strong>modello semplificato</strong> che serve a vedere la sensibilita' ai parametri, non a prevedere il chilometro esatto. Tutto gira nel tuo browser, nessun server, nessuna chiave, nessun dato che esce da qui.</p>
+
+    <div class="racelab">
+    <div class="wrap">
+
+    <!-- 1 · PERCORSO -->
+    <section>
+      <h2>1 · Percorso</h2>
+      <p class="lead">Percorsi e profili altimetrici fatti da noi: <b>nessuna API, nessuna chiave, nessun backend</b>. Tutto gira in locale nel browser.</p>
+      <div class="grid2">
+        <div class="card">
+          <label class="fld">Scegli il tragitto</label>
+          <select id="routeSel"></select>
+          <div id="routeInfo" class="muted" style="margin-top:12px"></div>
+          <div class="muted" style="margin-top:14px;border-top:1px solid rgba(130,130,140,.25);padding-top:12px">
+            🗺️ La mappa usa le tile OpenStreetMap (libere, senza chiavi). Distanza e altimetria sono modellate da noi.
+          </div>
+        </div>
+        <div class="card" style="padding:10px"><div id="map"></div></div>
+      </div>
+    </section>
+
+    <!-- 2 · VEICOLI -->
+    <section>
+      <h2>2 · Veicoli</h2>
+      <p class="lead">Seleziona i contendenti e gioca con i parametri.</p>
+      <div class="card"><div id="vehList" class="veh-toggle"></div></div>
+    </section>
+
+    <!-- 3 · CONDIZIONI -->
+    <section>
+      <h2>3 · Condizioni</h2>
+      <p class="lead">I risultati si aggiornano in tempo reale.</p>
+      <div class="card grid2">
+        <div>
+          <div class="slider"><label>Velocità media di crociera <span class="val"><span id="vSpeed">130</span> km/h</span></label><input type="range" id="sSpeed" min="60" max="310" step="5" value="130"></div>
+          <div class="slider"><label>Temperatura esterna <span class="val"><span id="vTemp">20</span> °C</span></label><input type="range" id="sTemp" min="-10" max="40" step="1" value="20"></div>
+          <div class="slider"><label>Vento (− contro / + a favore) <span class="val"><span id="vWind">0</span> km/h</span></label><input type="range" id="sWind" min="-40" max="40" step="5" value="0"></div>
+        </div>
+        <div>
+          <div class="slider"><label>Rendimento powertrain <span class="val"><span id="vEff">79</span>%</span></label><input type="range" id="sEff" min="70" max="92" step="1" value="79"></div>
+          <div class="muted" style="margin-top:-8px;margin-bottom:16px">~74% scenario prudenziale &middot; ~84% scenario favorevole &middot; la realta' sta nel mezzo</div>
+          <div class="slider"><label>Passeggeri a bordo <span class="val"><span id="vPax">1</span></span></label><input type="range" id="sPax" min="1" max="5" step="1" value="1"></div>
+          <label class="toggle"><input type="checkbox" id="cAC"> Climatizzatore acceso (+1,5 kW)</label>
+          <div class="muted">Sposta il rendimento e guarda autonomia, consumo e tempo cambiare: e' l'incertezza piu' grossa del modello. Il vento contrario entra nell'aerodinamica (v+vento)²; la temperatura cambia ausiliari e densità dell'aria.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · CLASSIFICA -->
+    <section>
+      <h2>4 · Gara tra modelli</h2>
+      <p class="lead">Tutti partono pieni e percorrono lo stesso tragitto alle stesse condizioni. Il tempo include le soste.</p>
+      <div class="card">
+        <table>
+          <thead><tr><th>Veicolo</th><th class="num">Arrivo</th><th class="num">kWh/100km</th><th class="num">Recuperata</th><th class="num">Soste</th><th class="num">Tempo</th><th class="num">Autonomia</th></tr></thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5 · GRAFICI -->
+    <section>
+      <h2>5 · Grafici</h2>
+      <div class="grid2">
+        <div class="card"><div class="chart-box"><canvas id="socChart"></canvas></div><div class="chart-cap">Carica / serbatoio lungo il percorso (%)</div></div>
+        <div class="card"><div class="chart-box"><canvas id="consChart"></canvas></div><div class="chart-cap">Consumo cumulativo (kWh)</div></div>
+        <div class="card"><div class="chart-box"><canvas id="regenChart"></canvas></div><div class="chart-cap">Energia recuperata in discesa (kWh). A velocità costante e su strada piana e' ~0: conta solo sulle discese ripide a bassa/media andatura (prova Milano-Monaco a 110-130)</div></div>
+        <div class="card"><div class="chart-box"><canvas id="finalChart"></canvas></div><div class="chart-cap">Tempo totale di viaggio, soste incluse (ore)</div></div>
+      </div>
+    </section>
+
+    <!-- 6 · TRIP RACE -->
+    <section>
+      <h2>6 · 🏁 La corsa</h2>
+      <p class="lead">Le auto avanzano sul tragitto scelto. Chi si ferma a ricaricare resta fermo per tutta la sosta. Premi START.</p>
+      <div class="card">
+        <button class="btn" id="raceBtn">▶ START</button>
+        <div class="race-track" id="raceTrack" style="margin-top:24px"></div>
+        <div class="note" id="raceMsg" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- 7 · METODO -->
+    <section>
+      <h2>7 · Metodo e assunzioni</h2>
+      <p class="lead">Tutto quello che c'e' sotto il cofano. Le ipotesi si possono discutere (e' giusto cosi'), la trasparenza no.</p>
+      <div class="card">
+        <h3>Il modello fisico</h3>
+        <p class="muted">Per ogni segmento, prima la <strong>forza</strong> resistente totale (tre contributi):</p>
+        <p style="font-family:var(--font-mono); font-size:.85rem; color:var(--ciano); background:var(--inset); border-radius:8px; padding:.7rem .9rem; overflow-x:auto;">F = ½ &middot; &rho; &middot; Cx &middot; A &middot; v&sup2; &nbsp;(aria)&nbsp; + &nbsp;Crr &middot; m &middot; g&nbsp; (rotolamento)&nbsp; + &nbsp;m &middot; g &middot; sin&theta;&nbsp; (pendenza)</p>
+        <p class="muted">poi la <strong>potenza</strong> alle ruote, che e' forza per velocita':</p>
+        <p style="font-family:var(--font-mono); font-size:.85rem; color:var(--ciano); background:var(--inset); border-radius:8px; padding:.7rem .9rem; overflow-x:auto;">P = F &middot; v &nbsp;&rarr;&nbsp; il termine aerodinamico diventa cosi' ½ &middot; &rho; &middot; Cx &middot; A &middot; v&sup3; (il cubo)</p>
+        <p class="muted">L'energia che esce dalla batteria = lavoro meccanico / rendimento + ausiliari. In discesa e in frenata si recupera energia (fino al 65%, limitato dalla potenza di rigenerazione dell'auto).</p>
+
+        <h3 style="margin-top:1.4rem">Costanti e ambiente</h3>
+        <ul style="list-style:disc; margin:.3rem 0 0 1.3rem; color:var(--muto); font-size:.85rem; line-height:1.8;">
+          <li>Densita' aria &rho; = 1,225 &middot; 288,15/(T+273,15) kg/m³ (cambia con la temperatura dello slider)</li>
+          <li>Coeff. rotolamento Crr = 0,0105 &middot; g = 9,81 m/s²</li>
+          <li>Ausiliari: 300 W di base; riscaldamento sotto i 18°C, raffrescamento sopra i 24°C; clima +1,5 kW se acceso</li>
+          <li>Vento: entra nella resistenza aerodinamica come (v + vento)²</li>
+          <li>Recupero in discesa/frenata: 65%, limitato dalla potenza regen dell'auto</li>
+        </ul>
+
+        <h3 style="margin-top:1.4rem">Rendimento del powertrain (lo slider)</h3>
+        <p class="muted">E' la catena batteria &rarr; ruote. Banda <strong>74%&ndash;84%</strong>. Il 74% rappresenta l'estremo prudenziale del modello, ottenuto dalla scomposizione 0,84 (carica/scarica batteria) &times; 0,92 (azionamento elettronico) &times; 0,96 (motore). L'84% e' un powertrain moderno in condizioni favorevoli. Default 79%, perche' la realta' sta nel mezzo.</p>
+
+        <h3 style="margin-top:1.4rem">Ricarica e soste</h3>
+        <ul style="list-style:disc; margin:.3rem 0 0 1.3rem; color:var(--muto); font-size:.85rem; line-height:1.8;">
+          <li>Si parte a batteria piena (energia <em>utilizzabile</em>, non lorda).</li>
+          <li>Si ricarica <strong>solo l'energia che serve</strong> per arrivare con il 10% di riserva, non un 70% fisso a ogni sosta.</li>
+          <li>Potenza media di ricarica = <strong>min(potenza max dell'auto, 350 kW) &times; 0,55</strong>. Il cap a 350 kW evita di assumere colonnine da 500 kW ovunque.</li>
+          <li>Al massimo ~70% di pacco per singola sosta.</li>
+          <li>Stessa velocita' di crociera per tutte: il tempo di guida e' identico, a fare la differenza sono solo le soste.</li>
+        </ul>
+
+        <h3 style="margin-top:1.4rem">Parametri dei veicoli (fonti pubbliche)</h3>
+        <table>
+          <thead><tr><th>Auto</th><th class="num">kWh lordi/utili</th><th class="num">Peso</th><th class="num">Cx</th><th class="num">A (m²)</th><th class="num">Ricarica</th><th class="num">Regen</th></tr></thead>
+          <tbody>
+            <tr><td>Ferrari Luce</td><td class="num">122 / 110</td><td class="num">2260</td><td class="num">0,254</td><td class="num">2,30</td><td class="num">350 kW</td><td class="num">500 kW</td></tr>
+            <tr><td>Tesla Model S Plaid</td><td class="num">100 / 96</td><td class="num">2265</td><td class="num">0,208</td><td class="num">2,34</td><td class="num">250 kW</td><td class="num">300 kW</td></tr>
+            <tr><td>Porsche Taycan Turbo GT</td><td class="num">105 / 97</td><td class="num">2290</td><td class="num">0,27</td><td class="num">2,33</td><td class="num">320 kW</td><td class="num">290 kW</td></tr>
+            <tr><td>Rimac Nevera</td><td class="num">120 / 107</td><td class="num">2150</td><td class="num">0,30</td><td class="num">2,10</td><td class="num">500 kW</td><td class="num">400 kW</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="margin-top:.7rem">L'area frontale non e' dichiarata dalle case: e' stimata dalle dimensioni (per la Luce, 2,0 m di larghezza × 1,54 m di altezza &rarr; ~2,3 m²). La potenza di ricarica della Nevera (500 kW) nel calcolo e' capata a 350 kW per realismo infrastrutturale. I valori possono ballare un po' tra le fonti: l'auto e' nuova.</p>
+
+        <h3 style="margin-top:1.4rem">Cosa il modello NON fa</h3>
+        <ul style="list-style:disc; margin:.3rem 0 0 1.3rem; color:var(--muto); font-size:.85rem; line-height:1.8;">
+          <li>Percorsi e profili altimetrici sono modellati da noi, non rilevati col GPS.</li>
+          <li>La curva di ricarica reale non e' piatta: qui e' approssimata con una potenza media.</li>
+          <li>Niente traffico, code, semafori, soste caffe', degrado della batteria, stile di guida.</li>
+          <li>Consumo a velocita' costante: niente accelerazioni e frenate ripetute.</li>
+        </ul>
+        <p class="note" style="margin-top:1rem"><strong>In una riga:</strong> serve a mostrare la sensibilita' ai parametri e gli ordini di grandezza, non a prevedere il chilometro esatto. Tutto dichiaratamente ipotetico, dati pubblici.</p>
+      </div>
+    </section>
+
+    </div>
+    </div>
+
+    <p class="muted" style="color: var(--text-secondary); font-size: 0.85rem;">Il modello e' fisico ma semplificato: i percorsi e le altimetrie li ho costruiti io (plausibili, non rilevati col GPS). <strong>Non serve a prevedere il chilometro esatto, ma a mostrare quanto i risultati dipendono dalle ipotesi</strong>: muovi il rendimento, la velocita' o il vento e guarda tutto cambiare. Tutto dichiaratamente ipotetico.</p>
+
+    <h2><span class="accent">//</span> Sui Mille Chilometri Il Vantaggio Si Scioglie</h2>
+    <span class="section-number">Sezione 06. Il viaggio lungo</span>
+
+    <p>Ultimo giro nel simulatore: il Gran Premio. Milano Barcellona, 1015 km di autostrada vera, tutte le elettriche da urlo alla stessa velocita' di crociera, 130. A parita' di velocita' il tempo di guida e' identico per tutte, quindi a decidere chi arriva prima restano solo le soste.</p>
+
+    <p>E qui l'aerodinamica ha gia' fatto il suo lavoro: a 130 reali quelle autonomie da brochure si riducono a poche centinaia di km per carica (gli intervalli li trovi sopra). Su mille km vuol dire fermarsi a ricaricare una o due volte, una ventina di minuti a sosta. Tempo morto, fermi, attaccati alla colonnina, mentre l'orologio gira.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il punto, senza provocazioni.</strong> Su tratte molto lunghe il vantaggio prestazionale di una elettrica si riduce drasticamente, perche' il tempo perso in ricarica puo' superare ampiamente il vantaggio guadagnato nelle accelerazioni. I due secondi e mezzo nello 0 a 100 non ti restituiscono la mezz'ora passata a una stazione di ricarica. Provalo da te qui sopra: scegli Milano Barcellona e guarda quanto pesano le soste sul tempo totale.</p>
+    </div>
+
+    <p>Non e' una bocciatura dell'auto elettrica, sia chiaro. E' una fotografia di <strong>oggi</strong>: la ricarica costa tempo e l'infrastruttura non e' ancora pronta per i grandi numeri. Ne ho parlato in lungo e in largo quando ho provato a calcolare <a href="litalia-non-ha-la-spina.html">quanto costerebbe davvero elettrificare l'Italia</a>: la rete non regge il picco, le colonnine vanno in coda infinita. E se ti interessa quanto e' complicato anche solo il prezzo di un litro di benzina, ne ho scritto in <a href="la-benzina-ha-un-modello.html">La Benzina Ha Un Modello</a> (non c'entra un cazzo, ma ce lo metto lo stesso).</p>
+
+    <p>E qui sta la parte davvero interessante. Non e' che Ferrari abbia sbagliato: probabilmente ha fatto quasi tutto giusto. Cx da record, motori derivati dalla F1, batteria enorme, cinque anni di galleria del vento. <strong>Eppure il cubo vince lo stesso.</strong> Perche' non esiste ingegneria, per quanto buona, che batta una legge fisica. La puoi solo assecondare, mai fregare.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"La potenza la vedi in pista.<br>L'autonomia la decide l'aria.<br>E l'aria non si compra, nemmeno da Ferrari."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Tutti i numeri sono pubblici. Tutto il resto e' fisica delle superiori e un pomeriggio di codice.</p>
+    </div>
+
+    <h2><span class="accent">//</span> Le Carte In Tavola</h2>
+    <span class="section-number">Fonti. Tutti i dati, tutti i link</span>
+
+    <p>Niente numeri tirati a caso. Ecco da dove ho raccattato tutto. Le specifiche sono quelle dichiarate dalle case o riportate da database pubblici (a volte ballano un po' tra una fonte e l'altra, e' normale, l'auto e' nuova). I conti di autonomia, derating e ricarica sono stime mie sul modello fisico, non dati ufficiali Ferrari.</p>
+
+    <ul class="sources-list">
+      <li><span class="cat">Spunto</span><a href="https://x.com/VinnieVegaPF/status/2061738035897581839" target="_blank" rel="noopener">Vincent Vega, il post che ha fatto partire tutto</a></li>
+      <li><span class="cat">Ferrari Luce</span><a href="https://www.ferrari.com/en-EN/auto/ferrari-luce" target="_blank" rel="noopener">Ferrari.com, pagina ufficiale Luce</a></li>
+      <li><span class="cat">Ferrari Luce</span><a href="https://www.ferrari.com/en-EN/auto/ferrari-luce-engineering" target="_blank" rel="noopener">Ferrari.com, sezione engineering</a></li>
+      <li><span class="cat">Ferrari Luce</span><a href="https://en.wikipedia.org/wiki/Ferrari_Luce" target="_blank" rel="noopener">Wikipedia, Ferrari Luce</a></li>
+      <li><span class="cat">Batteria</span><a href="https://www.batterydesign.net/ferrari-elettrica/" target="_blank" rel="noopener">Battery Design, dettaglio celle e pacco</a></li>
+      <li><span class="cat">Ferrari Luce</span><a href="https://electrek.co/2025/10/09/ferrari-reveals-specs-its-first-all-electric-car-elettrica/" target="_blank" rel="noopener">Electrek, specifiche al reveal</a></li>
+      <li><span class="cat">Ferrari Luce</span><a href="https://www.autocar.co.uk/car-news/electric-cars/1036bhp-329-miles-%C2%A3440k-ferrari-luce-revealed-wild-super-ev" target="_blank" rel="noopener">Autocar, Ferrari Luce revealed</a></li>
+      <li><span class="cat">Ferrari Luce</span><a href="https://www.motor1.com/news/796895/ferrari-luce-specs-price-debut-details/" target="_blank" rel="noopener">Motor1, specifiche e prezzo</a></li>
+      <li><span class="cat">Aerodinamica</span><a href="https://motori.ilmessaggero.it/anteprime/luce_una_ferrari_diversa_da_tutte_aerodinamica_e_propulsori_sono_la_marcia_in_piu-9557699.html" target="_blank" rel="noopener">Il Messaggero, aerodinamica e propulsori</a></li>
+      <li><span class="cat">Aerodinamica</span><a href="https://www.newsauto.it/ferrari/ferrari-luce-caratteristiche-prestazioni-prezzo-prima-elettrica-maranello-2026-620610/" target="_blank" rel="noopener">Newsauto, Cx 0,254 e i tergicristalli verticali</a></li>
+      <li><span class="cat">Aerodinamica</span><a href="https://driveauthority.com/ferrari-luce/" target="_blank" rel="noopener">Drive Authority, Cd 0.254 senza ala attiva</a></li>
+      <li><span class="cat">Tesla</span><a href="https://evkx.net/models/tesla/model_s/model_s_plaid/" target="_blank" rel="noopener">EVKX, Tesla Model S Plaid</a></li>
+      <li><span class="cat">Tesla</span><a href="https://ev-database.org/car/1405/Tesla-Model-S-Plaid" target="_blank" rel="noopener">EV Database, Model S Plaid</a></li>
+      <li><span class="cat">Porsche</span><a href="https://ev-database.org/car/2144/Porsche-Taycan-Turbo-GT" target="_blank" rel="noopener">EV Database, Taycan Turbo GT</a></li>
+      <li><span class="cat">Rimac</span><a href="https://en.wikipedia.org/wiki/Rimac_Nevera" target="_blank" rel="noopener">Wikipedia, Rimac Nevera</a></li>
+      <li><span class="cat">Lotus</span><a href="https://en.wikipedia.org/wiki/Lotus_Evija" target="_blank" rel="noopener">Wikipedia, Lotus Evija</a></li>
+      <li><span class="cat">Polemiche</span><a href="https://www.quattroruote.it/news/curiosita/2026/05/26/ferrari_luce_reazioni_social.html" target="_blank" rel="noopener">Quattroruote, reazioni social e critiche di Montezemolo</a></li>
+      <li><span class="cat">Polemiche</span><a href="https://www.automoto.it/news/ferrari-luce-la-bordata-di-briatore-i-cinesi-non-la-copiano.html" target="_blank" rel="noopener">Automoto.it, la bordata di Briatore</a></li>
+      <li><span class="cat">Polemiche</span><a href="https://www.fanpage.it/sport/motori/perche-la-ferrari-luce-e-criticatissima-prezzo-design-e-cinque-posti-la-rendono-irriconoscibile/" target="_blank" rel="noopener">Fanpage, perche' la Luce e' criticatissima</a></li>
+      <li><span class="cat">Polemiche</span><a href="https://www.autonews.com/stellantis/ferrari/ane-ferrari-luce-backlash-0528/" target="_blank" rel="noopener">Automotive News, il backlash e il calo in borsa</a></li>
+      <li><span class="cat">Polemiche</span><a href="https://insideevs.com/features/797057/ferrari-luce-ev-unpopular-opinion/" target="_blank" rel="noopener">InsideEVs, "everyone seems to hate it"</a></li>
+      <li><span class="cat">Approfondimento</span><a href="litalia-non-ha-la-spina.html">L'Italia Non Ha La Spina, perche' la rete non regge</a></li>
+      <li><span class="cat">Approfondimento</span><a href="la-benzina-ha-un-modello.html">La Benzina Ha Un Modello, il prezzo del carburante</a></li>
+    </ul>
+
+    <p class="muted" style="color: var(--text-secondary); font-size: 0.85rem;">Disclaimer: questo e' un esercizio di fisica e curiosita', non una recensione e non una consulenza d'acquisto. I numeri reali dipendono da mille cose che il modello non vede. Servono a ragionare sugli ordini di grandezza, non a decidere cosa comprare.</p>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <!-- ============ Race Lab, motore del simulatore inline ============ -->
+  <script>
+  (function(){
+  /* Database veicoli. EV: parametri energetici. */
+  const VEHICLES = [
+    {id:'luce',   name:'Ferrari Luce',           color:'#ff1e1e', batteryGrossKWh:122, batteryUsableKWh:110, massKg:2260, cd:0.254, frontalArea:2.30, maxPowerKW:772,  regenKW:500, dcChargeKW:350, efficiency:0.90},
+    {id:'plaid',  name:'Tesla Model S Plaid',    color:'#36e0d0', batteryGrossKWh:100, batteryUsableKWh:96,  massKg:2265, cd:0.208, frontalArea:2.34, maxPowerKW:760,  regenKW:300, dcChargeKW:250, efficiency:0.92},
+    {id:'taycan', name:'Porsche Taycan Turbo GT', color:'#ffd60a',batteryGrossKWh:105, batteryUsableKWh:97,  massKg:2290, cd:0.27,  frontalArea:2.33, maxPowerKW:760,  regenKW:290, dcChargeKW:320, efficiency:0.91},
+    {id:'nevera', name:'Rimac Nevera',           color:'#c084fc', batteryGrossKWh:120, batteryUsableKWh:107, massKg:2150, cd:0.30,  frontalArea:2.10, maxPowerKW:1408, regenKW:400, dcChargeKW:500, efficiency:0.89},
+  ];
+  const selected = new Set(VEHICLES.map(v=>v.id));
+
+  /* Percorsi modellati con profilo altimetrico deterministico. */
+  function genElevation(km, baseAlt, peakAlt, peakAt){
+    const pts=[], n=30;
+    for(let i=0;i<=n;i++){
+      const x=i/n, d=x*km;
+      const mountain = peakAlt*Math.exp(-Math.pow((x-peakAt)/0.07,2));
+      const rolling  = 45*Math.sin(x*16) + 30*Math.sin(x*6+1);
+      pts.push({d, alt: baseAlt + mountain + rolling});
+    }
+    return pts;
+  }
+  // Milano -> Monaco: salita a un passo alpino, discesa sostenuta (~7%), fondovalle.
+  // E' l'unico percorso con una discesa abbastanza ripida da far lavorare davvero la regen.
+  function genAlpine(km){
+    const pts=[], n=90, base=120, pass=2200, valley=560, descStart=0.45, descLen=0.05;
+    for(let i=0;i<=n;i++){
+      const x=i/n, d=x*km; let alt;
+      if(x < descStart)               alt = base + (pass-base)*(x/descStart);
+      else if(x < descStart+descLen)  alt = pass - (pass-valley)*((x-descStart)/descLen);
+      else                            alt = valley;
+      pts.push({d, alt: alt + 25*Math.sin(x*22)});
+    }
+    return pts;
+  }
+  const ROUTES = {
+    'mi-ro':{name:'Milano → Roma (575 km)', km:575, way:[[45.46,9.19],[45.05,9.69],[44.50,11.34],[43.77,11.25],[43.31,12.0],[42.40,12.45],[41.90,12.50]], elev:()=>genElevation(575,120,520,0.55)},
+    'mi-na':{name:'Milano → Napoli (770 km)', km:770, way:[[45.46,9.19],[44.50,11.34],[43.31,12.0],[41.90,12.50],[41.20,13.83],[40.85,14.27]], elev:()=>genElevation(770,120,560,0.5)},
+    'fi-ro':{name:'Firenze → Roma (280 km)', km:280, way:[[43.77,11.26],[43.31,12.0],[42.40,12.45],[41.90,12.50]], elev:()=>genElevation(280,50,300,0.45)},
+    'to-mi':{name:'Torino → Milano (140 km, pianura)', km:140, way:[[45.07,7.69],[45.18,8.42],[45.32,8.85],[45.46,9.19]], elev:()=>genElevation(140,240,90,0.5)},
+    'mi-mc':{name:'Milano → Monaco di Baviera (490 km, Alpi)', km:490, way:[[45.46,9.19],[46.07,11.12],[46.50,11.35],[47.26,11.40],[47.86,11.55],[48.14,11.58]], elev:()=>genAlpine(490)},
+    'mi-bcn':{name:'🏆 Milano → Barcellona (1015 km, il Gran Premio)', km:1015, way:[[45.46,9.19],[44.41,8.93],[43.70,7.27],[43.30,5.37],[43.61,3.88],[42.70,2.89],[41.39,2.17]], elev:()=>genElevation(1015,120,420,0.4)},
+  };
+  function mkRoute(k){ const r=ROUTES[k]; return {key:k, name:r.name, km:r.km, way:r.way, elevation:r.elev()}; }
+  let currentRoute = mkRoute('mi-ro');
+
+  /* Motore fisico. */
+  const G=9.81, CRR=0.0105;
+  const airDensity = t => 1.225*288.15/(t+273.15);
+  function simulate(v, route, cond){
+    const pts=route.elevation, N=pts.length;
+    const m=v.massKg+(cond.pax-1)*80, rho=airDensity(cond.tempC);
+    const spd=cond.speedKmh/3.6, vw=-cond.windKmh/3.6;
+    let auxW=300;
+    if(cond.tempC<18) auxW+=(18-cond.tempC)*180;
+    if(cond.tempC>24) auxW+=(cond.tempC-24)*150;
+    if(cond.ac) auxW+=1500;
+    const usableWh=v.batteryUsableKWh*1000;
+    let battWh=usableWh, energyWh=0, recovWh=0;
+    const soc=[100], cons=[0];
+    for(let i=0;i<N-1;i++){
+      const d=(pts[i+1].d-pts[i].d)*1000; if(d<=0) continue;
+      const sinT=Math.max(-0.12,Math.min(0.12,(pts[i+1].alt-pts[i].alt)/d));
+      const F=0.5*rho*v.cd*v.frontalArea*Math.pow(spd+vw,2)+CRR*m*G+m*G*sinT;
+      const Wj=F*d, t=d/spd, auxWh=auxW*t/3600;
+      let segWh;
+      if(Wj>=0) segWh=(Wj/3600)/cond.eff+auxWh;
+      else{ const r=Math.min(Math.abs(Wj)/3600*0.65, v.regenKW*1000*t/3600); recovWh+=r; segWh=-r+auxWh; }
+      energyWh+=segWh; battWh-=segWh;
+      soc.push(Math.max(0,battWh)/usableWh*100); cons.push(energyWh/1000);
+    }
+    const consumedKWh=energyWh/1000, rangeKm=(usableWh/1000)/(consumedKWh/route.km);
+    // Ricarica SOLO l'energia che serve per arrivare con una riserva del 10%,
+    // a una potenza media realistica (cap 350 kW: l'infrastruttura pubblica non va oltre).
+    const reserveWh=usableWh*0.10;
+    const rate=Math.min(v.dcChargeKW,350)*0.55;            // kW medi reali alla colonnina
+    const chargeWh=Math.max(0, energyWh-(usableWh-reserveWh));
+    const stops=chargeWh>0 ? Math.ceil(chargeWh/(usableWh*0.70)) : 0;
+    const chargeH=(chargeWh/1000)/rate;
+    const arrivalPct = chargeWh>0 ? 10 : (usableWh-energyWh)/usableWh*100;
+    return {v, consumedKWh, recoveredKWh:recovWh/1000, arrivalPct,
+            stops, chargeH, rangeKm, totalH: route.km/cond.speedKmh+chargeH, socSeries:soc, consSeries:cons};
+  }
+
+  /* Controlli e helper. */
+  const $=id=>document.getElementById(id);
+  const conditions=()=>({speedKmh:+$('sSpeed').value, tempC:+$('sTemp').value, windKmh:+$('sWind').value, pax:+$('sPax').value, ac:$('cAC').checked, eff:+$('sEff').value/100});
+  const fmtTime=h=>{let m=Math.round(h*60); const H=Math.floor(m/60); m=m%60; return H+'h'+String(m).padStart(2,'0');};
+
+  /* Lista veicoli. */
+  function buildVehicleList(){
+    $('vehList').innerHTML='';
+    VEHICLES.forEach(v=>{
+      const row=document.createElement('label');
+      row.className='veh'+(selected.has(v.id)?' on':''); row.style.setProperty('--carcol',v.color);
+      const spec = `${v.batteryUsableKWh} kWh · ${v.massKg} kg · ${Math.round(v.maxPowerKW*1.36)} cv`;
+      row.innerHTML=`<input type="checkbox" ${selected.has(v.id)?'checked':''}><span class="dot"></span><span class="nm">${v.name}</span><span class="sp">${spec}</span>`;
+      $('vehList').appendChild(row);
+      row.querySelector('input').addEventListener('change',e=>{
+        e.target.checked?selected.add(v.id):selected.delete(v.id);
+        row.classList.toggle('on',e.target.checked); run();
+      });
+    });
+  }
+
+  /* Mappa. */
+  let map, routeLine, markers=[];
+  function initMap(){
+    map=L.map('map',{zoomControl:true}).setView([44,9],5);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:18}).addTo(map);
+    drawRoute(currentRoute.way);
+  }
+  function drawRoute(latlngs){
+    if(routeLine) map.removeLayer(routeLine);
+    markers.forEach(m=>map.removeLayer(m)); markers=[];
+    routeLine=L.polyline(latlngs,{color:'#ff1e1e',weight:4,opacity:.9}).addTo(map);
+    const ic=c=>L.divIcon({className:'',html:`<div style="background:${c};width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px ${c}"></div>`});
+    markers.push(L.marker(latlngs[0],{icon:ic('#36e0d0')}).addTo(map));
+    markers.push(L.marker(latlngs[latlngs.length-1],{icon:ic('#ff1e1e')}).addTo(map));
+    map.fitBounds(routeLine.getBounds(),{padding:[40,40]});
+  }
+
+  /* Selezione percorso. */
+  function buildRouteSelect(){
+    Object.entries(ROUTES).forEach(([k,r])=>{const o=document.createElement('option');o.value=k;o.textContent=r.name;$('routeSel').appendChild(o);});
+    $('routeSel').addEventListener('change',e=>{currentRoute=mkRoute(e.target.value);drawRoute(currentRoute.way);updateRouteInfo();run();});
+  }
+  function updateRouteInfo(){
+    const e=currentRoute.elevation; let climb=0;
+    for(let i=0;i<e.length-1;i++){const d=e[i+1].alt-e[i].alt; if(d>0)climb+=d;}
+    $('routeInfo').innerHTML=`Distanza <b style="color:var(--text-primary)">${currentRoute.km} km</b> · dislivello positivo stimato <b style="color:var(--text-primary)">~${Math.round(climb)} m</b>`;
+  }
+
+  /* Esecuzione. */
+  let socChart,consChart,regenChart,finalChart,lastResults=[];
+  function run(){
+    const c=conditions();
+    $('vSpeed').textContent=c.speedKmh; $('vTemp').textContent=c.tempC;
+    $('vWind').textContent=(c.windKmh>0?'+':'')+c.windKmh; $('vPax').textContent=c.pax; $('vEff').textContent=Math.round(c.eff*100);
+    lastResults=VEHICLES.filter(v=>selected.has(v.id)).map(v=>simulate(v,currentRoute,c));
+    renderTable(lastResults); renderCharts(lastResults); buildRaceTrack(lastResults);
+  }
+  function renderTable(res){
+    if(!res.length){ $('resultBody').innerHTML='<tr><td colspan="7" class="muted">Seleziona almeno un veicolo.</td></tr>'; return; }
+    const km100 = r => r.consumedKWh/currentRoute.km*100;       // consumo specifico kWh/100km
+    const bestEff = res.reduce((a,b)=>km100(b)<km100(a)?b:a);    // piu' efficiente (meno kWh/100)
+    const mostPow = res.reduce((a,b)=>b.v.maxPowerKW>a.v.maxPowerKW?b:a);
+    const first   = res.reduce((a,b)=>b.totalH<a.totalH?b:a);    // arriva primo (tempo totale)
+    $('resultBody').innerHTML=res.map(r=>{
+      const tags=[];
+      if(r===first)   tags.push('<span class="badge-win badge-first">🏁 arriva primo</span>');
+      if(r===bestEff) tags.push('<span class="badge-win badge-eff">🏆 efficienza</span>');
+      if(r===mostPow) tags.push('<span class="badge-win">⚡ più potente</span>');
+      return `<tr>
+        <td><span style="color:${r.v.color};font-weight:700">●</span> ${r.v.name} ${tags.join(' ')}</td>
+        <td class="num">${Math.round(r.arrivalPct)}%</td>
+        <td class="num">${km100(r).toFixed(1)}</td>
+        <td class="num">${r.recoveredKWh.toFixed(1)} kWh</td>
+        <td class="num">${r.stops}</td>
+        <td class="num">${fmtTime(r.totalH)}</td>
+        <td class="num">${Math.round(r.rangeKm)} km</td>
+      </tr>`;
+    }).join('');
+  }
+  function renderCharts(res){
+    const labels=currentRoute.elevation.map(p=>Math.round(p.d));
+    const common={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{usePointStyle:true,boxWidth:8,color:'#8d8d96'}}},
+      scales:{x:{grid:{color:'rgba(130,130,140,.22)'},ticks:{color:'#8d8d96'}},y:{grid:{color:'rgba(130,130,140,.22)'},ticks:{color:'#8d8d96'}}}};
+    const mk=(id,ch,cfg)=>{ if(ch)ch.destroy(); return new Chart($(id),cfg); };
+    socChart=mk('socChart',socChart,{type:'line',data:{labels,datasets:res.map(r=>({label:r.v.name,data:r.socSeries,borderColor:r.v.color,backgroundColor:'transparent',tension:.2,pointRadius:0,borderWidth:2}))},
+      options:{...common,scales:{...common.scales,x:{...common.scales.x,title:{display:true,text:'km',color:'#8d8d96'}},y:{...common.scales.y,min:0,max:100,title:{display:true,text:'batteria %',color:'#8d8d96'}}}}});
+    consChart=mk('consChart',consChart,{type:'line',data:{labels,datasets:res.map(r=>({label:r.v.name,data:r.consSeries,borderColor:r.v.color,backgroundColor:'transparent',tension:.2,pointRadius:0,borderWidth:2}))},
+      options:{...common,scales:{...common.scales,x:{...common.scales.x,title:{display:true,text:'km',color:'#8d8d96'}},y:{...common.scales.y,title:{display:true,text:'kWh cumulati',color:'#8d8d96'}}}}});
+    regenChart=mk('regenChart',regenChart,{type:'bar',data:{labels:res.map(r=>r.v.name),datasets:[{data:res.map(r=>+r.recoveredKWh.toFixed(1)),backgroundColor:res.map(r=>r.v.color),borderRadius:6}]},
+      options:{...common,plugins:{legend:{display:false}}}});
+    finalChart=mk('finalChart',finalChart,{type:'bar',data:{labels:res.map(r=>r.v.name),datasets:[{data:res.map(r=>+r.totalH.toFixed(2)),backgroundColor:res.map(r=>r.v.color),borderRadius:6}]},
+      options:{...common,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmtTime(c.parsed.y)}}},scales:{...common.scales,y:{...common.scales.y,title:{display:true,text:'ore (meno è meglio)',color:'#8d8d96'}}}}});
+  }
+
+  /* Corsa a tempo con soste. Coerente col modello: usa stops e chargeH calcolati
+     da simulate(), cosi' il totale dell'animazione e' identico al tempo in tabella. */
+  function buildTimeline(r, cond){
+    const routeKm=currentRoute.km, spd=cond.speedKmh;
+    const stops=r.stops||0, segLen=routeKm/(stops+1), stopH=stops>0 ? r.chargeH/stops : 0;
+    const segs=[]; let pos=0,t=0;
+    for(let i=0;i<=stops;i++){
+      const next=Math.min(routeKm,pos+segLen);
+      segs.push({type:'drive',from:pos,to:next,t0:t,t1:t+(next-pos)/spd}); t+=(next-pos)/spd; pos=next;
+      if(i<stops){ segs.push({type:'stop',at:pos,t0:t,t1:t+stopH}); t+=stopH; }
+    }
+    return {segs,total:t};
+  }
+  function posAt(tl,t){
+    for(const s of tl.segs){ if(t<=s.t1){ return s.type==='stop'? s.at : s.from+(s.to-s.from)*(t-s.t0)/(s.t1-s.t0); } }
+    return currentRoute.km;
+  }
+  function isStopping(tl,t){ for(const s of tl.segs){ if(t<=s.t1) return s.type==='stop'; } return false; }
+  function buildRaceTrack(res){
+    $('raceTrack').innerHTML=res.map(r=>`
+      <div class="lane">
+        <div class="head"><b style="color:${r.v.color}">${r.v.name}</b><span class="st" id="st-${r.v.id}">pronta</span></div>
+        <div class="bar">
+          <div class="fill" id="fill-${r.v.id}" style="background:linear-gradient(90deg,${r.v.color},${r.v.color}44)"></div>
+          <div class="car" id="car-${r.v.id}">🏎️</div>
+          <div class="finish">🏁</div>
+        </div>
+      </div>`).join('');
+    $('raceMsg').style.display='none';
+  }
+  let raceAnim;
+  $('raceBtn').addEventListener('click',()=>{
+    if(!lastResults.length) return;
+    cancelAnimationFrame(raceAnim);
+    const cond=conditions(), routeKm=currentRoute.km;
+    const tls=lastResults.map(r=>({r, tl:buildTimeline(r,cond)}));
+    const maxTotal=Math.max(...tls.map(x=>x.tl.total));
+    const dur=6000, t0=performance.now(); const order=[];
+    function frame(now){
+      const p=Math.min(1,(now-t0)/dur), th=p*maxTotal;
+      tls.forEach(({r,tl})=>{
+        const pos=posAt(tl,th), pct=pos/routeKm*100;
+        $('fill-'+r.v.id).style.width=pct+'%';
+        $('car-'+r.v.id).style.left=pct+'%';
+        const arrived = th>=tl.total;
+        if(arrived && !order.includes(r.v.id)) order.push(r.v.id);
+        $('st-'+r.v.id).textContent = arrived ? '✓ '+fmtTime(tl.total)
+          : isStopping(tl,th) ? '⚡ ricarica' : Math.round(pos)+' km';
+        $('st-'+r.v.id).style.color = arrived ? r.v.color : '#8d8d96';
+      });
+      if(p<1) raceAnim=requestAnimationFrame(frame);
+      else{
+        const win=tls.reduce((a,b)=>b.tl.total<a.tl.total?b:a);
+        const second=tls.filter(x=>x!==win).reduce((a,b)=>b.tl.total<a.tl.total?b:a, tls.find(x=>x!==win));
+        const gap=second?fmtTime(second.tl.total-win.tl.total):'';
+        $('raceMsg').style.display='block';
+        $('raceMsg').innerHTML=`🏆 <b style="color:${win.r.v.color}">${win.r.v.name}</b> taglia il traguardo per prima in <b>${fmtTime(win.tl.total)}</b>`
+          + (second?`, con <b>${gap}</b> di vantaggio sulla seconda.`:'.');
+      }
+    }
+    raceAnim=requestAnimationFrame(frame);
+  });
+
+  /* Init. */
+  ['sSpeed','sTemp','sWind','sPax','cAC','sEff'].forEach(id=>$(id).addEventListener('input',run));
+  buildRouteSelect(); buildVehicleList(); initMap(); updateRouteInfo(); run();
+  })();
+  </script>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
