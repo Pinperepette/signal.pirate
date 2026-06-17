@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Numeri Veri, Storia Falsa | Signal Pirate</title>
+  <meta name="description" content="Un post virale dice che lo Stato versa 180 miliardi 'per le pensioni', che i pensionati guadagnano piu' dei lavoratori e che la media e' 29.019 euro. Ogni numero e' vero. La storia e' costruita. Smonto il perimetro dei 180 mld (solo 67 sono previdenza, 63% e' welfare e cuneo fiscale), la media gonfiata (oltre meta' delle pensioni sotto 750 euro al mese, mediana ben sotto la media: dato INPS diretto), il claim OCSE (reddito familiare equivalente, non pensione-vs-stipendio) e il risparmio fantasma di 6-12 mld. In appendice un esperimento illustrativo con modello lognormale e curva di Lorenz. 10 grafici, fonti istituzionali.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    blockquote.post-quote {
+      border-left: 3px solid var(--accent-rejection);
+      background: rgba(255,136,0,0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.4rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/numeri-veri-storia-falsa.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Numeri Veri, Storia Falsa">
+  <meta property="og:description" content="Un post virale dice che lo Stato versa 180 miliardi 'per le pensioni'. Ma di quei 180 solo 67 sono previdenza: il resto e' assistenza, Assegno Unico, NASpI, CIG e decontribuzione (inclusi 69 mld che fanno gia' cio' che il post vuole finanziare). La media da 29.019 esclude le classi piu' basse; il dato OCSE misura il reddito familiare, non la pensione del singolo; il risparmio da 6-12 mld non e' documentato. E in 30 anni di riforme i salari non sono saliti, perche' seguono la produttivita'. 10 grafici, fonti istituzionali.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/numeri-veri-storia-falsa.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-06-17">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Numeri Veri, Storia Falsa">
+  <meta name="twitter:description" content="180 miliardi 'per le pensioni'? Solo 67 sono previdenza. La media da 29.019 esclude i poveri. L'OCSE non misura la pensione del singolo. E in 30 anni di riforme i salari non sono saliti: seguono la produttivita', non le pensioni. 10 grafici, fonti istituzionali.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Numeri Veri, Storia Falsa","description":"Un post virale dice che lo Stato versa 180 miliardi per le pensioni: ma solo 67 sono previdenza, il resto e' assistenza e welfare. La media da 29.019 esclude le classi piu' basse, il dato OCSE misura il reddito familiare e non la pensione del singolo, il risparmio da 6-12 miliardi non e' documentato, e trent'anni di riforme non hanno alzato i salari, che seguono la produttivita'.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-06-17","dateModified":"2026-06-17","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/numeri-veri-storia-falsa.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-06-17 | Pinperepette</p>
+    <h1 class="article-page-title">Numeri Veri, <span class="accent">Storia Falsa</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Ho letto un post sulle pensioni che mi tornava e non mi tornava. Sotto, ho fatto una domanda semplice: ma l'INPS non paga anche assistenza, invalidita', assegno unico, NASpI e CIG? Nessuna risposta. Allora sono andato a cercare i dati. Questo e' quello che ho trovato.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Pensioni</span>
+      <span class="tag tag-highlight">Statistica</span>
+      <span class="tag tag-reaction">Disinformazione</span>
+      <span class="tag tag-amplification">Lorenz / Gini</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL POST
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Post</h2>
+    <span class="section-number">Sezione 00. Una domanda semplice, rimasta senza risposta</span>
+
+    <p>Mi e' passato davanti su X un <a href="https://x.com/ora_italia/status/2067226229858541646" target="_blank" rel="noopener">post</a> di <strong>ORA!</strong> (<a href="https://x.com/ora_italia" target="_blank" rel="noopener">@ora_italia</a>) sulle pensioni. Confezionato bene: cifre precise, fonti istituzionali, tono pacato, e un'immagine forte, un pensionato in sdraio su un masso chiamato "PENSIONI" che schiaccia i "lavoratori italiani". La tesi e' questa:</p>
+
+    <details style="border-left: 3px solid var(--accent-rejection); background: rgba(255,136,0,0.05); margin: 1.5rem 0; padding: 1rem 1.4rem; color: var(--text-secondary); line-height: 1.6; border-radius: 0 8px 8px 0;">
+      <summary style="cursor: pointer; font-style: italic; font-weight: 600; color: #c8c8d8;">"Uno Stato giusto non schiaccia chi produce reddito." <span style="font-style: normal; font-weight: 400; font-size: 0.85em; color: var(--text-secondary);">(testo integrale, clicca per aprire)</span></summary>
+      <div style="font-style: italic; margin-top: 0.8rem;">
+        <p>Ogni mese i contributi dei lavoratori finanziano le pensioni attuali. Ma i contributi non bastano per sostenere il sistema pensionistico: nel 2024 lo Stato ha trasferito all’INPS circa 180 miliardi (oltre i 300 che ottiene già dalle tasse sul lavoro).</p>
+        <p>Dove vanno questi soldi?</p>
+        <p>2 milioni di pensionati percepiscono un reddito totale non superiore a una volta il minimo.</p>
+        <p>14 milioni di pensionati sono sopra la soglia minima (ogni pensionato percepisce in media 1,4 prestazioni.)</p>
+        <p>€29.019 lordi è il reddito pensionistico medio, escludendo le pensioni sociali (prive di contribuzione) e gli assegni di reversibilità.</p>
+        <p>E il resto degli italiani non pensionati?</p>
+        <p>Secondo i dati OCSE, l’Italia è uno dei pochi Paesi sviluppati dove i pensionati guadagnano in media più dei lavoratori attivi.</p>
+        <p>Intanto chi lavora: stipendi bassi, precarietà, tasse record sul lavoro.</p>
+        <p>Chi è davvero fragile va protetto.</p>
+        <p>Chi in passato ha ottenuto vantaggi irripetibili deve contribuire.</p>
+        <p>Serve un ricalcolo graduale delle sole pensioni retributive, proporzionato all’importo percepito e al reddito familiare.</p>
+        <p>Nessun intervento sulle pensioni sotto la soglia di povertà assoluta regionale.</p>
+        <p>L'impatto è contenuto tra le pensioni medie (~2.100 e ~2.700 €/mese lordi). Progressivo oltre.</p>
+        <p>Così risparmiamo 6–12 miliardi/anno per abbassare le tasse sul lavoro e da reinvestire in istruzione, welfare e politiche per la famiglia.</p>
+        <p>Uno stato giusto deve difendere chi lavora oggi e chi lavorerà domani. Serve riequilibrio, ORA!</p>
+        <p style="font-style: normal; font-size: 0.85em; margin-top: 0.9rem;"><a href="https://x.com/ora_italia/status/2067226229858541646" target="_blank" rel="noopener">Il post originale su X</a></p>
+      </div>
+    </details>
+
+    <p>Una cosa pero' non mi tornava. Tutto il ragionamento parte da un numero, i 180 miliardi che lo Stato versa all'INPS "perche' le pensioni non si pagano da sole". Ma l'INPS non paga solo pensioni: gestisce anche assistenza, invalidita', assegno unico, NASpI, CIG. Cosi' ho fatto una domanda semplice, sotto al post.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/post-ora-italia.png" alt="Il post di @ora_italia su X e la mia domanda sotto, rimasta senza risposta" class="lab-screenshot" style="max-width: 380px; display: block; margin: 1.5rem auto;">
+
+    <p>Se circa 113 di quei 180 miliardi non sono pensioni, il ragionamento parte gia' dal perimetro sbagliato. Non era una provocazione, era un dubbio concreto. Non ho ricevuto risposta, e cosi' sono andato a cercare direttamente le fonti. Questo e' quello che ho trovato.</p>
+
+    <p>I numeri del post, presi uno per uno, sono quasi tutti veri. I 180 miliardi sono nel Rendiconto INPS, i 29.019 euro in un documento di Itinerari Previdenziali, il dato OCSE esiste davvero. Sono <strong>cifre vere collocate nel perimetro sbagliato</strong>, e questo basta a far dire loro il contrario di quel che sembra. Rimettiamole nel contesto, una alla volta.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Premessa onesta.</strong> Questo articolo non difende le "pensioni d'oro" e non sostiene che il sistema italiano sia perfetto, perche' non lo e': la spesa pensionistica e' tra le piu' alte d'Europa e il rapporto tra chi lavora e chi e' in pensione e' sotto la soglia di sicurezza. Resta il fatto che la catena <em>180 miliardi &rarr; pensionati ricchi &rarr; tagliamo</em> e' costruita con una tecnica precisa, e quella tecnica si puo' verificare numero per numero.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - IL PERIMETRO DEI 180 MILIARDI
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Effetto Del Perimetro</h2>
+    <span class="section-number">Sezione 01. Come cambia il risultato quando cambia il perimetro</span>
+
+    <p>Partiamo dal numero che fa da detonatore a tutto il resto: <strong>180 miliardi</strong>. E' vero. Nel 2024 lo Stato ha trasferito all'INPS 180,5 miliardi attraverso la GIAS, la Gestione degli Interventi Assistenziali e di Sostegno (INPS, Rendiconto generale 2024).</p>
+
+    <p>Il problema e' la parola "pensioni". La GIAS non e' la cassa delle pensioni, ma l'<strong>intero apparato di welfare</strong> che passa per i conti dell'INPS. Apriamola.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/01_perimetro_180mld.png" alt="Scomposizione dei trasferimenti GIAS 2024" class="lab-screenshot">
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">67</div>
+        <div class="stat-label">mld di previdenza<br>(37% del totale)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">112</div>
+        <div class="stat-label">mld che NON<br>sono pensioni (63%)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">45</div>
+        <div class="stat-label">mld di sgravi<br>sul cuneo fiscale</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">24</div>
+        <div class="stat-label">mld di Assegno<br>Unico + famiglia</div>
+      </div>
+    </div>
+
+    <p>Solo <strong>67 miliardi su 180</strong> sono previdenza, e gran parte di quei 67 e' il sostegno strutturale alle gestioni del <em>pubblico impiego</em> e ai fondi storicamente in disavanzo, non "le pensioni dei lavoratori privati che non si pagano da sole". Il resto, <strong>112 miliardi</strong>, e' altro: assistenza pura (invalidita' civili, assegni sociali), ammortizzatori, reddito di cittadinanza, e soprattutto due voci enormi.</p>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Nota sul metodo.</strong> La classificazione segue le voci GIAS del Rendiconto generale INPS 2024. A seconda di dove si traccia il confine, autori diversi possono arrivare a un numero leggermente diverso: il punto non cambia, perche' in ogni caso la quota non pensionistica resta largamente maggioritaria. Lo si vede provando a spostare la stima.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Se la previdenza vale...</th><th>...la spesa non pensionistica e'</th><th>quota non pensioni</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>60 mld</td><td>120 mld</td><td>67%</td></tr>
+        <tr><td>67 mld <em>(stima)</em></td><td>113 mld</td><td>63%</td></tr>
+        <tr><td>80 mld</td><td>100 mld</td><td>56%</td></tr>
+      </tbody>
+    </table>
+
+    <p>Anche tirando la previdenza fino a 80 miliardi, oltre la meta' dei 180 resta spesa non pensionistica. La conclusione non dipende dalla classificazione esatta: regge anche sbagliando la stima del 20%.</p>
+
+    <p>Qui emerge una <strong>tensione interna al ragionamento</strong>. Il post chiede di tagliare le pensioni per (parole sue) "abbassare le tasse sul lavoro e finanziare politiche per la famiglia". Ma dentro quei 180 miliardi che cita come buco previdenziale ci sono gia':</p>
+
+    <div class="warning-box fade-in" style="border-left-width: 5px;">
+      <p style="font-size: 1.05rem; line-height: 1.65;"><strong style="color: var(--accent-reaction);">Il cortocircuito, in numeri.</strong> Dentro i 180 miliardi che il post denuncia ci sono gia' <strong>45 miliardi di decontribuzione</strong> (cioe' il taglio delle tasse sul lavoro) e <strong>24 miliardi tra Assegno Unico e politiche per la famiglia</strong>. Sono <strong style="color: var(--accent-reaction);">69 miliardi</strong> che vanno gia' esattamente dove il post dice di voler spostare risorse tagliando le pensioni.</p>
+    </div>
+
+    <p>Etichettare quei 69 miliardi come "spesa pensionistica fuori controllo", e poi proporre di tagliare le pensioni per finanziare le stesse cose, e' un cortocircuito logico. Regge solo finche' nessuno apre il Rendiconto INPS a vedere cosa c'e' dentro l'aggregato.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La tecnica.</strong> Si prende un aggregato vero e grande (180 mld), gli si appiccica l'etichetta della parte emotivamente piu' carica ("pensioni") e si nasconde che la maggioranza dell'aggregato e' tutt'altro. E' un <em>errore di perimetro</em>, ed e' la madre di tutte le manipolazioni con i numeri veri.</p>
+    </div>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Chiamare 'pensioni' 180 miliardi che comprendono<br>anche assegno unico, invalidita', NASpI, CIG e<br>decontribuzioni cambia il risultato. Se oltre 110<br>miliardi non sono pensioni, il ragionamento parte<br>gia' dal perimetro sbagliato."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Questo e' il nucleo dell'articolo: regge sui soli documenti (Rendiconto INPS 2024), anche togliendo tutta la parte statistica e la discussione sul saldo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - DEFICIT O SURPLUS
+         ============================================================ -->
+    <h2><span class="accent">//</span> Deficit O Surplus?</h2>
+    <span class="section-number">Sezione 02. "I contributi non bastano": dipende da cosa chiami pensione</span>
+
+    <p>Il post dice: "i contributi non bastano". Quanto e' davvero in rosso il sistema <em>pensionistico</em>, una volta tolto il welfare? La risposta dipende dal perimetro, ed e' istruttiva.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/02_saldo_perimetro.png" alt="Saldo del sistema pensionistico: lordo vs netto" class="lab-screenshot">
+
+    <p>Entrate contributive 2024: <strong>260,6 miliardi</strong>. Spesa pensionistica IVS: <strong>286,1 miliardi</strong> (dati Itinerari Previdenziali, XIII Rapporto). Il saldo contabile lordo e' un deficit di <strong>25,5 miliardi</strong>, non 180. E quel deficit e' trainato dalle gestioni del pubblico impiego, non dai lavoratori privati.</p>
+
+    <p>Ma c'e' di piu'. Se separi la previdenza dall'assistenza che e' finita dentro la spesa, e sottrai i circa <strong>71 miliardi di IRPEF</strong> che i pensionati ri-versano allo Stato ogni anno sulle loro pensioni, lo stesso sistema, nello stesso anno, secondo la stessa fonte, chiude in <strong>attivo di 60,9 miliardi</strong>.</p>
+
+    <p>Quest'ultimo punto vale anche al di la' della stima di Itinerari, perche' e' un principio generale: il costo <em>lordo</em> di una pensione non e' quello che lo Stato sborsa davvero, dato che una parte rientra subito come imposte. Una pensione di 2.500 euro lordi con 500 di IRPEF trattenuta costa all'erario piu' vicino a 2.000 che a 2.500. E' per questo che l'OCSE, accanto alla spesa pensionistica lorda, pubblica anche quella <strong>netta</strong>, e l'Italia, che tassa le pensioni in misura rilevante, e' tra i Paesi dove la differenza tra le due pesa di piu'. Anche il dato lordo, quindi, sovrastima il costo effettivo.</p>
+
+    <p><strong>Anche ignorando del tutto questa stima di Itinerari Previdenziali</strong>, il messaggio non cambia: il deficit previdenziale lordo resta nell'ordine dei 25 miliardi, non dei 180 che il post lascia intendere. Il "+60,9" e' soltanto l'estremo opposto dello stesso intervallo, e per la tesi dell'articolo basta il dato lordo.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Trasparenza.</strong> Il "+60,9" e' una stima di Itinerari Previdenziali, un centro studi con una tesi precisa ("il sistema regge"), e usa un'IRPEF sulle pensioni che e' essa stessa una stima (il MEF non pubblica quella riga). Lo segnalo apposta. E va detto che non esiste un perimetro unico e universalmente accettato tra previdenza e assistenza: dove tracciare la linea e' materia di dibattito tecnico. Ma il punto regge a prescindere: che il saldo vero sia <strong>&minus;25 o +61</strong>, in nessuno scenario reale e' il <strong>&minus;180</strong> che il post lascia intendere. Il Rendiconto INPS non mostra un deficit previdenziale di 180 miliardi: quella cifra comprende una grande quantita' di spesa assistenziale e di welfare.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - LA MEDIA CHE MENTE
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Media Che Mente</h2>
+    <span class="section-number">Sezione 03. Statistica: perche' la media e' lo strumento sbagliato</span>
+
+    <p>Veniamo al numero piu' subdolo: <strong>29.019 euro lordi</strong> di reddito pensionistico medio. Ha due difetti, e per vederli non serve costruire nessun modello: bastano le tabelle dell'INPS.</p>
+
+    <p><strong>Primo difetto, statistico.</strong> Su una distribuzione cosi' sbilanciata la media non descrive la pensione tipica. La pensione media e' 15.141 euro l'anno, circa <strong>1.164 euro al mese</strong> (INPS-ISTAT, importo per prestazione). Ma <strong>il 53,5% delle pensioni sta sotto i 750 euro al mese</strong>: se piu' della meta' delle prestazioni e' sotto i 750 mentre la media e' 1.164, la <strong>pensione mediana e' molto piu' bassa della pensione media</strong>. Non e' una stima: e' una conseguenza diretta della distribuzione per classi pubblicata dall'INPS. E guardando alle persone invece che alle prestazioni il quadro non cambia: il 29,5% dei pensionati ha un reddito da pensione sotto i 1.000 euro al mese.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number orange">1.164</div>
+        <div class="stat-label">€/mese MEDIA<br>per prestazione (INPS)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">53,5%</div>
+        <div class="stat-label">delle pensioni<br>sotto 750 €/mese</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">29,5%</div>
+        <div class="stat-label">dei pensionati<br>sotto 1.000 €/mese</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">&lt; 750 €</div>
+        <div class="stat-label">MEDIANA per prestazione<br>(ben sotto la media)</div>
+      </div>
+    </div>
+
+    <p>La media e' tirata su dalla coda alta, la minoranza di pensioni elevate: poche pensioni molto grandi spostano il valore medio verso l'alto senza spostare chi sta in mezzo. Usare quella media per dire "i pensionati stanno bene" descrive un livello che la maggioranza delle pensioni non raggiunge.</p>
+
+    <p>La concentrazione si vede con la curva di Lorenz, costruita qui sui <strong>dati reali ISTAT</strong> (distribuzione delle pensioni per classe di importo), non su un modello.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/11_lorenz_reale.png" alt="Curva di Lorenz reale delle pensioni, dati ISTAT" class="lab-screenshot" style="max-width: 560px; display: block; margin: 1.5rem auto;">
+
+    <p>Il <strong>20% di pensioni piu' alte incassa circa il 49%</strong> della spesa pensionistica, mentre la meta' piu' bassa si divide il 23% (indice di Gini 0,42). E' questa coda a tenere alta la media: il valore medio somma la pensione bassa della maggioranza al peso di una minoranza elevata. Sono numeri reali, non l'output di un modello.</p>
+
+    <p><strong>Secondo difetto, di onesta'.</strong> Il 29.019 non e' nemmeno la media reale, che resta 21.382 euro pro capite. E' un valore che la fonte stessa, Itinerari Previdenziali, ottiene <em>escludendo le due classi di reddito piu' basse</em>, "in prevalenza assistenziali". E' un controfattuale legittimo, se dichiarato; diventa fuorviante quando lo si presenta come "il reddito medio". E il post lo descrive pure male: scrive "escludendo le pensioni sociali e gli assegni di reversibilita'", mentre la fonte esclude le due classi piu' basse, non la reversibilita'.</p>
+
+    <p>Tutto questo regge senza una riga di modello: la media e' alta perche' include la coda ricca, e il 29.019 e' una media a cui sono stati tolti i poveri. Per chi vuole <em>vedere</em> la forma completa di questa distribuzione, in fondo all'articolo c'e' un <a href="#appendice">esperimento illustrativo</a> con un modello lognormale: serve a rendere intuitivo cio' che i dati ufficiali gia' dicono, non e' una prova, e la tesi di questa sezione vale anche cancellandolo.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La tecnica.</strong> Due mosse in una. Primo: usare la <em>media</em> dove la <em>mediana</em> e' l'unica statistica onesta su una distribuzione asimmetrica. Secondo: costruire un <em>controfattuale</em> ("escludendo X") scegliendo X per massimizzare il numero. Entrambe danno l'impressione di pensioni generose, mentre piu' della meta' delle pensioni sta sotto i 750 euro al mese.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - PENSIONATI PIU RICCHI DEI LAVORATORI
+         ============================================================ -->
+    <h2><span class="accent">//</span> "Guadagnano Piu' Dei Lavoratori"</h2>
+    <span class="section-number">Sezione 04. La lettura forte di un indicatore debole</span>
+
+    <p>Il claim a effetto: "secondo l'OCSE i pensionati italiani guadagnano in media piu' dei lavoratori attivi". L'indicatore esiste davvero (OECD, <em>Pensions at a Glance 2025</em>, dati 2022). Ma misura una cosa diversa da quella che il post gli fa dire.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/06_ocse_redditi.png" alt="OCSE: reddito relativo degli over-65" class="lab-screenshot">
+
+    <p>L'indicatore e' il <strong>reddito disponibile equivalente degli over-65 come percentuale di quello della popolazione totale</strong>. Per l'Italia vale 98,8% (media OCSE 87%), tra i piu' alti dei Paesi sviluppati. Sembra dare ragione al post. Non e' cosi', per tre motivi tecnici:</p>
+
+    <ul>
+      <li><strong>E' reddito familiare equivalente</strong>, non la pensione del singolo. I nuclei degli over-65 sono piu' piccoli: la scala di equivalenza li avvantaggia in modo meccanico.</li>
+      <li><strong>Include tutte le fonti</strong>: redditi da capitale, immobili, lavoro residuo, e i redditi degli altri componenti del nucleo. Non e' "la pensione".</li>
+      <li><strong>E' al netto di imposte e contributi</strong>: il lavoratore paga contributi pesanti che escono dal "disponibile", il pensionato no.</li>
+    </ul>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Cosa misura l'indicatore OCSE</th><th>Cosa NON misura</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Reddito disponibile equivalente</td><td>La pensione individuale</td></tr>
+        <tr><td>Il nucleo familiare</td><td>Il singolo pensionato</td></tr>
+        <tr><td>Tutti i redditi (lavoro, capitale, immobili)</td><td>La sola pensione</td></tr>
+      </tbody>
+    </table>
+
+    <p>E soprattutto: il rapporto e' alto <em>anche perche' il denominatore e' basso</em>. I giovani italiani guadagnano poco: salari fermi, precarieta', disoccupazione giovanile. L'indicatore non dice "i pensionati sono ricchi": dice "i giovani stanno peggio della media OCSE". Confondere le due cose e' invertire causa ed effetto.</p>
+
+    <p>Detto questo, un fondo di verita' c'e', e l'onesta' impone di mostrarlo. Le pensioni italiane <em>sono</em> generose rispetto all'ultimo stipendio:</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/07_tasso_sostituzione.png" alt="Tasso di sostituzione Italia vs OCSE" class="lab-screenshot">
+
+    <p>Il tasso di sostituzione lordo italiano e' 70,6% contro il 47,5% della media OCSE: prendi in pensione il 70% dell'ultimo stipendio, contro il 47% altrove. E' un fatto. Ma il prezzo e' un'<strong>eta' di pensionamento alta</strong> (67 anni oggi, verso i 71 per i nuovi entranti). Non e' un pasto gratis: e' un sistema che paga bene chi ci arriva, e ci si arriva tardi.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La tecnica.</strong> Prendere un indicatore reale ma tecnico (reddito familiare equivalente) e darne la <em>lettura forte</em> ("pensionati &gt; lavoratori") che l'indicatore non supporta. L'autorevolezza della fonte ("secondo l'OCSE") viene prestata a un'affermazione che la fonte non fa.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - IL RISPARMIO FANTASMA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Risparmio Fantasma</h2>
+    <span class="section-number">Sezione 05. 6-12 miliardi: da dove? E la Costituzione?</span>
+
+    <p>La proposta operativa: ricalcolare col metodo contributivo le pensioni retributive, "risparmiando 6-12 miliardi l'anno". Tre problemi, in ordine crescente di gravita'.</p>
+
+    <p><strong>Primo: la cifra non e' documentata.</strong> Non esiste una stima ufficiale di 6-12 miliardi annui dal ricalcolo di tutte le retributive in essere. La sola stima seria mai prodotta (il piano Boeri del 2015) parlava di circa 4 miliardi, e fu contestata e mai adottata. Il "6-12" e' un numero senza paternita'.</p>
+
+    <p><strong>Secondo: la Costituzione.</strong> La Corte Costituzionale ha gia' bocciato piu' volte i tagli retroattivi sulle pensioni in essere:</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Sentenza</th><th>Cosa ha stabilito</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong><a href="https://giurcost.org/decisioni/2013/0116s-13.html" target="_blank" rel="noopener">116/2013</a></strong></td><td>Illegittimo il prelievo sui soli pensionati: e' un tributo discriminatorio (artt. 3 e 53)</td></tr>
+        <tr><td><strong><a href="https://giurcost.org/decisioni/2015/0070s-15.html" target="_blank" rel="noopener">70/2015</a></strong></td><td>Illegittimo il blocco della perequazione: viola proporzionalita', adeguatezza e legittimo affidamento</td></tr>
+        <tr><td><strong><a href="https://giurcost.org/decisioni/2016/0173s-16.html" target="_blank" rel="noopener">173/2016</a></strong></td><td>Contributo di solidarieta' ammesso, ma solo su pensioni &gt; ~90.000 €/anno e per max 3 anni</td></tr>
+        <tr><td><strong><a href="https://giurcost.org/decisioni/2020/0234s-20.html" target="_blank" rel="noopener">234/2020</a></strong></td><td>Raffreddamento ammesso, ma durata massima ~3 anni: oltre e' illegittimo</td></tr>
+      </tbody>
+    </table>
+
+    <p>La giurisprudenza e' chiara: sono ammessi solo contributi <strong>temporanei (massimo 3 anni), progressivi, sulle pensioni molto alte</strong>. Un ricalcolo generalizzato e permanente delle retributive avrebbe un rischio di incostituzionalita' altissimo. Il "risparmio strutturale" promesso e' giuridicamente fragile.</p>
+
+    <p><strong>Terzo: il problema si risolve da solo.</strong> La componente retributiva si riduce ogni anno per via del pro-rata. Il sistema diventa <em>interamente</em> contributivo per i nuovi pensionati intorno al 2040, e la spesa pensionistica in rapporto al PIL inizia a calare dal 2044 (RGS, Tendenze di medio-lungo periodo 2024).</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/08_demografia.png" alt="Rapporto attivi/pensionati e esaurimento del retributivo" class="lab-screenshot">
+
+    <p>Il "tesoretto" dei tagli alle retributive e' in gran parte un patrimonio in esaurimento naturale: tra vent'anni quel problema non c'e' piu', con o senza intervento.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - DOVE HA RAGIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dove Il Post Ha Ragione</h2>
+    <span class="section-number">Sezione 06. La demografia e' un problema vero</span>
+
+    <p>Sarebbe disonesto rovesciare la propaganda del post con la propaganda opposta. Quindi diciamolo: il nodo che il post tocca, l'<strong>equilibrio tra generazioni</strong>, e' reale.</p>
+
+    <p>Il grafico a sinistra qui sopra lo mostra: nel 2024 ci sono <strong>1,48 lavoratori attivi per ogni pensionato</strong>, sotto la soglia di sicurezza di 1,5. Sono 24,1 milioni di occupati contro 16,3 milioni di pensionati (e quasi 18 milioni di trattamenti). I salari bassi e la precarieta' dei giovani <em>sono</em> un problema, e <em>si'</em>, serve riequilibrio.</p>
+
+    <p>Ma la diagnosi del post ("le pensioni si mangiano 180 miliardi") e la cura ("tagliare le retributive") non seguono da qui. Se il problema sono pochi contributori, la leva e' farne crescere il numero e il reddito: <strong>salari, occupazione, natalita'</strong>. Non ridurre le prestazioni a chi ha gia' versato per quarant'anni sotto le regole di allora.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - E SE IL PROBLEMA FOSSERO I SALARI
+         ============================================================ -->
+    <h2><span class="accent">//</span> E Se Il Problema Fossero I Salari?</h2>
+    <span class="section-number">Sezione 07. Ribaltare la causa: il dato anomalo non sono le pensioni</span>
+
+    <p>C'e' una domanda che il post non si pone mai. Se le pensioni fossero la causa principale dell'impoverimento dei lavoratori, allora quando il sistema era piu' generoso i lavoratori avrebbero dovuto stare peggio. E' accaduto l'opposto.</p>
+
+    <p>Negli anni Sessanta, Settanta e Ottanta il sistema era molto piu' retributivo di oggi, si andava in pensione prima e la spesa previdenziale era meno contenuta. Nello stesso periodo i salari reali crescevano, il potere d'acquisto aumentava, e spesso una famiglia viveva con un solo stipendio.</p>
+
+    <p>Dal 1992 l'Italia ha incassato in fila le riforme Amato, Dini, Prodi, Maroni e Fornero: le pensioni sono diventate via via meno generose e sempre piu' contributive. La tesi del post si puo' allora mettere alla prova come un'ipotesi qualsiasi, con una previsione osservabile.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Il test, in forma di ipotesi</span>
+      Ipotesi:  pensioni alte  &rarr;  salari bassi<br>
+      Previsione:  taglio delle pensioni  &rarr;  salari piu' alti<br>
+      <span style="font-size: 0.85rem; color: var(--text-secondary);">Verifica su cinque riforme (Amato, Dini, Prodi, Maroni, Fornero). Esito atteso: salari in risalita. Esito osservato: salari fermi.</span>
+    </div>
+
+    <p>I dati dicono il contrario. Usando i numeri AMECO della Commissione Europea (retribuzione reale per occupato) e fissando il 1995 a 100, da allora il salario reale medio in Italia e' sceso intorno a <strong>94</strong>, mentre la media UE27 e' salita a circa <strong>119</strong>: una forbice di circa venticinque punti. L'Italia e' l'unico Paese dell'Unione Europea in cui i salari reali sono oggi piu' bassi rispetto a trent'anni fa.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/10_salari_riforme.png" alt="Salari reali Italia vs UE27 dal 1995, con le riforme pensionistiche" class="lab-screenshot">
+
+    <p>Le linee verticali segnano le riforme delle pensioni: cinque in trent'anni (Amato e' del 1992, prima dell'inizio del grafico). Le pensioni sono state riviste piu' e piu' volte, i salari reali sono rimasti fermi. La <strong>stagnazione dei salari reali</strong>, non le pensioni, e' il vero fenomeno anomalo italiano. <span style="font-size: 0.85em; color: var(--text-secondary);">(AMECO, deflatore del PIL; con il deflatore dei consumi la caduta italiana e' ancora maggiore. La serie UE27 parte dal 1995, da cui la base comune 1995 = 100.)</span></p>
+
+    <p><strong>Dal 1992 l'Italia ha fatto cinque grandi riforme pensionistiche. Se le pensioni fossero la causa principale dei salari bassi, i salari avrebbero dovuto reagire. Non e' successo.</strong></p>
+
+    <p>Una precisazione, per non cadere nello stesso errore del post. Questo non prova che le pensioni non abbiano <em>alcun</em> effetto sui salari. Nello stesso trentennio sono cambiate molte altre cose, dalla globalizzazione alla tecnologia, dalla struttura industriale all'ingresso nell'euro alla produttivita' stessa: il confronto e' suggestivo, non una prova causale definitiva. Resta pero' che la previsione empirica piu' ovvia della tesi del post, cioe' salari piu' alti dopo le riforme, non trova conferma nei dati. Quando la conseguenza attesa di un'ipotesi non si vede in trent'anni, l'ipotesi non e' un buon candidato come causa principale.</p>
+
+    <p>Questo rimette in prospettiva il dato OCSE citato nel post. Che i redditi degli over-65 siano vicini a quelli della popolazione si puo' leggere in due modi: i pensionati sono troppo ricchi, oppure i lavoratori italiani sono troppo poveri. Il post sceglie la prima lettura senza mai mostrare perche' la seconda sarebbe sbagliata, ed e' la seconda ad avere alle spalle trent'anni di salari fermi.</p>
+
+    <p>E se non sono le pensioni, allora cos'e'? La spiegazione piu' solida e' la <strong>produttivita'</strong>. Nel lungo periodo i salari reali seguono la produttivita' del lavoro, e quella italiana e' ferma quanto i salari.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/12_salari_produttivita.png" alt="Salari reali e produttivita': Italia vs UE27 dal 1995" class="lab-screenshot">
+
+    <p>Dal 1995 la produttivita' oraria reale italiana e' cresciuta di circa il 6% (Eurostat), contro il +39% della media UE27. Dove la produttivita' e' salita, i salari sono saliti; dove e' rimasta ferma, come in Italia, sono rimasti fermi. Le pensioni non compaiono in questa relazione. <span style="font-size: 0.85em; color: var(--text-secondary);">(Produttivita': Eurostat, prodotto reale per ora lavorata; il picco italiano del 2020 e' un effetto di composizione dovuto al crollo delle ore lavorate durante il Covid.)</span></p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La domanda da farsi.</strong> Tagliare le pensioni e' la risposta a un problema che i numeri collocano altrove. Se il nodo e' che i salari italiani sono fermi dal 1990, spostare risorse dai pensionati ai lavoratori senza toccare la dinamica salariale sposta il problema da una generazione all'altra, e la causa resta dov'e'.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - ANATOMIA DELLO SCALPORE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Anatomia Dello Scalpore</h2>
+    <span class="section-number">Sezione 08. Le sette tecniche, tutte in un post solo</span>
+
+    <p>Mettiamo da parte le pensioni e guardiamo la <em>struttura</em>. Questo post e' un manuale di come si fabbrica indignazione usando solo numeri veri. Le metto in fila una per una, perche' riconoscerle qui aiuta a riconoscerle ovunque.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Tecnica</th>
+          <th>Come funziona</th>
+          <th>Nel post</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Errore di perimetro</strong></td>
+          <td>Etichetti un aggregato grande con il nome della sua parte piu' emotiva</td>
+          <td>180 mld di welfare chiamati "pensioni" (lo sono per 67)</td>
+        </tr>
+        <tr>
+          <td><strong>Media su coda asimmetrica</strong></td>
+          <td>Usi la media dove la mediana e' l'unica onesta</td>
+          <td>"29.019" mentre oltre meta' delle pensioni sta sotto 750 €/mese</td>
+        </tr>
+        <tr>
+          <td><strong>Controfattuale su misura</strong></td>
+          <td>Escludi le classi "scomode" finche' il numero non ti piace</td>
+          <td>Si escludono le classi piu' basse per gonfiare la media</td>
+        </tr>
+        <tr>
+          <td><strong>Lettura forte</strong></td>
+          <td>Dai a un indicatore tecnico un significato che non ha</td>
+          <td>Reddito familiare 65+ &rarr; "pensionati &gt; lavoratori"</td>
+        </tr>
+        <tr>
+          <td><strong>Autorevolezza prestata</strong></td>
+          <td>"Secondo l'OCSE..." per coprire un'affermazione che l'OCSE non fa</td>
+          <td>L'OCSE misura il reddito relativo, non confronta i singoli</td>
+        </tr>
+        <tr>
+          <td><strong>Numero senza paternita'</strong></td>
+          <td>Una cifra precisa che sembra studiata ma non ha fonte</td>
+          <td>"6-12 miliardi" di risparmio: nessuna stima ufficiale</td>
+        </tr>
+        <tr>
+          <td><strong>Cornice morale preventiva</strong></td>
+          <td>"Chi e' fragile va protetto" disarma in anticipo le obiezioni</td>
+          <td>Si taglia "solo" il ceto medio, che e' la maggioranza</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Nessuna di queste e' una bugia. Sono <strong>distorsioni di contesto</strong>. Ed e' proprio per questo che funzionano: chi le riceve verifica un numero a caso, lo trova vero, e si fida di tutto il resto. La verifica del singolo dato e' la trappola. Quello che conta e' il perimetro, la statistica giusta, la lettura corretta.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - SCORECARD
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Verdetto, Riga Per Riga</h2>
+    <span class="section-number">Sezione 09. Cosa e' vero, cosa e' fuorviante, cosa e' falso</span>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Affermazione del post</th>
+          <th>Verdetto</th>
+          <th>Perche'</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lo Stato versa ~180 mld all'INPS</td>
+          <td style="color: var(--accent-rejection);"><strong>VERO MA FUORVIANTE</strong></td>
+          <td>Trasferimenti GIAS: ~67 mld classificati come previdenza, il resto assistenza e welfare</td>
+        </tr>
+        <tr>
+          <td>Servono a coprire le pensioni</td>
+          <td style="color: var(--accent-reaction);"><strong>FUORVIANTE</strong></td>
+          <td>Una parte e' previdenza, ma il grosso e' assistenza; il deficit previdenziale e' ~25 mld, non 180</td>
+        </tr>
+        <tr>
+          <td>Reddito medio 29.019 € (escl. reversibilita')</td>
+          <td style="color: var(--accent-rejection);"><strong>NUMERO OK, USO NO</strong></td>
+          <td>Media a cui sono tolte le 2 classi piu' basse; e non e' la reversibilita'</td>
+        </tr>
+        <tr>
+          <td>OCSE: pensionati &gt; lavoratori attivi</td>
+          <td style="color: var(--accent-reaction);"><strong>FUORVIANTE</strong></td>
+          <td>Indicatore di reddito familiare equivalente, non pensione-vs-stipendio</td>
+        </tr>
+        <tr>
+          <td>Pensioni generose (tasso di sostituzione)</td>
+          <td style="color: var(--accent-attention);"><strong>VERO</strong></td>
+          <td>70,6% lordo vs 47,5% OCSE, ma a fronte di eta' alta</td>
+        </tr>
+        <tr>
+          <td>Risparmio 6-12 mld/anno dal ricalcolo</td>
+          <td style="color: var(--accent-rejection);"><strong>NON DOCUMENTATO</strong></td>
+          <td>Nessuna stima ufficiale; Boeri ~4 mld; vincoli della Corte Cost.</td>
+        </tr>
+        <tr>
+          <td>Serve riequilibrio tra generazioni</td>
+          <td style="color: var(--accent-attention);"><strong>VERO</strong></td>
+          <td>Rapporto attivi/pensionati 1,48 sotto la soglia 1,5</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <!-- ============================================================
+         APPENDICE - ESPERIMENTO ILLUSTRATIVO
+         ============================================================ -->
+    <h2 id="appendice"><span class="accent">//</span> Appendice: Un Esperimento Illustrativo</h2>
+    <span class="section-number">Modello, non prova</span>
+
+    <div class="warning-box fade-in">
+      <p><strong>Avvertenza.</strong> Quanto segue e' un modello che ho costruito io per <em>visualizzare</em> la forma della distribuzione dei redditi pensionistici. Non e' una fonte e non e' la prova di niente: la tesi dell'articolo (mediana molto sotto la media, e il perimetro dei 180 miliardi) regge sui dati ufficiali, senza questo modello. Lo includo perche' rende intuitivo cio' che le tabelle INPS dicono in modo arido. Chi vuole, puo' saltarlo.</p>
+    </div>
+
+    <p>Ho preso una <strong>lognormale</strong>, la forma tipica dei redditi, e l'ho calibrata su due ancore ufficiali: la media pro capite (21.382 euro/anno) e il fatto che il 29,5% dei pensionati prende meno di 1.000 euro al mese. Risolvendo per i due parametri:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Calibrazione lognormale</span>
+      ln(media) = &mu; + &sigma;&sup2;/2 = ln(21.382)<br>
+      P(reddito &lt; 12.000) = &Phi;((ln 12.000 &minus; &mu;)/&sigma;) = 0,295<br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">&rarr; &mu; = 9,75 &nbsp; &sigma; = 0,66 &nbsp; &rarr; &nbsp; mediana del modello = exp(&mu;) &asymp; 17.157 €</span>
+    </div>
+
+    <img src="../immagini/numeri-veri-storia-falsa/03_distribuzione_pensioni.png" alt="Distribuzione lognormale dei redditi pensionistici" class="lab-screenshot">
+
+    <p>La forma e' <strong>asimmetrica a destra</strong>: una grande massa di pensioni basse, una coda lunga di pensioni alte. Nel modello la mediana (17.157) cade circa 4.200 euro sotto la media (21.382), e poco piu' del 60% dei pensionati resta sotto la media. Sono numeri del modello, coerenti con i dati ufficiali ma non sostituibili a essi.</p>
+
+    <p>La concentrazione vera (curva di Lorenz e indice di Gini) e' nel testo principale, alla Sezione 03, perche' la' e' costruita sui dati reali ISTAT e non su questo modello.</p>
+
+    <img src="../immagini/numeri-veri-storia-falsa/05_fabbrica_media.png" alt="La media come funzione delle classi escluse" class="lab-screenshot">
+
+    <p>Ultimo esperimento, il piu' istruttivo: la media condizionata <strong>E[X | X &gt; soglia]</strong> al crescere della frazione di pensionati esclusi dal basso. Nel modello illustrativo occorre escludere circa il 39% dei pensionati piu' poveri per ottenere una media di quell'ordine (intorno a 29.000). E' la versione quantitativa del punto gia' visto coi dati ufficiali: il 29.019 e' una media a cui sono stati tolti i poveri. Quel 39% dipende dall'ipotesi lognormale adottata e non va interpretato come ricostruzione esatta della distribuzione reale.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - FONTI E CODICE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Fonti e Codice</h2>
+    <span class="section-number">Sezione 10. Tutto verificabile</span>
+
+    <p>Ogni numero viene da una fonte istituzionale o da un centro studi, sempre indicato come tale. Il codice che genera i grafici e calcola la statistica e' uno script Python di ~230 righe: <code>numpy</code>, <code>matplotlib</code>, e <code>NormalDist</code> della libreria standard. Niente scipy, niente dati proprietari.</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 genera_grafici.py</span>
+      <span class="t-out"><span class="t-ok">[*]</span> GIAS totale: 179.8 mld | previdenza: 67.4 (37%) | non-pensioni: 112.4 (63%)</span>
+      <span class="t-out"><span class="t-warn">[!]</span> Cuneo + famiglia gia' dentro i 180: 69 mld</span>
+      <span class="t-out"><span class="t-ok">[*]</span> Saldo lordo -25.5 | netto +60.9</span>
+      <span class="t-out"><span class="t-ok">[*]</span> [MODELLO lognormale] mu=9.7502 sigma=0.6635 | media 21.382, mediana 17.157 (per pensionato)</span>
+      <span class="t-out"><span class="t-ok">[*]</span> [REALE, ISTAT 2014] Gini 0.42 | top 20% = 49% della spesa | bottom 50% = 23%</span>
+      <span class="t-out"><span class="t-highlight">[!] [MODELLO illustrativo] 'media 29.019' = escludere ~39% dei pensionati piu' poveri</span></span>
+    </div>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Dato</th><th>Valore</th><th>Fonte</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Trasferimenti GIAS 2024</td>
+          <td>180,5 mld</td>
+          <td><a href="https://www.inps.it/content/dam/inps-site/pdf/datiebilanci/bilanci-e-rendiconti/rendicontigenerali/documents/2024/Consuntivo_2024_Sintesi.pdf" target="_blank" rel="noopener">INPS, Rendiconto generale 2024</a></td>
+        </tr>
+        <tr>
+          <td>Saldo previdenziale e IRPEF</td>
+          <td>&minus;25,5 / +60,9 mld; 71 mld</td>
+          <td><a href="https://www.itinerariprevidenziali.it/il-punto/previdenza-e-assistenza-disequilibrio/" target="_blank" rel="noopener">Itinerari Previdenziali, XIII Rapporto</a></td>
+        </tr>
+        <tr>
+          <td>Spesa pensionistica % PIL</td>
+          <td>15,6% (allargata)</td>
+          <td><a href="https://www.rgs.mef.gov.it/_Documenti/VERSIONE-I/Attivit--i/Spesa-soci/Attivita_di_previsione_RGS/2024/Ltdmlpdspess-2024.pdf" target="_blank" rel="noopener">RGS, Tendenze di medio-lungo periodo (2024)</a></td>
+        </tr>
+        <tr>
+          <td>Pensionati sotto 1.000 €/mese</td>
+          <td>29,5%</td>
+          <td><a href="https://www.inps.it/it/it/inps-comunica/notizie/dettaglio-news-page.news.2025.10.prestazioni-pensionistiche-e-beneficiari-pubblicato-l-osservatorio.html" target="_blank" rel="noopener">INPS-ISTAT, Osservatorio sulle pensioni</a></td>
+        </tr>
+        <tr>
+          <td>Reddito medio pro capite / "29.019"</td>
+          <td>21.382 € / 29.019 €</td>
+          <td><a href="https://www.itinerariprevidenziali.it/il-punto/confusione-su-importi-pensioni-italiane/" target="_blank" rel="noopener">Itinerari Previdenziali</a></td>
+        </tr>
+        <tr>
+          <td>Reddito relativo over-65</td>
+          <td>98,8% (IT) vs 87% (OCSE)</td>
+          <td><a href="https://www.oecd.org/content/dam/oecd/en/publications/reports/2025/11/pensions-at-a-glance-2025-country-notes_e320013d/italy_bc5e9d26/3dd0d4fa-en.pdf" target="_blank" rel="noopener">OECD, Pensions at a Glance 2025 (nota Italia)</a></td>
+        </tr>
+        <tr>
+          <td>Tasso di sostituzione</td>
+          <td>70,6% lordo / 79,0% netto</td>
+          <td><a href="https://www.oecd.org/en/publications/pensions-at-a-glance-2025_e320013d-en.html" target="_blank" rel="noopener">OECD, Pensions at a Glance 2025</a></td>
+        </tr>
+        <tr>
+          <td>Salari reali dal 1990</td>
+          <td>Italia ai livelli del 1990 (unica nell'UE in calo)</td>
+          <td><a href="https://www.oecd.org/en/data/indicators/average-wages.html" target="_blank" rel="noopener">OECD, Average wages</a></td>
+        </tr>
+        <tr>
+          <td>Salario reale per occupato (graf.)</td>
+          <td>1995=100: Italia ~94, UE27 ~119</td>
+          <td><a href="https://db.nomics.world/AMECO/RWCDV" target="_blank" rel="noopener">AMECO (Commissione UE) RWCDV, via DBnomics</a></td>
+        </tr>
+        <tr>
+          <td>Distribuzione pensioni per classe (Lorenz, Gini 0,42)</td>
+          <td>top 20% = 49% della spesa</td>
+          <td><a href="https://www.istat.it/it/files//2015/12/Trattamenti-pensionistici-e-beneficiari_2014.pdf" target="_blank" rel="noopener">ISTAT, Trattamenti pensionistici 2014, Prospetto 10</a></td>
+        </tr>
+        <tr>
+          <td>Produttivita' oraria reale</td>
+          <td>1995=100: Italia ~106, UE27 ~139</td>
+          <td><a href="https://ec.europa.eu/eurostat/databrowser/product/view/nama_10_lp_ulc" target="_blank" rel="noopener">Eurostat nama_10_lp_ulc (RLPR_HW)</a></td>
+        </tr>
+        <tr>
+          <td>Rapporto attivi/pensionati</td>
+          <td>1,4758</td>
+          <td><a href="https://www.itinerariprevidenziali.it/comunicati-stampa/sistema-pensionistico-sostenibile/" target="_blank" rel="noopener">Itinerari Previdenziali</a></td>
+        </tr>
+        <tr>
+          <td>Vincoli su tagli retroattivi</td>
+          <td><a href="https://giurcost.org/decisioni/2013/0116s-13.html" target="_blank" rel="noopener">116/2013</a>, <a href="https://giurcost.org/decisioni/2015/0070s-15.html" target="_blank" rel="noopener">70/2015</a>, <a href="https://giurcost.org/decisioni/2016/0173s-16.html" target="_blank" rel="noopener">173/2016</a>, <a href="https://giurcost.org/decisioni/2020/0234s-20.html" target="_blank" rel="noopener">234/2020</a></td>
+          <td>Corte Costituzionale (giurcost.org)</td>
+        </tr>
+        <tr>
+          <td>Esaurimento retributivo / spesa PIL</td>
+          <td>contributivo ~2040, calo dal 2044</td>
+          <td><a href="https://www.rgs.mef.gov.it/_Documenti/VERSIONE-I/Attivit--i/Spesa-soci/Attivita_di_previsione_RGS/2024/Ltdmlpdspess-2024.pdf" target="_blank" rel="noopener">RGS, Tendenze di medio-lungo periodo (2024)</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Torniamo al post di @ora_italia, quello confezionato bene, con le fonti e il tono pacato.</p>
+
+    <p>Il meccanismo e' piu' sottile di una bugia: prende fatti veri e li rimonta in un ordine che porta a una conclusione falsa. I 180 miliardi esistono, ma sono in larga parte welfare. I 29.019 euro vengono da un documento serio, e restano comunque una media gonfiata dalla coda alta, con oltre la meta' delle pensioni sotto i 750 euro al mese. Il dato OCSE e' autentico, e misura il reddito di una famiglia, che e' cosa diversa dalla pensione di una persona. Il risparmio di 6-12 miliardi, invece, non ha alcuna fonte, e gran parte dei risparmi ipotizzati si scontra con i limiti posti dalla Corte Costituzionale e con il progressivo esaurimento naturale della componente retributiva.</p>
+
+    <p>Il problema esiste, la demografia e i salari dei giovani, e va affrontato. La leva pero' sta dal lato di <strong>chi i contributi li versa</strong>: salari, lavoro, natalita'. Tagliare le pensioni e chiamarlo equita', appoggiandosi a numeri veri usati nel perimetro sbagliato, e' un'altra cosa, e i dati non la indicano.</p>
+
+    <p>E c'e' una questione di scala che il post non affronta. Anche accettando integralmente la sua diagnosi, il risparmio ipotizzato, 6-12 miliardi, vale circa lo <strong>0,3-0,5% del PIL</strong>. Per attribuire a un intervento di quella dimensione trent'anni di stagnazione salariale bisognerebbe dimostrare che possa incidere su un fenomeno di scala enormemente piu' grande. Quella dimostrazione non c'e'.</p>
+
+    <p>E c'e' una prova del nove che riassume tutto. <strong>Se davvero il problema fosse stato causato dalle pensioni retributive, trent'anni di riforme pensionistiche avrebbero dovuto produrre salari piu' alti. E' accaduto il contrario.</strong></p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Una storia falsa,<br>costruita interamente con numeri veri,<br>tenuti fuori dal loro contesto."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Dati: INPS, Itinerari Previdenziali, RGS, ISTAT, OCSE, Corte Costituzionale. Tutto pubblico, tutto riproducibile.</p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
