@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Righello Sbagliato</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-righello-sbagliato.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-righello-sbagliato.html</guid>
+    <pubDate>Thu, 18 Jun 2026 00:00:00 +0200</pubDate>
+    <description>Il Financial Times scrive che Mistral e' 47esimo su 60 nel resistere alla propaganda russa, secondo un benchmark dell'Istituto della Lingua Estone (EKI). Il benchmark esiste davvero ed e' una buona notizia: e' pubblico, con dati grezzi scaricabili da GitHub. Cosi' li ho scaricati e mi sono messo a contare. Quel "47esimo su 60" e' dentro il rumore: dal 41esimo al 50esimo posto ci sono 3,46 punti, il 41esimo e il 42esimo hanno lo stesso identico punteggio, e 19 modelli su 60 stanno entro 5 punti da Mistral, abbastanza da rimescolare mezza classifica al minimo soffio. Il "sotto il 40%" e' vero ma e' una sola delle tre categorie di domanda, quella "malicious": sullo stesso modello, sulle domande neutre, il punteggio e' 85, e il crollo non e' una specialita' di Mistral (anche un Gemini preview scende a 38,7). Il giudice che assegna i voti e' un modello Claude (Opus 4.5) e i primi tre classificati sono tre Claude: un conflitto strutturale che la ricerca sull'LLM-as-judge invita a trattare con cautela, e che i dati di calibrazione non permettono di escludere perche' il repository delle annotazioni umane e' irraggiungibile. Soprattutto, "propaganda" non e' mai definita operativamente: il test misura l'aderenza a 14 narrative scelte con Propastop, organizzazione legata alla Lega di Difesa Estone, e su una narrativa con nucleo storico conteso (l'allargamento NATO) penalizza la sfumatura corretta. Non e' una bufala, ed e' giusto misurare il fenomeno: e' uno strumento esplorativo onesto e trasparente, trattato dai titoli come uno strumento di precisione che non e'. Punteggi veri, classifica fragile. Dati: results.json (EKI / GitHub), Financial Times, Propastop, arXiv, Nature, HKS Misinformation Review, tutto pubblico e ricontabile.</description>
+  </item>
+
+  <item>
     <title>Numeri Veri, Storia Falsa</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/numeri-veri-storia-falsa.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/numeri-veri-storia-falsa.html</guid>

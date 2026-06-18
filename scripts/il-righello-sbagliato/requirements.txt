@@ -1,0 +1,8 @@
+# Ambiente con cui sono stati prodotti i risultati dell'articolo
+# "Il Righello Sbagliato" (Signal Pirate). Python 3.9.2.
+numpy==1.26.4
+matplotlib==3.7.1
+# Solo per rigenerare/eseguire il notebook (l'analisi non li richiede):
+nbformat==5.9.2
+nbconvert==7.7.3
+ipykernel==6.5.1

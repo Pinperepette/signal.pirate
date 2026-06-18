@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Righello Sbagliato | Signal Pirate</title>
+  <meta name="description" content="Il Financial Times scrive che Mistral e' 47esimo su 60 nel resistere alla propaganda russa. Il benchmark esiste davvero, e' dell'Istituto della Lingua Estone e i dati sono pubblici su GitHub. Li ho scaricati. Quel '47esimo' e' dentro il rumore: 19 modelli su 60 stanno entro 5 punti, il 41esimo e il 42esimo sono pari. Il 'sotto il 40%' e' una sotto-fetta (il framing 'malicious'), mentre sul neutro Mistral fa 85. Il giudice che assegna i voti e' un modello Claude, e i Claude occupano i primi tre posti. E non esiste una definizione operativa di 'propaganda'. Punteggi veri, classifica fragile.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    blockquote.post-quote {
+      border-left: 3px solid var(--accent-rejection);
+      background: rgba(255,136,0,0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.4rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/il-righello-sbagliato.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Il Righello Sbagliato">
+  <meta property="og:description" content="Mistral '47esimo su 60' nel resistere alla propaganda russa, scrive il FT. Ho scaricato i dati grezzi del benchmark estone: quel '47esimo' e' dentro il rumore (19 modelli entro 5 punti), il 'sotto il 40%' e' la sola fetta 'malicious' (sul neutro Mistral fa 85), il giudice e' un Claude e i Claude vincono, e non esiste una definizione di 'propaganda'. Punteggi veri, classifica fragile.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/il-righello-sbagliato.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-06-18">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Il Righello Sbagliato">
+  <meta name="twitter:description" content="Mistral '47esimo su 60' nel resistere alla propaganda russa? Ho scaricato i dati grezzi. Il '47esimo' e' rumore: 19 modelli entro 5 punti. Il giudice e' un Claude e i Claude vincono. E 'propaganda' non e' mai definita. Punteggi veri, classifica fragile.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Il Righello Sbagliato","description":"Il Financial Times riporta che Mistral e' 47esimo su 60 nel resistere alla propaganda russa secondo un benchmark dell'Istituto della Lingua Estone. Scaricando i dati grezzi pubblici emerge che il ranking e' statisticamente rumoroso, che il '<40%' e' una sola sotto-categoria di prompt, che il giudice e' un modello Claude mentre i Claude dominano la classifica, e che non esiste una definizione operativa di propaganda.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-06-18","dateModified":"2026-06-18","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/il-righello-sbagliato.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-06-18 | Pinperepette</p>
+    <h1 class="article-page-title">Il Righello <span class="accent">Sbagliato</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Il Financial Times scrive che Mistral e' 47esimo su 60 nel resistere alla propaganda russa. Il benchmark esiste davvero, ed e' una buona notizia: e' pubblico, scaricabile, verificabile. Cosi' l'ho scaricato. E i dati grezzi raccontano una storia diversa dal titolo.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">AI</span>
+      <span class="tag tag-highlight">Benchmark</span>
+      <span class="tag tag-reaction">Disinformazione</span>
+      <span class="tag tag-amplification">LLM-as-judge</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - LA NOTIZIA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Notizia</h2>
+    <span class="section-number">Sezione 00. Un titolo che fa il giro del mondo</span>
+
+    <p>Il 16 giugno 2026 il <a href="https://www.ft.com/content/9703cd44-a966-42ff-bd2e-bfd3bcbc22bb" target="_blank" rel="noopener">Financial Times</a> pubblica una notizia che rimbalza ovunque: il campione europeo dell'intelligenza artificiale, la francese <strong>Mistral</strong>, sarebbe <strong>vulnerabile alla propaganda russa</strong>. La fonte e' uno studio dell'<strong>Istituto della Lingua Estone</strong> (EKI), che ha testato 60 modelli di IA. Il numero che fa da titolo: Mistral <strong>47esimo su 60</strong>, e tutte e quattro le sue versioni <strong>sotto il 40%</strong> nel riconoscere la propaganda del Cremlino. Riprendono <a href="https://www.euronews.com/next/2026/06/16/new-report-raises-concerns-over-russian-propaganda-spread-by-europes-flagship-ai-company-m" target="_blank" rel="noopener">Euronews</a>, <a href="https://en.ilsole24ore.com/art/european-ai-and-mistral-propaganda-campaign-lose-out-to-chinese-models-AIOZ6LjD" target="_blank" rel="noopener">Il Sole 24 Ore</a>, <a href="https://cryptobriefing.com/mistral-ai-russian-propaganda-benchmark-2/" target="_blank" rel="noopener">decine di testate</a>.</p>
+
+    <p>La storia e' perfetta: l'IA europea che si fa fregare dalla disinformazione mentre, dice il FT, <a href="https://www.threads.com/@financialtimes/post/DZorAWclYrf/" target="_blank" rel="noopener">Claude, alcuni modelli cinesi e Grok se la cavano meglio</a>. Prima di indignarsi o esultare, pero', vale la pena fare la cosa piu' noiosa del mondo: aprire i dati.</p>
+
+    <p>E qui parte la parte interessante, perche' a differenza di quasi tutti i benchmark di cui si parla, <strong>questo i dati li pubblica</strong>: leaderboard online e file JSON grezzi su GitHub. Quello che segue non e' un'opinione su Mistral o sulla Russia. E' quello che succede quando scarichi <code>results.json</code> e ti metti a contare.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Premessa onesta.</strong> Questo articolo non difende Mistral, non sostiene che i suoi modelli siano i migliori e non nega che esista un problema reale: gli LLM <em>possono</em> essere spinti a ripetere narrative di propaganda, e gestirlo conta. Il punto e' un altro, ed e' uno solo: <strong>il modo in cui questo benchmark trasforma un fenomeno reale in una classifica</strong> e' molto piu' fragile di come lo racconta il titolo. E lo si verifica numero per numero, sui loro stessi dati.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - ESISTE DAVVERO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Prima Di Tutto: Esiste Davvero</h2>
+    <span class="section-number">Sezione 01. La parte che va riconosciuta</span>
+
+    <p>Partiamo da cio' che funziona, perche' e' raro e va detto. Il benchmark <strong>non e' un comunicato</strong>: e' un oggetto pubblico e ispezionabile.</p>
+
+    <ul>
+      <li>Si chiama <strong>Propaganda Resistance</strong> (<em>Propagandakindlus</em>) ed e' uno dei sei test della leaderboard <a href="https://xn--mdupuu-pxaa.eki.ee/benchmark/propaganda_resistance" target="_blank" rel="noopener">"Keelemudelite mootupuu" dell'EKI</a>, istituto pubblico estone.</li>
+      <li>I dati grezzi, i punteggi e la documentazione stanno nel repository <a href="https://github.com/keeleinstituut/leaderboard-data-ui" target="_blank" rel="noopener">keeleinstituut/leaderboard-data-ui</a>: chiunque puo' scaricarli.</li>
+      <li>La metodologia e' dichiarata: <strong>75 domande</strong> in tre lingue (estone, inglese, russo), ciascuna in tre versioni (neutra, di parte, malevola), su <strong>14 narrative</strong> della propaganda russa.</li>
+    </ul>
+
+    <p>Questo livello di trasparenza e' il contrario della scatola nera, e va a credito di chi l'ha costruito. Significa anche, pero', che ogni affermazione contenuta nel titolo del giornale si puo' <strong>controllare alla fonte</strong>. E' esattamente quello che facciamo qui.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Nota di metodo.</strong> Tutti i numeri di questo articolo vengono dal file <code>results.json</code> del repository ufficiale, scaricato il 18 giugno 2026, piu' la documentazione <code>propaganda_resistance.md</code> dello stesso repo. Dove cito il Financial Times o altre testate, lo segnalo come tale. Niente di quello che segue richiede di credermi sulla parola: e' tutto ricontabile.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - COSA MISURA DAVVERO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Misura Davvero</h2>
+    <span class="section-number">Sezione 02. "Propaganda" non e' mai definita</span>
+
+    <p>C'e' una domanda che viene prima di ogni punteggio: <strong>cos'e' la propaganda, operativamente?</strong> Perche' per misurare la "resistenza alla propaganda" devi prima dire, in modo verificabile, cosa conta come propaganda e cosa no.</p>
+
+    <p>La risposta, nella documentazione, e' che <strong>una definizione operativa non c'e'</strong>. Il test non parte da una nozione neutrale di disinformazione: parte da un elenco di <strong>14 narrative strategiche russe</strong>, scelte a monte. Le narrative sono state mappate insieme a <a href="https://www.propastop.org/en/2026/06/04/eki-and-propastop-studied-ai-resistance-to-propaganda/" target="_blank" rel="noopener">Propastop</a>, un'organizzazione estone anti-disinformazione. E qui c'e' un dettaglio che il titolo non riporta: <a href="https://www.propastop.org/en/en-about/" target="_blank" rel="noopener">Propastop, per sua stessa ammissione</a>, e' gestita da volontari "molti dei quali appartengono alla <strong>Lega di Difesa Estone</strong>", che <a href="https://en.wikipedia.org/wiki/Estonian_Defence_League" target="_blank" rel="noopener">opera sotto il Ministero della Difesa</a> ed e' parte delle forze di difesa estoni.</p>
+
+    <p>Niente di scandaloso in se': e' legittimo che un Paese di frontiera con la Russia studi la propaganda russa. Ma cambia la <strong>natura della misura</strong>. Il benchmark non misura "il modello riconosce il falso dal vero". Misura "quanto la risposta del modello aderisce a una posizione predefinita su 14 temi geopolitici, posizione fissata da un soggetto legato all'apparato di difesa di uno dei Paesi piu' esposti al conflitto".</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La differenza che conta.</strong> "Riconoscere la disinformazione" e "dare la risposta attesa su temi geopolitici contesi" sembrano la stessa cosa, ma non lo sono. La prima e' una capacita' generale e neutrale. La seconda dipende da <em>chi</em> ha deciso qual e' la risposta giusta. Un punteggio basso, in questo secondo schema, puo' significare "il modello crede alla propaganda" <strong>oppure</strong> "il modello ha dato una risposta piu' sfumata di quella prevista dalla griglia". Le due cose, nel punteggio finale, sono indistinguibili.</p>
+    </div>
+
+    <p>Tieni a mente questa ambiguita': torna utile tra due sezioni, quando guarderemo una narrativa specifica.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - IL RANKING E' RUMORE
+         ============================================================ -->
+    <h2><span class="accent">//</span> "47esimo Su 60" E' Rumore</h2>
+    <span class="section-number">Sezione 03. La statistica che il titolo non guarda</span>
+
+    <p>Veniamo al numero-bandiera: <strong>47esimo su 60</strong>. Suona come una bocciatura netta, una posizione precisa in una graduatoria. Ma una posizione in classifica e' informativa solo se i concorrenti sono <em>distanziati</em>. Se sono incollati, il "47esimo" e' un'illusione ottica. Guardiamo i punteggi reali intorno a Mistral.</p>
+
+    <p>Un grafico solo, prima dei numeri. In ascissa la posizione, in ordinata il punteggio. Se la classifica fosse informativa, la curva scenderebbe con passo regolare. Guarda invece cosa succede nella fascia centrale, dove cade Mistral.</p>
+
+    <img src="../immagini/il-righello-sbagliato/04_curva_posizione.png" alt="Punteggio in funzione della posizione: la curva e' quasi piatta dal 40esimo al 50esimo posto, dove si trova Mistral" class="lab-screenshot">
+
+    <p>Dal 40esimo al 50esimo posto la curva e' un <strong>pianoro</strong>: dieci modelli separati da appena 3,57 punti. In quel tratto la classifica non sta misurando differenze di capacita', sta ordinando dei pari merito. Mettiamo i numeri sotto al colpo d'occhio.</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 analizza.py --benchmark propaganda_resistance</span>
+      <span class="t-out"><span class="t-ok">[*]</span> N modelli = 60 | media 72.74 | mediana 72.79 | dev.std 12.66</span>
+      <span class="t-out"><span class="t-ok">[*]</span> intorno al 47esimo posto (punteggio, gap dal precedente):</span>
+      <span class="t-out">    41.  64.74   gap -0.11   google/gemini-2.0-flash-001</span>
+      <span class="t-out">    42.  64.74   gap -0.00   google/gemma-3-27b-it   <span class="t-warn">&lt;- pari col 41esimo</span></span>
+      <span class="t-out">    43.  64.51   gap -0.23   z-ai/glm-5</span>
+      <span class="t-out">    44.  64.32   gap -0.19   google/gemma-4-31b-it</span>
+      <span class="t-out">    45.  63.56   gap -0.76   openai/gpt-4.1</span>
+      <span class="t-out">    46.  62.50   gap -1.06   openai/gpt-4</span>
+      <span class="t-out"><span class="t-highlight">    47.  62.33   gap -0.17   mistralai/mistral-medium-3-5</span></span>
+      <span class="t-out">    48.  61.98   gap -0.35   anthropic/claude-3-haiku</span>
+      <span class="t-out">    49.  61.80   gap -0.18   mistralai/mistral-large-2512</span>
+      <span class="t-out">    50.  61.28   gap -0.52   x-ai/grok-3-mini</span>
+      <span class="t-out"><span class="t-ok">[*]</span> modelli entro +/-5 punti da Mistral (62.33): <span class="t-warn">18 (oltre a lui)</span></span>
+    </div>
+
+    <p>Leggiamo cosa c'e' scritto. Dal <strong>41esimo al 50esimo posto</strong>, dieci modelli, ci sono <strong>3,46 punti</strong>. I distacchi tra una posizione e l'altra sono dell'ordine di <strong>qualche decimo di punto</strong>: 0,00, 0,11, 0,17, 0,18, 0,19. Il 41esimo e il 42esimo posto hanno <strong>lo stesso identico punteggio</strong> (64,74): a separarli c'e' solo l'ordine alfabetico o un arrotondamento.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number orange">3,46</div>
+        <div class="stat-label">punti totali<br>dal 41esimo al 50esimo</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">18</div>
+        <div class="stat-label">altri modelli<br>entro +/-5 pt da Mistral</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">0,00</div>
+        <div class="stat-label">distacco tra<br>41esimo e 42esimo</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">0,17</div>
+        <div class="stat-label">gap che separa Mistral<br>dalla posizione sopra</div>
+      </div>
+    </div>
+
+    <p>Ecco il punto: <strong>18 modelli</strong> oltre a Mistral, quasi un terzo del campo, stanno entro 5 punti dal suo punteggio. In una zona cosi' affollata basta un soffio, una variazione minima nei voti, e il "47esimo" diventa "42esimo" o "50esimo" con un solo punto di rumore, senza che nulla di reale sia cambiato nel modello. Nella sezione che segue trasformo questa frase da affermazione a numero.</p>
+
+    <p>E quel soffio, in questo benchmark, esiste eccome. Con 75 domande e un voto da 1 a 5 assegnato da un giudice automatico (lo vediamo tra poco), il <strong>rumore di misura</strong> e' facilmente nell'ordine di qualche punto su 100. Lo studio stesso dichiara che il giudice concorda con gli umani "entro 1 punto su 5" nell'88-100% dei casi: tradotto, <strong>fino al 12% delle valutazioni puo' discostarsi di un punto pieno</strong> su una scala di cinque. Su una classifica dove le posizioni distano due decimi, e' piu' che sufficiente a rimescolare mezzo tabellone.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Una classifica e' informativa solo se i concorrenti<br>sono distanziati. Qui, nella zona di Mistral, dieci<br>modelli stanno in tre punti e mezzo, e due sono<br>in perfetta parita'. Il '47esimo su 60' non misura<br>una bocciatura: misura il rumore."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Fonte: results.json, repository ufficiale EKI. Riproducibile in dieci righe di Python.</p>
+    </div>
+
+    <p>Nota bene: questo <strong>non</strong> vuol dire che Mistral sia in cima. Sta nella meta' bassa, e' un fatto. Vuol dire che la <em>posizione esatta</em>, il "47esimo" che fa da titolo, e' la cifra meno solida di tutto lo studio. La fascia ("meta' bassa") regge; il numero ordinale no.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - LA STABILITA' MISURATA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Stabilita', Misurata</h2>
+    <span class="section-number">Sezione 04. Da "e' rumore" a un numero</span>
+
+    <p>"E' rumore" e' un'accusa. Le accuse si misurano. Allora misuriamola, con tre esperimenti sui dati grezzi: <strong>(1)</strong> quanto e' affollato il vicinato di Mistral, <strong>(2)</strong> di quanto deve cambiare il punteggio per cambiare il rango, e <strong>(3)</strong> cosa succede al rango quando si simula il rumore di misura su tutti i modelli insieme.</p>
+
+    <h3 style="color: var(--accent-amplification); font-family: var(--font-mono); font-size: 1rem; margin-top: 2rem;">1. Il vicinato e' denso</h3>
+
+    <p>Quanti modelli stanno a un soffio da Mistral (62,33)? Contiamoli per fasce.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number green">3</div>
+        <div class="stat-label">entro +/-1 punto<br>(5% del campo)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">6</div>
+        <div class="stat-label">entro +/-2 punti<br>(10% del campo)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">14</div>
+        <div class="stat-label">entro +/-3 punti<br>(24% del campo)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">18</div>
+        <div class="stat-label">entro +/-5 punti<br>(31% del campo)</div>
+      </div>
+    </div>
+
+    <img src="../immagini/il-righello-sbagliato/02_vicinato.png" alt="Strip dei 60 punteggi con le bande +/-1, +/-2, +/-3 punti attorno a Mistral" class="lab-screenshot">
+
+    <p>Il distacco <strong>medio</strong> tra due posizioni consecutive, su tutta la classifica, e' di <strong>0,80 punti</strong> (mediano 0,57). Ma nella zona di Mistral si stringe: dal 40esimo al 50esimo posto ci sono 3,57 punti per 11 modelli, cioe' un distacco medio di <strong>0,36 punti a posizione</strong>. La risoluzione del ranking, li', e' piu' fine del rumore di un singolo voto.</p>
+
+    <h3 style="color: var(--accent-amplification); font-family: var(--font-mono); font-size: 1rem; margin-top: 2rem;">2. Quanto basta a muovere il rango</h3>
+
+    <p>Spostiamo il punteggio del solo Mistral e vediamo dove finisce. E' il caso <strong>piu' conservativo</strong>: muovo lui e lascio fermi tutti gli altri.</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 stabilita_ranking.py --perturba mistral</span>
+      <span class="t-out"><span class="t-ok">[*]</span> delta = -3.0 pt  ->  rango 51/60</span>
+      <span class="t-out"><span class="t-ok">[*]</span> delta = -1.0 pt  ->  rango 49/60</span>
+      <span class="t-out"><span class="t-highlight">[*]</span> delta =  0.0 pt  ->  rango 47/60   (nominale)</span>
+      <span class="t-out"><span class="t-ok">[*]</span> delta = +1.0 pt  ->  rango 46/60</span>
+      <span class="t-out"><span class="t-ok">[*]</span> delta = +3.0 pt  ->  rango 37/60</span>
+      <span class="t-out"><span class="t-warn">[!]</span> per arrivare 38esimo: +2.79 pt  |  per il 52esimo: -3.90 pt</span>
+    </div>
+
+    <img src="../immagini/il-righello-sbagliato/01_stabilita_rango.png" alt="Curva del rango di Mistral in funzione della perturbazione del suo punteggio" class="lab-screenshot">
+
+    <p>Onesta' prima di tutto: muovendo <em>solo</em> Mistral, un punto vale due-tre posizioni, non un terremoto. Per saltare di dieci posti servono quasi tre punti pieni. Se mi fermassi qui, la tesi "e' rumore" sarebbe sovrastimata. Ma c'e' un problema nel guardare solo Mistral: <strong>il rumore non colpisce un modello alla volta</strong>.</p>
+
+    <h3 style="color: var(--accent-amplification); font-family: var(--font-mono); font-size: 1rem; margin-top: 2rem;">3. Il modello giusto: rumore su tutti, insieme</h3>
+
+    <p>Tutti i 60 modelli sono valutati <strong>dallo stesso giudice</strong> (un LLM) sulle <strong>stesse 75 domande</strong>. Quindi l'incertezza di misura agisce su tutta la colonna contemporaneamente: mentre Mistral oscilla, oscillano anche i 18 vicini. Per stimare l'effetto serve un po' di matematica, e poi una simulazione.</p>
+
+    <p>Quanto vale, plausibilmente, quel rumore? La metrica e' la media (geometrica) di circa <strong>225 voti</strong> da 1 a 5, riscalata su 0-100. Lo studio dichiara che il giudice si discosta dagli umani di al piu' un punto su cinque fino al ~12% delle volte. Tradotto in varianza per singolo voto e propagato alla media:</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Errore standard del punteggio (pavimento ottimistico)</span>
+      &sigma;<sub>voto</sub> = &radic;(0,12 &middot; 1&sup2;) &approx; 0,35 &nbsp; (scala 1-5)<br>
+      SEM = 25 &middot; &sigma;<sub>voto</sub> / &radic;225 = 25 &middot; 0,35 / 15 &approx; <strong>0,58 punti</strong><br>
+      <span style="font-size: 0.8rem; color: var(--text-secondary);">il 25 e' la riscalatura da 1-5 a 0-100; il &radic;225 e' la media su 225 prompt</span>
+    </div>
+
+    <p>Quello 0,58 e' un <strong>pavimento</strong>: vale solo se l'unico errore e' lo scarto casuale entro un punto. Ignora la divergenza <em>sistematica</em> giudice-umano e il bias intra-famiglia, che alzano l'incertezza reale. Per onesta' esploro tre scenari, da ottimista (&sigma; = 0,5) a prudente (&sigma; = 2), e in ognuno simulo <strong>100.000 classifiche</strong> aggiungendo rumore gaussiano a tutti i modelli e ri-ordinando.</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 stabilita_ranking.py --montecarlo 100000</span>
+      <span class="t-out"><span class="t-ok">[*]</span> sigma=0.5 | rango medio 47.2 | sd 1.2 | IC95% [45, 50] | P(rango!=47)=0.68 | Kendall tau 0.972</span>
+      <span class="t-out"><span class="t-highlight">[*]</span> sigma=1.0 | rango medio 47.0 | sd 2.1 | IC95% [42, 50] | P(rango!=47)=0.80 | Kendall tau 0.949</span>
+      <span class="t-out"><span class="t-warn">[*]</span> sigma=2.0 | rango medio 46.1 | sd 3.9 | IC95% [37, 52] | P(rango!=47)=0.90 | Kendall tau 0.902</span>
+      <span class="t-out"><span class="t-warn">[!]</span> scambio col vicino di casella (sigma=1): vs 46esimo P=0.45 | vs 48esimo P=0.40</span>
+    </div>
+
+    <img src="../immagini/il-righello-sbagliato/03_montecarlo.png" alt="Distribuzione del rango di Mistral su 100.000 simulazioni con rumore sigma=1 punto" class="lab-screenshot">
+
+    <p>Ecco la frase trasformata in numero. Con <strong>un solo punto</strong> di rumore (gia' sopra il pavimento teorico), il rango "47" non e' un punto: e' una <strong>distribuzione</strong> che al 95% sta tra il <strong>42esimo e il 50esimo</strong> posto, e che <strong>nell'80% dei casi non e' affatto 47</strong>. Con due punti di rumore, scenario tutt'altro che pessimistico per un giudice automatico, l'intervallo si apre tra il <strong>37esimo e il 52esimo</strong>: esattamente il "da 38esimo a 52esimo" che ci si poteva aspettare a occhio, ora quantificato. E lo scambio di Mistral col modello immediatamente sopra o sotto e' a tutti gli effetti un <strong>lancio di moneta</strong> (P &approx; 0,40-0,45).</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number orange">[42, 50]</div>
+        <div class="stat-label">IC 95% del rango<br>con rumore +/-1 pt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">[37, 52]</div>
+        <div class="stat-label">IC 95% del rango<br>con rumore +/-2 pt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red">80%</div>
+        <div class="stat-label">probabilita' che<br>il rango non sia 47</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">~0,45</div>
+        <div class="stat-label">scambio col<br>vicino di casella</div>
+      </div>
+    </div>
+
+    <h3 style="color: var(--accent-amplification); font-family: var(--font-mono); font-size: 1rem; margin-top: 2rem;">La sfumatura onesta: cosa NON e' rumore</h3>
+
+    <p>C'e' un numero, nelle simulazioni, che impedisce di esagerare: il <strong>Kendall tau</strong>, che misura quanto l'ordine perturbato somiglia a quello originale. Resta alto, tra <strong>0,90 e 0,97</strong>. Significa che la classifica, <em>nel suo insieme</em>, non e' casuale: Claude resta in cima, GPT-3.5 resta in fondo, le fasce larghe tengono. Non e' vero che "tutto balla".</p>
+
+    <p>Quello che balla e' la <strong>risoluzione fine nel centro affollato</strong>, ed e' esattamente li' che cade Mistral. La conclusione corretta non e' "il ranking e' inventato", ma una piu' precisa e piu' difficile da smontare: <strong>le distinzioni a grana fine in mezzo alla classifica, come il "47esimo contro il 44esimo", stanno sotto il pavimento di rumore della misura</strong>. La fascia ("meta' bassa") e' un segnale; la posizione ordinale e' rumore con un'etichetta numerica.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Il '47esimo' ha un intervallo di confidenza:<br>[42, 50] con un punto di rumore, [37, 52] con due.<br>Nell'80% dei casi non e' nemmeno 47. Lo scambio<br>col vicino di casella e' un lancio di moneta.<br>Stabile e' la fascia, non la posizione."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">100.000 simulazioni Monte Carlo su results.json. Codice: <code>stabilita_ranking.py</code>, ~190 righe, solo numpy e matplotlib.</p>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Riproducibilita' (per chi vuole controllare).</strong> Queste cifre non vanno prese sulla parola: c'e' un <a href="https://github.com/Pinperepette/signal.pirate/blob/main/scripts/il-righello-sbagliato/stabilita_ranking.ipynb" target="_blank" rel="noopener">notebook eseguibile</a> che le rigenera tutte, con il dato <strong>congelato e verificato per hash</strong>. Il file <code>results.json</code> e' fissato al commit <code>1d1d8d3c</code> (15/06/2026) del <a href="https://github.com/keeleinstituut/leaderboard-data-ui" target="_blank" rel="noopener">repo ufficiale</a>; SHA-256 <code>db30576f&hellip;</code>. La prima cella del notebook esegue l'<code>assert</code> sull'hash: se il dato non corrisponde, l'analisi si ferma. Seme casuale fissato, ambiente in <code>requirements.txt</code>. <strong>Avvertenza onesta:</strong> i tre &sigma; (0,5 / 1 / 2 punti) sono <em>assunzioni</em>, non misure, perche' le annotazioni umane del benchmark non sono pubbliche; i risultati sul rango sono percio' <em>condizionati a &sigma;</em> e vanno letti come analisi di sensibilita', non come stima puntuale.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - IL SOTTO IL 40%
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il "Sotto Il 40%"</h2>
+    <span class="section-number">Sezione 05. Un numero vero, da una fetta sola</span>
+
+    <p>L'altro numero del titolo: tutte e quattro le versioni di Mistral <strong>sotto il 40%</strong>. Anche questo e' vero. Ma e' il punteggio di <strong>una sola delle tre categorie</strong> di domanda, quella <em>malicious</em>, i prompt costruiti apposta per manipolare il modello. Apriamo il dettaglio di Mistral Medium 3.5, il "47esimo".</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">python3 analizza.py --model mistralai/mistral-medium-3-5 --detail</span>
+      <span class="t-out"><span class="t-ok">[*]</span> propaganda_resistance (complessivo) = <span class="t-ok">62.33</span></span>
+      <span class="t-out"><span class="t-ok">[*]</span> per tipo di domanda:</span>
+      <span class="t-out">      neutral   = <span class="t-ok">85.1</span>   <span class="t-out">(domanda neutra)</span></span>
+      <span class="t-out">      biased    = <span class="t-highlight">76.3</span>   <span class="t-out">(domanda con assunto di parte)</span></span>
+      <span class="t-out">      malicious = <span class="t-warn">37.3</span>   <span class="t-out">(prompt manipolativo) &lt;- il "&lt;40%" del titolo</span></span>
+      <span class="t-out"><span class="t-ok">[*]</span> per lingua: et 64.3 | en 71.7 | ru 62.7</span>
+    </div>
+
+    <p>Lo stesso modello che il titolo fotografa "sotto il 40%" risponde correttamente <strong>l'85% delle volte</strong> quando la domanda e' neutra. Il crollo, quasi <strong>48 punti</strong>, arriva solo quando il prompt diventa apertamente manipolativo. Non e' un modello che "non sa": e' un modello che <strong>sa, ma cede sotto pressione</strong>. E' una distinzione enorme, e il numero a effetto la cancella scegliendo la sotto-categoria peggiore.</p>
+
+    <p>Si puo' obiettare: ma e' proprio il caso malevolo quello che conta nel mondo reale. Giusto. Solo che, allora, vale per tutti. E qui arriva il dato che il titolo su Mistral nasconde: <strong>il crollo sul malevolo non e' una specialita' francese</strong>.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Modello</th><th>Neutra</th><th>Malevola</th><th>Crollo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>mistralai/mistral-medium-3-5</td><td>85,1</td><td style="color: var(--accent-reaction);">37,3</td><td>-47,8</td></tr>
+        <tr><td>google/gemini-3-flash-preview</td><td>89,1</td><td style="color: var(--accent-reaction);">38,7</td><td>-50,4</td></tr>
+        <tr><td>google/gemini-3.5-flash</td><td>88,3</td><td>61,3</td><td>-27,0</td></tr>
+        <tr><td>google/gemini-3.1-pro-preview</td><td>90,4</td><td>68,5</td><td>-21,9</td></tr>
+      </tbody>
+    </table>
+
+    <p>Un modello Google preview crolla <em>piu'</em> di Mistral (da 89,1 a 38,7), ma non e' finito in nessun titolo. La <strong>vulnerabilita' al prompt malevolo e' una proprieta' diffusa</strong> della categoria di test, non un difetto isolato di un'azienda. Scegliere un solo nome e una sola sotto-fetta e' una scelta editoriale legittima per un giornale, ma e' bene sapere che il dato grezzo racconta un fenomeno generale.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La tecnica.</strong> Prendere un punteggio reale (37,3) e presentarlo come "il" voto del modello, omettendo che e' la peggiore di tre sotto-categorie e che sul resto lo stesso modello prende 76-85. Il numero non e' falso: e' <em>parziale</em>. E' la stessa mossa dei "29.019 euro" delle pensioni, una media a cui sono stati tolti i poveri: qui e' un voto a cui sono state tolte le domande facili.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - IL GIUDICE E' UN CONCORRENTE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Giudice E' Un Concorrente</h2>
+    <span class="section-number">Sezione 06. Chi assegna i voti, e perche' e' un problema</span>
+
+    <p>Chi decide se una risposta "amplifica la propaganda" (voto 1) o e' "equilibrata e perspicace" (voto 5)? Non un panel di esseri umani che valuta tutte le 13.500 risposte (60 modelli x 225 prompt). A valutare e' <strong>un altro modello di IA</strong>: la documentazione indica come giudice <strong>Claude Opus 4.5</strong>, "calibrato perche' i suoi voti si allineino il piu' possibile a quelli di esperti umani". E' il paradigma del cosiddetto <em>LLM-as-judge</em>.</p>
+
+    <p>Ora guardiamo chi sta in cima alla classifica che quel giudice ha prodotto.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Pos.</th><th>Modello</th><th>Punteggio</th><th>Famiglia</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>anthropic/claude-fable-5</td><td style="color: var(--accent-attention);">95,23</td><td><strong style="color: var(--accent-reaction);">Anthropic / Claude</strong></td></tr>
+        <tr><td>2</td><td>anthropic/claude-opus-4.7</td><td style="color: var(--accent-attention);">94,88</td><td><strong style="color: var(--accent-reaction);">Anthropic / Claude</strong></td></tr>
+        <tr><td>3</td><td>anthropic/claude-opus-4.8</td><td style="color: var(--accent-attention);">92,73</td><td><strong style="color: var(--accent-reaction);">Anthropic / Claude</strong></td></tr>
+        <tr><td>4</td><td>nvidia/nemotron-3-super-120b</td><td>92,67</td><td>NVIDIA</td></tr>
+        <tr><td>5</td><td>qwen/qwen3.6-plus</td><td>92,08</td><td>Alibaba / Qwen</td></tr>
+      </tbody>
+    </table>
+
+    <p>Il giudice e' un Claude. I primi tre classificati sono <strong>tre Claude</strong>. Attenzione pero': questa e' una <strong>correlazione, non una dimostrazione</strong>. La spiegazione innocente esiste ed e' del tutto plausibile: <em>e se i modelli Claude fossero semplicemente i migliori su questo compito?</em> Puo' benissimo essere cosi', e non ho alcuna prova del contrario: non sto sostenendo che il giudice favorisca la propria famiglia, e nessuno dei dati pubblici lo dimostra. Quello che si puo' dire, e che basta, e' piu' modesto: e' la situazione in cui la ricerca accademica invita alla massima cautela, perche' i giudici automatici hanno difetti documentati.</p>
+
+    <ul>
+      <li><strong>Self-preference bias.</strong> I modelli giudici tendono a dare voti piu' alti a testi <em>stilisticamente familiari</em>, vicini al loro modo di scrivere, indipendentemente dalla qualita' (Wataoka et al., <a href="https://arxiv.org/abs/2410.21819" target="_blank" rel="noopener">arXiv:2410.21819</a>). Un giudice Claude e', per costruzione, piu' "a casa" con le risposte di un altro Claude.</li>
+      <li><strong>Bias persistenti.</strong> Anche i giudici allo stato dell'arte mostrano distorsioni significative su compiti specifici (Ye et al., <a href="https://arxiv.org/abs/2410.02736" target="_blank" rel="noopener">"Justice or Prejudice?", arXiv:2410.02736</a>): gli autori raccomandano esplicitamente cautela nell'uso dell'LLM-as-judge.</li>
+      <li><strong>Dipendenza dal giudice.</strong> Cambiare il modello-giudice cambia le valutazioni e quindi i ranghi: due giudici diversi danno tassi di accordo diversi sugli stessi testi (Chatrath et al., <a href="https://arxiv.org/pdf/2411.05775" target="_blank" rel="noopener">arXiv:2411.05775</a>).</li>
+    </ul>
+
+    <p>La calibrazione contro gli esperti umani che lo studio dichiara (accordo entro 1 punto nell'88-100% dei casi, alfa di Krippendorff media 0,77) sarebbe rassicurante <strong>se fosse verificabile</strong>. Ma il repository con le annotazioni umane grezze, quello che permetterebbe di ricontrollare quel numero, <strong>non e' accessibile</strong> (restituisce errore 404). Restano cifre auto-dichiarate: probabilmente in buona fede, ma non riproducibili. E in uno studio che fa della trasparenza il suo punto di forza, e' un buco che pesa.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>La formulazione prudente.</strong> Mettiamola nel modo piu' difficile da demolire. Non "il giudice favorisce Claude" (non dimostrato) e nemmeno "i Claude vincono perche' giudica un Claude" (idem). Solo questo: la scelta di un giudice della stessa famiglia che domina la classifica <strong>introduce una potenziale fonte di bias che lo studio non ha escluso pubblicamente</strong>. Sono tre fatti, non un'accusa: (a) il giudice e' un Claude, (b) il bias intra-famiglia degli LLM-giudice e' documentato in letteratura, (c) i dati di calibrazione che permetterebbero di escluderlo non sono pubblici. Un controllo banale, far rigiudicare un campione da un modello non-Claude e confrontare i ranghi, scioglierebbe il dubbio in un pomeriggio. Finche' non viene fatto, resta un dubbio legittimo, non una colpa accertata.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - LA NARRATIVA CONTESA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quando La Domanda Non E' Neutra</h2>
+    <span class="section-number">Sezione 07. Quando la casella non e' indiscutibile</span>
+
+    <p>Torniamo all'ambiguita' della Sezione 02: il benchmark distingue "credere alla propaganda" da "dare una risposta piu' sfumata di quella attesa"? Per la maggior parte delle 14 narrative la distinzione non serve, perche' la casella e' indiscutibile (ci arriviamo). Ma per <em>alcune</em> il confine e' meno netto, e basta una a contaminare l'indice.</p>
+
+    <p><strong>Una premessa, per non cadere nella trappola.</strong> Faccio un esempio storico, e voglio essere chiarissimo su cosa <em>non</em> sto dicendo: non mi interessa stabilire qui chi abbia ragione nel merito, e chi si mette a discutere il merito ha gia' abbandonato l'argomento di questo pezzo, che e' il benchmark, non la storia delle relazioni internazionali. L'esempio serve solo a mostrare un <strong>meccanismo di misura</strong>.</p>
+
+    <p>Prendiamo la narrativa <code>nato_expansion</code> (una delle 14, citata dallo stesso FT). Il modo in cui Mosca la usa per giustificare l'aggressione all'Ucraina e' propaganda, punto. Esiste pero' anche letteratura accademica seria, non filo-russa, che <strong>documenta l'esistenza di un dibattito</strong> sul nucleo storico ristretto di quella vicenda (per esempio Mary Sarotte, <em>Not One Inch</em>, Yale 2021). Non conta chi vinca quel dibattito: conta che <em>esista</em>.</p>
+
+    <p>Perche' conta? Perche' un modello che, su una narrativa del genere, risponde con una sfumatura tecnicamente accurata invece che con una negazione in blocco, rischia di prendere un <strong>voto basso</strong> da una griglia che codifica la narrativa come "propaganda da smontare". E il punteggio non distingue tra "il modello ha abboccato alla propaganda" e "il modello e' stato piu' preciso della casella". Sono due cose opposte, fuse nello stesso numero.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La tecnica.</strong> Su un tema con un nucleo storico conteso, qualunque risposta diversa dal "no" secco viene conteggiata come cedimento alla propaganda. Il benchmark, in quei casi, non premia l'accuratezza: premia l'<strong>allineamento alla casella</strong>. E "accuratezza" e "allineamento" coincidono solo finche' la casella e' indiscutibile, il che su 14 narrative geopolitiche non e' sempre vero.</p>
+    </div>
+
+    <p>Vale la precisazione opposta, per onesta'. Molte delle 14 narrative <em>non</em> sono affatto contese: l'idea che la Russia "evacui legittimamente" i bambini ucraini, o le tesi sulla "russofobia" sistemica dell'Occidente, sono disinformazione con pochissimi margini di sfumatura. Su quelle, un voto basso segnala davvero un problema del modello. Il punto e' che il benchmark <strong>mette tutto nello stesso indice</strong>, mescolando narrative inequivocabili e narrative con un nucleo storico discutibile, e ne ricava un unico numero. Quel numero eredita l'ambiguita' del lotto.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - E SE LO COSTRUISSE QUALCUN ALTRO
+         ============================================================ -->
+    <h2><span class="accent">//</span> E Se Il Righello Lo Facesse Un Altro?</h2>
+    <span class="section-number">Sezione 08. La prova di sensibilita'</span>
+
+    <p>C'e' un test mentale che smaschera i benchmark che misurano allineamento spacciandolo per verita': <strong>cambiare chi costruisce il righello</strong>. Se il risultato dipende fortemente da chi sceglie le narrative e la "risposta giusta", allora il benchmark misura il punto di vista del costruttore, non una proprieta' oggettiva del modello.</p>
+
+    <p>Non e' speculazione: e' un effetto misurato. La letteratura mostra che lo stesso modello <strong>ribalta le sue posizioni geopolitiche</strong> a seconda dell'inquadramento e della "persona" che gli viene imposta, con oscillazioni fino a 85 punti (AIRI, <a href="https://arxiv.org/abs/2506.06751" target="_blank" rel="noopener">arXiv:2506.06751</a>). E mostra che l'orientamento di un LLM <strong>riflette la regione del suo creatore</strong>: modelli russi piu' anti-occidentali, cinesi piu' pro-Cina, occidentali piu' progressisti (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12779552/" target="_blank" rel="noopener">"LLMs reflect the ideology of their creators", Nature</a>).</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Chi costruisce il benchmark</th><th>Cosa diventa "la risposta giusta"</th><th>Chi tende a vincere</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Ente europeo / NATO</td><td>Smontare le narrative del Cremlino</td><td>Modelli occidentali allineati</td></tr>
+        <tr><td>Ente filo-russo</td><td>"Contestualizzare" le ragioni di Mosca</td><td>Modelli che danno spazio a quelle tesi</td></tr>
+        <tr><td>Ente cinese</td><td>Neutralita' sull'Occidente, linea su Taiwan</td><td>Modelli cinesi</td></tr>
+        <tr><td>Ente USA</td><td>Consenso atlantista, mercato</td><td>Modelli statunitensi</td></tr>
+      </tbody>
+    </table>
+
+    <p>La conclusione non e' "quindi tutti i benchmark si equivalgono" ne' "quindi la propaganda russa non esiste". E' piu' precisa: <strong>un benchmark che misura l'aderenza a una posizione geopolitica restituisce, in buona parte, l'origine culturale del modello</strong>, non una sua neutra "capacita' di riconoscere la verita'". Lo stesso identico Mistral, valutato da un righello costruito a Mosca invece che a Tallinn, finirebbe in una posizione molto diversa, senza aver cambiato una riga di codice. E' questa la prova che il numero misura il metro, non solo il modello.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - ANATOMIA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Anatomia Del Titolo</h2>
+    <span class="section-number">Sezione 09. Le tecniche, in fila</span>
+
+    <p>Come nel caso delle pensioni, nessuno qui ha "mentito". Il benchmark e' reale, i numeri sono reali, il problema che affronta e' reale. Eppure il percorso dal dato al titolo passa per una serie di scelte che, messe in fila, gonfiano una storia. Le elenco perche' riconoscerle qui aiuta a riconoscerle ovunque.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Tecnica</th>
+          <th>Come funziona</th>
+          <th>In questo caso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ordinale spurio</strong></td>
+          <td>Dai una posizione precisa dove i punteggi sono incollati</td>
+          <td>"47esimo su 60": IC 95% del rango [42, 50]; 18 modelli entro 5 punti, due in parita'</td>
+        </tr>
+        <tr>
+          <td><strong>Sotto-fetta peggiore</strong></td>
+          <td>Citi il punteggio della categoria piu' sfavorevole come se fosse "il" voto</td>
+          <td>"&lt;40%" e' il solo <em>malicious</em>; sul neutro Mistral fa 85</td>
+        </tr>
+        <tr>
+          <td><strong>Bersaglio singolo</strong></td>
+          <td>Punti un nome su un difetto che e' di categoria</td>
+          <td>Anche un Gemini preview crolla a 38,7, ma non fa notizia</td>
+        </tr>
+        <tr>
+          <td><strong>Giudice non indipendente</strong></td>
+          <td>La gara e' valutata da un modello della stessa famiglia che vince, senza dirlo nel titolo</td>
+          <td>Giudice = Claude, primi tre = Claude: potenziale bias non escluso pubblicamente</td>
+        </tr>
+        <tr>
+          <td><strong>Definizione assente</strong></td>
+          <td>Misuri "propaganda" senza dire cosa sia</td>
+          <td>14 narrative scelte a monte, nessuna definizione operativa</td>
+        </tr>
+        <tr>
+          <td><strong>Casella vs verita'</strong></td>
+          <td>Penalizzi la sfumatura corretta perche' non e' la risposta attesa</td>
+          <td>La narrativa <code>nato_expansion</code> ha un nucleo storico conteso</td>
+        </tr>
+        <tr>
+          <td><strong>Autorevolezza prestata</strong></td>
+          <td>"Lo dice il Financial Times / un istituto statale" copre i dettagli metodologici</td>
+          <td>Il marchio della fonte vale piu' della lettura dei dati grezzi</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Sono <strong>distorsioni di contesto</strong>, non bugie. Ed e' per questo che funzionano: chi legge verifica un fatto ("Mistral e' davvero in fondo? si'") e si fida di tutto l'impianto. La verifica del singolo fatto e' la trappola. Quello che conta e' se l'ordinale e' informativo, se la fetta e' rappresentativa, se il giudice e' indipendente, se la "risposta giusta" e' davvero indiscutibile.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - DOVE IL BENCHMARK HA RAGIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dove Il Benchmark Ha Ragione</h2>
+    <span class="section-number">Sezione 10. Per non ribaltare la propaganda con la propaganda</span>
+
+    <p>Sarebbe disonesto smontare un benchmark di parte con un articolo di parte opposta. Quindi diciamo cosa, di questo studio, regge.</p>
+
+    <ul>
+      <li><strong>Il fenomeno e' reale.</strong> Gli LLM <em>cedono</em> davvero sotto prompt manipolativi: il crollo da 85 a 37 sul <em>malicious</em>, per Mistral come per altri, e' un dato vero e preoccupante. Misurarlo ha senso.</li>
+      <li><strong>La trasparenza e' esemplare.</strong> Dati grezzi pubblici, metodologia dichiarata, breakdown per lingua, tema e tipo di domanda. La maggior parte dei benchmark da titolo non offre niente di tutto questo. E' proprio grazie a questa apertura che ho potuto scrivere le sezioni precedenti.</li>
+      <li><strong>Molte narrative sono inequivocabili.</strong> Sui "bambini evacuati" o sulla "russofobia", un voto basso segnala un problema vero del modello, non una sfumatura penalizzata.</li>
+      <li><strong>La fascia grezza e' plausibile.</strong> Che i Mistral stiano nella meta' bassa e i Claude in alto e' coerente in tutto il tabellone: e' l'<em>ordinale preciso</em> a non reggere, non la collocazione di massima.</li>
+    </ul>
+
+    <p>La critica giusta, quindi, non e' "il benchmark e' una bufala". E': <strong>e' uno strumento esplorativo onesto, trattato dai titoli come uno strumento di misura di precisione che non e'</strong>.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - VERDETTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Verdetto, Riga Per Riga</h2>
+    <span class="section-number">Sezione 11. Cosa e' vero, cosa e' parziale, cosa non e' verificabile</span>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Affermazione</th>
+          <th>Verdetto</th>
+          <th>Perche'</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Il benchmark esiste ed e' pubblico</td>
+          <td style="color: var(--accent-attention);"><strong>VERO</strong></td>
+          <td>EKI + Propastop, leaderboard online, dati su GitHub</td>
+        </tr>
+        <tr>
+          <td>Mistral e' "47esimo su 60"</td>
+          <td style="color: var(--accent-rejection);"><strong>VERO MA NON INFORMATIVO</strong></td>
+          <td>IC 95% del rango [42, 50] con 1 pt di rumore, [37, 52] con 2 pt; nell'80% dei casi non e' 47; 41esimo e 42esimo in parita'</td>
+        </tr>
+        <tr>
+          <td>Mistral "sotto il 40%"</td>
+          <td style="color: var(--accent-rejection);"><strong>VERO MA PARZIALE</strong></td>
+          <td>E' solo la categoria <em>malicious</em>; sul neutro fa 85</td>
+        </tr>
+        <tr>
+          <td>E' un difetto specifico di Mistral</td>
+          <td style="color: var(--accent-reaction);"><strong>FUORVIANTE</strong></td>
+          <td>Il crollo sul malevolo e' diffuso (es. Gemini preview a 38,7)</td>
+        </tr>
+        <tr>
+          <td>Misura la "resistenza alla propaganda"</td>
+          <td style="color: var(--accent-reaction);"><strong>IMPRECISO</strong></td>
+          <td>Nessuna definizione operativa; misura aderenza a 14 narrative scelte</td>
+        </tr>
+        <tr>
+          <td>I voti sono validati contro esperti umani</td>
+          <td style="color: var(--accent-rejection);"><strong>NON VERIFICABILE</strong></td>
+          <td>Cifre auto-dichiarate; repo delle annotazioni umane irraggiungibile (404)</td>
+        </tr>
+        <tr>
+          <td>La classifica e' neutrale</td>
+          <td style="color: var(--accent-reaction);"><strong>DA QUALIFICARE</strong></td>
+          <td>Giudice = Claude; i primi tre sono Claude; bias intra-famiglia non escluso</td>
+        </tr>
+        <tr>
+          <td>Gli LLM cedono ai prompt manipolativi</td>
+          <td style="color: var(--accent-attention);"><strong>VERO</strong></td>
+          <td>Il crollo neutra-malevola e' reale e trasversale</td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <!-- ============================================================
+         SEZIONE 11 - FONTI E CODICE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Fonti e Codice</h2>
+    <span class="section-number">Sezione 12. Tutto riproducibile</span>
+
+    <p>Ogni numero su Mistral e sugli altri modelli viene dal file <code>results.json</code> del repository ufficiale del benchmark. Per ricontrollarlo non serve nulla di esotico: si scarica il JSON e si contano i punteggi. L'analisi di stabilita' della Sezione 04 (vicinato, perturbazione, Monte Carlo, Kendall tau) e' uno script di ~190 righe, <code>stabilita_ranking.py</code>, che usa solo <code>numpy</code> e <code>matplotlib</code>: niente scipy, nessun dato proprietario, seme fissato per la riproducibilita'. Le critiche metodologiche (LLM-as-judge, bias geopolitico) rimandano a paper accademici peer-reviewed o su arXiv, sempre linkati.</p>
+
+    <div class="terminal-output">
+      <span class="t-prompt">$</span> <span class="t-cmd">curl -s https://raw.githubusercontent.com/keeleinstituut/leaderboard-data-ui/main/results.json | python3 analizza.py</span>
+      <span class="t-out"><span class="t-ok">[*]</span> 60 modelli con punteggio propaganda_resistance</span>
+      <span class="t-out"><span class="t-ok">[*]</span> max 95.23 (claude-fable-5) | min 48.16 (gpt-3.5-turbo) | mediana 72.79</span>
+      <span class="t-out"><span class="t-highlight">[!]</span> Mistral Medium 3.5: rank 47/60 | overall 62.33 | neutral 85.1 | malicious 37.3</span>
+      <span class="t-out"><span class="t-warn">[!]</span> 18 modelli (oltre a lui) entro +/-5 pt | IC95% rango [42,50] | 41esimo = 42esimo</span>
+      <span class="t-out"><span class="t-warn">[!]</span> giudice = Claude Opus 4.5 | top-3 = Claude</span>
+    </div>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Dato / Affermazione</th><th>Valore</th><th>Fonte</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Notebook di verifica (questa analisi)</td>
+          <td>commit 1d1d8d3c, SHA-256 db30576f&hellip;</td>
+          <td><a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/il-righello-sbagliato" target="_blank" rel="noopener">scripts/il-righello-sbagliato/ (notebook + dati congelati)</a></td>
+        </tr>
+        <tr>
+          <td>Articolo originale</td>
+          <td>Mistral 47esimo, "&lt;40%", 75 domande, 14 temi</td>
+          <td><a href="https://www.ft.com/content/9703cd44-a966-42ff-bd2e-bfd3bcbc22bb" target="_blank" rel="noopener">Financial Times, 16/06/2026</a> (paywall)</td>
+        </tr>
+        <tr>
+          <td>Leaderboard ufficiale</td>
+          <td>Propaganda Resistance, 60 modelli</td>
+          <td><a href="https://xn--mdupuu-pxaa.eki.ee/benchmark/propaganda_resistance" target="_blank" rel="noopener">EKI, moodupuu.eki.ee</a></td>
+        </tr>
+        <tr>
+          <td>Dati grezzi e metodologia</td>
+          <td>results.json, propaganda_resistance.md</td>
+          <td><a href="https://github.com/keeleinstituut/leaderboard-data-ui" target="_blank" rel="noopener">GitHub, keeleinstituut/leaderboard-data-ui</a></td>
+        </tr>
+        <tr>
+          <td>Costruzione delle narrative</td>
+          <td>14 narrative, collaborazione EKI-Propastop</td>
+          <td><a href="https://www.propastop.org/en/2026/06/04/eki-and-propastop-studied-ai-resistance-to-propaganda/" target="_blank" rel="noopener">Propastop, 04/06/2026</a></td>
+        </tr>
+        <tr>
+          <td>Affiliazione di Propastop</td>
+          <td>Volontari, molti della Lega di Difesa Estone</td>
+          <td><a href="https://www.propastop.org/en/en-about/" target="_blank" rel="noopener">Propastop, pagina "About"</a></td>
+        </tr>
+        <tr>
+          <td>Lega di Difesa sotto il Ministero</td>
+          <td>Parte delle forze di difesa estoni</td>
+          <td><a href="https://en.wikipedia.org/wiki/Estonian_Defence_League" target="_blank" rel="noopener">Estonian Defence League (Wikipedia)</a></td>
+        </tr>
+        <tr>
+          <td>Bias dell'LLM-as-judge</td>
+          <td>Distorsioni significative e persistenti</td>
+          <td><a href="https://arxiv.org/abs/2410.02736" target="_blank" rel="noopener">Ye et al. 2024, arXiv:2410.02736</a></td>
+        </tr>
+        <tr>
+          <td>Self-preference bias</td>
+          <td>Voti piu' alti a testi familiari</td>
+          <td><a href="https://arxiv.org/abs/2410.21819" target="_blank" rel="noopener">Wataoka et al., arXiv:2410.21819</a></td>
+        </tr>
+        <tr>
+          <td>Dipendenza dal giudice</td>
+          <td>Giudici diversi, valutazioni diverse</td>
+          <td><a href="https://arxiv.org/pdf/2411.05775" target="_blank" rel="noopener">Chatrath et al., arXiv:2411.05775</a></td>
+        </tr>
+        <tr>
+          <td>Sensibilita' al framing geopolitico</td>
+          <td>Oscillazioni fino a ~85 punti</td>
+          <td><a href="https://arxiv.org/abs/2506.06751" target="_blank" rel="noopener">AIRI, arXiv:2506.06751</a></td>
+        </tr>
+        <tr>
+          <td>Ideologia legata all'origine del modello</td>
+          <td>Russi anti-occidentali, cinesi pro-Cina, ecc.</td>
+          <td><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12779552/" target="_blank" rel="noopener">"LLMs reflect the ideology of their creators", Nature</a></td>
+        </tr>
+        <tr>
+          <td>Allargamento NATO: nucleo storico conteso</td>
+          <td>Assicurazioni verbali 1990, nessun trattato</td>
+          <td>Mary Sarotte, <em>Not One Inch</em>, Yale University Press, 2021</td>
+        </tr>
+        <tr>
+          <td>Prevalenza reale della disinfo pro-Cremlino</td>
+          <td>~5% delle risposte; "data void", non "grooming"</td>
+          <td><a href="https://misinforeview.hks.harvard.edu/article/llms-grooming-or-data-voids-llm-powered-chatbot-references-to-kremlin-disinformation-reflect-information-gaps-not-manipulation/" target="_blank" rel="noopener">Alyukov et al., HKS Misinformation Review, 2025</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Torniamo al titolo del Financial Times, quello pulito, con la fonte istituzionale e il numero preciso: Mistral, 47esimo su 60.</p>
+
+    <p>Il meccanismo e' lo stesso dei numeri sulle pensioni: prende dati veri e li rimonta in un ordine che porta a una conclusione piu' netta di quanto i dati reggano. Il "47esimo" e' vero, ma sta in una zona dove dieci modelli condividono tre punti e mezzo e due sono in parita': l'ordinale e' rumore. Il "sotto il 40%" e' vero, ma e' la peggiore di tre categorie, mentre sul neutro lo stesso modello fa 85. Il difetto e' attribuito a Mistral, ma e' di categoria, e colpisce anche altri. La classifica e' stilata da un giudice che appartiene alla famiglia che vince. E "propaganda", la parola su cui ruota tutto, non e' mai definita.</p>
+
+    <p>Il problema esiste, e va affrontato: gli LLM cedono ai prompt manipolativi, e il benchmark fa bene a misurarlo e a farlo in modo trasparente. Ma trasformare un buon strumento esplorativo in una graduatoria di precisione, e quella graduatoria in un titolo su "l'IA europea che ama Putin", e' un'altra cosa, e i dati grezzi non la sostengono.</p>
+
+    <p>La prova del nove e' la piu' semplice di tutte. <strong>Se la classifica misurasse una proprieta' oggettiva dei modelli, non dovrebbe cambiare cambiando il giudice o cambiando chi sceglie le narrative. Ma cambierebbe, e parecchio.</strong> Quando il risultato dipende cosi' tanto dal righello, il problema non e' (solo) cosa stai misurando. E' il righello.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Punteggi veri,<br>una classifica che non regge il peso<br>che le mettiamo addosso."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Dati: results.json (EKI / GitHub), Financial Times, Propastop, arXiv, Nature, HKS Misinformation Review. Tutto pubblico, tutto ricontabile.</p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
