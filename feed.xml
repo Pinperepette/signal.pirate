@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Da Dove Arrivano i Voti di Vannacci</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/da-dove-arrivano-i-voti-vannacci.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/da-dove-arrivano-i-voti-vannacci.html</guid>
+    <pubDate>Fri, 19 Jun 2026 00:00:00 +0200</pubDate>
+    <description>Su X continuo a leggere la stessa frase, "Vannacci prende i voti dalla sinistra", e mi pareva una stronzata. Ma "mi pare" non e' un argomento, e per fortuna questa e' una previsione su dei numeri: i flussi elettorali. Cosi' sono andato a leggerli. Secondo il Barometro Politico di Demopolis (demopolis.it, 9 aprile 2026), Futuro Nazionale e' al 3,5% e sottrae "l'1,3% a Salvini, l'1% a Fratelli d'Italia, ma attingendo anche al largo bacino dell'astensione": il centrosinistra non e' nemmeno citato tra le fonti. Un secondo istituto, Lab21 (per Affaritaliani, 13 giugno 2026, n=1.014), la quota da fuori la destra la misura: e' il 2,1% (Lega 45,7%, FdI 38,9%, CasaPound 7,2%, altro centrodestra 6,1%, altre forze 2,1%). Una simulazione Dirichlet-multinomiale sui conteggi reali di Lab21, 200 mila estrazioni, conferma una quota "altre forze" con media 2,1% e intervallo di confidenza 95% tra 1,3 e 3,1%; perche' la tesi di X regga (piu' voti da sinistra che da destra) la quota da fuori la destra dovrebbe diventare maggioranza, una sottostima di circa 24 volte, e in 200 mila simulazioni non accade mai. Lo schema e' lo stesso delle europee 2024, l'unica volta in cui Vannacci e' finito davvero in una scheda (532.368 preferenze, prima della Lega): i flussi del Cattaneo, stimati col modello di Goodman, mostrano una destra che si rimescola al proprio interno (FI e Lega verso FdI) e un M5S che si disperde nell'astensione, non un travaso tra i campi. Resta l'effetto "ago della bilancia", quello che fa dire "senza Vannacci il centrodestra perde": e' vero (Supermedia YouTrend 1 giugno: centrodestra 44,8 contro campo largo 44,9, ma 48,8 se Vannacci rientra), pero' e' pura aritmetica di coalizione, perche' il campo largo resta fermo a 44,9 in entrambi gli scenari. Vannacci non gli toglie ne' gli da' un solo voto: dei suoi 3,5 punti, 2,3 erano gia' voti di centrodestra e il resto e' astensione. Sposta voti dentro la destra, non tra i campi: non pesca a sinistra, la divide. 8 grafici, dati Istituto Cattaneo, Demopolis, Lab21, Supermedia YouTrend/AGI, tutti verificati alla fonte primaria, simulazione riproducibile.</description>
+  </item>
+
+  <item>
     <title>Il Righello Sbagliato</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/il-righello-sbagliato.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/il-righello-sbagliato.html</guid>

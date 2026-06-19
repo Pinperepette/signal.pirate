@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Da Dove Arrivano i Voti di Vannacci | Signal Pirate</title>
+  <meta name="description" content="Su X continuo a leggere che Vannacci 'prende i voti dalla sinistra'. L'ho verificato alla fonte primaria. Demopolis (Barometro, 9 apr 2026): Futuro Nazionale al 3,5%, sottrae 1,3 alla Lega e 1,0 a FdI, il resto all'astensione, e il centrosinistra non e' nemmeno citato. Lab21 (n=1.014) lo quantifica al 2,1%. Una Dirichlet-multinomiale sui conteggi reali conferma una quota da fuori la destra del 2,1% (IC 1,3-3,1%), e perche' la tesi regga (piu' voti da sinistra che da destra) la rilevazione dovrebbe sottostimare di circa 24 volte. L'effetto 'ago della bilancia' e' solo aritmetica: il campo largo non si muove mai. 8 grafici, dati Cattaneo, Demopolis, Lab21, YouTrend, verificati al primario.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    blockquote.post-quote {
+      border-left: 3px solid var(--accent-rejection);
+      background: rgba(255,136,0,0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.4rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/da-dove-arrivano-i-voti-vannacci.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Da Dove Arrivano i Voti di Vannacci">
+  <meta property="og:description" content="Su X si ripete che Vannacci 'pesca a sinistra'. L'ho verificato alla fonte primaria. Demopolis: i suoi voti vengono da Lega, FdI e astensione, il centrosinistra non e' citato. Lab21 (n=1.014): solo il 2,1% da altre forze. Dirichlet sui conteggi reali: 2,1% (IC 1,3-3,1%); perche' la tesi regga servirebbe una sottostima di circa 24 volte. L'effetto 'ago della bilancia' e' solo aritmetica: il campo largo non si muove mai. 8 grafici, dati verificati Cattaneo, Demopolis, Lab21, YouTrend.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/da-dove-arrivano-i-voti-vannacci.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-06-19">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Da Dove Arrivano i Voti di Vannacci">
+  <meta name="twitter:description" content="'Pesca a sinistra'? Le fonti dicono il contrario: Demopolis non cita nemmeno il centrosinistra, Lab21 lo ferma al 2,1%. Perche' la tesi regga servirebbe una sottostima di ~24 volte. E l'ago della bilancia e' solo aritmetica: il campo largo non si muove mai.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Da Dove Arrivano i Voti di Vannacci","description":"Su X si ripete che Vannacci prende i voti dalla sinistra. Le fonti verificate dicono il contrario: secondo Demopolis i suoi voti vengono da Lega, FdI e astensione e il centrosinistra non e' citato; secondo Lab21 (n=1.014) solo il 2,1% arriva da altre forze. Una simulazione Dirichlet-multinomiale sui conteggi reali conferma una quota intorno al 2%, e l'effetto 'ago della bilancia' e' pura aritmetica di coalizione perche' il campo largo non si muove.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-06-19","dateModified":"2026-06-19","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/da-dove-arrivano-i-voti-vannacci.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-06-19 | Pinperepette</p>
+    <h1 class="article-page-title">Da Dove Arrivano i <span class="accent">Voti di Vannacci</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Su X continuo a leggere la stessa frase: "Vannacci prende i voti dalla sinistra". Mi suonava come una stronzata, ma "mi suona" non e' un argomento. Cosi' sono andato a vedere se i flussi elettorali dicono davvero questo. Spoiler: no.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Politica</span>
+      <span class="tag tag-highlight">Statistica</span>
+      <span class="tag tag-reaction">Flussi elettorali</span>
+      <span class="tag tag-amplification">Monte Carlo</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - LA FRASE CHE GIRA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Frase Che Gira</h2>
+    <span class="section-number">Sezione 00. Una curiosita', non una tesi politica</span>
+
+    <p>Non m'interessa, qui, se Vannacci sia un bene o un male: m'interessa una frase che gira su X, declinata in mille varianti, e che a differenza di un'opinione si puo' <strong>misurare</strong>: <em>"Vannacci ruba voti alla sinistra"</em>, <em>"Futuro Nazionale pesca nel bacino del campo largo"</em>, <em>"e' il nuovo argine al centrosinistra"</em>.</p>
+
+    <blockquote class="post-quote">
+      "In realta' Vannacci sta prendendo un sacco di voti delusi dal PD e dai 5 Stelle, gente di sinistra che non si sente piu' rappresentata."
+      <span style="display:block; font-style:normal; font-size:0.8em; margin-top:0.5rem; color:var(--text-secondary);">— uno dei tanti commenti, parafrasato. Lo trovi in venti varianti sotto qualsiasi thread sui sondaggi.</span>
+    </blockquote>
+
+    <p>Mi puzzava perche' Vannacci viene dalla Lega, fa campagna su immigrazione, sicurezza, identita': temi che pescano a destra, non a sinistra. Ma il sospetto non basta. La cosa bella e' che <strong>questa frase non e' un'opinione: e' una previsione su dei numeri</strong>, e i numeri esistono. Si chiamano flussi elettorali. Andiamo a leggerli.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Una cosa va detta subito.</strong> La lista di Vannacci (Futuro Nazionale) <strong>non ha ancora votato</strong> a un'elezione vera: i numeri sulla provenienza dei suoi voti sono stime di sondaggio, non schede contate. Dove invece i voti sono stati contati, le europee 2024, il quadro e' lo stesso.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - COME SI MISURA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Come Si Misura "Da Dove Arriva Un Voto"</h2>
+    <span class="section-number">Sezione 01. I flussi elettorali in due minuti</span>
+
+    <p>Il voto e' segreto, quindi nessuno sa <em>davvero</em> cosa hai votato cinque anni fa e cosa voti oggi. Eppure si riesce a stimare quanti elettori si sono spostati da un partito all'altro. Due strade:</p>
+
+    <ul>
+      <li><strong>Inferenza ecologica</strong> (la scuola dell'<a href="https://www.cattaneo.org/" target="_blank" rel="noopener">Istituto Cattaneo</a>): si confrontano i risultati seggio per seggio tra due elezioni e, dai modi in cui salgono e scendono insieme, si stima la matrice degli spostamenti. Niente interviste: solo i numeri reali delle urne.</li>
+      <li><strong>Sondaggi panel / ricordo del voto</strong>: si chiede a un campione cosa ha votato prima e cosa voterebbe oggi. E' il metodo usato per le liste che non hanno ancora uno storico elettorale, come quella di Vannacci.</li>
+    </ul>
+
+    <p>Entrambi hanno limiti, e li dichiaro: l'inferenza ecologica puo' sbagliare se nello stesso seggio gruppi diversi si muovono in direzioni opposte; il sondaggio soffre del fatto che la gente ricorda male (e a volte ricostruisce) il proprio voto passato. Per questo non mi fido di un singolo numero: cerco la <strong>convergenza</strong> tra il dato vero del 2024 e le stime di oggi. Se puntano nella stessa direzione, la direzione e' probabilmente quella.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>L'idea chiave.</strong> "Da dove arriva un voto" non e' una domanda da bar: e' una grandezza stimabile. E una stima si puo' mettere alla prova, le si puo' attaccare un margine d'errore e si puo' chiedere: <em>quanto dovrebbe essere sbagliata perche' la conclusione cambi?</em></p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - IL PRECEDENTE REALE: EUROPEE 2024
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Precedente Dove I Voti Sono Stati Contati</h2>
+    <span class="section-number">Sezione 02. Europee 2024: l'unica volta che Vannacci e' finito in una scheda</span>
+
+    <p>Alle europee del 2024 Vannacci si e' candidato nella <strong>Lega</strong> e ha fatto il botto di preferenze: <strong>532.368</strong>, primo del partito in quattro circoscrizioni su cinque (<a href="https://www.quotidiano.net/elezioni/vannacci-preferenze-europee-thct33q9" target="_blank" rel="noopener">Quotidiano Nazionale</a>). E' l'unico dato <em>vero</em>, contato, che abbiamo su di lui. Solo che dice meno di quanto sembra.</p>
+
+    <p>Le preferenze sono <strong>voti dentro la lista</strong>: ti dicono che molti elettori della Lega hanno scelto lui, non da dove veniva quell'elettorato. Per quello servono i flussi, e quelli delle europee 2024 li ha stimati l'Istituto Cattaneo col <strong>modello di Goodman</strong> (la stima statistica dei travasi a partire dai risultati di tutte le sezioni di una citta'), pubblicandoli solo dopo i controlli sull'errore (<a href="https://www.cattaneo.org/wp-content/uploads/2024/06/2024-06-10-Eur_Risultati_Flussi.pdf" target="_blank" rel="noopener">Cattaneo, 10/06/2024</a>). Cosa raccontano? Che i blocchi tengono, e il rimescolio avviene <strong>dentro</strong> ciascun campo.</p>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/03_europee2024_fdi.png" alt="Variazione dei voti tra Politiche 2022 ed Europee 2024 (Istituto Cattaneo, dati Min. Interno): a sinistra il M5S cala di 5,4 punti mentre PD (+5,2) e AVS (+3,1) crescono; a destra FdI (+2,6), Lega (+0,2) e FI+Moderati (+1,4) tengono o salgono" class="lab-screenshot">
+
+    <p>Il Cattaneo lo scrive a parole sue: alle europee si trovano "flussi da FI e Lega verso FdI", e specularmente "da M5S e AVS verso il PD", mentre i due grandi partiti pescano dall'area del Terzo Polo ormai disciolto. Il M5S, che e' il partito che perde di piu', si disperde soprattutto <strong>nell'astensione</strong>. Detto altrimenti: i movimenti prevalenti osservati dal Cattaneo avvengono <strong>all'interno dei due blocchi</strong>, piu' una grossa fetta di elettori che torna nell'astensione. Il travaso da un campo all'altro, in quei flussi, non e' il protagonista.</p>
+
+    <p>E l'exploit personale di Vannacci? Le preferenze non raccontano i flussi, ma il contesto e' questo: la Lega, dove correva, quel giorno non e' esplosa (resta intorno al 9%, +0,2 punti sul 2022). Il suo mezzo milione di preferenze e' stato soprattutto una <strong>ridistribuzione dentro la destra</strong>, non una conquista di terreno avversario. Tieni a mente lo schema, perche' nel 2026 si ripete.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - OGGI: DA DOVE ARRIVANO I 4,5 PUNTI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Oggi: I Punti Di Futuro Nazionale</h2>
+    <span class="section-number">Sezione 03. La scomposizione del voto, numero per numero</span>
+
+    <p>Veniamo a oggi. Il partito di Vannacci, Futuro Nazionale, nei sondaggi della primavera-estate 2026 viaggia tra il 3,5% e il 5%. La domanda di X e': quei punti, da chi arrivano? Il dato piu' esplicito lo da' il <strong>Barometro Politico di Demopolis</strong> (<a href="https://www.demopolis.it/?p=13193" target="_blank" rel="noopener">demopolis.it, 9 aprile 2026</a>), che stima Futuro Nazionale al 3,5% e ne descrive cosi' la provenienza, testualmente: sottrae "l'1,3% a Salvini, l'1% a Fratelli d'Italia, ma attingendo anche al largo bacino dell'astensione".</p>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/01_provenienza_fn.png" alt="Provenienza dei voti di Futuro Nazionale secondo Demopolis (9 aprile 2026): 1,3 punti dalla Lega, 1,0 da FdI, circa 1,2 dall'astensione, e il centrosinistra non e' citato tra le fonti" class="lab-screenshot">
+
+    <p>Mettiamo i numeri in fila. Dei 3,5 punti, <strong>1,3 vengono dalla Lega</strong> e <strong>1,0 da Fratelli d'Italia</strong>: 2,3 punti, i due terzi, sono voti tolti agli <em>alleati</em> di centrodestra. Il resto, circa <strong>1,2 punti</strong> (cioe' 3,5 meno 2,3), Demopolis lo attribuisce all'<strong>astensione</strong>, gente che alle europee era rimasta a casa. E il centrosinistra? <strong>Non e' nemmeno citato come fonte.</strong> Messa in proporzione, la fotografia e' questa:</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number orange">66%</div>
+        <div class="stat-label">da destra<br>(Lega + FdI)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">34%</div>
+        <div class="stat-label">da ex<br>astenuti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">&le;2%</div>
+        <div class="stat-label">dal centrosinistra<br>(Demopolis: 0)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">532k</div>
+        <div class="stat-label">preferenze 2024<br>(stesso schema)</div>
+      </div>
+    </div>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/02_torta_provenienza.png" alt="Ripartizione dei voti di Vannacci secondo Demopolis: 66% da destra, 34% da astensione, zero dichiarato dal centrosinistra" class="lab-screenshot" style="max-width: 620px; display: block; margin: 1.5rem auto;">
+
+    <p>Una precisazione sul dato, perche' conta. Demopolis nomina solo Lega, FdI e astensione: <strong>non quantifica il centrosinistra</strong>. "Non citato" pero' non e' "misurato a zero": per mettere un numero su quella casella serve un secondo istituto, ed e' la prossima sezione. Per ora resta il fatto leggibile qui: la provenienza che Demopolis registra e' <strong>tutta a destra, piu' l'astensione</strong>.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">La frase di X come ipotesi falsificabile</span>
+      Ipotesi:  i voti di Vannacci arrivano da sinistra<br>
+      Previsione:  nei flussi, quota "da sinistra" alta<br>
+      <span style="font-size: 0.9rem; color: var(--text-secondary);">Dato osservato (Demopolis): fonti = Lega 1,3, FdI 1,0, astensione ~1,2; centrosinistra non citato. Previsione fallita.</span>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03b - TRIANGOLAZIONE TRA ISTITUTI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Due Misure, Stessa Direzione</h2>
+    <span class="section-number">Sezione 03b. Demopolis e Lab21, controllati alla fonte</span>
+
+    <p>Un istituto solo non basta, e Demopolis per giunta il centrosinistra non lo quantifica nemmeno. Serve una seconda misura, di un altro istituto e con un altro metodo, che faccia il lavoro mancante: mettere un numero sulla quota da fuori la destra. Ce n'e' una, controllata alla fonte primaria: Lab21, per Affaritaliani, su 1.014 interviste.</p>
+
+    <table class="strategy-table">
+      <thead>
+        <tr><th>Fonte (data)</th><th>Da Lega</th><th>Da FdI</th><th>Altra destra</th><th>Astensione</th><th>Centrosinistra / altre forze</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Demopolis</strong><br>(9 apr 2026)</td>
+          <td>1,3 pt</td><td>1,0 pt</td><td>&mdash;</td><td>~1,2 pt</td>
+          <td style="color: var(--accent-attention);"><strong>non citato</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Lab21</strong><br>(13 giu 2026, n=1.014)</td>
+          <td>45,7%</td><td>38,9%</td><td>13,3%<br><span style="font-size:0.85em; color:var(--text-secondary);">CasaPound 7,2 + altro cdx 6,1</span></td><td><span style="color:var(--text-secondary);">non rilevata</span></td>
+          <td style="color: var(--accent-attention);"><strong>2,1%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Attenzione alle unita'.</strong> Le due fonti <em>non</em> misurano la stessa cosa e le righe non vanno sommate: Demopolis esprime la provenienza in <strong>punti sull'elettorato</strong> (su un totale del 3,5%) e include l'astensione; Lab21 (per Affaritaliani) da' la <strong>composizione percentuale</strong> dei soli elettori di Futuro Nazionale e misura solo i travasi <em>tra partiti</em> (l'astensione non entra, ed e' per questo che le sue percentuali di partito sono piu' alte). Direttamente confrontabile e' l'ultima colonna, ed e' quella che conta.</p>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/08_triangolazione.png" alt="Quota dei voti di Vannacci dal centrosinistra/altre forze: Demopolis non la cita (zero dichiarato), Lab21 la stima al 2,1%, entrambe lontanissime dalla soglia del 50% che servirebbe perche' la tesi di X fosse vera" class="lab-screenshot">
+
+    <p>Le due fonti partono da metodi diversi e sui numeri grossi non coincidono. Ma sulla casella che qui decide tutto, quella da fuori la destra, convergono per due strade: Demopolis <strong>non la registra nemmeno</strong>, Lab21 la <strong>misura e la inchioda al 2,1%</strong>. Due strumenti tarati in modo diverso che cadono sullo stesso punto valgono molto piu' di un numero singolo.</p>
+
+    <p>Gli altri istituti (SWG, Noto, Tecne') vanno nella stessa direzione, "soprattutto Lega, FdI e astenuti", ma non pubblicano una matrice disaggregata che si possa aprire e controllare: restano fuori dal conto, validi solo come conferma qualitativa.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Un punto di metodo.</strong> Il modello statistico della prossima sezione quantifica l'incertezza <em>dentro</em> una stima. Ma a tenere in piedi un risultato e' soprattutto una <strong>seconda misura separata, con un altro metodo, che cade nello stesso posto</strong>: e' quella, piu' della simulazione, a dire che la direzione e' solida.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - QUANTO REGGE: MONTE CARLO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quanto E' Precisa La Stima</h2>
+    <span class="section-number">Sezione 04. L'incertezza campionaria, messa alla prova</span>
+
+    <p>Le due fonti concordano sulla direzione; adesso quantifico quanto e' stretto il numero. Uso quello che ha un campione vero e una casella esplicita per la sinistra: <strong>Lab21, n=1.014</strong>. Modello la composizione del voto di Futuro Nazionale con una <strong>Dirichlet-multinomiale</strong>, lo strumento standard per le proporzioni: dai 1.014 intervistati ricavo i conteggi reali nelle cinque caselle di provenienza (con prior di Jeffreys, &alpha; = conteggi + 0,5) ed estraggo <strong>200.000 composizioni possibili</strong>. Il vantaggio, rispetto a infilare un errore gaussiano su ogni numero, e' che il modello impone da solo le due cose che la realta' richiede: le quote non possono essere negative e devono sommare a cento. Non devo quindi assumere che le componenti siano indipendenti, perche' non lo sono. Poi guardo, nelle 200.000 simulazioni, quanto pesa la casella "altre forze", quella che contiene il centrosinistra.</p>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/06_montecarlo_sinistra.png" alt="Simulazione Dirichlet-multinomiale sui conteggi reali Lab21 (n=1.014, 200.000 estrazioni): la quota di elettori di Vannacci dalla casella 'altre forze' ha media 2,1% e intervallo di confidenza 95% tra 1,3% e 3,1%" class="lab-screenshot">
+
+    <p>La quota "altre forze" ha una <strong>media del 2,1%</strong> e un intervallo di confidenza al 95% tra <strong>1,3% e 3,1%</strong>. Nemmeno nello scenario piu' generoso compatibile con i dati, e attribuendo per intero quella casella al centrosinistra, da sinistra arriva piu' di un trentesimo dei voti di Vannacci. La conclusione non dipende dall'aver preso per buono un singolo decimale: regge anche scuotendo il dato entro il suo errore campionario.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Perche' questo conta.</strong> Un conto e' dire "il sondaggio dice 2%", un altro e' dire "anche sbagliando il sondaggio nel modo a me piu' sfavorevole, e mettendo <em>tutto</em> il residuo a sinistra, resta sotto il 3,5%". La seconda e' una conclusione robusta. La frase di X avrebbe bisogno di un errore di rilevazione enorme e tutto nella stessa direzione per diventare vera: non e' un margine, e' un miracolo. E quel miracolo si puo' perfino quantificare.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04b - LO STRESS TEST: QUANTO E' IMPROBABILE LA TESI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quanto Dovrebbe Sbagliare Il Sondaggio</h2>
+    <span class="section-number">Sezione 04b. Il controfattuale, e la probabilita' diretta della tesi di X</span>
+
+    <p>Fin qui ho misurato l'incertezza. Adesso ribalto la domanda: invece di chiedermi "quanto sono sicuro che i voti vengano da destra?", mi chiedo <strong>"quanto dovrebbe essere sbagliata la rilevazione perche' la tesi di X diventi vera?"</strong>. Perche' "Vannacci pesca soprattutto a sinistra" ha un significato numerico esatto: la quota in arrivo da fuori la destra dovrebbe <em>superare</em> quella in arrivo dalla destra.</p>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/07_stress_test.png" alt="Composizione Lab21 degli elettori di Futuro Nazionale: 97,9% da destra contro 2,1% da altre forze; perche' la tesi di X regga la quota verde dovrebbe diventare maggioranza superando il 50%, cioe' servirebbe una sottostima di circa 24 volte; la probabilita' che prenda piu' voti da sinistra che da destra e' inferiore a una su 200.000" class="lab-screenshot">
+
+    <p>Nei dati Lab21 sono <strong>97,9% da destra contro 2,1%</strong> da altre forze. Il 97,9% non e' una categoria costruita da me: aggrega le quattro componenti dell'area di destra che <em>Lab21 stessa</em> riporta separate (Lega, FdI, CasaPound e "altro centrodestra"); il 2,1% e' la sua categoria residuale "altre forze", quella che contiene il centrosinistra. Perche' la seconda <em>superi</em> la prima deve diventare maggioranza, cioe' passare il 50%: la rilevazione dovrebbe aver contato 2,1 dove il valore vero supera 50, una <strong>sottostima di circa 24 volte</strong>. Non l'errore di campionamento, che su 1.014 interviste vale poco piu' di un punto; un errore di oltre un ordine di grandezza, tutto nella stessa direzione. I sondaggi sbagliano, ma non cosi'.</p>
+
+    <p>Lo stesso, detto in probabilita'. Nelle 200.000 estrazioni del Dirichlet ho contato quante volte la quota "altre forze" supera quella di destra: <strong>zero</strong>. Non "poche": nessuna. Sotto questo modello, la probabilita' che la maggioranza dei voti di Vannacci venga da sinistra e' <strong>troppo piccola per emergere in 200.000 simulazioni</strong>: empiricamente, sotto una su 200.000. E' il limite superiore alla probabilita' dell'evento, non un rapporto di verosimiglianza fra le due teorie (che sarebbe un altro conto). Ma per la sola domanda che qui conta, "puo' reggere la frase di X?", un evento che non capita mai in duecentomila prove e' gia' una risposta.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"Perche' la tesi di X fosse vera,<br>la rilevazione dovrebbe sbagliarsi<br>di una ventina di volte, in una sola direzione.<br>I sondaggi non si sbagliano cosi'."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Controfattuale e probabilita' diretta sono due letture dello stesso dato Lab21: convergono perche' descrivono lo stesso scarto, 97,9 contro 2,1.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - L'ILLUSIONE OTTICA: L'AGO DELLA BILANCIA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Allora Perche' "Sembra" Aiutare La Sinistra?</h2>
+    <span class="section-number">Sezione 05. L'ago della bilancia e' aritmetica, non un travaso</span>
+
+    <p>Qui c'e' la parte interessante, quella che secondo me genera l'equivoco. Perche' tanta gente e' convinta che Vannacci favorisca il centrosinistra? Perche' <strong>guardano il risultato finale e ne deducono la causa sbagliata</strong>. Guardiamo i numeri della Supermedia YouTrend/AGI del 1 giugno 2026.</p>
+
+    <p>Con Futuro Nazionale lista a se', il <strong>centrodestra e' al 44,8%</strong> e il <strong>campo largo al 44,9%</strong>: il centrosinistra e' davanti di un soffio. Se Vannacci rientrasse nella coalizione, il centrodestra salirebbe a <strong>48,8%</strong> e tornerebbe a vincere. Lo stesso 4% di Vannacci ribalta chi vince. Da qui il salto logico: "quindi Vannacci sposta voti tra i due campi".</p>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/04_ago_bilancia.png" alt="Confronto coalizioni (Supermedia YouTrend 1 giugno 2026): con Vannacci fuori, centrodestra 44,8 contro campo largo 44,9 (vince il campo largo); con Vannacci dentro, centrodestra 48,8 contro 44,9 (vince il centrodestra). Il campo largo resta fermo a 44,9 in entrambi gli scenari" class="lab-screenshot">
+
+    <p>Guarda bene il grafico. C'e' un dettaglio che smonta tutto: <strong>la barra del campo largo non si muove</strong>. Resta 44,9 sia con Vannacci dentro sia con Vannacci fuori. Vannacci <em>non tocca</em> il centrosinistra: ne' gli toglie ne' gli da' voti. Allora cosa cambia? Cambia <strong>dove vengono contati i suoi voti</strong>. Scomponiamo quei punti che porterebbe a una coalizione di centrodestra, con le proporzioni misurate da Demopolis (3,5%):</p>
+
+    <img src="../immagini/da-dove-arrivano-i-voti-vannacci/05_riciclato_vs_nuovo.png" alt="Scomposizione dei 3,5 punti di Vannacci secondo Demopolis: 2,3 sono voti che erano gia' del centrodestra (riciclati), circa 1,2 sono davvero nuovi (ex astenuti); il centrosinistra non compare" class="lab-screenshot">
+
+    <p>Dei 3,5 punti, <strong>2,3 erano gia' voti del centrodestra</strong> (la Lega e FdI) che Vannacci si era portato via: rientrando, non li <em>aggiunge</em>, li <em>restituisce</em>. Solo <strong>~1,2 punti sono davvero nuovi</strong> per il blocco, ed e' mobilitazione di ex astenuti; il centrosinistra, lo abbiamo visto, non compare proprio. L'"ago della bilancia" e' tutto qui:</p>
+
+    <div class="warning-box fade-in" style="border-left-width: 5px;">
+      <p style="font-size: 1.05rem; line-height: 1.65;"><strong style="color: var(--accent-reaction);">Il meccanismo, in una riga.</strong> Vannacci da solo <strong>sottrae</strong> ~2,3 punti al centrodestra (che cosi' scivola sotto il campo largo); Vannacci alleato glieli <strong>rida'</strong> (e il centrodestra torna sopra). Il campo largo, in mezzo, non si e' mai mosso. Sembra che Vannacci sposti l'equilibrio tra i due schieramenti, ma sta solo spostando voti <strong>dentro</strong> la destra, dentro e fuori dal recinto della coalizione.</p>
+    </div>
+
+    <p>E' la differenza tra <strong>spostare un peso da un piatto all'altro</strong> della bilancia e <strong>togliere e rimettere un peso sullo stesso piatto</strong>. Visivamente l'ago fa la stessa cosa, ma sono due fenomeni diversi. La frase di X confonde il secondo col primo: vede l'ago muoversi e conclude che il peso e' passato dall'altra parte. Non e' passato da nessuna parte: e' sempre stato a destra.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>La distinzione che regge tutto.</strong> Vannacci <em>puo'</em> favorire il campo largo, ma in modo <strong>indiretto</strong>: dividendo la destra, non sottraendo un solo voto all'avversario. <strong>Un partito puo' danneggiare una coalizione senza togliere un voto allo schieramento opposto.</strong> "Far perdere la mia coalizione" e "portare voti all'altra" sono due cose diverse: qui la prima e' vera, la seconda no. La leggenda del Vannacci-che-pesca-a-sinistra nasce dal trattarle come la stessa frase.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - VERDETTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Verdetto, Riga Per Riga</h2>
+    <span class="section-number">Sezione 06. Cosa e' vero, cosa e' falso</span>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Affermazione che gira su X</th>
+          <th>Verdetto</th>
+          <th>Perche'</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Vannacci prende i voti dalla sinistra</td>
+          <td style="color: var(--accent-reaction);"><strong>SMENTITO DAI DATI</strong></td>
+          <td>Demopolis non cita il centrosinistra tra le fonti; Lab21 lo stima al 2,1%. Dirichlet: media 2,1%, &lt; 3,5% anche nel caso peggiore; P(piu' da sinistra che da destra) &lt; 1 su 200.000</td>
+        </tr>
+        <tr>
+          <td>Vannacci toglie voti al centrodestra</td>
+          <td style="color: var(--accent-attention);"><strong>VERO</strong></td>
+          <td>1,3 dalla Lega + 1,0 da FdI = 2,3 punti su 3,5 (66%, Demopolis); Lab21: 97,9% da destra</td>
+        </tr>
+        <tr>
+          <td>Vannacci mobilita gli astenuti</td>
+          <td style="color: var(--accent-attention);"><strong>VERO</strong></td>
+          <td>~1,2 punti su 3,5 (34%), il residuo che Demopolis attribuisce all'astensione</td>
+        </tr>
+        <tr>
+          <td>Senza Vannacci il centrodestra perde</td>
+          <td style="color: var(--accent-rejection);"><strong>VERO MA FRAINTESO</strong></td>
+          <td>E' aritmetica di coalizione: il campo largo resta a 44,9, non riceve nulla da lui</td>
+        </tr>
+        <tr>
+          <td>Quindi Vannacci "aiuta" la sinistra</td>
+          <td style="color: var(--accent-reaction);"><strong>FALSO</strong></td>
+          <td>Confonde "sottrae voti alla sua coalizione" con "regala voti all'altra". Sono cose diverse</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Riconoscere questo schema serve oltre Vannacci: ogni volta che un terzo incomodo "fa vincere l'avversario", la domanda giusta non e' "a chi ruba i voti il nuovo arrivato", ma <strong>"il blocco avverso e' cresciuto, o e' solo quello vicino a essersi diviso?"</strong>. Quasi sempre e' la seconda.</p>
+
+
+    <!-- ============================================================
+         CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Conclusione</h2>
+    <span class="section-number">Fine trasmissione</span>
+
+    <p>Sono partito da una frase letta cento volte su X e dalla sensazione che non quadrasse. La sensazione non e' una prova, ma dice dove scavare. Ho scavato, e i numeri sono concordi su due livelli diversi: il dato <em>vero</em> delle europee 2024 (la destra si rimescola dentro se stessa) e le <em>stime</em> di oggi (due terzi dei voti di Vannacci da destra, un terzo dagli astenuti, e dal centrosinistra una quota che Demopolis non registra nemmeno e Lab21 ferma al 2,1%), per giunta robuste all'incertezza di sondaggio.</p>
+
+    <p>L'equivoco nasce da un cortocircuito comprensibile: senza Vannacci nella coalizione il centrodestra va sotto, quindi "Vannacci aiuta la sinistra". Ma la sinistra, in quei numeri, non si muove di un millimetro. Vannacci sposta voti <strong>dentro</strong> il suo campo, non <strong>tra</strong> i campi. E' un fenomeno tutto interno alla destra: ne' un travaso, ne' un argine. Una scissione, semmai.</p>
+
+    <p>Si puo' pensare tutto il bene o tutto il male di Vannacci: e' legittimo, ed e' un'altra discussione. Ma "prende i voti dalla sinistra" e' una di quelle affermazioni che suonano profonde e si sgonfiano appena le tocchi con i dati. Non e' una questione di opinioni: e' una questione di dove arrivano i voti, e i voti hanno lasciato le impronte.</p>
+
+    <div class="conclusion-box fade-in">
+      <div class="quote">"L'ago si muove, ma il peso<br>non ha cambiato piatto.<br>Vannacci non pesca a sinistra:<br>divide la destra."</div>
+      <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">Dati: Istituto Cattaneo (flussi europee 2024), Demopolis e Lab21 (provenienza voti, giugno 2026), Supermedia YouTrend/AGI. Codice della simulazione e dei grafici nel repository, riproducibile.</p>
+    </div>
+
+
+    <!-- ============================================================
+         FONTI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Fonti, Una Per Una</h2>
+    <span class="section-number">Appendice. Tutto pubblico, tutto ricontabile</span>
+
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Dato</th>
+          <th>Valore</th>
+          <th>Fonte</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Preferenze Vannacci, europee 2024</td>
+          <td>532.368 (1&deg; nella Lega)</td>
+          <td><a href="https://www.quotidiano.net/elezioni/vannacci-preferenze-europee-thct33q9" target="_blank" rel="noopener">Quotidiano Nazionale</a></td>
+        </tr>
+        <tr>
+          <td>Flussi europee 2024 (modello di Goodman)</td>
+          <td>blocchi stabili: FI/Lega&rarr;FdI, M5S&rarr;astensione e PD; variazioni 2022&rarr;2024: M5S &minus;5,4, PD +5,2, Lega +0,2</td>
+          <td><a href="https://www.cattaneo.org/wp-content/uploads/2024/06/2024-06-10-Eur_Risultati_Flussi.pdf" target="_blank" rel="noopener">Istituto Cattaneo (PDF, 10/06/2024, Tab.1 e Fig.2)</a></td>
+        </tr>
+        <tr>
+          <td>Provenienza voti FN (Demopolis)</td>
+          <td>FN 3,5%: sottrae 1,3 alla Lega, 1,0 a FdI, il resto all'astensione; centrosinistra non citato</td>
+          <td><a href="https://www.demopolis.it/?p=13193" target="_blank" rel="noopener">Demopolis, Barometro Politico (9/04/2026)</a></td>
+        </tr>
+        <tr>
+          <td>Provenienza voti FN (Lab21, n=1.014)</td>
+          <td>Lega 45,7% / FdI 38,9% / CasaPound 7,2% / altro cdx 6,1% / altre forze 2,1%</td>
+          <td><a href="https://www.affaritaliani.it/politica/effetto-vannacci-cresce-la-fiducia-nel-generale-e-il-suo-partito-sale-al-51-drenando-voti-a-lega-e-fdi-il-sondaggio.html" target="_blank" rel="noopener">Lab21, via Affaritaliani (13/06/2026)</a></td>
+        </tr>
+        <tr>
+          <td>Stime di lista e coalizioni (1 giu 2026)</td>
+          <td>CDX 44,8 / Campo largo 44,9 / FN 4,0 (FdI 28,4, PD 22,2, Lega 7,0)</td>
+          <td><a href="https://www.quotidiano.net/politica/sondaggi-politici-centrodestra-campo-largo-supermedia-youtrend-yd8tn4nk" target="_blank" rel="noopener">Supermedia YouTrend/AGI</a></td>
+        </tr>
+        <tr>
+          <td>Simulazione Dirichlet-multinomiale (200k iter.)</td>
+          <td>sui conteggi reali Lab21 (n=1.014): quota "altre forze" media 2,1%, IC95% 1,3&ndash;3,1%; P(altre&gt;destra) &lt; 1/200.000 (per diventare maggioranza servirebbe una sottostima ~24&times;)</td>
+          <td><a href="https://github.com/pinperepette" target="_blank" rel="noopener">genera_grafici.py (questo repo)</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Nota sul metodo.</strong> I dati sulla lista Vannacci sono stime di sondaggio: la lista non ha ancora affrontato un'elezione politica. La simulazione Dirichlet-multinomiale modella l'errore campionario sui <strong>conteggi reali di Lab21 (n=1.014, prior di Jeffreys)</strong>, non eventuali distorsioni sistematiche del ricordo del voto; e' un controllo di robustezza, non una garanzia di esattezza. Un'avvertenza dovuta: le fonti qui usate poggiano su metodologie diverse e non confrontabili voto per voto, e proprio per questo non le sommo ne' le medio. I flussi del Cattaneo nascono da inferenza ecologica (modello di Goodman) sui risultati reali delle urne; la scomposizione Demopolis e quella Lab21 da sondaggi sul ricordo del voto, ma con categorie diverse (Demopolis include l'astensione e ragiona in punti sull'elettorato; Lab21 misura i soli travasi tra partiti). Le tratto come <strong>verifiche separate, ottenute con strumenti diversi</strong> (non come misure indipendenti in senso statistico: non so se gli istituti condividano pesature o bias): il valore sta nel fatto che strumenti cosi' diversi cadano sullo stesso punto, non in un singolo numero. Tutte le cifre qui riportate sono state controllate alla fonte primaria; le sintesi di altri istituti (SWG, Noto, Tecne') sono citate solo come conferma qualitativa della direzione, perche' non ho potuto aprirne la scomposizione disaggregata.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
