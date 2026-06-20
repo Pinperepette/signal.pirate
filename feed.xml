@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Il Consenso Senza Sondaggi</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/il-consenso-senza-sondaggi.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/il-consenso-senza-sondaggi.html</guid>
+    <pubDate>Sat, 20 Jun 2026 00:00:00 +0200</pubDate>
+    <description>Parlavo su X con un amico, Stefano Morandi, e a un certo punto, invece di rilanciare la solita discussione, mi ha fatto la domanda giusta: "da matematico, esiste un sistema alternativo ai sondaggi per capire a quanto stanno i partiti? Dovresti fare un modello che sfrutta Eligendo, anche se le tornate sono troppo sfalsate per essere affidabili". Ho provato a costruirlo. E' uno state-space bayesiano gerarchico che tratta ogni elezione come una misura distorta di un consenso latente: lo stato evolve come random walk nel tempo, ogni elezione lo "fotografa" con un bias di tipo (le politiche fanno da ancora) e un effetto affluenza, e la gerarchia territoriale tiene separato il livello nazionale dagli offset regionali. Niente sondaggi: 8 elezioni nazionali dal 2008 al 2024, 13 regionali, i risultati per 7.800 comuni scaricati forzando l'archivio open-data del Ministero dell'Interno (i link sono generati in JavaScript), piu' il reddito comunale del MEF. La prova del nove: ricalcolando l'affluenza nazionale sommando i comuni vengono 64,0% (politiche 2022) e 49,7% (europee 2024), identiche alle ufficiali. Il modello impara da solo il bias delle europee (la Lega che la' rende il doppio), ritrova i flussi veri del 2022-2024 (il M5S che si dissolve nell'astensione, la Lega assorbita da FdI) e nel backtest fuori campione sulle europee 2024 sbaglia di circa 2 punti. Ma c'e' un confine, ed e' un limite di informazione, non del metodo: senza un voto nazionale recente (l'ultimo e' giugno 2024), stimare "oggi" significa proiettare di due anni e gli intervalli esplodono. E ho preso io stesso la trappola che lui aveva descritto: ancorando alle regionali 2025 la Lega schizzava al 26% nazionale per colpa della Liga Veneta. Un random forest sui comuni dice poi una cosa scomoda per tutti: in Italia la geografia spiega il voto piu' della classe sociale. Non ho costruito un ammazza-sondaggi: ho costruito una lente diversa, che parte dai voti veri ed e' onesta abbastanza da dire "non lo so" quando non lo sa.</description>
+  </item>
+
+  <item>
     <title>Da Dove Arrivano i Voti di Vannacci</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/da-dove-arrivano-i-voti-vannacci.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/da-dove-arrivano-i-voti-vannacci.html</guid>

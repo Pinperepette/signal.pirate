@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Consenso Senza Sondaggi | Signal Pirate</title>
+  <meta name="description" content="Un amico su X, Stefano Morandi, mi ha chiesto: 'da matematico, esiste un sistema alternativo ai sondaggi per capire a quanto stanno i partiti? Sfrutta Eligendo'. E ha aggiunto il dubbio giusto: 'le tornate sono troppo sfalsate per essere affidabili'. Ho provato a costruirlo: uno state-space bayesiano che tratta ogni elezione reale come misura distorta di un consenso latente. 8 politiche/europee + 13 regionali, 7.800 comuni da Eligendo, zero sondaggi. Funziona per ricostruire il passato (backtest ~2 punti) e mappare la geografia del voto; sul presente nazionale, senza un voto recente, gli intervalli esplodono: e' un limite di informazione, non del metodo.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Formula Box === */
+    .formula-box {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.3);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      color: var(--accent-highlight);
+      line-height: 2;
+    }
+    .formula-box .formula-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Lab Screenshot === */
+    .lab-screenshot {
+      border-radius: 12px;
+      border: 1px solid rgba(124,77,255,0.2);
+      margin: 1.5rem 0;
+      max-width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    blockquote.post-quote {
+      border-left: 3px solid var(--accent-rejection);
+      background: rgba(255,136,0,0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.4rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/il-consenso-senza-sondaggi.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Il Consenso Senza Sondaggi">
+  <meta property="og:description" content="Un amico su X mi ha chiesto: 'esiste un sistema alternativo ai sondaggi che sfrutti Eligendo?'. Ho provato a costruirlo: uno state-space bayesiano che tratta ogni elezione come misura distorta di un consenso latente. Niente sondaggi. Funziona sul passato, e' onesto sul fatto che non sa il presente.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/il-consenso-senza-sondaggi.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-06-20">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Il Consenso Senza Sondaggi">
+  <meta name="twitter:description" content="Da una conversazione su X con un amico: si puo' stimare il consenso dei partiti senza sondaggi, solo coi voti reali di Eligendo? Ho costruito uno state-space bayesiano. Funziona sul passato; sul presente, senza un voto recente, e' onestamente incerto e lo dichiara.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Il Consenso Senza Sondaggi","description":"Da una conversazione su X con un amico, Stefano Morandi, nasce la domanda: esiste un sistema alternativo ai sondaggi, basato sui voti reali di Eligendo, per stimare il consenso dei partiti? L'articolo descrive uno state-space bayesiano gerarchico che tratta ogni elezione come misura distorta di un consenso latente, costruito su 8 elezioni nazionali e 13 regionali e 7.800 comuni, senza sondaggi. Funziona per ricostruire il passato (backtest ~2 punti) e mappare la geografia del voto; sul presente nazionale, in assenza di un voto recente, gli intervalli sono ampi.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-06-20","dateModified":"2026-06-20","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/il-consenso-senza-sondaggi.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-06-20 | Pinperepette</p>
+    <h1 class="article-page-title">Il Consenso <span class="accent">Senza Sondaggi</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Stavo parlando su X con un amico. A un certo punto, invece di rilanciare la solita discussione, mi ha fatto una domanda da ingegnere: "da matematico, esiste un sistema alternativo ai sondaggi?". Ieri sera ho provato a costruirlo. Questo e' quello che ne e' uscito, limiti compresi.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Politica</span>
+      <span class="tag tag-highlight">Bayesiano</span>
+      <span class="tag tag-reaction">State-space</span>
+      <span class="tag tag-amplification">Eligendo</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - LA DOMANDA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Domanda Di Un Amico</h2>
+    <span class="section-number">Sezione 00. La domanda giusta arriva da dove non te l'aspetti</span>
+
+    <p>Ieri parlavo su X con un amico, <a href="https://x.com/SteMorandi1990" target="_blank" rel="noopener">Stefano Morandi</a>. Si parlava di sondaggi, di affidabilita', del solito teatrino delle percentuali. Di politica spesso la pensiamo diversamente, ma sempre da amici e con rispetto. E a un certo punto, invece di rilanciare, e' arrivata questa:</p>
+
+    <blockquote class="post-quote">
+      "Ma da matematico, secondo te, esiste un sistema alternativo ai sondaggi per capire, non so, con gli storici, a quanto sono piu' verosimilmente i partiti? Dovresti fare un modello che sfrutta Eligendo, anche se mi rendo conto che le tornate elettorali sono troppo sfalsate tra loro per essere affidabili."
+      <span style="display:block; font-style:normal; font-size:0.8em; margin-top:0.5rem; color:var(--text-secondary);"><a href="https://x.com/SteMorandi1990/status/2067980096124645474" target="_blank" rel="noopener">@SteMorandi1990, 19 giugno 2026</a></span>
+    </blockquote>
+
+    <p>Mi e' piaciuta perche' e' la domanda giusta. Non "chi vince", ma "<strong>esiste un modo di misurare il consenso senza chiedere alla gente cosa votera'</strong>". E perche' aveva gia' messo a fuoco il punto tecnico su cui si gioca tutto: le elezioni sono di tipo diverso e distanziate nel tempo. Il mestiere del modello e' esattamente questo, trasformare quella difficolta' in qualcosa di misurabile.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La scommessa.</strong> Un sondaggio chiede a un campione un'intenzione. Un'elezione, invece, e' una cosa che e' <em>successa davvero</em>: milioni di schede contate. Se i sondaggi sono opinioni su un campione, le elezioni sono <strong>misure su tutta la popolazione</strong>. Il problema e' che ogni elezione misura una cosa leggermente diversa. Il mestiere e' tutto qui: separare il segnale dalla deformazione.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - L'IDEA
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Elezione Come Misura Sporca</h2>
+    <span class="section-number">Sezione 01. Lo stato latente</span>
+
+    <p>L'idea di fondo la rubo allo stesso linguaggio che si usa per i GPS e per i filtri di Kalman. Esiste una grandezza che non vedo direttamente, chiamiamola <strong>consenso vero</strong> di un partito in un certo momento, <code>&theta;_t</code>. Non la osservo mai. Quello che osservo sono le elezioni, e ogni elezione e' una <strong>misura distorta</strong> di quello stato, vista attraverso una lente che deforma:</p>
+
+    <ul>
+      <li>le <strong>europee</strong> non si votano come le politiche (l'elettorato si muove, l'affluenza cambia);</li>
+      <li>le <strong>regionali</strong> premiano i radicamenti locali e le liste civiche;</li>
+      <li>l'<strong>affluenza</strong> gonfia o sgonfia certi partiti piu' di altri;</li>
+      <li>alcuni partiti sono forti dove altri spariscono.</li>
+    </ul>
+
+    <p>Il modello non cerca di indovinare la prossima elezione. Cerca di stimare <code>&theta;_t</code> oggi, togliendo dalle elezioni passate la loro deformazione specifica. E' un <strong>State Space Model bayesiano gerarchico</strong>: lo stato evolve nel tempo, le elezioni lo "fotografano" con un errore noto.</p>
+
+    <div class="formula-box">
+      <span class="formula-name">Equazione di stato: il consenso si muove piano</span>
+      &eta;<sub>t</sub> = &eta;<sub>t-1</sub> + &omega;<sub>t</sub><span style="color:var(--text-secondary)">,&nbsp;&nbsp;&omega;<sub>t</sub> ~ N(0, Q&middot;&Delta;t)</span>
+    </div>
+
+    <div class="formula-box">
+      <span class="formula-name">Equazione di osservazione: l'elezione vede lo stato attraverso una lente</span>
+      y<sub>k,e</sub> = &eta;<sub>k,t(e)</sub> + &beta;<sub>k,&tau;(e)</sub> + &gamma;(affluenza) + &epsilon;
+    </div>
+
+    <p>In parole: lo stato di oggi e' quello di ieri piu' un piccolo scostamento casuale (random walk, tanto piu' grande quanto piu' tempo e' passato). Quando arriva un'elezione, quella misura lo stato <em>piu'</em> un <strong>bias di tipo</strong> (<code>&beta;</code>: quanto un partito sovra/sotto-rende a quel tipo di elezione) <em>piu'</em> un effetto affluenza. Le <strong>politiche</strong> fanno da ancora: il loro bias e' fissato a zero, sono loro a definire la scala del "consenso nazionale". Lavoro in log-ratio (poi softmax), cosi' le quote sommano sempre a 1 e restano tra 0 e 1 senza forzature. L'inferenza gira con NUTS (Hamiltonian Monte Carlo).</p>
+
+    <img src="../immagini/il-consenso-senza-sondaggi/stima-nazionale.png" alt="Dashboard del sistema: stima nazionale per partito con barra e intervallo credibile al 95%, accanto alla mappa del vincente per regione" class="lab-screenshot">
+    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align:center; margin-top:-0.6rem;">La stima non e' un numero secco: ogni partito ha media e <strong>intervallo credibile al 95%</strong>. A destra, la stessa stima ribaltata sulla geografia.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Perche' bayesiano e non un machine learning qualunque?</strong> Perche' la domanda di Morandi non chiede <em>un numero</em>, chiede <em>quanto e' verosimile</em>. Un random forest ti sputa "7,3%" con finta sicurezza. Un modello bayesiano ti dice "tra il 6 e l'8 con il 95% di probabilita'", e quando non sa, te lo dice allargando l'intervallo. Su poche elezioni distanziate nel tempo, la cosa onesta e' proprio mostrare l'incertezza, non nasconderla.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - IL PARADOSSO CHE LUI AVEVA GIA' VISTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Paradosso Che Morandi Aveva Gia' Visto</h2>
+    <span class="section-number">Sezione 02. Lega al 7% nazionale, 38% in Veneto</span>
+
+    <p>Nello stesso scambio, poche ore prima, mi aveva fatto l'osservazione piu' tagliente di tutte:</p>
+
+    <blockquote class="post-quote">
+      "Come spieghi un dato nazionale Lega al 7% se alle amministrative in Abruzzo si veleggia al 10, alle regionali in Calabria al 9 e in Veneto si fa il 38? Un dato nazionale al 7% implicherebbe che la Lega in Lombardia sia sotto il 3%. E' impossibile."
+      <span style="display:block; font-style:normal; font-size:0.8em; margin-top:0.5rem; color:var(--text-secondary);"><a href="https://x.com/SteMorandi1990/status/2067975741623488730" target="_blank" rel="noopener">@SteMorandi1990, 19 giugno 2026</a></span>
+    </blockquote>
+
+    <p>Questa e' esattamente la ragione per cui un modello serio deve essere <strong>gerarchico</strong> e per cui un modello ingenuo si schianta. Il consenso non e' un numero unico: vive su piu' livelli (sezione, comune, provincia, regione, nazione) e ogni livello informa gli altri. Una regionale fortissima in Veneto non e' la prova che il dato nazionale sia sbagliato: e' la prova che <strong>esiste un offset regionale</strong> enorme, che il modello deve stimare e tenere separato dal livello nazionale.</p>
+
+    <p>E qui arriva la conferma piu' bella che potessi avere: <strong>ho preso io stesso la trappola che lui aveva descritto.</strong> A un certo punto ho provato ad ancorare la stima nazionale "di oggi" alle regionali piu' recenti (ottobre-novembre 2025: Veneto, Campania, Puglia, Calabria, Toscana). Risultato: la <strong>Lega data al 26% nazionale</strong>. Assurdo. Il motivo? In Veneto la lista e' "Lega-Liga Veneta", che fa percentuali enormi e che il sistema, ingenuamente, sommava al dato nazionale. Esattamente il suo "Veneto al 38%" che, preso male, ti fa esplodere il numero.</p>
+
+    <img src="../immagini/il-consenso-senza-sondaggi/mappa-vincente.png" alt="Mappa politica dell'Italia per regione: ogni regione colorata dal partito primo, con intensita' proporzionale alla forza" class="lab-screenshot">
+    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align:center; margin-top:-0.6rem;">La gerarchia in pratica: gli offset regionali reggono un Veneto fortissimo per il centrodestra <em>e</em> un dato nazionale coerente, senza farlo esplodere.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>La lezione.</strong> Le regionali sono ottime per stimare la <em>geografia</em> del voto, ma sono <strong>pessime per il dato nazionale del momento</strong>: non sono un campione del Paese e i partiti regionali (Liga Veneta, le mille civiche) le distorcono. Il modello le usa per gli offset territoriali e ne <strong>riduce il peso</strong> sul dato nazionale. Tradotto: la sua intuizione, "le tornate sono troppo sfalsate", non era un dettaglio, era il cuore del problema.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - I DATI VERI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Dati Veri, Zero Sondaggi</h2>
+    <span class="section-number">Sezione 03. Forzare l'archivio del Ministero</span>
+
+    <p>Lui aveva detto "sfrutta Eligendo". L'ho preso alla lettera. L'<a href="https://elezionistorico.interno.gov.it/eligendo/opendata.php" target="_blank" rel="noopener">archivio open-data del Ministero dell'Interno</a> pubblica tutto, ma i link di download sono generati via JavaScript: niente URL diretti. Mezz'ora di reverse engineering della pagina e salta fuori il pattern reale (<code>/daithome/documenti/opendata/&hellip;</code>). Da li' ho tirato giu' i CSV per comune.</p>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number green">8</div><div class="stat-label">elezioni nazionali<br>(2008-2024)</div></div>
+      <div class="stat-card"><div class="stat-number cyan">13</div><div class="stat-label">regionali reali</div></div>
+      <div class="stat-card"><div class="stat-number purple">7.800</div><div class="stat-label">comuni per tornata</div></div>
+      <div class="stat-card"><div class="stat-number orange">0</div><div class="stat-label">sondaggi usati</div></div>
+    </div>
+
+    <p>Politiche e europee dal 2008 al 2024, le Regionali 2023-2025, i risultati per comune di Politiche 2022 ed Europee 2024, piu' il reddito medio comunale (open-data del MEF, via il warehouse ISTAT) per dare al modello delle covariate socio-economiche. La <strong>prova del nove</strong> che i dati erano stati ingeriti bene: ricalcolando l'affluenza nazionale sommando i 7.800 comuni, viene <strong>64,0%</strong> per le Politiche 2022 e <strong>49,7%</strong> per le Europee 2024, identiche a quelle ufficiali. Quando i tuoi totali combaciano alla virgola con la Gazzetta Ufficiale, sai che la pipeline non sta mentendo.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il problema dei partiti che cambiano nome.</strong> Un sistema cosi' deve sapere che il PdL del 2008 e' la continuita' elettorale di Forza Italia, che Sinistra Arcobaleno e SEL confluiscono nell'area di AVS, che M5S e FdI semplicemente <em>non esistevano</em> prima del 2013 (e vanno mascherati, non messi a zero). Ogni scelta e' una decisione documentata sulla continuita' dell'elettorato, non sull'etichetta giuridica.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - COSA ESCE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Esce: Flussi e Geografia</h2>
+    <span class="section-number">Sezione 04. Il modello impara cose vere</span>
+
+    <p>La parte che mi ha convinto che non stavo solo disegnando grafici e' che il modello <strong>impara da solo regolarita' che conosciamo</strong>. Sul bias di tipo-elezione, scopre che la Lega ha l'effetto-europee piu' forte di tutti (il 34% di Salvini al 2019 contro l'8% delle Politiche 2022): non gliel'ho detto io, l'ha dedotto. Sui flussi elettorali stimati dai comuni tra Politiche 2022 ed Europee 2024, ritrova le due storie vere di quel biennio:</p>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number red">63%</div><div class="stat-label">elettori M5S 2022<br>&rarr; astensione 2024</div></div>
+      <div class="stat-card"><div class="stat-number cyan">35%</div><div class="stat-label">flusso Lega<br>&rarr; FdI</div></div>
+      <div class="stat-card"><div class="stat-number green">0,83</div><div class="stat-label">R&sup2; geografia<br>&rarr; voto M5S</div></div>
+      <div class="stat-card"><div class="stat-number purple">~2 pt</div><div class="stat-label">errore backtest<br>Europee 2024</div></div>
+    </div>
+
+    <img src="../immagini/il-consenso-senza-sondaggi/flussi.png" alt="Matrice dei flussi elettorali tra Politiche 2022 ed Europee 2024 stimata sui comuni: righe = da chi, colonne = verso chi, intensita' = quota trasferita" class="lab-screenshot">
+    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align:center; margin-top:-0.6rem;">I flussi stimati 2022 -> 2024 sui comuni: sulla diagonale chi resta, fuori i travasi, con l'astensione come grande contenitore.</p>
+
+    <p>Il M5S che sembra dissolversi nell'astensione e la Lega assorbita da FdI: e' lo stesso quadro che avevo gia' raccontato per Vannacci in <a href="da-dove-arrivano-i-voti-vannacci.html">"Da dove arrivano i voti di Vannacci"</a>: la destra si rimescola dentro se stessa. E un random forest addestrato sui comuni dice una cosa scomoda per tutte le tifoserie: <strong>in Italia la geografia spiega il voto piu' della classe sociale</strong>. Il reddito conta (il M5S e' fortissimo nei comuni poveri, &minus;0,52 di correlazione), ma il gradiente Nord-Sud lo schiaccia. La frase "il PD e' il partito dei ricchi" non regge ai numeri di questa analisi: e' il legame col reddito piu' debole di tutti.</p>
+
+    <p>Per validarlo ho fatto l'unica cosa che conta: <strong>backtest fuori campione</strong>. Addestro fino al 2022, gli nascondo le Europee 2024, gli chiedo di prevederle. Errore medio circa 2 punti sui sette partiti, e l'intervallo al 95% conteneva il risultato vero in tutti e sette i casi. Sia chiaro: e' <strong>un solo</strong> test out-of-sample (una elezione, sette partiti), quindi un indizio robusto, non una validazione su larga scala. E infatti su un partito ha toppato di brutto (la Lega, di 10 punti): aveva visto <em>una sola</em> europea in addestramento, il picco del 34% del 2019, e l'ha scambiato per la norma. Aggiunta una seconda europea, l'errore si e' dimezzato. Piu' dati, meno errore: banale, ma misurato.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - IL LIMITE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Sa Fare E Cosa No</h2>
+    <span class="section-number">Sezione 05. Il confine, dichiarato</span>
+
+    <p>E qui devo essere onesto, perche' altrimenti faccio esattamente quello che rimprovero ai sondaggisti. La domanda che resta e' "<strong>oggi</strong> come stanno messi i partiti?". E la risposta vera e': <strong>non lo so con precisione, e nessun modello onesto puo' saperlo.</strong></p>
+
+    <p>L'ultimo voto nazionale e' di giugno 2024 (europee). Da allora, a livello nazionale, non si e' votato. Stimare "oggi" significa proiettare il consenso latente in avanti di oltre venti mesi: il random walk accumula incertezza e gli intervalli esplodono: per qualche partito da <em>singola cifra a oltre il 40%</em>. Ho provato a colmare il buco con le Regionali 2025, e abbiamo visto com'e' finita (la Lega al 26%). <strong>Ho aggiunto cinque anni di dati storici in piu' e gli intervalli di "oggi" non si sono mossi di un millimetro</strong>, perche' il problema non e' la quantita' di storia: e' che <em>manca il dato recente</em>. E' un limite di informazione, non del metodo: il sistema fa benissimo quello per cui e' nato (ricostruire e mappare il voto reale), e si ferma dove qualunque approccio onesto si fermerebbe.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Quello che il sistema sa fare e quello che non sa fare.</strong> Ricostruire e mappare il voto reale del passato: si', bene (backtest ~2 punti). Stimare la geografia e i flussi: si'. Dare un numero nazionale credibile <em>per oggi</em>, a oltre venti mesi dall'ultimo voto: <strong>no</strong>. E dirlo e' il punto, non il difetto. Un sistema che ammette "non lo so" quando e' vero vale piu' di uno che finge tre cifre decimali.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - LA CRONACA COME IPOTESI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Scenari: Mettere E Togliere Un'Ipotesi Sui Dati Reali</h2>
+    <span class="section-number">Sezione 06. L'AI propone, il modello calcola, tu confronti</span>
+
+    <p>L'ultima parte e' la piu' interessante. Do in pasto a un'AI gli articoli di cronaca, ma con una regola precisa: <strong>l'AI non produce le percentuali</strong>. Le legge, e le traduce in <em>assunzioni esplicite e citate</em>: "inchiesta sulla Lega &rarr; &minus;2/&minus;3 punti, con questa frase a giustificarlo". Sono quelle assunzioni che il modello calibrato applica, propagando l'incertezza. Non e' un oracolo che spara un numero: sono <strong>scenari probabili</strong>, costruiti su ipotesi che puoi leggere, correggere a mano e rimettere in conto.</p>
+
+    <p>E qui sta la parte utile: uno scenario lo puoi <strong>applicare a tutta l'analisi</strong> e poi <strong>toglierlo</strong>. Quando lo attivi, l'intera dashboard si riallinea all'ipotesi: cambiano le barre nazionali, la mappa del vincente per regione, le schede dei singoli partiti. Un clic su "rimuovi" e torni ai dati reali. Cosi' sovrapponi il "<em>e se succedesse X?</em>" alla fotografia vera, e lo stacchi quando vuoi, senza mai confondere i due piani.</p>
+
+    <p>E puoi <strong>salvare piu' scenari e confrontarli</strong> affiancati: Baseline contro Ipotesi A contro Ipotesi B, in un'unica tabella, con le differenze in chiaro. E' anche il modo per dare una collocazione a un partito che non ha ancora votato: da un articolo sull'ascesa di Futuro Nazionale il sistema lo inserisce come scenario, stimando da chi pesca (Lega, FdI, astensione) e in quali regioni, e lo disegna persino sulla mappa. Sempre come ipotesi probabile, non come misura: "<em>se questo e' vero, allora ecco le conseguenze, con questo margine</em>".</p>
+
+    <img src="../immagini/il-consenso-senza-sondaggi/scenario.png" alt="La scheda Scenari del sistema: a sinistra le assunzioni che l'AI ricava dagli articoli, a destra il confronto tra baseline e scenario, con un nuovo partito che compare" class="lab-screenshot">
+    <p style="font-size: 0.85rem; color: var(--text-secondary); text-align:center; margin-top:-0.6rem;">Uno scenario applicato a tutta l'analisi: a sinistra le assunzioni (modificabili), a destra baseline contro scenario, col partito nuovo che spunta.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il principio.</strong> Un LLM sa leggere, non sa misurare. Qui non fa l'oracolo: trasforma le notizie in ipotesi tracciabili, e a fare i conti resta il modello calibrato. Quello che ottieni sono <strong>scenari probabili</strong>, da mettere, togliere e confrontare sui dati reali. La matematica resta al modello; all'AI lascio l'idraulica.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Ho Imparato Da Una Chiacchierata</h2>
+    <span class="section-number">Sezione 07. Grazie all'amico</span>
+
+    <p>Non ho costruito un ammazza-sondaggi. Ho costruito una <strong>lente diversa</strong>: parte dai voti veri invece che dalle intenzioni dichiarate, e' onesta sull'incertezza fino al punto di dirti "su questo non posso pronunciarmi", e ti fa vedere il meccanismo invece di consegnarti una cifra da prendere o lasciare. Per il presente nazionale servirebbe un voto recente o, come modulo opzionale e dichiarato, i sondaggi stessi. Per la geografia, i flussi e la ricostruzione storica, invece, funziona, e poggia su numeri che chiunque puo' riscaricare.</p>
+
+    <div class="conclusion-box">
+      <p class="quote">"Esiste un sistema alternativo ai sondaggi?"<br>Si', per il passato. Per il presente, senza dati recenti, l'incertezza resta troppo alta per una stima credibile.</p>
+    </div>
+
+    <p style="text-align:center; font-family: var(--font-mono); font-size: 0.95rem;">Codice, dati e dashboard: <a href="https://github.com/pinperepette/consenso-senza-sondaggi" target="_blank" rel="noopener">github.com/pinperepette/consenso-senza-sondaggi</a></p>
+
+    <p>La cosa che mi tengo non e' il codice. E' che la domanda migliore di tutta la giornata su X me l'ha fatta un amico con cui, di politica, sono spesso in disaccordo. Aveva intuito la soluzione (Eligendo) <em>e</em> il suo limite (le tornate sfalsate) in due messaggi, tra un argomento e l'altro. Funziona anche cosi': uno tira fuori una domanda seria, l'altro prova a rispondere con i numeri. Grazie, Stefano.</p>
+
+    <p>E comunque e' solo un inizio. Di idee da aggiungere ce ne sono a bizzeffe: i sondaggi come modulo opzionale e dichiarato per agganciare il presente, l'MRP sulla demografia, i flussi a livello di sezione, l'istruzione comune per comune, una calibrazione piu' fine dei bias. Ci si potrebbe lavorare per mesi, e probabilmente lo faro'. Ma di notte funziona cosi': a un certo punto, invece del modello, finisci che fondi tu. Per stavolta mi fermo qui, le idee restano in lista.</p>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Nota sul metodo e sui limiti.</strong> Il modello e' uno state-space bayesiano gerarchico (NUTS) su dati reali di Eligendo (Min. Interno) e covariate ISTAT/MEF; nessun sondaggio entra nella stima principale. I dati sono pubblici e verificabili (le affluenze ricalcolate combaciano con quelle ufficiali). I flussi elettorali sono stime su aggregati comunali (inferenza ecologica): valgono come direzione, non come comportamento individuale certo: vale la <em>ecological fallacy</em>. La stima nazionale "del momento" e', a oggi e in assenza di un voto nazionale recente, ad alta incertezza: e' una proiezione, non una fotografia, ed e' etichettata come tale. Gli scenari "AI" sono ipotesi esplicite e citate applicate dal modello, non previsioni. Tutto questo non sostituisce i sondaggi seri: e' una lente complementare, costruita per essere onesta su cio' che non sa.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
