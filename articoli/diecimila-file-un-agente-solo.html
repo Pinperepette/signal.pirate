@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diecimila File, Un Agente Solo | Signal Pirate</title>
+  <meta name="description" content="Dopo mesi a costruire, rompere e ricostruire sistemi agentici, qualche appunto su come si ragiona davvero. Gli agenti sono utili e li uso. Il punto non e' evitarli, e' capire se servono, quanti, e quanto specialistici. Lo mostro su una cosa concreta: mettere in ordine una cartella Download piena di file. L'ho costruito sul serio, con un agente solo per capire cosa e' ogni file e tutto il resto in codice deterministico. Sulla cartella vera: 364 file, 0 errori, pochi centesimi. Parti dal problema, poi decidi.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    blockquote.post-quote {
+      border-left: 3px solid var(--accent-rejection);
+      background: rgba(255,136,0,0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.4rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/diecimila-file-un-agente-solo.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Diecimila File, Un Agente Solo">
+  <meta property="og:description" content="Dopo mesi a costruire e debuggare sistemi agentici, qualche appunto su come si ragiona davvero. Gli agenti li uso e funzionano: il punto e' capire se servono, quanti, e quanto specialistici. Lo mostro mettendo in ordine una cartella Download: un agente solo per capire cosa e' ogni file, il resto in codice. Sulla cartella vera, 364 file, 0 errori, pochi centesimi.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/diecimila-file-un-agente-solo.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate, logo">
+  <meta property="article:published_time" content="2026-06-22">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Diecimila File, Un Agente Solo">
+  <meta name="twitter:description" content="Appunti da mesi passati a costruire sistemi agentici. Non 'evita gli agenti', ma 'parti dal problema, poi decidi se servono e quanti'. Caso concreto: ordinare una cartella Download con un agente solo e tanto codice deterministico. 364 file veri, 0 errori, pochi centesimi, col codice nel repo.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Diecimila File, Un Agente Solo","description":"Appunti pratici, nati da mesi passati a costruire, rompere e ricostruire sistemi agentici, su come si ragiona quando si progetta un sistema con gli LLM: gli agenti sono utili, il punto non e' evitarli ma capire se servono, quanti, e quanto specialistici. L'autore lo mostra su un caso concreto, mettere in ordine una cartella Download piena di file, costruendo davvero il sistema: un solo agente (un modello DeepSeek economico) usato per capire cosa e' ogni file, mentre hash, deduplica, conteggi, policy delle cartelle, collisioni e log restano codice deterministico. Sulla cartella reale: 364 file, 265 organizzati, 95 doppioni esatti individuati per hash, 4 in quarantena, 0 errori, pochi centesimi. Vengono toccati i nove punti del metodo: parti dal problema e poi decidi degli agenti, i loop, la decomposizione, il costo come benchmark, i framework, la memoria e il contesto, i conti deterministici fuori dall'LLM, il logging, e il partire da un agente solo dividendolo solo quando serve.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-06-22","dateModified":"2026-06-22","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/diecimila-file-un-agente-solo.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-06-22 | Pinperepette</p>
+    <h1 class="article-page-title">Diecimila File, <span class="accent">Un Agente Solo</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Dopo mesi a costruire, rompere e ricostruire sistemi agentici, un po' di appunti su come si ragiona davvero. Non "evita gli agenti": li uso e funzionano. Ma parti dal problema, poi decidi se ti servono e quanti. Per renderlo concreto metto in ordine una cosa che hai sul disco anche tu: la cartella Download.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Agenti AI</span>
+      <span class="tag tag-highlight">Architettura</span>
+      <span class="tag tag-reaction">LLM</span>
+      <span class="tag tag-amplification">Python</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL PROBLEMA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Parti Dal Problema, Poi Decidi Degli Agenti</h2>
+    <span class="section-number">Sezione 00. "Voglio usare gli agenti" non e' un requisito</span>
+
+    <p>Mi fanno spesso domande sugli agenti. Sanno che sono di Piacenza, e forse pensano che da queste parti di agenti ce ne intendiamo. Del resto e' la citta' dove hanno arrestato un'intera caserma, quindi diciamo che qui il concetto di "agente" e' sempre stato interpretato in modo creativo. Ti fermavano e ti chiedevano se avevi della droga, non per sequestrarla, per capire se ne volevi comprare dell'altra. Comunque. Dopo parecchi mesi passati a costruire, rompere, debuggare e ricostruire sistemi agentici di quelli seri, mi sono segnato un po' di appunti. <strong>Non per dirti di non usare gli agenti: li uso, e funzionano.</strong> Per dirti come ci si ragiona prima di tirarne su mille.</p>
+
+    <p>E per renderlo concreto invece che teorico, prendo una cosa che capisce chiunque: una cartella Download piena fino all'orlo. Fatture in PDF, screenshot con nomi tipo <code>Schermata 2024-03-11 alle 18.42.png</code>, installer mai aperti, zip scaricati due volte, <code>IMG_4471.jpg</code>, <code>documento (3).pdf</code>, referti, roba di lavoro mischiata ai meme. Vuoi che qualcuno la sistemi: legga i file, capisca cosa sono, faccia le cartelle giuste, dia nomi sensati, tolga i doppioni, ci riprovi quando e' in dubbio e si segni tutto.</p>
+
+    <p>Adesso guarda cosa succede appena lo dici in una stanza piena di gente sveglia. Parte la liturgia: ci vuole un <strong>planner</strong> che decide la strategia, un <strong>supervisor</strong> che coordina, un <strong>reviewer</strong> che controlla, un <strong>evaluator</strong> che controlla il reviewer. In dieci minuti hai sei riquadri che si parlano addosso, per spostare dei file in delle cartelle. Il punto che saltano tutti: <strong>"voglio usare gli agenti" non e' un requisito, e' una soluzione possibile</strong>. Meta' delle architetture che vedo nasce al contrario, dalla soluzione verso il problema. Prima scriviti su un foglio cosa devi fare. Poi decidi se ti servono gli agenti, e quanti.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La risposta, per la cartella, non e' "zero agenti".</strong> Scrivendo il foglio ti accorgi che un pezzo richiede davvero del giudizio: capire se <code>scan0007.pdf</code> e' una bolletta o un referto guardandoci dentro. Quello e' lavoro da modello, ed e' giusto usare un agente per farlo. Ma e' <em>un</em> pezzo. Per spostare, contare, riconoscere i doppioni e dare i nomi non serve nessuna intelligenza, serve del codice. Quindi la risposta onesta e': si', un agente mi serve. <strong>Uno.</strong> Non una colonia.</p>
+    </div>
+
+    <p>E una sorpresa, scoperta solo mettendoci le mani. La cartella, contati i file col codice e non a occhio, ne aveva novemila: sembra un caso da grande orchestrazione. Ma il grosso era gia' dentro a vecchie sottocartelle, e quelli <em>davvero</em> da sistemare erano <strong>trecentosessantaquattro</strong>. Un decimo di quello che la paura raccontava. Succede quasi sempre: il caso enorme si sgonfia appena lo guardi davvero invece di immaginarlo.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - IL LOOP
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Loop Sono Sottovalutati</h2>
+    <span class="section-number">Sezione 01. Esegui, verifica, se fa schifo riprova, continua</span>
+
+    <p>Una quantita' imbarazzante di problemi si risolve con quattro righe in croce:</p>
+
+    <blockquote class="post-quote">
+      esegui il task &middot; verifica il risultato &middot; se fa schifo riprova &middot; continua
+    </blockquote>
+
+    <p>Tanti sistemi che da fuori sembrano astronavi, sotto sotto, fanno esattamente questo. I loop sono una delle invenzioni migliori dell'informatica e nel 2026 funzionano ancora benissimo. La parte che fa la differenza e' il "verifica", ed e' proprio quella che la gente salta. Sulla cartella Download il mio agente classifica un file e tira fuori una confidenza. Se e' alta, vado. Se e' bassa, il loop non si blocca e non spara a caso: <strong>raccoglie piu' contesto e riprova</strong>, e se proprio non ne viene a capo mette il file in quarantena invece di indovinare.</p>
+
+    <div class="code-block" data-lang="organize.py &middot; esegui, verifica, riprova">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cm"># primo tentativo: poche righe di contenuto, costa poco</span></td></tr>
+        <tr><td class="ln">2</td><td class="code">res = <span class="fn">classify</span>(file, <span class="fn">content_preview</span>(path, <span class="nb">2000</span>))</td></tr>
+        <tr><td class="ln">3</td><td class="code"><span class="kw">if</span> res[<span class="st">"confidence"</span>] &lt; CONFIDENCE_THRESHOLD:        <span class="cm"># in dubbio?</span></td></tr>
+        <tr><td class="ln">4</td><td class="code">    res = <span class="fn">classify</span>(file, <span class="fn">content_preview</span>(path, <span class="nb">8000</span>),  <span class="cm"># piu' contesto,</span></td></tr>
+        <tr><td class="ln">5</td><td class="code">                   decisive=<span class="kw">True</span>)                       <span class="cm"># e sii deciso</span></td></tr>
+        <tr><td class="ln">6</td><td class="code"></td></tr>
+        <tr><td class="ln">7</td><td class="code"><span class="cm"># piu' avanti, al momento di spostare:</span></td></tr>
+        <tr><td class="ln">8</td><td class="code"><span class="kw">if</span> res[<span class="st">"confidence"</span>] &lt; CONFIDENCE_THRESHOLD:</td></tr>
+        <tr><td class="ln">9</td><td class="code">    folder = QUARANTINE_DIR              <span class="cm"># ancora incerto: in quarantena</span></td></tr>
+        <tr><td class="ln">10</td><td class="code"><span class="kw">else</span>:</td></tr>
+        <tr><td class="ln">11</td><td class="code">    folder = CATEGORIES[res[<span class="st">"category"</span>]]   <span class="cm"># sicuro: al suo posto</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>"Riprovare" non vuol dire rilanciare identico sperando in un miracolo: vuol dire dare al secondo giro piu' testo e l'ordine di essere deciso. L'ho visto su un file senza nome, senza estensione, cinque byte a caso: confidenza 0,30 dopo due tentativi, in quarantena. Giusto cosi'. Un agente che ammette "questo non lo so" vale piu' di uno che ti sporge una bugia con la faccia sicura.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - DECOMPOSIZIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Spezzetta Tutto</h2>
+    <span class="section-number">Sezione 02. Task piccoli, prompt piccoli, responsabilita' piccole</span>
+
+    <p>La tentazione e' un unico prompt gigante che fa tutto: leggi, classifica, proponi la cartella, inventa il nome, controlla i doppioni, e spiegami pure il ragionamento. Sembra efficiente, ed e' il modo piu' rapido per ottenere risposte mediocri su tutto. Gli LLM diventano molto piu' affidabili quando fanno <strong>una cosa sola</strong>: quando gli chiedi di fare insieme il planner, il programmatore, il revisore, il tester e il filosofo, cominciano a perdere pezzi, e proprio quelli importanti.</p>
+
+    <p>Per questo il sistema lavora in tre fasi nette, e a ognuna il suo mestiere. Prima fase deterministica: calcolo le impronte e raggruppo i doppioni, zero modello. Seconda fase, e qui c'e' l'unico agente: una domanda sola, "che cos'e' questo file?". Terza fase di nuovo deterministica: sposto, gestisco le collisioni di nomi, scrivo il log. Mettere la deduplica <em>prima</em> della classificazione ha un effetto bello: i doppioni non costano nemmeno una chiamata.</p>
+
+    <div class="code-block" data-lang="organize.py &middot; tre fasi, un agente">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="cm"># FASE 1  deterministica, zero token: hash e raggruppa i doppioni</span></td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="kw">for</span> p <span class="kw">in</span> files:</td></tr>
+        <tr><td class="ln">3</td><td class="code">    by_hash.<span class="fn">setdefault</span>(<span class="fn">sha256_of</span>(p), []).<span class="fn">append</span>(p)</td></tr>
+        <tr><td class="ln">4</td><td class="code"><span class="kw">for</span> p <span class="kw">in</span> files:</td></tr>
+        <tr><td class="ln">5</td><td class="code">    <span class="kw">if</span> file_hash[p] <span class="kw">in</span> seen:            <span class="cm"># gia' archiviato in una run prima</span></td></tr>
+        <tr><td class="ln">6</td><td class="code">        dups.<span class="fn">append</span>(p)</td></tr>
+        <tr><td class="ln">7</td><td class="code">    <span class="kw">elif</span> by_hash[file_hash[p]][<span class="nb">0</span>] == p:  <span class="cm"># prima volta che lo vedo</span></td></tr>
+        <tr><td class="ln">8</td><td class="code">        keepers.<span class="fn">append</span>(p)</td></tr>
+        <tr><td class="ln">9</td><td class="code">    <span class="kw">else</span>:                              <span class="cm"># doppione interno a questa run</span></td></tr>
+        <tr><td class="ln">10</td><td class="code">        dups.<span class="fn">append</span>(p)</td></tr>
+        <tr><td class="ln">11</td><td class="code"></td></tr>
+        <tr><td class="ln">12</td><td class="code"><span class="cm"># FASE 2  l'unico agente, in parallelo: "che cos'e' questo file?"</span></td></tr>
+        <tr><td class="ln">13</td><td class="code"><span class="kw">with</span> <span class="fn">ThreadPoolExecutor</span>(max_workers=<span class="nb">8</span>) <span class="kw">as</span> ex:</td></tr>
+        <tr><td class="ln">14</td><td class="code">    <span class="kw">for</span> p, res, err <span class="kw">in</span> ex.<span class="fn">map</span>(work, keepers):</td></tr>
+        <tr><td class="ln">15</td><td class="code">        results[p] = (res, err)</td></tr>
+        <tr><td class="ln">16</td><td class="code"></td></tr>
+        <tr><td class="ln">17</td><td class="code"><span class="cm"># FASE 3  deterministica: sposta, niente sovrascritture, logga</span></td></tr>
+        <tr><td class="ln">18</td><td class="code"><span class="kw">for</span> p <span class="kw">in</span> keepers:</td></tr>
+        <tr><td class="ln">19</td><td class="code">    dest = <span class="fn">unique_destination</span>(cartella(results[p]), nome_pulito(p))</td></tr>
+        <tr><td class="ln">20</td><td class="code">    os.<span class="fn">rename</span>(p, dest)</td></tr>
+        <tr><td class="ln">21</td><td class="code">    <span class="fn">log</span>(p, dest, results[p])</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Tenere separate queste cose non e' pignoleria: e' che ognuna si rompe in modo diverso e si aggiusta in modo diverso. Se i nomi vengono brutti, sistemi il pezzo dei nomi senza toccare la classificazione. <strong>Responsabilita' piccole vuol dire guasti piccoli e circoscritti.</strong></p>
+
+    <blockquote class="post-quote">
+      Non ricordo chi fosse il poeta che scrisse "se ti cade per terra qualcosa, ti rimbalza nel culo". Vale pure per i prompt: piu' cose gli infili dentro, piu' quella che si perde e' quella che ti serviva.
+    </blockquote>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - IL COSTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Benchmark Che Conta E' Il Costo</h2>
+    <span class="section-number">Sezione 03. "Funziona" e' facile, "funziona e costa niente" no</span>
+
+    <p>Far vedere una demo che funziona e' relativamente facile. Farla costare un decimo e' molto piu' difficile. Una delle skill piu' importanti oggi e' ottenere il risultato che vuoi col modello piu' economico possibile. Qui non ti devo convincere a parole, perche' l'ho misurato. Il modello e' un DeepSeek economico (<code>deepseek-chat</code>, gira sulla loro versione flash): una chiamata per file, circa seicento token a botta. Tutto il resto, hash, doppioni, conteggi, cartelle, nomi, e' codice che non paghi a token. Ecco la run vera:</p>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number cyan">364</div><div class="stat-label">file processati</div></div>
+      <div class="stat-card"><div class="stat-number green">265</div><div class="stat-label">organizzati</div></div>
+      <div class="stat-card"><div class="stat-number orange">95</div><div class="stat-label">doppioni isolati</div></div>
+      <div class="stat-card"><div class="stat-number red">0</div><div class="stat-label">errori</div></div>
+    </div>
+
+    <p>Centosessantaduemila token in tutto, pochi centesimi. Adesso l'altro conto: la versione barocca, per ogni file, fa parlare planner, supervisor, classificatore, reviewer ed evaluator. Cinque o sei chiamate a un modello grosso per spostare <em>un</em> file. Moltiplica per le decine di migliaia, e quando passi da dieci richieste al giorno a centomila, di colpo diventate tutti interessatissimi all'ottimizzazione. Quella roba la progetti dall'inizio, non la appiccichi su una colonia di agenti gia' nata cara.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - I FRAMEWORK
+         ============================================================ -->
+    <h2><span class="accent">//</span> Smettila Di Inseguire Il Framework Della Settimana</h2>
+    <span class="section-number">Sezione 04. Python, qualche API, una coda, un database</span>
+
+    <p>Deciso che ti servono gli agenti, parte la seconda domanda: con quale framework? LangGraph, CrewAI, AutoGen, quello uscito ieri, quello che esce domani. Prendine uno. Oppure nessuno. Perche' la verita' scomoda e' che, per mettere in ordine dei file, il framework spesso non ti serve proprio. Il sistema intero e' un file Python solo. Per chiamare il modello non ho installato niente: gli mando una richiesta HTTP con la libreria standard e basta. Zero dipendenze. La coda dei file incerti e' una cartella. La memoria di cosa ho gia' visto e' un file di testo. Questi pezzi li capisci tutti, li debugghi tutti, e tra cinque anni esistono ancora.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Quello che il framework ti nasconde.</strong> Ti regala un grafo di agenti in due righe, e per la demo e' fantastico. Poi vuoi sapere perche' un PDF e' finito nella cartella sbagliata e ti ritrovi a fare reverse engineering del suo loop interno, dei suoi retry impliciti, del suo modo tutto suo di tenere gli stati. Hai aggiunto una dipendenza enorme per risparmiare il codice che avresti capito al volo. Ho visto sistemi costruiti sopra tre framework diversi fare meno, e peggio, di uno script scritto bene.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - MEMORIA E CONTESTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Memoria Conta Quanto Il Modello</h2>
+    <span class="section-number">Sezione 05. Il contesto giusto batte il modello grosso</span>
+
+    <p>C'e' un'idea dura a morire: che la qualita' dipenda soprattutto da quanto e' potente il modello. Il retrieval conta piu' del modello. Il contesto conta piu' del modello. I dati contano piu' del modello. Sto semplificando, ma non di tanto. Un modello mediocre con le informazioni giuste batte spesso un modello enorme che naviga nel vuoto cosmico.</p>
+
+    <p>In concreto: il sistema sceglie tra categorie fisse, sempre le stesse, invece di reinventare la tassonomia a ogni file (altrimenti due lanci ti danno due ordini diversi). E soprattutto ricorda gli hash dei file gia' archiviati. L'ho provato: ho ributtato nella cartella una copia identica di un PDF sistemato il giorno prima, e il sistema l'ha riconosciuto come doppione di un file archiviato in una run precedente, senza nemmeno disturbare il modello.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La cartella e' la sua stessa memoria.</strong> Il pezzo piu' prezioso di contesto ce l'hai gia' sul disco: lo stato delle cartelle e il registro di cosa hai deciso. Un modello mediocre con quella memoria produce risultati coerenti. Un modello eccezionale senza, ti reinventa l'ordine ogni volta. La coerenza non viene dal modello, viene da quello che gli fai sapere.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - DETERMINISMO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Gli LLM Non Sanno Contare</h2>
+    <span class="section-number">Sezione 06. I conti li fa il codice, il ragionamento il modello</span>
+
+    <p>Ripetiamolo, perche' e' la fonte di meta' dei disastri: gli LLM non sanno contare. Non sono database. Non sono motori SQL. Non sono calcolatrici. Sono macchine che ragionano sul linguaggio, e in quello sono bravissime. Se devi contare record, verificare somme, confrontare numeri o fare aggregazioni, usa un tool. I <strong>doppioni</strong> sono l'esempio perfetto: capire se due file sono identici non e' una questione di giudizio, e' una questione di impronta. Calcoli l'hash e confronti. O sono uguali o non lo sono, certo al cento per cento.</p>
+
+    <div class="code-block" data-lang="organize.py &middot; la dedup vera">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="kw">def</span> <span class="fn">sha256_of</span>(path, buf=<span class="nb">1024</span> * <span class="nb">1024</span>):</td></tr>
+        <tr><td class="ln">2</td><td class="code">    h = hashlib.<span class="fn">sha256</span>()</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="kw">with</span> <span class="fn">open</span>(path, <span class="st">"rb"</span>) <span class="kw">as</span> f:</td></tr>
+        <tr><td class="ln">4</td><td class="code">        <span class="kw">for</span> chunk <span class="kw">in</span> <span class="fn">iter</span>(<span class="kw">lambda</span>: f.<span class="fn">read</span>(buf), <span class="st">b""</span>):</td></tr>
+        <tr><td class="ln">5</td><td class="code">            h.<span class="fn">update</span>(chunk)</td></tr>
+        <tr><td class="ln">6</td><td class="code">    <span class="kw">return</span> h.<span class="fn">hexdigest</span>()    <span class="cm"># o due file sono identici, o non lo sono</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>E qui c'e' la prova piu' bella, una che il modello non avrebbe mai trovato da solo. Sulla mia cartella l'hash ha beccato file <strong>identici nel contenuto ma con nomi completamente diversi</strong>: un <code>README.pdf</code> byte per byte uguale a un altro documento che con "readme" non c'entrava niente, e un'estensione del browser ripresa due volte sotto due nomi diversi. Per un occhio umano, e per un LLM che ragiona sui nomi, erano file diversi. Per l'hash, doppioni esatti. In tutto novantacinque copie, roba riscaricata negli anni. Al modello il ragionamento, al codice i conti: cosi' quando il sistema dice "novantacinque doppioni" e' un fatto, non un "circa novanta, credo".</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - LOGGING
+         ============================================================ -->
+    <h2><span class="accent">//</span> Logga Qualsiasi Cosa Si Muova</h2>
+    <span class="section-number">Sezione 07. La differenza tra dieci minuti e due giorni</span>
+
+    <p>Questa e' la sezione che la gente salta, e poi se ne pente. Quando costruisci qualcosa che sposta e rinomina file, logga tutto: prompt, esito, confidenza, azione, errori, token, tempi. Una riga per file. Sembra paranoia finche' fila liscio. Poi arriva il giorno, e non e' ipotetico, e' martedi prossimo: il sistema decide che una classe di file e' "roba temporanea" e te ne sposta tremila, dentro ci finiscono venti contratti. Senza log hai una cartella diversa da ieri e nessuna idea di come: due giorni a bestemmiare. Coi log apri il registro, vedi la decisione e con quanta confidenza, e in dieci minuti sai cosa rimettere a posto.</p>
+
+    <p>E i log non servono solo a capire, servono a <strong>tornare indietro</strong>. Visto che ogni spostamento e' scritto, ci ho costruito l'annullamento: un comando rigioca il log al contrario, rimette ogni file dov'era e cancella le cartelle vuote. Verificato su centocinquanta file copiati a parte: organizzati, annullati, tornati tutti al punto di partenza. Con questa rete sotto, lanciarlo sulla cartella vera fa molta meno paura.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Prima o poi diventa un procione.</strong> Arrivera' il giorno in cui il tuo agente, sereno, si mettera' a fare il procione sotto metanfetamine alle tre di notte: classifica tutto come "fattura", entra in loop sui nomi, sposta nella cartella sbagliata a raffica. In quel momento i log sono l'unica differenza tra un fix da dieci minuti e due giorni buttati. Non li scrivi per quando va bene. Li scrivi per quel momento li', che arriva sempre.</p>
+    </div>
+
+    <p>E si', loggherai anche roba inutile, va benissimo. Meglio una riga di troppo che la riga che ti serviva e non c'e'. Una volta, in un altro sistema, nei log mi e' finita pure la mia cagna, Panna: passava di li' mentre debuggavo e l'ho loggata per sbaglio. E' rimasta. Non ha mai fatto male a nessuno, al contrario del log che <em>non</em> avevo scritto la volta che e' sparita una cartella.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - GIT
+         ============================================================ -->
+    <h2><span class="accent">//</span> Git, Ma Per Il Lavoro Giusto</h2>
+    <span class="section-number">Sezione 08. Duecentotrentasei kilobyte contro ventisei gigabyte</span>
+
+    <p>A un certo punto arriva la domanda naturale: "e se usassi git per tenere traccia di cosa cambia nella cartella?". Idea sensata di pancia, e merita di essere presa sul serio, perche' nasconde proprio la lezione di tutto il pezzo. Mettere git <em>dentro</em> alla cartella Download, coi suoi ventisei gigabyte di foto, dmg e zip, e' una pessima idea: git e' fatto per versionare testo, su una montagna di binari diventa lento e per dirti cosa e' cambiato deve tenersi una copia di tutto. Raddoppi lo spazio per un risultato peggiore.</p>
+
+    <p>Pero' git un posto giusto ce l'ha. Non versiono i file, versiono il <strong>giornale</strong>: lo stato dell'organizzatore e i log delle run, che sono tutto testo. Cosi' la cronologia di cosa e' cambiato, e quando, ce l'ho con un semplice <code>git log</code>, una riga per passata. La differenza, misurata: il giornale completo pesa <strong>duecentotrentasei kilobyte</strong>, la cartella vera ne pesa ventisei miliardi. Stesso strumento, due usi: uno leggerissimo, uno che ti avrebbe fatto piangere.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il principio, di nuovo.</strong> Non e' "git si' o git no". E' "git per cosa?". Per versionare il testo di quello che e' successo: perfetto, costa niente. Per fotografare ventisei gigabyte di binari a ogni giro: lo strumento sbagliato per il lavoro. Scegliere bene <em>dove</em> mettere uno strumento e' meta' del mestiere.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - IL DEMONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Demone, E Come Stavo Per Rifare L'Errore</h2>
+    <span class="section-number">Sezione 09. Ogni ora, ma senza inventarsi un detective</span>
+
+    <p>Dopo la prima pulizia il passo dopo viene da se': bello, ma io continuo a scaricare roba. Mi serve qualcosa che ogni ora guardi se sono arrivati file nuovi e li sistemi. E qui, te lo confesso, stavo per cadere io stesso nella trappola: il primo pensiero e' stato "ogni ora controllo con git se sono cambiati dei file, e organizzo quelli cambiati". Cioe', appena devo costruire una cosa nuova, il riflesso mi porta dritto verso lo strumento piu' complicato. La stessa malattia che racconto da inizio articolo.</p>
+
+    <p>Per fortuna basta fermarsi un secondo e rifare la prova del foglio. I file nuovi dove atterrano? Nella radice della cartella, sempre. Le categorie sono sottocartelle, e quelle l'organizzatore le ignora. Quindi "i file cambiati" sono semplicemente "i file in radice". <strong>Non mi serve nessun detective che vada a caccia delle differenze: la radice e' gia', di suo, la coda di lavoro.</strong> Rilanciare il sistema sistema solo i nuovi arrivi, e la memoria degli hash becca quelli che sono copie di roba archiviata.</p>
+
+    <p>Cosi' il demone diventa banale, e banale e' un complimento: un lavoretto pianificato che ogni ora fa partire il sistema sulla cartella. Se in radice non c'e' niente di nuovo, il giro <strong>esce subito senza spendere un solo token</strong>. Se e' arrivata roba, la classifica, la sposta e scrive una riga nel giornale git. L'ho provato: a vuoto dice "niente da fare"; con due file nuovi, uno e' finito tra le fatture e l'altro, copia identica di uno gia' archiviato, e' stato riconosciuto come doppione. Duecentosettantasette token, per un giro che a mani vuote costa zero.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>La morale, ed e' su di me.</strong> Il riflesso di tirare in mezzo git come "rilevatore di modifiche" era esattamente l'errore che predico di evitare: aggiungere un meccanismo furbo per un problema che la struttura giusta aveva gia' risolto da sola. La complessita' non te la propone solo il collega entusiasta: te la propone la tua testa, ogni volta che parti dallo strumento invece che dal problema. Anche dopo anni che lo sai.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - PARTI DA UN AGENTE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Parti Da Un Agente. Uno.</h2>
+    <span class="section-number">Sezione 10. Lo dividi quando ti fa male, non prima</span>
+
+    <p>Eccoci al punto che tiene insieme tutto. Quando, dopo la prova del foglio, hai deciso che un agente ti serve davvero, partine da uno. Uno solo. Un loop con un modello che capisce e codice deterministico intorno. Fallo girare sulla cosa vera, guardalo lavorare. E poi, solo se serve, lo dividi.</p>
+
+    <p>Quando si divide? Quando te lo chiede il sistema, non l'estetica. Se l'unico agente si rompe perche' ha troppe responsabilita', dividilo. Se diventa un collo di bottiglia, dividilo. Se emergono competenze davvero specialistiche, dividilo. Sempre come risposta a un dolore vero e misurato, non a tavolino il primo giorno. Il mio organizzatore e' rimasto uno: un agente per capire, tre fasi di codice intorno, e nessun motivo concreto per spaccarlo in sei. Se domani aggiungo l'OCR per i PDF scansionati o un riconoscitore di volti per le foto, quelle saranno competenze vere: allora, e solo allora, nasceranno altri agenti.</p>
+
+    <p>Perche' partire dritti con una colonia di agenti che discutono tra loro e' uno dei modi piu' rapidi che conosco per costruire qualcosa di costoso, lento e difficile da debuggare, prima ancora di sapere se il problema lo chiedeva. Che poi, a pensarci bene, e' una tradizione dell'informatica molto piu' antica degli LLM.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 11 - SCRIPT E CODICE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Script e Codice</h2>
+    <span class="section-number">Sezione 11. Un file Python, niente dipendenze</span>
+
+    <p>Tutto il codice e' su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/diecimila-file-un-agente-solo" target="_blank" rel="noopener" style="color: var(--accent-highlight);">GitHub</a>, nella cartella <code>scripts/diecimila-file-un-agente-solo/</code>. Gira con la sola libreria standard di Python, la chiamata al modello e' una richiesta HTTP, niente da installare.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>File</th><th>Cosa fa</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>organize.py</code></td><td>Il sistema: tre fasi (hash e dedup, l'unico agente che classifica con DeepSeek, spostamento), retry e quarantena, <code>--undo</code> dal log, <code>--journal</code> su git</td></tr>
+        <tr><td><code>make_sandbox.py</code></td><td>Genera una cartella Download finta ma realistica (doppioni esatti compresi) per provarlo senza rischi</td></tr>
+        <tr><td><code>com.signalpirate.download-organizer.plist</code></td><td>Il demone orario: un LaunchAgent macOS che sistema solo i nuovi arrivi in radice</td></tr>
+        <tr><td><code>README.md</code></td><td>Comandi, modalita' dry-run e apply, note sui limiti</td></tr>
+      </tbody>
+    </table>
+
+
+    <!-- ============================================================
+         SEZIONE 12 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Mi Tengo</h2>
+    <span class="section-number">Sezione 12. Gli agenti si', ma ragionati</span>
+
+    <p>Non ti sto dicendo che gli agenti sono una moda da buttare, anzi: li costruisco, mi pagano le bollette, ne vado fiero. Ti sto dicendo che vanno trattati come una soluzione, non come il punto di partenza. Parti dal problema. Usa un loop che verifica e riprova. Spezzetta le responsabilita'. Tieni i conti fuori dal modello. Misura il costo, non solo il fatto che gira. Diffida del framework della settimana. Dai al sistema la memoria del contesto che gia' possiedi. Logga tutto. Usa git per il testo, non per i gigabyte. E parti da un agente, uno, dividendolo solo quando il dolore e' reale.</p>
+
+    <p>La cartella Download e' l'esempio piu' stupido che mi venisse in mente, ed e' per questo che e' utile: lo capisce chiunque, e la sproporzione tra soluzione barocca e sobria la vedi a occhio nudo. Ma lo schema e' lo stesso su problemi molto piu' seri: cambia la posta, non la lezione. E la cosa piu' onesta: mentre costruivo la versione semplice, il riflesso verso quella complicata e' tornato a bussare piu' di una volta. Anche a me. Si combatte ogni giorno.</p>
+
+    <div class="conclusion-box">
+      <p class="quote">"Voglio usare gli agenti" non e' un requisito.<br>E' una soluzione possibile. Parti dal problema, poi decidi.</p>
+    </div>
+
+    <p>Questo pezzo nasce da una cosa buttata giu' di getto su X, dopo l'ennesima architettura vista nascere al contrario. Poi l'ho costruito davvero, perche' gli appunti valgono di piu' quando sotto c'e' qualcosa che gira. E gira, costa pochi centesimi, tiene in ordine la mia cartella anche mentre dormo, con un agente solo. Se ti ritrovi nel disegno coi sei riquadri, nessun giudizio: ci sono passato, e ci ricasco. Ma la prossima volta, prima di disegnarlo, apri la cartella Download e chiediti quanti agenti ti servono davvero. Spesso la risposta e' uno.</p>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Nota.</strong> Il sistema e' un singolo file Python che usa la libreria standard e una chiamata HTTP a un modello DeepSeek economico per la sola classificazione; deduplica, conteggi, policy delle cartelle, collisioni e log sono codice deterministico. I numeri vengono dalla run reale sulla mia cartella Download (364 file, 0 errori) e dai test di annullamento su 150 file copiati a parte. I blocchi di codice qui sopra sono estratti, leggermente condensati per leggibilita'; la versione integra e' nel repo. Panna sta bene e continua a passare davanti allo schermo.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

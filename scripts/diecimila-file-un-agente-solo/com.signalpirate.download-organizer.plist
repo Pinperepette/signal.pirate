@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.signalpirate.download-organizer</string>
+
+  <!-- L'interprete reale (no shim pyenv: launchd non ha PATH/PYENV_ROOT) -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/pinperepette/.pyenv/versions/Program/bin/python3</string>
+    <string>/Users/pinperepette/Desktop/test-laboratorio/test-agent/organize.py</string>
+    <string>/Users/pinperepette/Downloads</string>
+    <string>--apply</string>
+    <string>--journal</string>
+    <string>--quiet</string>
+  </array>
+
+  <!-- Ogni ora. Il tick a vuoto e' gratis: se la radice non ha file nuovi,
+       l'organizzatore esce subito senza spendere un solo token. -->
+  <key>StartInterval</key>
+  <integer>3600</integer>
+
+  <!-- launchd non espande ~: serve HOME per leggere ~/.server/deepseek.txt -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>/Users/pinperepette</string>
+    <key>PATH</key>
+    <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/pinperepette/Desktop/test-laboratorio/test-agent</string>
+
+  <key>StandardOutPath</key>
+  <string>/Users/pinperepette/Desktop/test-laboratorio/test-agent/organizer-state/daemon.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/pinperepette/Desktop/test-laboratorio/test-agent/organizer-state/daemon.err.log</string>
+
+  <!-- Non far ripartire in loop se esce: e' un job periodico, non un servizio -->
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>
