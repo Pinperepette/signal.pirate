@@ -83,6 +83,35 @@
 
     <div class="articles-grid">
 
+      <!-- Article Card: Sei lo 0,1% -->
+      <a href="articoli/sei-lo-zero-virgola-uno.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-06-29</div>
+        <h3 class="article-card-title">Sei lo 0,1%</h3>
+        <p class="article-card-abstract">
+          Tutti spiegano come gira il loop di un agente di coding. Quasi nessuno ha
+          misurato cosa entra davvero nel suo contesto. L'ho contato token per token su
+          un esempio neutro, un bug da sistemare in un toy project, attribuendo ogni
+          token alla sua sorgente: la harness (system prompt, definizioni dei tool,
+          hook, skill), i file che l'agente legge, il suo ragionamento, e quello che hai
+          digitato tu. In un task corto la harness e' il 98% del contesto, tu lo 0,1%:
+          per ogni tuo token la macchina ne legge mille che non hai scritto. Nelle
+          sessioni lunghe vincono i file letti, ma tu resti una scheggia. Poi la seconda
+          dimensione, la persistenza: a ogni inferenza il contesto torna in input
+          daccapo, e su una sessione reale da 99 turni gli stessi token vengono
+          riprocessati 55 volte (read amplification). Da qui il terzo asse, il costo, e
+          quattro regole pratiche per chi costruisce agenti: tagliare gli output dei
+          tool, hook corti, niente letture in massa, sintetizzare presto. Con lo script
+          per misurarlo sulla tua sessione, privacy-safe. Non parla di un prodotto,
+          parla del budget del contesto.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">Agenti AI</span>
+          <span class="tag tag-highlight">Harness</span>
+          <span class="tag tag-reaction">LLM</span>
+          <span class="tag tag-amplification">Token</span>
+        </div>
+      </a>
+
       <!-- Article Card: Diecimila File, Un Agente Solo -->
       <a href="articoli/diecimila-file-un-agente-solo.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-06-22</div>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sei lo 0,1% | Signal Pirate</title>
+  <meta name="description" content="Tutti spiegano come gira il loop di un agente di coding. Nessuno ha misurato cosa entra davvero nel suo contesto. L'ho fatto su un task banale, contando ogni token e attribuendolo alla sua sorgente: tu scrivi sei parole, la macchina ne legge ventimila che non hai scritto. Sei lo 0,1%. Esempio neutro, riproducibile, con lo script per provarlo sulla tua sessione.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.5;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .code-block .cm { color: #6a6a8a; }
+    .code-block .kw { color: #7c4dff; }
+    .code-block .st { color: #00ff88; }
+    .code-block .nb { color: #ff8800; }
+    .code-block .fn { color: #4ecdc4; }
+    .code-block .key { color: #ff6b6b; }
+    .code-block .dc { color: #8b949e; font-style: italic; }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+    blockquote.post-quote {
+      border-left: 3px solid var(--accent-rejection);
+      background: rgba(255,136,0,0.05);
+      margin: 1.5rem 0;
+      padding: 1rem 1.4rem;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+    }
+    .lab-screenshot {
+      max-width: 100%;
+      display: block;
+      margin: 1.5rem auto;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+    }
+    figcaption {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 0.6rem;
+      line-height: 1.5;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/sei-lo-zero-virgola-uno.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Sei lo 0,1%">
+  <meta property="og:description" content="Tutti spiegano come gira il loop di un agente di coding. Nessuno ha misurato cosa entra davvero nel suo contesto. L&#x27;ho fatto su un task banale, contando ogni token e attribuendolo alla sua sorgente: tu scrivi sei parole, la macchina ne legge ventimila che non hai scritto. Sei lo 0,1%. Esempio neutro, riproducibile, con lo script per provarlo sulla tua sessione.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/sei-lo-zero-virgola-uno.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-06-29">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sei lo 0,1%">
+  <meta name="twitter:description" content="Tutti spiegano come gira il loop di un agente di coding. Nessuno ha misurato cosa entra davvero nel suo contesto. L&#x27;ho fatto su un task banale, contando ogni token e attribuendolo alla sua sorgente: tu scrivi sei parole, la macchina ne legge ventimila che non hai scritto. Sei lo 0,1%. Esempio neutro, riproducibile, con lo script per provarlo sulla tua sessione.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Sei lo 0,1%","description":"Tutti spiegano come gira il loop di un agente di coding. Nessuno ha misurato cosa entra davvero nel suo contesto. L'ho fatto su un task banale, contando ogni token e attribuendolo alla sua sorgente: tu scrivi sei parole, la macchina ne legge ventimila che non hai scritto. Sei lo 0,1%. Esempio neutro, riproducibile, con lo script per provarlo sulla tua sessione.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-06-29","dateModified":"2026-06-29","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/sei-lo-zero-virgola-uno.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-06-29 | Pinperepette</p>
+    <h1 class="article-page-title">Sei lo <span class="accent">0,1%</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Tutti spiegano come gira il loop di un agente di coding. Nessuno si e' fermato a contare cosa entra davvero nel suo contesto. L'ho fatto, token per token, su un task banale. Tu scrivi sei parole. La macchina ne legge ventimila che non hai scritto.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Agenti AI</span>
+      <span class="tag tag-highlight">Harness</span>
+      <span class="tag tag-reaction">LLM</span>
+      <span class="tag tag-amplification">Token</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - LA DOMANDA CHE NESSUNO FA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Cosa Che Tutti Spiegano, E Quella Che Nessuno Conta</h2>
+    <span class="section-number">Sezione 00. Il loop e' facile, la dieta nascosta no</span>
+
+    <p>Se cerchi "come funziona Claude Code" trovi venti articoli che ti disegnano lo stesso schema: l'agente <strong>pensa</strong>, chiama un <strong>tool</strong>, legge il <strong>risultato</strong>, ripensa, e avanti cosi' finche' ha finito. Think, act, observe, repeat. E' giusto, e' anche elegante, ed e' una delle invenzioni piu' vecchie dell'informatica vestita da novita'. Il problema e' che, a furia di raccontare il loop, si e' smesso di guardare la cosa accanto: a ogni giro di quel loop, <strong>cosa finisce davvero davanti agli occhi del modello?</strong></p>
+
+    <p>Perche' quando tu scrivi <code>sistemami questo bug</code> in una chat con un agente, hai l'impressione che il modello stia leggendo quelle tre parole. Non e' cosi'. Prima delle tue tre parole, la <em>harness</em>, cioe' il programma che avvolge il modello e gli passa il lavoro, gli ha gia' messo in mano una quantita' di roba che tu non vedi: le istruzioni di sistema, le definizioni di tutti i tool, il file di configurazione del progetto, gli hook, le skill. Tutto contesto che paghi e che pesa, scritto da qualcun altro. Mi sono chiesto: rispetto a quella montagna, quanto sono io? Invece di immaginarlo, l'ho misurato.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Non e' l'ennesimo "come funziona il loop".</strong> Quello e' scritto ovunque. Qui faccio una cosa che non ho visto fare a nessuno, men che meno in italiano: prendo una sessione tipo, conto <em>ogni singolo token</em> che entra nel contesto e lo attribuisco alla sua sorgente. Chi ha scritto cosa. E alla fine ti dico, numero alla mano, quanto di quel contesto sei davvero tu.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - L'ESPERIMENTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Esperimento, Su Una Cosa Volutamente Stupida</h2>
+    <span class="section-number">Sezione 01. Un bug finto, per non parlare del mio lavoro vero</span>
+
+    <p>Mi serviva un task che capisse chiunque e che non raccontasse niente di me. Quindi niente sessioni reali: mi sono inventato un toy project. Un carrello della spesa con un bug nello sconto. Il subtotale e' giusto, ma al momento di applicare lo sconto qualcuno, mesi fa, ha scritto un <code>+</code> dove andava un <code>-</code>. Cento euro di spesa, sconto del dieci per cento, e il totale viene centodieci invece di novanta. Il classico bug idiota che costa due minuti a chiunque lo veda.</p>
+
+    <div class="code-block" data-lang="cart.py &middot; il bug, un piu' al posto di un meno">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="kw">def</span> <span class="fn">totale</span>(self):</td></tr>
+        <tr><td class="ln">2</td><td class="code">    s = self.<span class="fn">subtotale</span>()</td></tr>
+        <tr><td class="ln">3</td><td class="code">    <span class="cm"># BUG: lo sconto viene sommato invece che sottratto</span></td></tr>
+        <tr><td class="ln">4</td><td class="code">    <span class="kw">return</span> s + (s * self.<span class="fn">sconto_percentuale</span>())   <span class="cm"># dovrebbe essere un meno</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Poi ho ricostruito la sessione tipica che farebbe un agente per sistemarlo. Niente di esotico, il giro che fa sempre: tu scrivi la richiesta, lui legge il file per capire com'e' fatto, lancia i test e li vede fallire, applica la correzione, rilancia i test e li vede passare, ti scrive due righe di riassunto. Cinque o sei mosse. A ogni mossa ho contato i token, e ho diviso il conto in quattro caselle a seconda di chi quei token li ha prodotti:</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Sorgente</th><th>Cos'e'</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>HARNESS</strong></td><td>Il costo fisso: istruzioni di sistema, definizioni dei tool, file di progetto, hook, skill. Roba che c'e' prima ancora che tu parli.</td></tr>
+        <tr><td><strong>RISULTATI TOOL</strong></td><td>Quello che l'agente si procura da solo: il contenuto dei file che legge, l'output dei comandi che lancia.</td></tr>
+        <tr><td><strong>AGENTE</strong></td><td>Il suo ragionamento e le chiamate ai tool che scrive.</td></tr>
+        <tr><td><strong>TU</strong></td><td>Quello che hai digitato. La richiesta.</td></tr>
+      </tbody>
+    </table>
+
+    <p>Una nota di onesta', perche' senza diventa marketing. Il costo della harness e' un numero <strong>vero</strong>, misurato dai dati di fatturazione dell'API: e' identico per tutti, non e' contenuto tuo, e' puro overhead del tooling. Tutto il resto l'ho contato con un tokenizzatore standard. Non e' esattamente quello di Anthropic, quindi i valori assoluti sono una stima entro un dieci-quindici per cento. Ma a noi interessano le proporzioni, e quelle non si spostano.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - IL RISULTATO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Risultato: Tu Sei Una Scheggia</h2>
+    <span class="section-number">Sezione 02. Diciannovemilaseicentonovantaquattro contro venti</span>
+
+    <p>Ecco la scomposizione del task corto, contesto cumulato fino all'ultima mossa. Guarda le proporzioni prima ancora dei numeri.</p>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number purple">98%</div><div class="stat-label">harness</div></div>
+      <div class="stat-card"><div class="stat-number cyan">1,5%</div><div class="stat-label">risultati tool</div></div>
+      <div class="stat-card"><div class="stat-number green">0,7%</div><div class="stat-label">agente</div></div>
+      <div class="stat-card"><div class="stat-number red">0,1%</div><div class="stat-label">tu</div></div>
+    </div>
+
+    <p>In numeri: la harness sono <strong>19.694</strong> token, fissi, quelli che ci sono sempre. I file letti e l'output dei test, trecento. Il ragionamento dell'agente, centotrenta. Tu? <strong>Venti token.</strong> La tua richiesta, <code>il totale del carrello e' sbagliato quando scatta lo sconto, sistemalo</code>, pesa venti token su un contesto totale di ventimila. Sei lo zero virgola uno per cento di quello che la macchina legge per risponderti.</p>
+
+    <blockquote class="post-quote">
+      Per ogni token che scrivi tu, la harness ne mette davanti al modello mille e sette che non hai scritto. Non e' una metafora. E' una divisione.
+    </blockquote>
+
+    <p>Il dato e' controintuitivo. In volume, tu sei una riga in un testo che hanno scritto quasi tutto altri: il system prompt, le definizioni dei tool, gli hook. La forma del comportamento dell'agente e' influenzata moltissimo da quei diciannovemila token fissi, anche se la tua richiesta resta il segnale che orienta il lavoro.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Attento a cosa dice davvero questo numero.</strong> Non misura l'importanza di un token, misura solo la sua presenza nel contesto. Sono due cose diverse, e qui sta tutta la differenza: pochi token non vuol dire poca influenza. Una sola istruzione tua puo' cambiare da cima a fondo come si comporta l'agente. Quello che dimostro non e' "la tua richiesta conta poco", e' "la tua richiesta occupa pochissimo spazio". Tieni separate le due frasi: il resto dell'articolo regge solo sulla seconda.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - L'OBIEZIONE ONESTA
+         ============================================================ -->
+    <h2><span class="accent">//</span> "Eh, Ma Nelle Sessioni Vere?"</h2>
+    <span class="section-number">Sezione 03. Cambia chi vince, non cambi tu</span>
+
+    <p>L'obiezione giusta, quella che farei anch'io: certo, su un task da due minuti la harness domina, perche' non e' ancora successo niente. Ma in una sessione vera l'agente apre venti file, lancia i test dieci volte, esplora il codebase. Li' il contesto si gonfia di roba. Vero. L'ho rifatto modellando proprio quello: una sessione lunga in cui l'agente legge ventidue file per orientarsi e gira a lungo.</p>
+
+    <figure>
+      <img src="../immagini/sei-lo-zero-virgola-uno/tu_sei_lo_zero_virgola_uno.png" alt="Due barre impilate a confronto. A sinistra lo scenario A (task corto): la barra e' quasi tutta viola, la harness occupa il 98 per cento del contesto, e una freccia rossa indica che TU sei lo 0,10 per cento. A destra lo scenario B (sessione lunga): la barra e' molto piu' alta, ora i risultati dei tool in teal occupano il 52 per cento e superano la harness viola al 46 per cento, ma una freccia rossa indica che TU resti lo 0,12 per cento." class="lab-screenshot">
+      <figcaption>Scenario A (task corto) e B (sessione lunga). Nel lungo i file letti superano la harness, ma la fetta rossa, TU, resta una linea sottile in entrambi.</figcaption>
+    </figure>
+
+    <p>Il risultato interessante arriva adesso: l'obiezione e' corretta ma non ti salva. Nella sessione lunga succede davvero il ribaltone: i <strong>risultati dei tool</strong> arrivano al cinquantadue per cento e <em>superano</em> la harness, scesa al quarantasei. La barra si capovolge. Cambia chi comanda il contesto. Ma guarda la fetta rossa: tu passi da venti a cinquantatre token, e in percentuale vai dallo zero virgola dieci allo zero virgola dodici. <strong>Ti sei mosso di due centesimi di punto.</strong> In pratica sei rimasto fermo.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Ed e' peggio, non meglio.</strong> Nel task corto almeno il padrone del contesto e' codice scritto da umani, le istruzioni della harness. Nella sessione lunga il padrone diventa roba che l'agente si e' procurato <em>da solo</em>: file che ha deciso lui di aprire, comandi che ha deciso lui di lanciare. Il contesto si riempie di scelte della macchina. In entrambi i mondi, l'unica certezza e' che <strong>chi riempie quella finestra non sei tu.</strong> Mai.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - DENTRO I 19.694
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa C'e' Dentro Quei Diciannovemila</h2>
+    <span class="section-number">Sezione 04. E chi ce li ha messi senza dirtelo</span>
+
+    <p>A questo punto la domanda diventa: cosa <em>sono</em> quei diciannovemila token che ci trovi prima di aprire bocca? Smontiamoli. C'e' il <strong>system prompt</strong>, il documentone che dice al modello chi e' e come comportarsi. Ci sono le <strong>definizioni di tutti i tool</strong>, lo schema completo di ogni cosa che puo' fare, leggere file, scrivere, lanciare comandi, cercare sul web, ognuna con i suoi parametri descritti per esteso. C'e' il <strong>file di progetto</strong>, il classico <code>CLAUDE.md</code> con le tue regole. E poi due categorie che quasi nessuno considera: gli <strong>hook</strong> e le <strong>skill</strong>.</p>
+
+    <p>Gli hook sono programmini che la harness lancia da sola a momenti precisi, per esempio quando apri la sessione, e il cui output <strong>finisce dritto nel contesto del modello</strong>. Memoria del progetto, regole imparate in sessioni passate, liste di strumenti aggiuntivi, suggerimenti. Roba utile, spesso. Ma e' roba che entra nella testa dell'agente senza passare da te, e a volte senza che nemmeno tu sappia che c'e'. Le skill sono pacchetti di istruzioni specializzate, e anche le loro descrizioni stanno li' a occupare spazio.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Quel diciannovemila e' il mio, non e' una costante universale.</strong> Dipende da come hai vestito la harness. Un'installazione spoglia ne ha molti meno. Una piena di hook, server esterni e skill come la mia ne ha parecchi di piu'. Ed e' questo il lato forense: <em>piu' personalizzi l'agente, piu' allarghi la fetta di contesto scritta da chiunque tranne te</em>, e piu' la tua richiesta occupa una fetta sottile dello spazio. Quando ti chiedi "perche' l'agente si comporta cosi'?", vale la pena cercare la risposta anche in quei diciannovemila token, non solo nei tuoi venti.</p>
+    </div>
+
+    <p>C'e' poi la parte che, da queste parti, ci piace. Quella finestra di contesto e' una superficie. Tutto cio' che ci entra, l'agente in qualche misura lo crede. Se un hook ci scrive qualcosa, l'agente lo legge come verita' di contorno. Se l'output di un tool, cioe' il contenuto di un file che l'agente apre, contiene una riga scritta apposta per dargli un ordine, quella riga arriva nel contesto con lo stesso peso del resto. E' esattamente il meccanismo di una <strong>prompt injection</strong>: funziona perche' trasforma dei dati in istruzioni. Lo stesso vale per gli output dei server <strong>MCP</strong>, ormai dappertutto: se finiscono nel contesto, per il modello diventano altro testo che deve interpretare nello stesso contesto. Non sto facendo una dimostrazione oggi, ma il terreno e' tutto qui: <strong>il contesto non e' tuo, e non e' nemmeno solo dell'agente. E' di chiunque riesca a scriverci dentro.</strong> E come hai appena visto, ci scrivono dentro in tanti.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - LA PERSISTENZA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Seconda Dimensione: Non Quanto, Ma Quante Volte</h2>
+    <span class="section-number">Sezione 05. Lo stesso token riletto cinquantacinque volte</span>
+
+    <p>Fin qui ho misurato il volume: quanti token, e di chi. Ma c'e' una seconda dimensione che cambia tutto, e quasi nessuno la racconta. Il contesto e' <strong>incrementale</strong>. A ogni turno il modello non legge solo l'ultimo messaggio: riceve <em>tutta</em> la conversazione accumulata fino a quel punto, piu' il nuovo output dei tool, piu' il nuovo contesto che la harness aggiunge. A ogni inferenza il contesto completo viene fornito di nuovo al modello, ripresentato come input della chiamata. Gli stessi identici token tornano dentro, daccapo, a ogni singolo giro del loop. E' anche il motivo per cui il costo cresce mano a mano che la sessione va avanti.</p>
+
+    <div class="code-block" data-lang="il contesto si accumula a ogni turno">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code">turno 1   20k                                <span class="cm"># harness + la tua richiesta</span></td></tr>
+        <tr><td class="ln">2</td><td class="code">turno 2   20k + output del primo tool</td></tr>
+        <tr><td class="ln">3</td><td class="code">turno 3   20k + output tool + file letto</td></tr>
+        <tr><td class="ln">4</td><td class="code">turno 4   20k + output tool + file + nuovo file...</td></tr>
+        <tr><td class="ln">5</td><td class="code">          <span class="cm"># a ogni giro il contesto completo torna in input</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Questo divide il contesto in due nature molto diverse. C'e' la parte <strong>statica</strong>, che entra all'inizio e resta immobile per tutta la sessione, e la parte <strong>dinamica</strong>, che si gonfia a ogni mossa.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin:1.5rem 0;">
+      <div style="background:var(--bg-secondary);border:1px solid var(--border-subtle);border-left:3px solid var(--accent-highlight);border-radius:10px;padding:1.2rem 1.4rem;">
+        <div style="font-family:var(--font-mono);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-highlight);margin-bottom:0.7rem;">Statico &middot; entra una volta, resta sempre</div>
+        <ul style="margin:0;padding-left:1.1rem;line-height:1.8;color:var(--text-secondary);">
+          <li>system prompt</li>
+          <li>definizioni dei tool</li>
+          <li>skill</li>
+          <li>hook</li>
+          <li>CLAUDE.md</li>
+        </ul>
+      </div>
+      <div style="background:var(--bg-secondary);border:1px solid var(--border-subtle);border-left:3px solid var(--accent-amplification);border-radius:10px;padding:1.2rem 1.4rem;">
+        <div style="font-family:var(--font-mono);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-amplification);margin-bottom:0.7rem;">Dinamico &middot; cresce a ogni turno</div>
+        <ul style="margin:0;padding-left:1.1rem;line-height:1.8;color:var(--text-secondary);">
+          <li>file letti</li>
+          <li>output dei comandi</li>
+          <li>test</li>
+          <li>i tuoi messaggi</li>
+          <li>il ragionamento dell'agente</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>La parte statica e' piccola come numero di voci, ed e' proprio quella che paga il prezzo della persistenza: c'e' dal primo turno, quindi viene riletta <em>tutte</em> le volte. Quei diciannovemila token vengono riprocessati a ogni chiamata del modello. Da qui una metrica che prendo in prestito dal mondo dello storage e applico al contesto degli agenti: la chiamo <strong>read amplification</strong>, il rapporto tra tutti i token processati durante la sessione e quelli presenti nel turno piu' grande. Il termine non e' uno standard del mondo LLM, l'estensione agli agenti e' mia. Per produrre i tuoi venti token di risposta, il modello deve rileggere decine di migliaia di token gia' presenti: una modifica minuscola dell'input comporta la rilettura di una quantita' enorme di contesto.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>Sorgente</th><th>Quando entra</th><th>Quante volte viene riletto</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>System prompt, tool, hook, skill</td><td>turno 1</td><td>a ogni turno</td></tr>
+        <tr><td>CLAUDE.md</td><td>turno 1</td><td>a ogni turno</td></tr>
+        <tr><td>La tua richiesta</td><td>turno 1</td><td>a ogni turno successivo</td></tr>
+        <tr><td>Output dei comandi</td><td>quando l'agente li lancia</td><td>a ogni turno successivo</td></tr>
+        <tr><td>File letti</td><td>quando l'agente li apre</td><td>a ogni turno successivo</td></tr>
+      </tbody>
+    </table>
+
+    <p>Sull'esempio da cinque turni l'amplificazione e' gia' cinque volte: ventimila token al picco, ma centomila effettivamente riletti. Su una sessione vera esplode. Ho misurato quella in cui ho costruito questa analisi, lunga e piena di lavoro: <strong>novantanove</strong> chiamate al modello, centoventunmila token nel turno piu' grande, e <strong>sei milioni e seicentomila token riletti</strong> in totale. I diciannovemila della harness, riprocessati novantanove volte uno dopo l'altro.</p>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number cyan">99</div><div class="stat-label">turni</div></div>
+      <div class="stat-card"><div class="stat-number purple">121k</div><div class="stat-label">picco del contesto</div></div>
+      <div class="stat-card"><div class="stat-number green">6,68M</div><div class="stat-label">token riletti</div></div>
+      <div class="stat-card"><div class="stat-number red">55x</div><div class="stat-label">read amplification</div></div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p><strong>Un'obiezione tecnica, anticipata.</strong> Dal punto di vista logico il contesto viene ripresentato a ogni inferenza. Molte implementazioni mantengono una <strong>KV cache</strong> che, nelle inferenze compatibili, evita di ricalcolare da zero l'attenzione sui token gia' visti, e questo riduce il lavoro interno e il prezzo: lo vedi negli sconti sui token "cached". Ma non cambia la sostanza, quei token continuano a far parte di ogni inferenza. E allungare il contesto non aumenta solo la memoria occupata: aumenta anche il lavoro richiesto ai meccanismi di attenzione, pur con le ottimizzazioni dei modelli moderni, ed e' il motivo per cui i contesti molto lunghi costano sempre di piu'.</p>
+    </div>
+
+    <p><strong>I limiti, detti chiaramente.</strong> Questa misura non dice quanto ogni sorgente influenzi davvero la risposta finale. Dice quanto spazio occupa e quanto a lungo resta nel contesto. L'influenza effettiva dipende anche dall'architettura del modello, da come l'attenzione pesa i token e dal loro contenuto. Sto misurando l'occupazione e la persistenza, non l'importanza: sono piani diversi, e tengo separata l'osservazione dall'interpretazione apposta.</p>
+
+    <p>C'e' anche un motivo per cui la fetta dinamica si gonfia cosi' in fretta, ed e' piu' sottile di "l'agente legge dei file". Per sistemare una riga, un agente non apre solo il file che modifica. Apre le sue dipendenze, i test, il README, la configurazione, gli helper, e si rilegge gli errori del compilatore. Il codice che <em>tocca</em> e' minuscolo, quello che <em>guarda</em> per decidere e' enorme. Per questo la parte tool cresce molto piu' in fretta del lavoro effettivo, e ogni file aperto poi viaggia nel contesto per tutti i turni che restano. E tutto compete per lo stesso spazio: la context window non e' occupata "dalla conversazione", e' un'unica finestra dove system prompt, definizioni dei tool, file letti e output dei comandi si contendono lo stesso budget. Quando si riempie, qualcosa deve cedere.</p>
+
+    <p>Fin qui, volume e persistenza. Resta il <strong>costo</strong>. In una sessione lunga la maggior parte del lavoro computazionale non viene dal generare token nuovi, ma dal rileggere di continuo quelli gia' presenti. E' anche il motivo per cui le risposte rallentano man mano che la conversazione cresce: non stai pagando soprattutto quello che il modello scrive, stai pagando tutto quello che si deve rileggere prima di scriverlo. Contesto, inferenza, costo e latenza sono quattro aspetti strettamente collegati dello stesso fenomeno: la latenza, per onesta', dipende anche da hardware, batching, cache e rete, ma la direzione e' quella.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Un limite onesto di questa misura.</strong> Vale finche' la conversazione non viene compressa. Molti agenti, superata una certa soglia di riempimento, sintetizzano in automatico parte della cronologia: riassumono, tagliano, ricostruiscono la memoria. Da quel momento la composizione del contesto cambia e i conti vanno rifatti. La foto che ti ho fatto vale per la sessione prima della compattazione, dopo e' un'altra foto.</p>
+    </div>
+
+    <blockquote class="post-quote">
+      Il token piu' costoso non e' quello che occupa piu' spazio. E' quello che viene riletto piu' volte. Non conta solo quanti token hai: conta quante inferenze li attraversano.
+    </blockquote>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - FALLO TU
+         ============================================================ -->
+    <h2><span class="accent">//</span> Non Fidarti, Misuralo Sulla Tua Sessione</h2>
+    <span class="section-number">Sezione 06. Uno script, il tuo transcript, due minuti</span>
+
+    <p>Questi numeri vengono da un esempio inventato apposta, neutro, perche' non volevo mostrarti il mio lavoro vero. Ma il bello e' che la stessa misura la puoi fare sulla <strong>tua</strong> sessione, quella vera, sul tuo disco. Claude Code tiene un registro di ogni sessione in un file di testo, dentro <code>~/.claude/projects/</code>. Lo script nel repo lo legge e ti sputa fuori esattamente la stessa scomposizione: harness, tool, agente, tu.</p>
+
+    <p>E' scritto per essere <strong>a prova di paranoia</strong>, e giustamente: non stampa mai il contenuto dei tuoi messaggi ne' dei file che hai aperto, conta i token e basta, e gira tutto in locale. Niente esce dal tuo computer. Il totale che usa e' il numero reale dei dati di fatturazione, non una stima, e la voce "harness" e' semplicemente tutto cio' che resta togliendo i messaggi visibili.</p>
+
+    <div class="code-block" data-lang="bash &middot; provalo sulla tua sessione piu' recente">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code">pip install tiktoken</td></tr>
+        <tr><td class="ln">2</td><td class="code"><span class="cm"># senza argomenti prende la sessione piu' recente</span></td></tr>
+        <tr><td class="ln">3</td><td class="code">python analizza-la-tua-sessione.py</td></tr>
+        <tr><td class="ln">4</td><td class="code"></td></tr>
+        <tr><td class="ln">5</td><td class="code"><span class="cm"># oppure puntala a un transcript preciso</span></td></tr>
+        <tr><td class="ln">6</td><td class="code">python analizza-la-tua-sessione.py ~/.claude/projects/&lt;progetto&gt;/&lt;id&gt;.jsonl</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>L'ho lanciato sulla sessione vera in cui ho costruito proprio questa analisi, una sessione lunga e piena di lavoro. Risultato: harness al settantadue per cento, ragionamento dell'agente al venti, file letti all'otto, e <strong>io allo zero virgola venticinque per cento</strong>. Trecentonovantadue token non miei per ogni token mio. Diverso dall'esempio inventato nei dettagli, identico nella morale. Quando i numeri veri confermano quelli finti, l'esempio finto ha fatto il suo lavoro.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - IMPLICAZIONI PROGETTUALI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Implicazioni Progettuali</h2>
+    <span class="section-number">Sezione 07. Le stesse due misure, lette come regole</span>
+
+    <p>Finora ho fatto l'analista. Ma se costruisci agenti, da questi due numeri, volume e persistenza, scendono delle regole molto concrete. Non sono opinioni, sono <strong>conseguenze dell'aritmetica</strong>: ogni token lo paghi moltiplicato per i turni che restano. Tienilo a mente e quattro decisioni si raddrizzano da sole.</p>
+
+    <p><strong>Taglia gli output dei tool alla fonte.</strong> Un comando che vomita mille righe, un file letto per intero quando ti serviva una funzione, una query che torna tutto il database: quel token non lo paghi una volta, lo paghi per ogni turno fino a fine sessione. Un <code>head</code>, un <code>grep</code> mirato, una paginazione, un troncamento, non sono pignoleria: il risparmio si moltiplica per tutte le riletture che eviti. E' la leva di costo piu' sottovalutata che conosca.</p>
+
+    <p><strong>Un hook verboso e' la cosa piu' cara che hai.</strong> Gli hook stanno nella parte statica: vengono riletti a <em>ogni</em> chiamata. Un hook che inietta duemila token di "stato del progetto" non costa duemila token, ne costa duemila per turno. Su una sessione da novantanove giri sono duecentomila. Il contenuto degli hook va trattato come il system prompt: il piu' corto possibile, solo l'essenziale, mai un dump "tanto puo' servire".</p>
+
+    <p><strong>Far leggere cinquanta file "per sicurezza" e' quasi sempre un errore.</strong> Il riflesso di dare all'agente tutto il contesto "cosi' e' coperto" si ritorce due volte: ogni file aperto entra nella fetta dinamica e ci resta per tutti i turni successivi, e per giunta diluisce il segnale, perche' il modello deve ritrovare l'ago in un pagliaio che gli hai dato tu. Meglio un <strong>retrieval mirato</strong>, una lettura quando serve, e chiudere. Il contesto giusto batte il contesto abbondante, sempre.</p>
+
+    <p><strong>Sintetizza presto, non quando esplode.</strong> Visto che il costo cresce con la rilettura, comprimere il contesto prima che diventi enorme non e' igiene, e' risparmio diretto su costo e latenza di ogni turno a venire. Un riassunto da cinquecento token che rimpiazza ottomila token di cronologia ripaga il costo della compressione in pochissimi giri. Aspettare la soglia automatica e' gia' tardi: a quel punto hai pagato la rilettura piena per decine di turni.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>La scelta</th><th>Perche' pesa, col conto in mano</th><th>La mossa</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Output dei tool lunghi</td><td>Riletti a ogni turno restante</td><td>Tronca e filtra alla fonte</td></tr>
+        <tr><td>Hook e system prompt gonfi</td><td>Parte statica, riletta sempre</td><td>Solo l'essenziale, niente dump</td></tr>
+        <tr><td>Leggere file in massa</td><td>Restano nel contesto e diluiscono il segnale</td><td>Retrieval mirato, una lettura quando serve</td></tr>
+        <tr><td>Sintesi tardiva</td><td>Paghi la rilettura piena fino alla soglia</td><td>Comprimi presto, sotto controllo</td></tr>
+      </tbody>
+    </table>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il principio, in una riga.</strong> Progettare un agente economico vuol dire tenere <em>piccola la parte statica e corta la parte dinamica</em>, perche' le paghi entrambe moltiplicate per il numero di turni. Tutto il resto sono variazioni di questo principio.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Chi Scrive Davvero</h2>
+    <span class="section-number">Sezione 08. Cosa mi tengo da questa divisione</span>
+
+    <p>Non e' un articolo contro gli agenti, li uso ogni giorno e mi pagano le bollette. E non e' nemmeno un "occhio che ti spiano". E' una correzione di prospettiva, e basta. Quando lavori con un agente di coding hai la sensazione di essere al centro della scena, il regista che da' gli ordini. La misura ridimensiona la scena: in volume la tua parte e' minima, e il grosso del contesto lo riempiono altri, chi ha scritto il system prompt, chi ha definito i tool, chi ha messo gli hook, e l'agente stesso coi file e i comandi che apre. Resta vero, e l'ho ripetuto apposta, che quella parte minima e' anche il segnale che mette in moto tutto il resto.</p>
+
+    <p>E c'e' un secondo livello, quello che mi interessa di piu'. La domanda di partenza era "chi scrive il contesto?". Misurando la persistenza ne spunta una piu' fine: "quali parti di quel contesto il modello continua a rileggere, turno dopo turno, per tutta la sessione?". La risposta e' la stessa fetta statica che hai gia' visto, e ogni rilettura e' un'inferenza pagata. Non basta sapere quanti token hai: conta quante volte ci passi sopra.</p>
+
+    <p>Sapere questo cambia anche il modo in cui debugghi. Quando l'agente fa una cosa strana, il riflesso e' rileggere la propria richiesta a caccia dell'errore tuo. Ma quella richiesta e' una frazione minima di cio' che il modello aveva davanti, e intorno c'e' un contesto molto piu' grande e quasi tutto non scritto da te: una regola del file di progetto che avevi dimenticato, un hook che inietta qualcosa, il contenuto di un file che l'agente ha letto e preso per buono. Quando il tuo prompt sembra giusto e il risultato no, e' li' che conviene allargare lo sguardo, non solo sulle tue due righe.</p>
+
+    <p>Tutto questo, oggi, ha un nome che gira parecchio: <strong>context engineering</strong>. Progettare un agente vuol dire progettare soprattutto il contesto che gli verra' mostrato, prima ancora del modello che lo legge. Questo pezzo, in fondo, parla quasi solo di quello: di chi riempie quella finestra, di quanto a lungo ci resta, e di quanto ti costa ogni volta che ci ripassa sopra.</p>
+
+    <p>Sembra un articolo su Claude Code, e Claude Code e' stato solo il banco di prova. Il fenomeno non e' suo: e' di qualunque agente che si costruisce il contesto turno dopo turno, da Codex a Gemini CLI, da Aider a Cursor o Windsurf fino a Goose. Cambiano i numeri, cambia la forma della harness, non cambia la legge. In fondo non parla di un prodotto, parla del <strong>budget del contesto</strong>, e quello ce l'hanno tutti.</p>
+
+    <div class="conclusion-box">
+      <p class="quote">Ogni prompt e' una riga<br>in un documento molto piu' grande, scritto gia' da molti.</p>
+    </div>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Nota.</strong> Tutto il codice e' su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/sei-lo-zero-virgola-uno" target="_blank" rel="noopener" style="color: var(--accent-highlight);">GitHub</a>, nella cartella <code>scripts/sei-lo-zero-virgola-uno/</code>. Gli scenari e il grafico girano con <code>tiktoken</code> e <code>matplotlib</code>; lo script sul transcript reale serve solo <code>tiktoken</code>. Il costo fisso della harness e' un numero reale preso dai campi <code>usage</code> dell'API (system prompt, definizioni dei tool, file di progetto, hook, skill); nel mio setup sono 19.694 token, ma dipende da come hai configurato l'agente. Tutto il resto e' contato con il tokenizzatore <code>cl100k_base</code>, che e' di OpenAI e non di Anthropic: i valori assoluti sono stime entro circa il dieci-quindici per cento, le proporzioni reggono. I numeri di read amplification (cinque volte sull'esempio, cinquantacinque sulla sessione reale da 99 turni) sono la somma dei token in input a ogni chiamata divisa per il contesto piu' pieno, sempre dai campi <code>usage</code>, e valgono per la sessione prima dell'eventuale compattazione automatica. L'esempio del carrello e' inventato apposta per non mostrare lavoro reale; la verifica sulla sessione vera serve solo a confermare che le proporzioni dell'esempio non barano. Un'ultima precisazione: i numeri assoluti dipendono dall'implementazione dell'agente, qui Claude Code. L'analisi descrive un principio generale, valido per qualunque agente che accumuli contesto a ogni turno; le percentuali e i conteggi riportati si riferiscono alla configurazione misurata, e con un altro agente o un altro setup cambierebbero nei valori, non nella sostanza.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

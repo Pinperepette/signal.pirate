@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Sei lo 0,1%</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/sei-lo-zero-virgola-uno.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/sei-lo-zero-virgola-uno.html</guid>
+    <pubDate>Mon, 29 Jun 2026 00:00:00 +0200</pubDate>
+    <description>Tutti spiegano come gira il loop di un agente di coding: pensa, chiama un tool, legge il risultato, ripete. Quasi nessuno si e' fermato a contare cosa entra davvero nel contesto del modello a ogni giro. L'ho misurato, token per token, su un esempio neutro e riproducibile, un bug da sistemare in un toy project, attribuendo ogni token alla sua sorgente: la harness (system prompt, definizioni dei tool, CLAUDE.md, hook, skill), i file che l'agente legge, il suo ragionamento, e quello che ha digitato l'utente. In un task corto la harness pesa il 98% del contesto e tu lo 0,1%: per ogni token tuo la macchina ne legge mille che non hai scritto. Nelle sessioni lunghe il quadro si capovolge, i file letti dall'agente superano la harness, ma la tua fetta resta sotto lo 0,2%: cambia chi riempie il contesto, non sei mai tu. Attenzione pero': questa misura dice quanto spazio occupi e quanto a lungo resti, non quanto influenzi la risposta, due piani diversi che tengo separati apposta. Poi la seconda dimensione, quella che quasi nessuno racconta: la persistenza. Il contesto e' incrementale, a ogni inferenza torna in input daccapo, quindi la parte statica viene riprocessata a ogni chiamata. Su una sessione reale da 99 turni: picco di 121 mila token, 6,68 milioni di token complessivamente riletti, una read amplification di 55 volte. Da qui il terzo asse, il costo: in una sessione lunga la maggior parte del lavoro non viene dal generare token nuovi ma dal rileggere quelli gia' presenti, ed e' anche perche' cresce la latenza. Ne escono quattro regole per chi costruisce agenti: tagliare gli output dei tool alla fonte, tenere corti hook e system prompt, evitare di leggere file in massa preferendo un retrieval mirato, e sintetizzare il contesto presto invece che alla soglia. Con i caveat tecnici giusti (KV cache, attenzione, prompt injection, MCP) e uno script che lanci sul tuo transcript per rifare la misura in locale, senza che esca nulla. Claude Code e' solo il banco di prova: il fenomeno e' di qualunque agente che si costruisce il contesto turno dopo turno. Non parla di un prodotto, parla del budget del contesto, oggi lo chiamano context engineering.</description>
+  </item>
+
+  <item>
     <title>Diecimila File, Un Agente Solo</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/diecimila-file-un-agente-solo.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/diecimila-file-un-agente-solo.html</guid>
