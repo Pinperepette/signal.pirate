@@ -497,7 +497,7 @@
       </tbody></table></div>
     </div>
 
-    <p>L'ho lanciato sulla sessione vera in cui ho costruito proprio questa analisi, una sessione lunga e piena di lavoro. Risultato: harness al settantadue per cento, ragionamento dell'agente al venti, file letti all'otto, e <strong>io allo zero virgola venticinque per cento</strong>. Trecentonovantadue token non miei per ogni token mio. Diverso dall'esempio inventato nei dettagli, identico nella morale. Quando i numeri veri confermano quelli finti, l'esempio finto ha fatto il suo lavoro.</p>
+    <p>L'ho lanciato sulla sessione vera in cui ho costruito proprio questa analisi, una sessione lunga e piena di lavoro. Risultato: harness al settantadue per cento, ragionamento dell'agente al venti, file letti all'otto, e <strong>io allo zero virgola venticinque per cento</strong>. Trecentonovantadue token non miei per ogni token mio. Diverso dall'esempio inventato nei dettagli, identico nella morale. Quando i numeri veri confermano quelli finti, l'esempio finto ha fatto il suo lavoro. E se vuoi rifare anche il conto della persistenza, il numero da cinquantacinque volte, c'e' uno script gemello (<a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/read_amplification.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>read_amplification.py</code></a>) che la calcola sulla tua sessione, sempre solo dai conteggi.</p>
 
 
     <!-- ============================================================
@@ -534,10 +534,33 @@
 
 
     <!-- ============================================================
-         SEZIONE 08 - CONCLUSIONE
+         SEZIONE 08 - SCRIPT E CODICE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Script e Codice</h2>
+    <span class="section-number">Sezione 08. Tutto riproducibile, anche sulla tua sessione</span>
+
+    <p>Tutto il codice e' su <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/sei-lo-zero-virgola-uno" target="_blank" rel="noopener" style="color: var(--accent-highlight);">GitHub</a>, nella cartella <code>scripts/sei-lo-zero-virgola-uno/</code>. Gli scenari e il grafico girano con <code>tiktoken</code> e <code>matplotlib</code>; gli script che leggono il tuo transcript vogliono solo <code>tiktoken</code> e non fanno uscire nulla dal tuo computer.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr><th>File</th><th>Cosa fa</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/scenari.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>scenari.py</code></a></td><td>I due scenari neutri (task corto e sessione lunga), con la scomposizione del contesto per sorgente contata token per token</td></tr>
+        <tr><td><a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/persistenza.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>persistenza.py</code></a></td><td>La "vita di un token": quante volte ogni sorgente viene riprocessata, e la read amplification sull'esempio</td></tr>
+        <tr><td><a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/grafico.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>grafico.py</code></a></td><td>Genera il grafico dei due scenari che vedi nell'articolo</td></tr>
+        <tr><td><a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/analizza-la-tua-sessione.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>analizza-la-tua-sessione.py</code></a></td><td><strong>Sul tuo transcript:</strong> la scomposizione del contesto (harness, tool, agente, tu). Solo conteggi, mai il contenuto</td></tr>
+        <tr><td><a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/read_amplification.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>read_amplification.py</code></a></td><td><strong>Sul tuo transcript:</strong> la read amplification reale (turni, picco del contesto, token riletti) dai campi <code>usage</code> dell'API</td></tr>
+        <tr><td><a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/cart.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>cart.py</code></a> + <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/sei-lo-zero-virgola-uno/test_cart.py" target="_blank" rel="noopener" style="color: var(--accent-highlight);"><code>test_cart.py</code></a></td><td>Il toy project col bug dello sconto, usato come esempio neutro</td></tr>
+      </tbody>
+    </table>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - CONCLUSIONE
          ============================================================ -->
     <h2><span class="accent">//</span> Chi Scrive Davvero</h2>
-    <span class="section-number">Sezione 08. Cosa mi tengo da questa divisione</span>
+    <span class="section-number">Sezione 09. Cosa mi tengo da questa divisione</span>
 
     <p>Non e' un articolo contro gli agenti, li uso ogni giorno e mi pagano le bollette. E non e' nemmeno un "occhio che ti spiano". E' una correzione di prospettiva, e basta. Quando lavori con un agente di coding hai la sensazione di essere al centro della scena, il regista che da' gli ordini. La misura ridimensiona la scena: in volume la tua parte e' minima, e il grosso del contesto lo riempiono altri, chi ha scritto il system prompt, chi ha definito i tool, chi ha messo gli hook, e l'agente stesso coi file e i comandi che apre. Resta vero, e l'ho ripetuto apposta, che quella parte minima e' anche il segnale che mette in moto tutto il resto.</p>
 

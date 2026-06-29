@@ -13,6 +13,7 @@ tu la veda.
 | `analizza.py` | Versione minima a uno scenario, piu' commentata. |
 | `persistenza.py` | La seconda dimensione: quante volte ogni token viene riletto (read amplification). Tabella "vita di un token" + numero reale (55x su 99 turni). |
 | `analizza-la-tua-sessione.py` | **Lancialo sul TUO transcript.** Dice la stessa scomposizione sulla tua sessione reale. Privacy-safe: conta e basta, non stampa mai il contenuto. |
+| `read_amplification.py` | Sempre sul tuo transcript: calcola la read amplification reale (turni, picco del contesto, token riletti) dai campi `usage` dell'API. Privacy-safe. |
 | `cart.py`, `test_cart.py` | Il toy project con il bug usato come esempio neutro. |
 
 ## Come si usa
