@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Deriva Ha Un Calendario | Signal Pirate</title>
+  <meta name="description" content="Chat Control, data retention, eIDAS wallet, DSA, AI Act, EES, ETIAS, tetto al contante, euro digitale. Nessuna misura da sola e' sorveglianza di massa. Messe in fila, con date verificate dal 2006 a oggi, disegnano un'architettura. Il pericolo non e' il tassello, e' il mosaico.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+      vertical-align: top;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+    .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+    .table-scroll .strategy-table { margin: 0; }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Timeline === */
+    .timeline {
+      position: relative;
+      margin: 2rem 0;
+      padding-left: 1.75rem;
+      border-left: 2px solid var(--border-subtle);
+    }
+    .tl-item { position: relative; margin-bottom: 1.6rem; }
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: -2.05rem;
+      top: 0.35rem;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent-highlight);
+      box-shadow: 0 0 0 4px var(--bg-primary);
+    }
+    .tl-item.red::before { background: var(--accent-reaction); }
+    .tl-item.green::before { background: var(--accent-attention); }
+    .tl-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-amplification);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .tl-body { margin-top: 0.2rem; line-height: 1.55; font-size: 0.95rem; }
+    .tl-body strong { color: var(--accent-yellow); }
+
+    /* === Sources === */
+    .sources {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin: 1rem 0 2rem;
+    }
+    .sources a { color: var(--accent-amplification); word-break: break-word; }
+
+    .lead {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* === Mosaico (tessere) === */
+    .mosaic {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: 82px;
+      grid-auto-flow: dense;
+      gap: 8px;
+      margin: 2rem 0 0.6rem;
+    }
+    .tile {
+      --c: var(--accent-highlight);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--c);
+      background: var(--bg-secondary);
+      background: linear-gradient(150deg, color-mix(in srgb, var(--c) 15%, var(--bg-secondary)), var(--bg-secondary));
+      padding: 0.8rem 0.95rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      transition: transform 0.15s ease;
+    }
+    .tile:hover { transform: translateY(-2px); }
+    .tile .t-idx {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--c);
+      opacity: 0.85;
+    }
+    .tile .t-domain {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--c);
+      line-height: 1.1;
+    }
+    .tile .t-measure {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+      line-height: 1.25;
+    }
+    .tile.c-purple { --c: var(--accent-highlight); }
+    .tile.c-red    { --c: var(--accent-reaction); }
+    .tile.c-cyan   { --c: var(--accent-amplification); }
+    .tile.c-orange { --c: var(--accent-rejection); }
+    .tile.c-green  { --c: var(--accent-attention); }
+    .tile.c-yellow { --c: var(--accent-yellow); }
+    .tile.s2 { grid-column: span 2; }
+    .tile.s3 { grid-column: span 3; }
+    .tile.t2 { grid-row: span 2; }
+    .mosaic-caption {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin: 0 0 1.5rem;
+    }
+    .mosaic-caption strong { color: var(--accent-yellow); }
+    @media (max-width: 760px) {
+      .mosaic { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 92px; }
+      .tile.s2, .tile.s3 { grid-column: span 1; }
+      .tile.t2 { grid-row: span 1; }
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/la-deriva-ha-un-calendario.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="La Deriva Ha Un Calendario">
+  <meta property="og:description" content="Chat Control, data retention, eIDAS wallet, DSA, AI Act, EES, ETIAS, tetto al contante, euro digitale. Nessuna misura da sola e&#x27; sorveglianza di massa. Messe in fila, con date verificate dal 2006 a oggi, disegnano un&#x27;architettura. Il pericolo non e&#x27; il tassello, e&#x27; il mosaico.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/la-deriva-ha-un-calendario.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-07-08">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="La Deriva Ha Un Calendario">
+  <meta name="twitter:description" content="Chat Control, data retention, eIDAS wallet, DSA, AI Act, EES, ETIAS, tetto al contante, euro digitale. Nessuna misura da sola e&#x27; sorveglianza di massa. Messe in fila, con date verificate dal 2006 a oggi, disegnano un&#x27;architettura. Il pericolo non e&#x27; il tassello, e&#x27; il mosaico.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"La Deriva Ha Un Calendario","description":"Chat Control, data retention, eIDAS wallet, DSA, AI Act, EES, ETIAS, tetto al contante, euro digitale. Nessuna misura da sola e' sorveglianza di massa. Messe in fila, con date verificate dal 2006 a oggi, disegnano un'architettura. Il pericolo non e' il tassello, e' il mosaico.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-07-08","dateModified":"2026-07-08","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/la-deriva-ha-un-calendario.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-07-08 | Pinperepette</p>
+    <h1 class="article-page-title">La Deriva Ha Un <span class="accent">Calendario</span></h1>
+    <p class="lead" style="margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+      A luglio 2026 il Parlamento europeo ha rimesso in agenda la scansione dei messaggi che a marzo aveva bocciato per un voto. Non e' un caso isolato. Negli ultimi anni l'UE ha aggiunto un tassello alla volta: identita' digitale, controllo dei contenuti, biometria alle frontiere, tetto al contante, euro digitale. Prese una alla volta hanno ciascuna la loro ragione, e nessuna e' sorveglianza di massa. A pesare e' la somma.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Sorveglianza</span>
+      <span class="tag tag-highlight">Privacy</span>
+      <span class="tag tag-reaction">Unione Europea</span>
+      <span class="tag tag-amplification">Chat Control</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - IL VOTO DI LUGLIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Voto di Luglio</h2>
+    <span class="section-number">Sezione 00. Chat Control, la cronaca</span>
+
+    <p>Il 26 marzo 2026 il Parlamento europeo aveva detto no. Con <strong>307 voti contro 306</strong>, un voto di scarto, aveva rifiutato di prorogare la deroga che permette alle piattaforme di scansionare i messaggi privati a caccia di materiale pedopornografico. La deroga e' poi scaduta il 3 aprile. Sembrava chiuso.</p>
+
+    <p>Non era chiuso. Il 30 giugno il quinto e presunto ultimo negoziato tra Parlamento, Consiglio e Commissione sul regolamento permanente, il cosiddetto Chat Control 2.0, si e' concluso senza accordo. Il Parlamento ha tenuto la sua linea rossa: no alla scansione obbligatoria e indiscriminata di tutte le comunicazioni, comprese quelle cifrate di WhatsApp, Signal, Telegram. Il Consiglio voleva rendere permanente la scansione. Stallo.</p>
+
+    <p>A quel punto il Consiglio ha scelto un'altra strada. Ha riscritto il testo come se fosse una legge nuova e identica, e lo ha spinto sul tavolo del Parlamento con richiesta di <strong>procedura d'urgenza</strong>, l'ultima settimana utile prima della pausa estiva. Il 7 luglio il Parlamento ha approvato l'accelerazione. Lo stesso Parlamento che a marzo aveva bocciato la misura per un voto ha rimesso in corsa la deroga, con il voto finale nel merito previsto in plenaria a ridosso della pausa.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Il metodo, in un caso solo.</strong> Una misura contestata viene respinta di misura. Non muore: viene riscritta, ripresentata come nuova, accelerata in urgenza mentre l'attenzione cala. Non serve uno strappo. Basta la persistenza e il calendario giusto.</p>
+    </div>
+
+    <p>Chat Control e' l'esempio piu' visibile perche' e' la vicenda piu' recente. Preso da solo, pero', racconta poco: non conta la singola proposta, conta la direzione in cui spinge. Qui sotto ho messo in fila quello che l'UE ha costruito negli ultimi anni, con le date, per guardare l'insieme.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - IL METODO, NON LO STRAPPO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Non Serve Uno Strappo</h2>
+    <span class="section-number">Sezione 01. La tesi</span>
+
+    <p>Nessuna delle misure di cui parliamo, presa isolata, e' la sorveglianza di massa da romanzo distopico. Ciascuna ha un obiettivo che si difende bene in pubblico: proteggere i minori, fermare i terroristi, semplificare la burocrazia, combattere il riciclaggio, arginare la disinformazione. Argomenti ragionevoli, e chi prova a contestarli si ritrova a difendere l'indifendibile.</p>
+
+    <p>E la sorveglianza non arriva mai col suo nome. Si presenta come sicurezza, o come efficienza, o come tutela, e arriva a pezzi, ciascuno votato in un momento diverso, da maggioranze diverse, con motivazioni diverse. Nessuno, a un certo punto, si alza e propone di sorvegliare tutti. Si chiede di verificare l'identita' online per proteggere i bambini, di conservare i tabulati per prendere i criminali, di introdurre il portafoglio digitale per evitare le file, di mettere un tetto al contante per stanare i riciclatori.</p>
+
+    <p>Presi uno per uno, sono frammenti. Quasi nessuno si ferma a chiedersi cosa compongano una volta accostati, e quasi nessuno nota che questi frammenti, una volta posati, non si tolgono piu'. Una legge di sicurezza che passa tende a restare, e col tempo a espandersi. Il temporaneo diventa permanente, la deroga scade e viene riproposta, la banca dati nata per un reato grave finisce aperta ad altri reati.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>La logica del cricchetto.</strong> Un cricchetto gira in un senso solo. Gli strumenti di controllo si aggiungono, quasi mai si smontano, e il potere nuovo parte dalla base lasciata dal precedente. Non si torna al punto di partenza: si riparte sempre da un gradino piu' su.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LE COMUNICAZIONI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Comunicazioni</h2>
+    <span class="section-number">Sezione 02. Messaggi, tabulati, cifratura</span>
+
+    <p>Chat Control, nella sua versione piu' dura, prevedeva ordini di individuazione che avrebbero imposto alle piattaforme di scansionare i contenuti sul dispositivo dell'utente <em>prima</em> che venissero cifrati. Si chiama <code>client-side scanning</code>, e viene venduto come compromesso: la cifratura resta intatta, il controllo avviene prima. Tecnicamente e' un inganno. Se il messaggio viene letto prima di essere cifrato, la cifratura non protegge piu' niente. Hai costruito una porta di servizio e l'hai messa dentro casa.</p>
+
+    <p>Non lo dice un gruppo di attivisti. Lo hanno scritto <strong>oltre 500 scienziati</strong> con competenze in crittografia e sicurezza, in una lettera aperta: la misura e' tecnicamente inattuabile senza minare la sicurezza e la privacy di tutti i cittadini europei. Una porta di servizio non distingue tra un investigatore e un criminale. E' aperta per entrambi.</p>
+
+    <p>Chat Control e' solo il fronte piu' rumoroso. Dietro ce ne sono altri due, meno pubblicizzati e piu' strutturali.</p>
+
+    <p>Il primo e' la <strong>conservazione dei dati di traffico</strong>, la data retention. La direttiva europea del 2006 obbligava gli operatori a conservare i tabulati di chi chiama chi, quando, da dove. Nel 2014 la Corte di Giustizia dell'UE l'ha annullata: sorveglianza generalizzata e indiscriminata, incompatibile con i diritti fondamentali. Sentenza netta. Undici anni dopo, nel 2025, la Commissione ha annunciato una valutazione d'impatto per aggiornare le regole sulla conservazione dei dati. Detto altrimenti: riproporre, in forma aggiornata, quello che la Corte aveva bocciato.</p>
+
+    <p>Il secondo e' <strong>ProtectEU</strong>, la strategia di sicurezza interna presentata il 1 aprile 2025. Il 24 giugno 2025 la Commissione ha pubblicato una tabella di marcia per l'accesso "lecito ed efficace" ai dati da parte delle forze dell'ordine. Sei aree: conservazione dei dati, intercettazione, forense digitale, decrittazione, standardizzazione, IA. Dentro c'e' una <em>Technology Roadmap on encryption</em>, prevista per il 2026, che deve individuare soluzioni tecniche per accedere ai dati cifrati. E c'e' l'obiettivo di dare a Europol capacita' di decrittazione "di nuova generazione" dal 2030.</p>
+
+    <div class="warning-box fade-in">
+      <p>Da una parte l'UE tutela, giustamente, la cifratura come infrastruttura critica. Dall'altra finanzia, per legge e con soldi pubblici, gli strumenti per aggirarla quando le serve. Le due cose stanno nello stesso pacchetto, e dove finisca l'una e cominci l'altra lo decidono le scelte politiche del momento.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - L'IDENTITA'
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Identita'</h2>
+    <span class="section-number">Sezione 03. eIDAS 2.0, il portafoglio digitale</span>
+
+    <p>Nel 2024 l'UE ha adottato eIDAS 2.0, il regolamento che introduce il <strong>Portafoglio Europeo di Identita' Digitale</strong>. Un'app, sul telefono, che raccoglie documenti e credenziali: carta d'identita', patente, titoli di studio, tessera sanitaria, credenziali di accesso ai servizi. Entro il 2026 tutti gli Stati membri devono offrirlo ai cittadini.</p>
+
+    <p>Sulla carta e' comodo. Un solo strumento per identificarti ovunque, meno file, meno fotocopie, meno password. I sostenitori parlano di semplificazione e di controllo dell'utente sui propri dati. E in parte e' vero: il modello prevede che sia l'utente a decidere quali attributi mostrare.</p>
+
+    <p>Il rischio non sta nel singolo uso, ma nella <strong>centralizzazione</strong>. Quando la stessa identita' verificata diventa la chiave per la sanita', la banca, i social, i servizi pubblici, l'acquisto online, finisce per essere anche il punto in cui tutto converge. La stessa cosa che la rende comoda, un'unica credenziale che ti segue ovunque, la rende potente: tiene insieme attivita' che prima restavano separate. Chi controlla il registro, o chi puo' pretendere quella credenziale per un numero sempre maggiore di operazioni, ottiene una visione che nessun documento di carta ha mai dato.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - I CONTENUTI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Contenuti</h2>
+    <span class="section-number">Sezione 04. DSA e disinformazione</span>
+
+    <p>Il Digital Services Act e' pienamente in vigore dal 17 febbraio 2024. Impone alle piattaforme, in particolare a quelle molto grandi, obblighi sulla gestione dei contenuti illegali e sulla mitigazione dei "rischi sistemici". A questo si aggiunge il Code of Practice on Disinformation, il codice di condotta contro la disinformazione, integrato nel quadro del DSA.</p>
+
+    <p>Qui la lettura e' genuinamente a due facce, e vale la pena tenerle entrambe. Da un lato il DSA da' agli utenti strumenti reali: trasparenza sugli algoritmi, diritto di contestare le rimozioni, obblighi per le piattaforme che prima rispondevano solo a se stesse. E' anche l'arma con cui l'Europa prova a mettere un limite allo strapotere delle Big Tech.</p>
+
+    <p>Dall'altro, la nozione di "rischio sistemico" e di "contenuto dannoso ma legale" e' elastica. Chi decide cosa e' disinformazione? Con quali criteri, e con quali margini di errore? Un quadro nato per proteggere il dibattito pubblico puo' diventare, in mani diverse o in un clima diverso, una leva di pressione sulla parola. Non serve la censura esplicita: basta che la piattaforma, per non rischiare sanzioni, rimuova in eccesso. Il DSA non e' censura. Costruisce pero' un canale formale tra il potere pubblico e cio' che puoi dire online, e quel canale resta al suo posto anche quando cambia chi lo usa.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - IL VOLTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Volto</h2>
+    <span class="section-number">Sezione 05. AI Act e biometria</span>
+
+    <p>L'AI Act e' entrato in vigore nell'agosto 2024. Dal <strong>2 febbraio 2025</strong> si applicano i divieti sulle pratiche a rischio inaccettabile, tra cui l'identificazione biometrica remota in tempo reale negli spazi pubblici. Sulla carta, un divieto. Un buon divieto.</p>
+
+    <p>Il divieto pero' ha le sue eccezioni, ed e' nelle eccezioni che vive la sostanza. L'identificazione biometrica in tempo reale resta consentita alle forze dell'ordine in "un numero limitato di casi gravi": ricerca di persone scomparse, prevenzione di attacchi terroristici, ricerca di autori di reati gravi. L'uso richiede una valutazione d'impatto sui diritti fondamentali e la registrazione in una banca dati europea. Ma in casi di urgenza si puo' partire <em>prima</em> della registrazione, salvo completarla dopo.</p>
+
+    <p>C'e' poi l'identificazione biometrica <em>a posteriori</em>, la post-RBI: riconoscere un volto non in diretta ma analizzando immagini gia' registrate. Consentita per reati gravi, con autorizzazione. Significa che una telecamera che ti riprende adesso puo' diventare, in seguito, il punto di partenza di un'identificazione, quando le immagini vengono riesaminate.</p>
+
+    <div class="insight-box fade-in">
+      <p>"Vietato, salvo per terrorismo, reati gravi, persone scomparse, urgenza." Ogni eccezione, presa da sola, sembra ragionevole. Sommate cambiano completamente il risultato: dentro quel perimetro la sorveglianza biometrica non e' solo possibile, e' legale.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - LE FRONTIERE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Frontiere</h2>
+    <span class="section-number">Sezione 06. EES ed ETIAS</span>
+
+    <p>Il 12 ottobre 2025 e' partito l'<strong>Entry/Exit System</strong> (EES), operativo a pieno regime dal 10 aprile 2026. Sostituisce il timbro sul passaporto con un registro biometrico: nome, dati del documento, <strong>impronte digitali e immagine del volto</strong>, data e luogo di ogni ingresso e uscita dallo spazio Schengen. Da quel momento, attraversare la frontiera esterna significa lasciare un record biometrico in una banca dati centrale.</p>
+
+    <p>A ruota arriva <strong>ETIAS</strong>, l'autorizzazione elettronica di viaggio prevista verso la fine del 2026. Un'autorizzazione preventiva per i cittadini di Paesi terzi esentati dal visto: prima di partire, chiedi il permesso, paghi, e un sistema decide se puoi entrare. Non e' un visto, ma la logica e' quella dello screening a monte.</p>
+
+    <p>Sono strumenti pensati per la frontiera esterna e per chi non e' cittadino UE. Normalizzano pero' un principio: attraversare un confine e', per impostazione predefinita, un atto biometrico e registrato. E una volta costruita, l'infrastruttura resta. Cosa collegarci e chi potra' consultarla si stabilisce dopo, in sede politica.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - IL DENARO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Denaro</h2>
+    <span class="section-number">Sezione 07. Antiriciclaggio, contante, euro digitale</span>
+
+    <p>Il regolamento antiriciclaggio dell'UE (2024/1624) introduce dal <strong>10 luglio 2027</strong> un tetto ai pagamenti in contanti di <strong>10.000 euro</strong> in ambito commerciale, valido in tutta l'Unione, con la possibilita' per i singoli Stati di fissare soglie piu' basse. Nasce l'AMLA, l'autorita' europea antiriciclaggio con sede a Francoforte, operativa dal 2028. Per le criptovalute: due diligence completa sopra i 1.000 euro, divieto di conti anonimi e di custodial wallet anonimi, stop alle privacy coin sulle piattaforme regolate.</p>
+
+    <p>Sul lato pubblico, la Banca Centrale Europea prepara l'<strong>euro digitale</strong>, con un pilota atteso nella seconda meta' del 2027. Sarebbe una passivita' diretta della BCE, con la garanzia sovrana di una banconota ma la tracciabilita' di un bonifico. La BCE dice che tutelera' la privacy per i pagamenti quotidiani. I critici osservano che un contante programmabile e tracciabile per costruzione e', in prospettiva, lo strumento di visibilita' finanziaria piu' potente mai esistito.</p>
+
+    <p>Anche qui, la lettura onesta e' doppia. Il riciclaggio esiste, l'anonimato assoluto del denaro serve anche alla criminalita', un tetto al contante non e' di per se' tirannia. Ma la direzione e' sempre quella: riforma dopo riforma, lo spazio dei pagamenti non tracciabili si restringe e quello dei pagamenti registrati si allarga. Il contante e' l'ultimo che non lascia una riga in un database, e lo si sta comprimendo, un tetto e una soglia per volta.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - IL CALENDARIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Calendario</h2>
+    <span class="section-number">Sezione 08. Vent'anni in fila</span>
+
+    <p>Prese nel loro anno, erano notizie di settore. Messe in ordine, sono una traiettoria.</p>
+
+    <div class="timeline fade-in">
+      <div class="tl-item">
+        <div class="tl-date">2006</div>
+        <div class="tl-body"><strong>Direttiva sulla data retention.</strong> Obbligo di conservare i tabulati delle comunicazioni.</div>
+      </div>
+      <div class="tl-item green">
+        <div class="tl-date">2014</div>
+        <div class="tl-body"><strong>La Corte di Giustizia annulla la direttiva.</strong> Sorveglianza generalizzata, incompatibile con i diritti fondamentali.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2016</div>
+        <div class="tl-body"><strong>Direttiva PNR.</strong> I dati di prenotazione dei passeggeri aerei vengono raccolti e conservati per le indagini.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Maggio 2022</div>
+        <div class="tl-body"><strong>La Commissione propone il regolamento CSA</strong>, il futuro Chat Control: scansione dei messaggi contro la pedopornografia.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Febbraio 2024</div>
+        <div class="tl-body"><strong>Il DSA e' pienamente in vigore.</strong> Obblighi sui contenuti e sui rischi sistemici per le piattaforme.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2024</div>
+        <div class="tl-body"><strong>eIDAS 2.0 e regolamento antiriciclaggio.</strong> Portafoglio di identita' digitale e nuove regole su contante e cripto.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Agosto 2024</div>
+        <div class="tl-body"><strong>L'AI Act entra in vigore.</strong> Regole sull'IA, comprese biometria e identificazione.</div>
+      </div>
+      <div class="tl-item red">
+        <div class="tl-date">2 Feb 2025</div>
+        <div class="tl-body"><strong>Scattano i divieti dell'AI Act</strong> sulla biometria remota in tempo reale. Con le eccezioni per le forze dell'ordine.</div>
+      </div>
+      <div class="tl-item red">
+        <div class="tl-date">1 Apr 2025</div>
+        <div class="tl-body"><strong>ProtectEU.</strong> La strategia di sicurezza interna. Accesso "lecito" ai dati come obiettivo esplicito.</div>
+      </div>
+      <div class="tl-item red">
+        <div class="tl-date">24 Giu 2025</div>
+        <div class="tl-body"><strong>Roadmap per l'accesso ai dati.</strong> Data retention, intercettazione, decrittazione, Europol. Rilancio della conservazione dei dati.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">12 Ott 2025</div>
+        <div class="tl-body"><strong>Parte l'Entry/Exit System.</strong> Impronte e volto a ogni attraversamento della frontiera esterna.</div>
+      </div>
+      <div class="tl-item green">
+        <div class="tl-date">26 Mar 2026</div>
+        <div class="tl-body"><strong>Il Parlamento boccia Chat Control</strong> per un voto: 307 a 306. La deroga scade il 3 aprile.</div>
+      </div>
+      <div class="tl-item red">
+        <div class="tl-date">30 Giu 2026</div>
+        <div class="tl-body"><strong>Negoziato senza accordo</strong> sul regolamento permanente. Il Consiglio riscrive il testo.</div>
+      </div>
+      <div class="tl-item red">
+        <div class="tl-date">7 Lug 2026</div>
+        <div class="tl-body"><strong>Il Parlamento approva la procedura d'urgenza.</strong> La scansione volontaria torna in agenda, prima della pausa estiva.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Fine 2026</div>
+        <div class="tl-body"><strong>ETIAS</strong> atteso. Autorizzazione preventiva al viaggio. E la <em>Technology Roadmap</em> sulla decrittazione.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">Luglio 2027</div>
+        <div class="tl-body"><strong>Tetto al contante a 10.000 euro</strong> in tutta l'UE. Pilota dell'<strong>euro digitale</strong> nella seconda meta' dell'anno.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">2030</div>
+        <div class="tl-body"><strong>Capacita' di decrittazione "di nuova generazione" per Europol</strong>, come obiettivo della roadmap.</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - IL MOSAICO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Mosaico</h2>
+    <span class="section-number">Sezione 09. Cosa formano insieme</span>
+
+    <p>Guarda le misure non per la ragione con cui sono state vendute, ma per quello che aggiungono. Ciascuna rende visibile un pezzo di vita che prima non lo era: da sola e' un frammento, e il quadro si vede solo mettendole tutte insieme.</p>
+
+    <div class="mosaic fade-in" role="img" aria-label="Mosaico delle misure UE: ogni tessera e' un pezzo di vita reso leggibile da una misura diversa">
+      <div class="tile c-purple s2 t2">
+        <div class="t-idx">01</div>
+        <div><div class="t-domain">Identita'</div><div class="t-measure">eIDAS 2.0, portafoglio digitale</div></div>
+      </div>
+      <div class="tile c-red s2">
+        <div class="t-idx">02</div>
+        <div><div class="t-domain">Messaggi</div><div class="t-measure">Chat Control</div></div>
+      </div>
+      <div class="tile c-cyan s2">
+        <div class="t-idx">03</div>
+        <div><div class="t-domain">Volto</div><div class="t-measure">AI Act, biometria</div></div>
+      </div>
+      <div class="tile c-orange s2 t2">
+        <div class="t-idx">04</div>
+        <div><div class="t-domain">Metadati</div><div class="t-measure">Data retention</div></div>
+      </div>
+      <div class="tile c-green s2">
+        <div class="t-idx">05</div>
+        <div><div class="t-domain">Cifratura</div><div class="t-measure">Roadmap accesso ai dati</div></div>
+      </div>
+      <div class="tile c-cyan s2">
+        <div class="t-idx">06</div>
+        <div><div class="t-domain">Frontiere</div><div class="t-measure">EES / ETIAS</div></div>
+      </div>
+      <div class="tile c-yellow s2">
+        <div class="t-idx">07</div>
+        <div><div class="t-domain">Pagamenti</div><div class="t-measure">Contante, euro digitale</div></div>
+      </div>
+      <div class="tile c-purple s2">
+        <div class="t-idx">08</div>
+        <div><div class="t-domain">Parola</div><div class="t-measure">DSA, contenuti</div></div>
+      </div>
+      <div class="tile c-green s3">
+        <div class="t-idx">09</div>
+        <div><div class="t-domain">Salute</div><div class="t-measure">Certificati digitali, poi rete OMS</div></div>
+      </div>
+    </div>
+    <p class="mosaic-caption">9 tessere gia' posate. <strong>E il mosaico non e' finito.</strong></p>
+
+    <div class="table-scroll fade-in">
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Misura</th>
+          <th>Giustificazione pubblica</th>
+          <th>Cosa rende visibile</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Chat Control</td>
+          <td>Proteggere i minori</td>
+          <td>Il contenuto dei messaggi privati, prima della cifratura</td>
+        </tr>
+        <tr>
+          <td>Data retention</td>
+          <td>Prendere i criminali</td>
+          <td>Chi comunica con chi, quando, da dove</td>
+        </tr>
+        <tr>
+          <td>Roadmap decrittazione</td>
+          <td>Accesso lecito ai dati</td>
+          <td>Lo sviluppo di strumenti per ottenere accesso ai dati cifrati</td>
+        </tr>
+        <tr>
+          <td>eIDAS wallet</td>
+          <td>Semplificare la burocrazia</td>
+          <td>Una sola identita' verificata per accedere a tutto</td>
+        </tr>
+        <tr>
+          <td>DSA</td>
+          <td>Tutelare gli utenti</td>
+          <td>Un canale formale tra Stato e cio' che si dice online</td>
+        </tr>
+        <tr>
+          <td>AI Act biometria</td>
+          <td>Terrorismo, persone scomparse</td>
+          <td>Il volto come chiave di identificazione, in diretta e a posteriori</td>
+        </tr>
+        <tr>
+          <td>EES / ETIAS</td>
+          <td>Sicurezza delle frontiere</td>
+          <td>Ingresso e uscita registrati come record biometrico</td>
+        </tr>
+        <tr>
+          <td>Antiriciclaggio / euro digitale</td>
+          <td>Fermare il riciclaggio</td>
+          <td>Le transazioni, con lo spazio del contante che si stringe</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>Leggile in colonna, sull'ultima voce: disegnano una persona interamente leggibile. Identita' verificata, messaggi leggibili, volto identificabile, spostamenti registrati, pagamenti tracciati, parola incanalata. Nessuna singola legge dice questo. L'insieme lo permette.</p>
+
+    <p>Conta soprattutto una cosa, al di la' delle intenzioni di chi governa adesso. Un'infrastruttura di controllo non ha colore politico: sono banche dati, poteri di accesso, obblighi di identificazione. Chi la mette in piedi di solito e' convinto di usarla bene, e a volte lo fa davvero, ma la lascia in eredita' a chi verra' dopo. Le banche dati non si cancellano al cambio di governo, i poteri di accesso non scadono con la maggioranza che li ha votati. Non devi chiederti se ti fidi delle istituzioni europee di oggi, ma se ti fidi di tutte quelle che erediteranno questa infrastruttura, nei ventisette Paesi, per i prossimi trent'anni.</p>
+
+    <div class="warning-box fade-in">
+      <p>Non chiederti se chi governa oggi vorra' abusarne. Chiediti cosa consentirebbe questo strumento a chiunque, un domani, decidesse di farlo. Le persone cambiano a ogni elezione; l'architettura che si lasciano dietro no, ed e' quella con cui avrai a che fare.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - LE EMERGENZE CAMBIANO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Emergenze Cambiano, L'Infrastruttura Resta</h2>
+    <span class="section-number">Sezione 10. Il pretesto e cio' che lascia</span>
+
+    <p>C'e' un motivo se questi provvedimenti arrivano quasi sempre in scia a un'emergenza. L'emergenza e' il grimaldello: serve a scavalcare l'obiezione naturale, che il potere richiesto e' troppo grande, sostituendola con una piu' pressante, che senza quel potere la gente muore, i bambini vengono abusati, i terroristi vincono. Davanti a un'emergenza, chiedere garanzie sembra un lusso da tempi di pace.</p>
+
+    <p>Ma le emergenze passano. Quello che non passa e' cio' che si sono lasciate dietro.</p>
+
+    <div class="table-scroll fade-in">
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Emergenza</th>
+          <th>Strumento nato per rispondere</th>
+          <th>Cosa e' rimasto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Terrorismo</td>
+          <td>Data retention, PNR</td>
+          <td>Conservazione dei tabulati e dei dati di viaggio. Bocciata, riproposta.</td>
+        </tr>
+        <tr>
+          <td>Pedopornografia</td>
+          <td>Chat Control</td>
+          <td>Il principio della scansione dei messaggi privati, tornato in agenda a luglio 2026.</td>
+        </tr>
+        <tr>
+          <td>Riciclaggio</td>
+          <td>Limiti al contante, AMLA</td>
+          <td>Tetto ai pagamenti anonimi e autorita' permanente a Francoforte.</td>
+        </tr>
+        <tr>
+          <td>Disinformazione</td>
+          <td>DSA, codice sulla disinformazione</td>
+          <td>Un canale formale tra potere pubblico e cio' che si pubblica online.</td>
+        </tr>
+        <tr>
+          <td>Sicurezza delle frontiere</td>
+          <td>EES, biometria</td>
+          <td>Impronte e volto in banca dati a ogni attraversamento.</td>
+        </tr>
+        <tr>
+          <td>Pandemia</td>
+          <td>Certificati digitali</td>
+          <td>Un sistema di identita' sanitaria digitale globale.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>L'ultima riga e' la piu' istruttiva, perche' l'emergenza e' finita davvero e possiamo vedere cosa e' successo dopo. Il Certificato COVID Digitale dell'UE, il green pass, era lo strumento temporaneo per definizione: nato per la pandemia, scaduto con la pandemia. La sua base giuridica e' cessata. La sua infrastruttura no. Il <strong>1 luglio 2023 l'Organizzazione Mondiale della Sanita' ha adottato il sistema europeo</strong> come primo mattone della propria rete globale di certificazione sanitaria digitale, la GDHCN, disegnata esplicitamente per essere riusata per altri scopi: digitalizzazione dei certificati vaccinali internazionali, verifica delle prescrizioni transfrontaliere, cartelle cliniche. L'emergenza e' finita. L'infrastruttura non solo e' sopravvissuta: e' stata globalizzata e riconvertita.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il pattern.</strong> Le motivazioni cambiano di continuo, terrorismo, abusi, riciclaggio, disinformazione, frontiere, pandemia, pretesti diversi per la stessa spinta. A non cambiare mai e' il residuo: a emergenza finita l'infrastruttura resta al suo posto, e quasi nessuna viene mai smontata.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 11 - AGGIRABILE, MA NON DA TUTTI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Aggirabile, Ma Non Da Tutti</h2>
+    <span class="section-number">Sezione 11. L'asimmetria</span>
+
+    <p>Resta la parte piu' amara di tutte. Sul piano tecnico, queste misure sono aggirabili. La cifratura vera continua a esistere, fuori dalle app di massa. Un indirizzo si sposta con un click, una giurisdizione si cambia, un pagamento lo si spezza in tanti piccoli, un'identita' la si tiene lontana dai servizi che la pretendono. Non sono muri, sono filtri.</p>
+
+    <p>Solo che aggirarli non e' alla portata di tutti. Serve competenza, tempo, mezzi, e un motivo abbastanza forte per procurarseli. E chi ha davvero tutto questo, competenza, tempo, mezzi e motivo, e' esattamente chi ha qualcosa di grosso da nascondere.</p>
+
+    <div class="table-scroll fade-in">
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Chi la misura dovrebbe prendere</th>
+          <th>Perche' non lo prende</th>
+          <th>Chi resta scoperto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>La rete di abuso organizzata</td>
+          <td>Opera gia' su canali chiusi, non sulle app che verrebbero scansionate</td>
+          <td>La coppia che si manda le foto dei figli su WhatsApp</td>
+        </tr>
+        <tr>
+          <td>La cellula terroristica</td>
+          <td>Usa strumenti propri e giurisdizioni fuori portata</td>
+          <td>Il cittadino che usa la messaggistica di default</td>
+        </tr>
+        <tr>
+          <td>Il grande evasore</td>
+          <td>Muove capitali con strutture estere e schemi dedicati</td>
+          <td>Chi preleva contante e paga con la carta tracciata</td>
+        </tr>
+        <tr>
+          <td>Il riciclatore professionale</td>
+          <td>Ha reti e consulenti per restare sotto le soglie</td>
+          <td>Il piccolo commerciante sopra il tetto dei 10.000 euro</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>Il risultato e' rovesciato rispetto alle promesse. La sorveglianza si costruisce nel nome dei pochi che dovrebbe fermare, e sono proprio loro ad avere i mezzi per sfilarsene, spostandosi su quello che non e' coperto, o raggiunto, o scansionato. La rete si chiude su chi non aveva niente da nascondere, e nessuna ragione per imparare ad aggirarla.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>L'asimmetria.</strong> Rinunci alla privacy dei molti per prendere i pochi, e i pochi sono proprio quelli che scappano. Terroristi, reti di abuso, evasori e riciclatori continueranno in larga parte indisturbati. A pagare il conto, come sempre, saranno i soliti: chi la tecnologia la usa cosi' come gliela danno.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 12 - LA DIFESA DIVENTA IL BERSAGLIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Difesa Diventa il Bersaglio</h2>
+    <span class="section-number">Sezione 12. Le VPN</span>
+
+    <p>C'e' uno strumento che avvicina un minimo di autodifesa anche a chi non e' un esperto: la VPN. Sposta il tuo indirizzo, incapsula il traffico in un tunnel cifrato, ti fa sembrare altrove. Non e' anonimato assoluto, ma e' la cosa piu' vicina a uno scudo che una persona normale possa installare in due minuti. Decine di milioni la usano.</p>
+
+    <p>Ed e' esattamente per questo che e' finita nel mirino. Non con un divieto, va detto con precisione: le notizie su un "bando delle VPN" travisano un documento di ricerca del Parlamento, non una legge. Ma su due fronti distinti la pressione e' reale e documentata.</p>
+
+    <p>Il primo fronte sono le indagini. Il rapporto dell'High-Level Group che alimenta la strategia ProtectEU elenca, <strong>per la prima volta, le VPN tra le "key challenges"</strong> per le forze dell'ordine, accanto ai dispositivi e alle app cifrate. E l'espansione della conservazione dei dati prevista dalla roadmap del giugno 2025 mette i provider VPN tra i soggetti potenzialmente obbligati a registrare e conservare.</p>
+
+    <p>Il secondo fronte e' la verifica dell'eta'. Ad aprile 2025 la Commissione ha annunciato un'app europea per verificare l'eta' online entro fine 2026, basata su documenti d'identita' e legata all'identita' digitale. In conferenza stampa la vicepresidente esecutiva Henna Virkkunen ha detto che <strong>"la VPN non deve permettere di aggirare il sistema"</strong>, e che impedirlo potrebbe far parte dei "prossimi passi". Una proposta legislativa e' attesa intorno alla meta' del 2026. Sul tavolo non ci sono sanzioni penali per chi usa una VPN, ma obblighi sui provider: registrazione, log dei metadati di connessione, blocchi IP su ordine, misure tecniche contro l'aggiramento.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il cerchio si chiude.</strong> Guarda il cortocircuito: la stessa verifica dell'eta' che pretende la tua identita' verificata, la tessera 01, e' la ragione per cui la VPN va chiusa. Quando le persone comuni provano a difendersi, la risposta non e' fermarsi, e' mettere sotto regola anche la difesa. Il controllo arriva perfino allo strumento che useresti per sottrartici.</p>
+    </div>
+
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">Nessuno ha votato la sorveglianza.<br>La stanno costruendo una legge alla volta.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.8rem;">
+        Il pericolo non e' il singolo tassello. E' il mosaico.<br>
+        Guarda l'insieme. E' l'unico modo per vederlo.
+      </p>
+    </div>
+
+
+    <!-- ============================================================
+         FONTI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Fonti</h2>
+    <span class="section-number">Documenti e coperture verificate</span>
+
+    <div class="sources">
+      <p>
+        Commissione europea, <em>Roadmap for lawful and effective access to data for law enforcement</em> (24 giu 2025): <a href="https://home-affairs.ec.europa.eu/news/commission-presents-roadmap-effective-and-lawful-access-data-law-enforcement-2025-06-24_en" target="_blank" rel="noopener">home-affairs.ec.europa.eu</a><br>
+        Commissione europea, pagina su cifratura e accesso lecito: <a href="https://home-affairs.ec.europa.eu/policies/internal-security/lawful-access-data/encryption_en" target="_blank" rel="noopener">home-affairs.ec.europa.eu/encryption</a><br>
+        Parlamento europeo, <em>Legislative Train</em>, strategia di sicurezza interna: <a href="https://www.europarl.europa.eu/legislative-train/package-security-union/file-internal-security-strategy" target="_blank" rel="noopener">europarl.europa.eu</a><br>
+        Parlamento europeo, <em>Legislative Train</em>, data retention: <a href="https://www.europarl.europa.eu/legislative-train/theme-area-of-justice-and-fundamental-rights/file-data-retention-directive" target="_blank" rel="noopener">europarl.europa.eu</a><br>
+        EDRi, critica a ProtectEU: <a href="https://edri.org/our-work/protecteu-security-strategy-a-step-further-towards-a-digital-dystopian-future/" target="_blank" rel="noopener">edri.org</a><br>
+        EFF, contro il rilancio della data retention: <a href="https://www.eff.org/deeplinks/2025/06/eff-european-commission-dont-resurrect-illegal-data-retention-mandates" target="_blank" rel="noopener">eff.org</a><br>
+        AI Act, testo dell'Articolo 5 (pratiche vietate): <a href="https://artificialintelligenceact.eu/article/5/" target="_blank" rel="noopener">artificialintelligenceact.eu</a><br>
+        Commissione europea, Entry/Exit System (EES): <a href="https://home-affairs.ec.europa.eu/policies/schengen/smart-borders/entry-exit-system_en" target="_blank" rel="noopener">home-affairs.ec.europa.eu/ees</a><br>
+        OMS, Commissione UE e OMS lanciano l'iniziativa di sanita' digitale, l'UE cede il sistema del certificato COVID (5 giu 2023): <a href="https://www.who.int/news/item/05-06-2023-the-european-commission-and-who-launch-landmark-digital-health-initiative-to-strengthen-global-health-security" target="_blank" rel="noopener">who.int</a><br>
+        OMS, Global Digital Health Certification Network (GDHCN): <a href="https://www.who.int/initiatives/global-digital-health-certification-network" target="_blank" rel="noopener">who.int/gdhcn</a><br>
+        Euronews, fact check: l'UE sta per limitare le VPN? (15 mag 2026): <a href="https://www.euronews.com/my-europe/2026/05/15/fact-check-is-the-eu-about-to-restrict-the-use-of-vpns" target="_blank" rel="noopener">euronews.com</a><br>
+        TechRadar, l'UE prepara il terreno a una data retention piu' ampia, e i provider VPN sono tra i target: <a href="https://www.techradar.com/vpn/vpn-privacy-security/the-eu-prepares-ground-for-wider-data-retention-and-vpn-providers-are-among-the-targets" target="_blank" rel="noopener">techradar.com</a><br>
+        Euronews, proroga del regime di scansione dei messaggi (7 lug 2026): <a href="https://www.euronews.com/my-europe/2026/07/07/eu-to-extend-temporary-message-scanning-regime-to-detect-child-sexual-abuse-online" target="_blank" rel="noopener">euronews.com</a><br>
+        ANSA, tensione sul voto d'urgenza al PE (6 lug 2026): <a href="https://www.ansa.it/europa/notizie/rubriche/voceeurodeputati/2026/07/06/tensione-sul-voto-durgenza-al-pe-sul-chat-control-pressing-degli-esperti_57530c2c-91a5-4fea-a774-04d2f0dc9cde.html" target="_blank" rel="noopener">ansa.it</a><br>
+        Guerre di Rete, <em>L'eterno ritorno di Chat Control</em>: <a href="https://www.guerredirete.it/leterno-ritorno-di-chat-control/" target="_blank" rel="noopener">guerredirete.it</a><br>
+        Agenda Digitale, <em>Chat Control 2.0</em>: <a href="https://www.agendadigitale.eu/cultura-digitale/chat-control-2-0-cosa-cambia-per-messaggi-e-verifica-delleta/" target="_blank" rel="noopener">agendadigitale.eu</a>
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. La deriva ha un calendario. Guardalo.</p>
+      <div class="footer-links">
+        <a href="../">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
