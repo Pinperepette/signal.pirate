@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Il Telefono Non Deve Sapere | Signal Pirate</title>
+  <meta name="description" content="Un futuro in cui l'Europa e' diventata autoritaria e legge le chat di tutti prima che vengano cifrate. Le app non bastano piu': se il regime controlla il telefono, controlla il chiaro. La difesa non e' un'app, e' un'architettura. Sposta la cifratura fuori dal telefono, e il telefono trasporta solo buste sigillate che non puo' aprire. Cosa serve, dal foglio di carta al dispositivo dedicato.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+      vertical-align: top;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+    .table-scroll { overflow-x: auto; margin: 1.5rem 0; }
+    .table-scroll .strategy-table { margin: 0; }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Sources === */
+    .sources {
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin: 1rem 0 2rem;
+    }
+    .sources a { color: var(--accent-amplification); word-break: break-word; }
+
+    .lead {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* === Flusso air gap === */
+    .flow {
+      display: flex;
+      align-items: stretch;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+      font-family: var(--font-mono);
+    }
+    .flow-node {
+      flex: 1 1 150px;
+      min-width: 150px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .flow-node.trusted { border-color: var(--accent-attention); border-left: 3px solid var(--accent-attention); }
+    .flow-node.dirty { border-color: var(--accent-reaction); border-left: 3px solid var(--accent-reaction); }
+    .flow-node .fn-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+    }
+    .flow-node .fn-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin: 0.35rem 0;
+    }
+    .flow-node.trusted .fn-name { color: var(--accent-attention); }
+    .flow-node.dirty .fn-name { color: var(--accent-reaction); }
+    .flow-node .fn-carries {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+    .flow-arrow {
+      align-self: center;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--accent-highlight);
+      font-size: 1.1rem;
+    }
+    .flow-caption {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin: -0.6rem 0 1.5rem;
+    }
+    @media (max-width: 640px) {
+      .flow { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); align-self: center; }
+    }
+
+    /* === Lifecycle bar: dove vive il chiaro === */
+    .lifecycle { margin: 2rem 0 0; }
+    .lc-bar { display: flex; gap: 4px; font-family: var(--font-mono); }
+    .lc-seg {
+      flex: 1;
+      border-radius: 10px;
+      padding: 1rem 0.7rem;
+      text-align: center;
+      border: 1px solid var(--border-subtle);
+    }
+    .lc-seg.plain {
+      flex: 1.2;
+      border-color: var(--accent-reaction);
+      background: linear-gradient(150deg, color-mix(in srgb, var(--accent-reaction) 16%, var(--bg-secondary)), var(--bg-secondary));
+    }
+    .lc-seg.cipher {
+      border-color: var(--accent-attention);
+      background: linear-gradient(150deg, color-mix(in srgb, var(--accent-attention) 14%, var(--bg-secondary)), var(--bg-secondary));
+    }
+    .lc-state { font-weight: 800; font-size: 0.95rem; letter-spacing: 0.08em; }
+    .lc-seg.plain .lc-state { color: var(--accent-reaction); }
+    .lc-seg.cipher .lc-state { color: var(--accent-attention); }
+    .lc-where { font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.35rem; line-height: 1.3; }
+    .lc-eye {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.6rem;
+      color: var(--accent-reaction);
+      font-weight: 700;
+    }
+    .lc-eye.safe { color: var(--accent-attention); }
+    .lifecycle + .flow-caption { margin-top: 0.9rem; }
+    @media (max-width: 600px) { .lc-bar { flex-direction: column; } }
+
+    /* === Device map: schema del dispositivo dedicato === */
+    .device-map { display: flex; gap: 0.7rem; align-items: stretch; flex-wrap: wrap; margin: 2rem 0 0.4rem; }
+    .dev-box { flex: 1 1 260px; border-radius: 12px; padding: 1.1rem 1.2rem; background: var(--bg-secondary); }
+    .dev-box.trusted { border: 1px solid var(--accent-attention); border-top: 3px solid var(--accent-attention); }
+    .dev-box.phone { border: 1px solid var(--accent-reaction); border-top: 3px solid var(--accent-reaction); }
+    .dev-title { font-family: var(--font-mono); font-weight: 800; font-size: 1rem; }
+    .dev-box.trusted .dev-title { color: var(--accent-attention); }
+    .dev-box.phone .dev-title { color: var(--accent-reaction); }
+    .dev-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-top: 0.15rem;
+    }
+    .dev-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.9rem; }
+    .chip {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.55rem 0.65rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+    .chip strong { display: block; color: var(--accent-attention); font-size: 0.78rem; margin-bottom: 0.15rem; }
+    .radios { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+    .radio-off {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      text-decoration: line-through;
+      color: var(--accent-reaction);
+      border: 1px dashed var(--accent-reaction);
+      border-radius: 6px;
+      padding: 0.2rem 0.5rem;
+    }
+    .dev-note { font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-secondary); margin-top: 0.5rem; }
+    .phone-body { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin-top: 0.9rem; }
+    .phone-body strong { color: var(--accent-yellow); }
+    .bridge {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0 0.3rem;
+    }
+    .qr-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 6px;
+      border: 2px solid var(--text-secondary);
+      background-image: conic-gradient(var(--text-secondary) 25%, transparent 0 50%, var(--text-secondary) 0 75%, transparent 0);
+      background-size: 11px 11px;
+    }
+    .bridge-label { font-family: var(--font-mono); font-size: 0.66rem; text-align: center; color: var(--accent-highlight); line-height: 1.2; }
+    .bridge-arrows { font-size: 1.3rem; color: var(--accent-highlight); line-height: 1; }
+    @media (max-width: 640px) { .bridge-arrows { transform: rotate(90deg); } }
+
+    /* === Approfondimento tecnico (collassabile) === */
+    details.tech-aside {
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-amplification);
+      border-radius: 0 12px 12px 0;
+      background: color-mix(in srgb, var(--accent-amplification) 6%, var(--bg-secondary));
+      margin: 2rem 0;
+      padding: 0 1.5rem;
+    }
+    details.tech-aside > summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 1.1rem 0;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.8rem;
+      color: var(--accent-amplification);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    details.tech-aside > summary::-webkit-details-marker { display: none; }
+    details.tech-aside > summary::before {
+      content: '\25B8';
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+    details.tech-aside[open] > summary::before { transform: rotate(90deg); }
+    details.tech-aside > summary .sub {
+      color: var(--text-secondary);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.75rem;
+    }
+    details.tech-aside[open] > summary { border-bottom: 1px solid var(--border-subtle); margin-bottom: 0.8rem; }
+    details.tech-aside > *:last-child { margin-bottom: 1.3rem; }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/il-telefono-non-deve-sapere.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Il Telefono Non Deve Sapere">
+  <meta property="og:description" content="Un futuro in cui l&#x27;Europa e&#x27; diventata autoritaria e legge le chat di tutti prima che vengano cifrate. Le app non bastano piu&#x27;: se il regime controlla il telefono, controlla il chiaro. La difesa non e&#x27; un&#x27;app, e&#x27; un&#x27;architettura. Sposta la cifratura fuori dal telefono, e il telefono trasporta solo buste sigillate che non puo&#x27; aprire. Cosa serve, dal foglio di carta al dispositivo dedicato.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/il-telefono-non-deve-sapere.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-07-09">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Il Telefono Non Deve Sapere">
+  <meta name="twitter:description" content="Un futuro in cui l&#x27;Europa e&#x27; diventata autoritaria e legge le chat di tutti prima che vengano cifrate. Le app non bastano piu&#x27;: se il regime controlla il telefono, controlla il chiaro. La difesa non e&#x27; un&#x27;app, e&#x27; un&#x27;architettura. Sposta la cifratura fuori dal telefono, e il telefono trasporta solo buste sigillate che non puo&#x27; aprire. Cosa serve, dal foglio di carta al dispositivo dedicato.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Il Telefono Non Deve Sapere","description":"Un futuro in cui l'Europa e' diventata autoritaria e legge le chat di tutti prima che vengano cifrate. Le app non bastano piu': se il regime controlla il telefono, controlla il chiaro. La difesa non e' un'app, e' un'architettura. Sposta la cifratura fuori dal telefono, e il telefono trasporta solo buste sigillate che non puo' aprire. Cosa serve, dal foglio di carta al dispositivo dedicato.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-07-09","dateModified":"2026-07-09","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/il-telefono-non-deve-sapere.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-07-09 | Pinperepette</p>
+    <h1 class="article-page-title">Il Telefono Non Deve <span class="accent">Sapere</span></h1>
+    <p class="lead" style="margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+      Mettiamo che sia passata. L'Europa ha smesso di somigliare a se stessa, e la legge che per anni era stata respinta di misura adesso e' in vigore: ogni dispositivo legge quello che scrivi e quello che leggi, prima che venga cifrato, e lo riferisce. Signal non ti salva, WhatsApp nemmeno. Quando il regime controlla il telefono, controlla il chiaro. La difesa non e' un'app da scaricare. E' spostare la cifratura fuori dal telefono, e lasciare al telefono solo un mestiere: trasportare buste sigillate di cui non puo' leggere il contenuto.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Crittografia</span>
+      <span class="tag tag-highlight">Privacy</span>
+      <span class="tag tag-reaction">Sorveglianza</span>
+      <span class="tag tag-amplification">Air Gap</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+
+    <!-- ============================================================
+         SEZIONE 00 - LA SCENA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Scena</h2>
+    <span class="section-number">Sezione 00. Il telefono che ti ascolta di piu'</span>
+
+    <p>Non serve immaginare i manganelli. Il futuro dispotico che conta davvero e' silenzioso, e ha la forma di un aggiornamento di sistema. Una notte il telefono si riavvia, la mattina funziona esattamente come prima, e da quel momento tutto quello che digiti passa sotto un occhio prima di partire. Non i messaggi cifrati sulla rete: quelli restano cifrati. Il testo, mentre lo scrivi. La foto, mentre la scegli. La pagina, mentre la leggi. Il controllo avviene <em>sul dispositivo</em>, nel breve istante in cui il messaggio e' ancora in chiaro, tra la tua tastiera e la crittografia.</p>
+
+    <p>Questo scenario non nasce dal nulla. E' la versione compiuta di una cosa che ha gia' un nome tecnico e una storia parlamentare: la scansione lato client, il <code>client-side scanning</code>. Per anni e' stata proposta e ritirata, votata e bocciata, riscritta e ripresentata. In un'Europa che tiene, resta una proposta contestata. In un'Europa che ha smesso di tenere, diventa la norma. Da qui in poi ragiono su quel mondo, e sulla domanda che conta: come si difende una persona qualsiasi, non solo un esperto, quando il nemico e' dentro il dispositivo che ha in tasca?</p>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - PERCHE' L'APP NON BASTA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' L'App Non Basta</h2>
+    <span class="section-number">Sezione 01. Il lucchetto perfetto, il ladro in salotto</span>
+
+    <p>La crittografia end-to-end di Signal, WhatsApp, Telegram protegge il messaggio <em>durante il viaggio</em>. Parte cifrato dal tuo telefono, arriva cifrato all'altro, e nel mezzo nessuno legge niente. Contro chi intercetta la rete, e' un muro. La matematica regge, e nessuno la sta rompendo.</p>
+
+    <p>Il punto e' che il messaggio non nasce cifrato. Nasce in chiaro, sotto le tue dita, e diventa leggibile di nuovo in chiaro sullo schermo di chi lo riceve. La cifratura vive nel mezzo. Se il regime mette il suo occhio proprio agli estremi, nel momento in cui scrivi e nel momento in cui leggi, la cifratura nel mezzo non serve piu' a niente. Il lucchetto sulla porta e' perfetto, ma il ladro e' seduto in salotto e ti guarda comporre la combinazione.</p>
+
+    <div class="lifecycle fade-in" role="img" aria-label="La vita di un messaggio: chiaro mentre lo scrivi sul telefono, cifrato in viaggio sulla rete, di nuovo chiaro sul telefono di chi legge. Il regime guarda le due estremita'.">
+      <div class="lc-bar">
+        <div class="lc-seg plain">
+          <div class="lc-state">CHIARO</div>
+          <div class="lc-where">mentre lo scrivi, sul telefono</div>
+          <div class="lc-eye">occhio del regime</div>
+        </div>
+        <div class="lc-seg cipher">
+          <div class="lc-state">CIFRATO</div>
+          <div class="lc-where">in viaggio sulla rete</div>
+          <div class="lc-eye safe">al riparo</div>
+        </div>
+        <div class="lc-seg plain">
+          <div class="lc-state">CHIARO</div>
+          <div class="lc-where">mentre lo legge, sul suo telefono</div>
+          <div class="lc-eye">occhio del regime</div>
+        </div>
+      </div>
+    </div>
+    <p class="flow-caption">La cifratura protegge il centro. Il regime guarda le estremita', dove il messaggio e' ancora in chiaro, sul dispositivo.</p>
+
+    <p>Una precisazione onesta prima di andare avanti. In tutto l'articolo dico che il telefono, spostata la cifratura fuori, "trasporta solo dati cifrati". E' vero per il contenuto, non per il contorno. Come una busta sigillata, il messaggio nasconde cio' che c'e' dentro, ma resta visibile la busta: la lunghezza, il destinatario, l'orario, la frequenza. Il regime non legge le parole, ma vede che hai scritto a qualcuno, quando, e quanto spesso. Il contenuto e' al riparo, il traffico no. Ci torno alla fine, perche' e' il limite che nessuna di queste tecniche cancella.</p>
+
+    <div class="insight-box fade-in">
+      <p>La crittografia protegge il messaggio dal mondo. Non lo protegge dal dispositivo su cui lo scrivi. Se quel dispositivo lavora per qualcun altro, hai cifrato una lettera e l'hai imbucata davanti a chi voleva leggerla.</p>
+    </div>
+
+    <p>Da qui discende la conclusione scomoda: cambiare app non risolve. Passare da WhatsApp a Signal ti protegge da chi spia la rete, non da un telefono che riferisce. Un regime che impone la scansione sul dispositivo, o che pretende una porta di servizio nel sistema operativo, ha gia' vinto la guerra delle app. La domanda giusta non e' <em>quale app</em>. E' <em>dove avviene la cifratura</em>.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - IL PRINCIPIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Principio</h2>
+    <span class="section-number">Sezione 02. Sposta il confine della fiducia</span>
+
+    <p>Tutta la difesa sta in una frase: il telefono non deve mai vedere il chiaro. Ne' quando scrivi, ne' quando leggi. Se il messaggio nasce gia' cifrato <em>prima</em> di toccare il telefono, e viene decifrato <em>dopo</em> averlo lasciato, allora il telefono trasporta soltanto rumore. Puo' pure riferirlo al regime: sta riferendo una stringa illeggibile.</p>
+
+    <p>Il telefono smette di essere il posto dove custodisci i segreti e diventa un tubo stupido, come la rete. Non si fida di lui, esattamente come non ti fidi del cavo telefonico. Il chiaro esiste solo altrove: su un pezzo di carta, su un vecchio apparecchio scollegato da tutto, su un dispositivo dedicato che non parla con nessuno. Il confine della fiducia si sposta fuori dalla macchina sorvegliata.</p>
+
+    <div class="flow fade-in" role="img" aria-label="Flusso: il chiaro nasce e muore fuori dal telefono, il telefono trasporta solo cifrato">
+      <div class="flow-node trusted">
+        <div class="fn-label">Fuori</div>
+        <div class="fn-name">Scrivi e cifri</div>
+        <div class="fn-carries">chiaro &rarr; cifrato</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node dirty">
+        <div class="fn-label">Sorvegliato</div>
+        <div class="fn-name">Telefono</div>
+        <div class="fn-carries">vede solo cifrato</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node dirty">
+        <div class="fn-label">Sorvegliato</div>
+        <div class="fn-name">Telefono</div>
+        <div class="fn-carries">vede solo cifrato</div>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node trusted">
+        <div class="fn-label">Fuori</div>
+        <div class="fn-name">Decifri e leggi</div>
+        <div class="fn-carries">cifrato &rarr; chiaro</div>
+      </div>
+    </div>
+    <p class="flow-caption">Il chiaro nasce e muore agli estremi, fuori dal dispositivo. Nel mezzo viaggia solo cifrato.</p>
+
+    <p>Questo e' il punto in cui la tua intuizione, tastiera e schermo esterni, coglie qualcosa che in molti sbagliano. Non basta cifrare fuori: se poi <em>leggi la risposta sullo schermo del telefono</em>, la cattura dello schermo ti frega comunque. Servono due canali protetti, non uno. L'ingresso, dove scrivi, e l'uscita, dove leggi. Entrambi devono stare fuori dalla macchina sorvegliata.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - L'ANALOGIA CHE GIA' FUNZIONA
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Analogia Che Gia' Funziona</h2>
+    <span class="section-number">Sezione 03. Il portafoglio hardware</span>
+
+    <p>Questa non e' fantascienza, e non e' nemmeno un'idea nuova da progettare da zero. Esiste gia', funziona ogni giorno, e protegge cose per cui la gente combatte: i soldi. Si chiama portafoglio hardware, un <code>hardware wallet</code> per criptovalute.</p>
+
+    <p>Il ragionamento e' identico. Le chiavi che controllano il denaro non devono mai toccare il telefono connesso a internet, perche' il telefono e' considerato sporco per definizione. Allora stanno su un dispositivo separato, che non ha rete. Quando devi firmare una transazione, l'apparecchio online prepara una richiesta, la mostra come <strong>codice QR</strong>, il dispositivo separato la inquadra con la sua camera, firma al suo interno, e restituisce la firma come un altro QR. La chiave privata non lascia mai la scatola. Tra i due mondi passano solo immagini quadrate di puntini, e il ponte e' un occhio, non un cavo.</p>
+
+    <div class="insight-box fade-in">
+      <p>Il portafoglio hardware ha gia' risolto il problema difficile: far lavorare insieme un dispositivo fidato e uno sporco, senza che il segreto passi dall'uno all'altro. Il ponte e' il QR, un canale che l'occhio legge ma che non apre nessuna porta nel dispositivo fidato. Quella stessa architettura, applicata ai messaggi invece che al denaro, e' tutta la difesa di questo articolo.</p>
+    </div>
+
+    <p>C'e' un precedente storico che dice anche cosa <em>non</em> fare. I telefoni cifrati commerciali degli anni Dieci, i vari crypto phone, sbagliavano l'assunto di partenza: si fidavano ancora del sistema operativo del telefono. Costruivano una cassaforte dentro la casa del nemico. La lezione e' netta: non blindare il telefono, aggiralo. Il telefono resta del regime. Il segreto vive fuori.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - LIVELLO ZERO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Livello Zero: Carta</h2>
+    <span class="section-number">Sezione 04. Per tutti, senza elettronica</span>
+
+    <p>Partiamo dal fondo, dalla difesa che non richiede batterie, aggiornamenti, competenze. Un foglio di carta e un accordo preso di persona. E' il livello che sconfigge la sorveglianza piu' avanzata con lo strumento piu' antico, e vale la pena capirlo prima di tutto il resto, perche' spiega il principio nella sua forma pura.</p>
+
+    <p>Tu e la persona con cui vuoi parlare vi mettete d'accordo, una volta, su un segreto condiviso, e lo fate <em>fuori dal telefono sorvegliato</em>. Vedervi di persona e' il modo piu' semplice, non l'unico: va bene qualunque canale che il regime non controlla in quel momento, un altro apparecchio pulito, un foglio consegnato a mano, la posta, un oggetto qualsiasi. L'unica regola e' che quel segreto non transiti mai dalla chat sorvegliata, perche' se lo vede lui una volta, tutto il resto e' inutile. Nella versione piu' semplice il segreto e' un <strong>cifrario a blocco monouso</strong>, il one-time pad: due copie identiche di una lunga sequenza di caratteri casuali, una per ciascuno, stampate o scritte a mano. Quando devi mandare un messaggio, lo combini a mano con la porzione di sequenza che non hai ancora usato. Esce una stringa che, per chi non ha il foglio, e' indistinguibile dal rumore. La scrivi nella chat sorvegliata come se fosse una password incomprensibile. Chi riceve fa l'operazione inversa con la sua copia, legge, e cancella quella porzione. Nessuna delle due copie si riusa mai.</p>
+
+    <p>La cosa sorprendente e' che questo schema, usato correttamente, e' matematicamente <strong>impossibile da rompere</strong>. Non difficile: impossibile. Non esiste computer, oggi o tra cinquant'anni, che possa risalire al testo senza il foglio, perche' senza la chiave ogni messaggio possibile e' ugualmente probabile. La crittografia da miliardi di dollari del regime si spegne davanti a un blocchetto di carta compilato in cucina.</p>
+
+    <div class="warning-box fade-in">
+      <p>Il prezzo di questa perfezione e' la scomodita'. La chiave dev'essere lunga quanto tutti i messaggi che manderai, va consegnata di persona, e non si riusa mai. Va bene per poche frasi importanti tra due persone fidate, non per chiacchierare tutto il giorno. E' l'arma dei casi che contano, non della vita quotidiana. Ma esiste, funziona, e non chiede a nessuno di essere un tecnico.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - LIVELLO UNO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Livello Uno: Un Secondo Apparecchio</h2>
+    <span class="section-number">Sezione 05. Il vecchio telefono che non parla con nessuno</span>
+
+    <p>Il livello intermedio recupera la comodita' senza cedere il principio. Serve un secondo dispositivo, e quasi tutti ne hanno gia' uno in un cassetto: un vecchio telefono. Gli togli la SIM, lo tieni in modalita' aereo <em>per sempre</em>, disattivi Wi-Fi e Bluetooth, e non gli fai mai piu' toccare una rete. Questo apparecchio non serve a comunicare. Serve solo a cifrare e decifrare, offline, al riparo.</p>
+
+    <p>Sul telefono offline installi, una volta sola e da scollegato, un programma di cifratura che lavora senza rete. Scrivi lì il messaggio in chiaro, lì viene cifrato, e il risultato lo trasporti sull'altro telefono, quello connesso e sorvegliato, nel modo piu' semplice possibile: lo riscrivi, oppure lo mostri come QR e lo inquadri con la camera. Il telefono sorvegliato riceve una stringa illeggibile e la spedisce nella chat. In arrivo fai il percorso inverso: la stringa cifrata la porti sul telefono offline, che la decifra e ti mostra il chiaro <strong>sul suo schermo</strong>, mai su quello sorvegliato.</p>
+
+    <div class="flow fade-in" role="img" aria-label="Flusso a due telefoni: il telefono offline cifra, il telefono online trasporta">
+      <div class="flow-node trusted">
+        <div class="fn-label">Offline, in aereo</div>
+        <div class="fn-name">Vecchio telefono</div>
+        <div class="fn-carries">qui scrivi e leggi il chiaro</div>
+      </div>
+      <div class="flow-arrow">&harr;</div>
+      <div class="flow-node dirty">
+        <div class="fn-label">Sorvegliato</div>
+        <div class="fn-name">Telefono di tutti i giorni</div>
+        <div class="fn-carries">trasporta solo cifrato</div>
+      </div>
+    </div>
+    <p class="flow-caption">Il ponte tra i due e' il QR o la ricopiatura a mano. Il chiaro non attraversa mai quello sorvegliato.</p>
+
+    <p>Il telefono di tutti i giorni continua a fare la sua vita normale, con le sue app, la sua SIM, la sua sorveglianza. Ma non vede mai una parola in chiaro dei tuoi messaggi importanti. Puo' riferire finche' vuole: riferisce stringhe illeggibili. E il costo per te e' un vecchio apparecchio spento in un cassetto, non un corso di crittografia.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - LIVELLO DUE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Livello Due: La Cover Che Cifra</h2>
+    <span class="section-number">Sezione 06. Il dispositivo dedicato</span>
+
+    <p>Il livello piu' curato e' la tua idea iniziale portata a prodotto: un apparecchio piccolo, pensato solo per questo. Immaginalo come una cover un po' spessa, o una scatolina che sta in tasca, con una sua tastiera, un suo schermo a inchiostro elettronico e una piccola camera. Dentro, un chip sicuro che custodisce le chiavi e non le fa uscire per nessun motivo. Fuori, nessuna radio: niente SIM, niente Wi-Fi, niente Bluetooth. L'unico modo per entrarci e uscirne e' l'occhio, cioe' il QR.</p>
+
+    <p>L'uso e' asciutto. Scrivi il messaggio sulla tastierina, il dispositivo lo cifra al suo interno e mostra sul suo schermo il QR del testo cifrato. Prendi il telefono normale, inquadri quel QR, e la stringa finisce nella chat. Quando arriva una risposta, il telefono la mostra come QR sul suo schermo, il dispositivo la inquadra con la sua camera, decifra dentro di se' e ti mostra il chiaro sul suo schermo. Il telefono non ha mai visto ne' il testo ne' la chiave. Ha fatto da postino, e il postino non sa leggere.</p>
+
+    <div class="insight-box fade-in">
+      <p>E' esattamente il portafoglio hardware, con i messaggi al posto delle monete. Non c'e' niente da inventare a livello di architettura: la firma delle transazioni via QR, con le chiavi che non lasciano mai la scatola, e' tecnologia matura da anni. Manca solo qualcuno che la impacchetti per le parole invece che per il denaro, e la renda semplice come premere un tasto.</p>
+    </div>
+
+    <p>Il vantaggio rispetto al vecchio telefono e' la disciplina imposta dal ferro. Un telefono, anche in modalita' aereo, resta un computer complesso, pieno di modi per riaccendere una radio o farsi infettare. Un apparecchio nato senza radio non ha quelle porte. Meno cose puo' fare, meno cose gli si possono far fare contro di te.</p>
+
+    <p>Costruirlo per davvero, pero', non e' banale, e vale la pena dirlo netto: l'hardware e' la parte semplice, il difficile e' la filiera di fiducia che gli sta intorno, da come nasce la chiave a come verifichi che il firmware non sia manomesso. Chi vuole vedere com'e' fatto dentro trova il dettaglio qui sotto. Chi no, puo' passare oltre senza perdere il filo.</p>
+
+    <details class="tech-aside">
+      <summary>Approfondimento tecnico <span class="sub">(puoi saltarlo senza perdere il filo)</span></summary>
+
+    <p>Vale la pena entrare nel ferro, perche' e' li' che si capisce cosa distingue un simile apparecchio da un telefono. La regola di progetto e' una sola: massima semplicita' verificabile. Ogni componente in piu' e' superficie d'attacco in piu'. Per questo non ci va un processore applicativo come quello di un telefono, con il suo sistema operativo enorme e, soprattutto, con la sua <strong>baseband</strong>, il chip radio che e' di fatto un secondo computer con firmware chiuso, sempre acceso, che non controlli. Ci va il meno possibile, e possibilmente qualcosa che qualcuno diverso dal produttore possa ispezionare.</p>
+
+    <div class="device-map" role="img" aria-label="Schema del dispositivo dedicato: una scatola fidata con MCU, secure element, TRNG, tastiera, schermo e camera, senza alcuna radio, collegata al telefono sorvegliato solo tramite QR.">
+      <div class="dev-box trusted">
+        <div class="dev-title">Dispositivo fidato</div>
+        <div class="dev-sub">il chiaro vive solo qui dentro</div>
+        <div class="dev-grid">
+          <div class="chip"><strong>MCU / FPGA</strong>calcolo minimo, ispezionabile</div>
+          <div class="chip"><strong>Secure element</strong>la chiave nasce e resta qui</div>
+          <div class="chip"><strong>TRNG</strong>entropia per le chiavi</div>
+          <div class="chip"><strong>Tastiera</strong>ci scrivi il chiaro</div>
+          <div class="chip"><strong>Schermo e-ink</strong>ci leggi il chiaro</div>
+          <div class="chip"><strong>Camera</strong>legge i QR in arrivo</div>
+        </div>
+        <div class="radios">
+          <span class="radio-off">WiFi</span>
+          <span class="radio-off">Bluetooth</span>
+          <span class="radio-off">Cellulare</span>
+          <span class="radio-off">NFC</span>
+        </div>
+        <div class="dev-note">radio non disattivate: fisicamente assenti dalla scheda</div>
+      </div>
+
+      <div class="bridge">
+        <div class="qr-icon"></div>
+        <div class="bridge-label">solo QR<br>ottico</div>
+        <div class="bridge-arrows">&#8646;</div>
+      </div>
+
+      <div class="dev-box phone">
+        <div class="dev-title">Telefono</div>
+        <div class="dev-sub">sorvegliato</div>
+        <div class="phone-body">Riceve e mostra solo <strong>buste sigillate</strong>. Le spedisce nella chat come stringhe illeggibili. Non vede mai ne' il chiaro ne' la chiave.</div>
+      </div>
+    </div>
+    <p class="flow-caption">Tra i due mondi passa solo un'immagine di puntini. Il ponte e' un occhio, non un cavo: nessuna radio lo attraversa.</p>
+
+    <div class="table-scroll">
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Scelta ragionevole</th>
+          <th>Perche'</th>
+          <th>Il compromesso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Calcolo</td>
+          <td>Un microcontrollore semplice (classe Cortex-M o RISC-V), o una FPGA</td>
+          <td>Poco codice, poca superficie, nessun motore di gestione nascosto come nei SoC dei telefoni</td>
+          <td>La FPGA e' ispezionabile ma cara e complessa; l'MCU e' economico ma ti fidi del silicio di chi lo produce</td>
+        </tr>
+        <tr>
+          <td>Custodia chiavi</td>
+          <td>Un secure element dedicato, oppure un MCU nudo con chiave protetta da passphrase</td>
+          <td>Nel secure element la chiave nasce on-chip e non esce mai, resiste all'estrazione fisica</td>
+          <td>Il secure element e' una scatola nera certificata che non puoi verificare; l'MCU nudo e' controllabile ma la chiave e' estraibile con attacchi fisici</td>
+        </tr>
+        <tr>
+          <td>Entropia</td>
+          <td>Un generatore hardware di numeri casuali (TRNG), mescolato con entropia dell'utente (dadi, rumore della camera)</td>
+          <td>Una chiave nasce solida solo se l'entropia e' solida; entropia debole significa chiave debole a prescindere dall'algoritmo</td>
+          <td>Verificare davvero la qualita' di un TRNG e' difficile, ed e' un punto dove un difetto non si vede</td>
+        </tr>
+        <tr>
+          <td>Ingresso</td>
+          <td>Tastiera fisica cablata</td>
+          <td>Il chiaro lo digiti qui, sull'apparecchio fidato, senza passare da nessuna radio</td>
+          <td>Scomodo e lento rispetto a un touchscreen</td>
+        </tr>
+        <tr>
+          <td>Uscita</td>
+          <td>Schermo e-ink o LCD transflettivo</td>
+          <td>L'e-ink consuma pochissimo e non ha retroilluminazione che trapela; leggi il chiaro qui, mai sul telefono</td>
+          <td>L'e-ink e' lento a rinfrescare</td>
+        </tr>
+        <tr>
+          <td>Ponte (air gap)</td>
+          <td>Camera che legge i QR in ingresso, schermo che mostra i QR in uscita</td>
+          <td>Un canale ottico e' ispezionabile a occhio: davanti a una camera che guarda uno schermo non ci passa una radio nascosta</td>
+          <td>Trasferimento manuale, lento, con un limite di dati per singolo QR</td>
+        </tr>
+        <tr>
+          <td>Radio</td>
+          <td>Assenti. Non disattivate: fisicamente non montate sulla scheda</td>
+          <td>Non puoi accendere, per errore o per attacco, cio' che non e' saldato</td>
+          <td>Nessuna comodita' di rete, tutto passa dal ponte ottico</td>
+        </tr>
+        <tr>
+          <td>Alimentazione e involucro</td>
+          <td>Batteria removibile, taglio fisico dell'alimentazione, involucro con evidenza di manomissione</td>
+          <td>L'attacco fisico e' reale: aprire il dispositivo deve lasciare una traccia visibile</td>
+          <td>Costa e ingombra, e nessuna barriera fisica e' definitiva contro chi ha tempo e laboratorio</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>Elencati i pezzi, si vede subito perche' l'hardware e' la parte semplice. Saldare questi componenti lo sa fare qualunque azienda. Il lavoro vero comincia dopo, sul firmware e sulla filiera. Un progetto serio poggia su due gambe. La prima sono le <strong>build riproducibili</strong>: il codice e' aperto e chiunque, ricompilandolo, ottiene un binario con lo stesso identico hash, cosi' puoi verificare che l'apparecchio esegua davvero quel sorgente e non un altro. La seconda e' il <strong>boot verificato</strong>: all'accensione un bootloader controlla la firma del firmware e si rifiuta di partire se e' stato manomesso. Restano le domande scomode che ogni progetto del genere deve saper guardare in faccia: come nasce la chiave dentro il chip, come si aggiorna il firmware senza aprire una porta di servizio, come si inizializza il dispositivo, come si salva una copia delle chiavi senza vanificare tutto.</p>
+
+    <div class="warning-box">
+      <p><strong>Le due tensioni che non spariscono.</strong> La prima: il secure element ti difende dall'estrazione fisica della chiave, ma e' una scatola nera che devi accettare sulla fiducia; l'MCU aperto lo puoi ispezionare, ma protegge peggio la chiave da chi ha il dispositivo in mano. La seconda e' piu' profonda: qualunque cosa scegli, ti fidi comunque di chi ha fabbricato il chip, perche' non puoi verificare un silicio che non hai fuso tu. Progetti come Precursor di Bunnie Huang nascono proprio da qui, e usano una FPGA perche' la sua logica e' sintetizzabile e ispezionabile: riducono quella fiducia cieca, non la azzerano. Nessuno la azzera.</p>
+    </div>
+
+    </details>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - COSA SERVE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Serve</h2>
+    <span class="section-number">Sezione 07. I tre livelli in tabella</span>
+
+    <p>La domanda pratica, in fondo, e' una sola: cosa devo avere in mano per farlo? La risposta cambia con quanto sei disposto a portarti dietro. Qui i tre livelli, uno accanto all'altro.</p>
+
+    <div class="table-scroll fade-in">
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Livello</th>
+          <th>Cosa serve</th>
+          <th>Chi lo puo' fare</th>
+          <th>Il limite</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>0 &middot; Carta</td>
+          <td>Due copie identiche di una chiave casuale su carta, scambiate su un canale fuori dal telefono sorvegliato. Nient'altro.</td>
+          <td>Chiunque sappia leggere e scrivere</td>
+          <td>Scomodo, chiave monouso, poche frasi alla volta</td>
+        </tr>
+        <tr>
+          <td>1 &middot; Secondo apparecchio</td>
+          <td>Un vecchio telefono in modalita' aereo per sempre, con un'app di cifratura offline. Trasferimento via QR o a mano.</td>
+          <td>Quasi tutti, con mezz'ora di preparazione</td>
+          <td>Un telefono resta complesso, va tenuto davvero scollegato</td>
+        </tr>
+        <tr>
+          <td>2 &middot; Dispositivo dedicato</td>
+          <td>Un apparecchio senza radio, con chip sicuro, tastiera, schermo, camera. Ponte solo via QR.</td>
+          <td>Chi lo compra gia' pronto, poi e' semplice come un tasto</td>
+          <td>Va prodotto e distribuito, costa, va procurato in modo affidabile</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>Il filo comune e' che nessuno dei tre chiede di capire la crittografia. Il livello zero chiede pazienza, il livello uno un cassetto, il livello due un acquisto. Nessuno chiede di essere un hacker. E' questo il punto che rende la difesa alla portata di tutti: la parte difficile, la matematica, e' gia' fatta e nascosta. Quello che resta da capire e' un'unica regola, e la capisce chiunque: <strong>il chiaro non tocca mai il telefono</strong>.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - IL RUMORE E' SOSPETTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Rumore E' Sospetto</h2>
+    <span class="section-number">Sezione 08. Far sembrare normale</span>
+
+    <p>C'e' un problema che nessuno dei tre livelli, da solo, risolve. In un regime che legge le chat, mandare una stringa di rumore e' come camminare per strada con un passamontagna. Il contenuto e' al sicuro, ma il gesto e' visibile, e in un clima ostile il gesto stesso e' un'accusa. Nessuno intorno a te scrive password incomprensibili tutto il giorno. Chi lo fa, si segnala.</p>
+
+    <p>La contromossa e' vecchia quanto le spie: non nascondere che stai parlando, nascondere <em>che stai nascondendo</em>. Si chiama steganografia. Invece di produrre rumore evidente, il messaggio cifrato viene camuffato dentro qualcosa di normale: una frase che sembra una chiacchiera qualsiasi, i dettagli impercettibili di una foto banale, un messaggio vocale che suona come mille altri. A occhio, e' traffico ordinario. Solo chi ha la chiave sa che dentro c'e' altro, e sa dove guardare.</p>
+
+    <div class="warning-box fade-in">
+      <p>La cifratura ti protegge dal <em>venire letto</em>. La steganografia ti protegge dal <em>dare nell'occhio</em>. In un futuro dove usare protezione e' esso stesso motivo di sospetto, la seconda diventa importante quanto la prima. Non basta che il messaggio sia illeggibile. Deve sembrare che non ci sia nessun messaggio.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - COSA NON RISOLVE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Non Risolve</h2>
+    <span class="section-number">Sezione 09. I limiti, detti onestamente</span>
+
+    <p>Una difesa che non dichiara i propri buchi e' propaganda. Questa architettura sposta il chiaro fuori dal telefono, e questo lo fa davvero. Ma non e' un mantello dell'invisibilita', e vale la pena elencare cosa resta scoperto.</p>
+
+    <div class="table-scroll fade-in">
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th>Il buco</th>
+          <th>Perche' resta aperto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>I metadati</td>
+          <td>Il contenuto e' rumore, ma il telefono e la rete vedono comunque con chi parli, quando, quanto spesso. L'analisi del traffico non ha bisogno di leggere le parole per disegnare la tua rete di contatti.</td>
+        </tr>
+        <tr>
+          <td>La stanza</td>
+          <td>Una telecamera puntata sul tuo schermo esterno legge il chiaro prima di te. Nessuna crittografia protegge da un occhio fisico affacciato sul dispositivo fidato mentre lo usi.</td>
+        </tr>
+        <tr>
+          <td>Lo scambio della chiave</td>
+          <td>Il momento in cui condividi il segreto deve avvenire su un canale fuori dalla portata del regime, non per forza di persona, ma mai dal telefono sorvegliato. Se quel passaggio e' compromesso, tutto il resto crolla.</td>
+        </tr>
+        <tr>
+          <td>La catena di fornitura</td>
+          <td>Il dispositivo dedicato, o l'app che scarichi, potrebbe arrivare gia' manomesso. Devi fidarti di chi te lo da', e in un regime la fiducia e' merce rara.</td>
+        </tr>
+        <tr>
+          <td>Il possesso stesso</td>
+          <td>Dove la difesa e' fuorilegge, avere lo strumento e' il reato. La matematica ti protegge dalla lettura, non dalla perquisizione. La sicurezza torna a essere anche un fatto fisico e umano.</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <p>Sommati, questi limiti dicono una cosa sola: la tecnica sposta il muro, non lo rende infinito. Ti restituisce il contenuto delle tue parole, che e' molto. Non ti restituisce l'invisibilita', che non esiste. Chi ti promette l'invisibilita' ti sta vendendo qualcosa.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 10 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Fuori Dalla Macchina</h2>
+    <span class="section-number">Sezione 10. Cosa il regime non puo' toccare</span>
+
+    <p>Ripercorri il ragionamento e vedrai che si regge su un unico appoggio. Il regime puo' imporre cosa fa la macchina. Puo' obbligare il telefono a leggere, a riferire, ad aprire una porta di servizio nel sistema operativo. Il suo potere finisce sul bordo del dispositivo. Non puo' imporre cosa succede fuori: su un foglio di carta piegato in tasca, su un apparecchio che non ha mai conosciuto una rete, nella tua testa quando componi a mano una frase con una chiave che nessuno ha.</p>
+
+    <p>E' per questo che la tradecraft piu' vecchia batte la sorveglianza piu' nuova. Non perche' sia piu' sofisticata, ma perche' gioca su un altro tavolo. La sorveglianza di massa e' potentissima dentro la macchina e cieca fuori. Spostare il chiaro fuori dalla macchina non e' un trucco da esperti: e' riportare il segreto dove il potere digitale non arriva, cioe' nel mondo fisico, tra due persone che hanno condiviso una chiave lontano da ogni occhio.</p>
+
+    <p>C'e' un capovolgimento, in fondo a tutto questo, che vale piu' di ogni tecnica. Per trent'anni abbiamo provato a rendere affidabile il telefono: sistemi operativi piu' sicuri, app piu' blindate, aggiornamenti su aggiornamenti, sempre inseguendo l'idea che quel dispositivo, prima o poi, ci si sarebbe potuti fidare. Forse e' il presupposto sbagliato. Con internet abbiamo gia' fatto la scelta opposta, e ha funzionato: diamo per scontato che la rete sia ostile, che qualcuno stia ascoltando, e cifriamo agli estremi proprio perche' non ci fidiamo del mezzo. Il telefono merita lo stesso trattamento. Non un alleato da blindare, ma un canale ostile da attraversare. Trasporta pacchetti, non segreti. Il giorno in cui smetti di chiedergli di custodire cio' che conta, smette di potertelo tradire.</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">Il regime controlla il telefono.<br>Non controlla cio' che fai fuori dal telefono.</p>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.8rem;">
+        La difesa non e' un'app da scaricare. E' una regola da capire:<br>
+        il chiaro nasce e muore fuori dalla macchina sorvegliata.
+      </p>
+    </div>
+
+
+    <!-- ============================================================
+         NOTE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Note</h2>
+    <span class="section-number">Concetti e precedenti</span>
+
+    <div class="sources">
+      <p>
+        <strong>Client-side scanning.</strong> La scansione dei contenuti sul dispositivo prima della cifratura e' al centro del dibattito europeo su Chat Control da anni. Oltre 500 ricercatori in crittografia e sicurezza ne hanno segnalato in lettere aperte l'inattuabilita' senza minare la sicurezza di tutti. Analisi tecnica di riferimento: Abelson et al., <em>Bugs in our Pockets: The Risks of Client-Side Scanning</em> (2021).<br>
+        <strong>One-time pad.</strong> Il cifrario a blocco monouso e' l'unico schema con segretezza perfetta dimostrata, a condizione che la chiave sia veramente casuale, lunga quanto il messaggio, usata una sola volta e mai riutilizzata. Il risultato risale a Claude Shannon (1949).<br>
+        <strong>Air gap e QR.</strong> Il modello del portafoglio hardware, con chiavi che non lasciano un dispositivo senza rete e transazioni scambiate come codici QR, e' pratica consolidata nell'ecosistema delle criptovalute (dispositivi con firma via QR). Le smartcard OpenPGP applicano da anni lo stesso principio alle chiavi crittografiche: generate on-chip, non esportabili.<br>
+        <strong>Silicio verificabile.</strong> Sul limite di fondo, non poter verificare un chip che non hai fabbricato, il progetto di riferimento e' Precursor / Betrusted di Andrew "Bunnie" Huang, che usa una FPGA proprio perche' la logica e' sintetizzabile e ispezionabile. Sul firmware, le build riproducibili sono la pratica che permette a un estraneo di verificare che il binario in esecuzione corrisponda al sorgente pubblico.<br>
+        <strong>Steganografia.</strong> Nascondere l'esistenza stessa del messaggio, e non solo il suo contenuto, e' complementare alla cifratura ed e' rilevante ovunque il semplice uso di crittografia attiri sospetto.<br>
+        <strong>Nota.</strong> Questo articolo e' uno scenario di riflessione su un futuro autoritario ipotetico. Descrive principi generali di modello di minaccia, non istruzioni operative per aggirare leggi vigenti.
+      </p>
+    </div>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-copy">&copy; 2026 Signal Pirate. Il chiaro non tocca mai il telefono.</p>
+      <div class="footer-links">
+        <a href="../">Home</a>
+        <a href="../feed.xml">RSS</a>
+        <a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
