@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Rotta Rubata | Signal Pirate</title>
+  <meta name="description" content="Internet instrada fidandosi di chiunque annunci una rotta. Un annuncio BGP piu' specifico e il traffico di un intero paese cambia strada. Lab riproducibile con FRR in network namespace, casi reali (YouTube 2008, MyEtherWallet 2018), e perche' RPKI ferma solo meta' del problema.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Code Block === */
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+
+    /* syntax colors */
+    .ck { color: #7c4dff; }  /* keyword */
+    .cs { color: #00ff88; }  /* string */
+    .cn { color: #b5cea8; }  /* number */
+    .cc { color: #6a6a8a; }  /* comment */
+    .cf { color: #4ecdc4; }  /* function */
+    .cv { color: #9cdcfe; }  /* variable */
+    .ct { color: #4ec9b0; }  /* type */
+    .co { color: #d4d4d4; }  /* operator */
+
+    /* === Terminal Output === */
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+
+    /* === Pipeline Steps === */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* === Strategy Table === */
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td {
+      background: rgba(0,255,136,0.03);
+    }
+
+    /* === Two Panel Comparison === */
+    .two-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin: 1.5rem 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    @media (max-width: 768px) {
+      .two-panel { grid-template-columns: 1fr; }
+    }
+    .panel-side {
+      padding: 1.5rem;
+    }
+    .panel-left {
+      background: rgba(0,255,136,0.05);
+      border-right: 1px solid var(--border-subtle);
+    }
+    .panel-right {
+      background: rgba(255,107,107,0.05);
+    }
+    .panel-side-title {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    .panel-left .panel-side-title { color: var(--accent-attention); }
+    .panel-right .panel-side-title { color: var(--accent-reaction); }
+    .panel-side p {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin: 0.4rem 0;
+    }
+
+    /* === Conclusion Box === */
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+
+    /* === Accent === */
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+
+    /* === Architecture Diagram === */
+    .arch-diagram {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.9;
+      overflow-x: auto;
+      white-space: pre;
+      color: #c8c8d8;
+    }
+    .arch-diagram .a-victim { color: #00ff88; }
+    .arch-diagram .a-attacker { color: #ff6b6b; }
+    .arch-diagram .a-transit { color: #4ecdc4; }
+    .arch-diagram .a-label { color: #6a6a8a; }
+    .arch-diagram .a-flow { color: #ff8800; }
+
+    /* === Timeline interattiva del dirottamento (Sei AS300) === */
+    .hijack-timeline {
+      background: #0d1117;
+      border: 1px solid rgba(124,77,255,0.18);
+      border-radius: 12px;
+      padding: 1.4rem 1.2rem;
+      margin: 2rem 0;
+    }
+    .timeline-head {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;
+    }
+    #timeline-status {
+      font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-secondary);
+    }
+    #timeline-status b { color: var(--accent-attention); font-weight: 700; }
+    #timeline-status.hijacked, #timeline-status.hijacked b { color: var(--accent-reaction); }
+    #timeline-play {
+      font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem;
+      color: #0d1117; background: var(--accent-attention);
+      border: none; border-radius: 8px; padding: 0.55rem 1rem; cursor: pointer;
+      transition: transform .15s, opacity .2s; white-space: nowrap;
+    }
+    #timeline-play:hover { transform: translateY(-1px); }
+    #timeline-play:disabled { opacity: .5; cursor: default; }
+    .timeline-network { position: relative; height: 172px; margin: 0.4rem 0 1.1rem; }
+    .tl-wire {
+      position: absolute; top: 46px; left: 12%; right: 12%; height: 2px;
+      background: linear-gradient(90deg, rgba(0,255,136,.12), rgba(0,255,136,.4), rgba(0,255,136,.12));
+    }
+    .tl-wire.to666 {
+      top: 48px; left: 50%; width: 2px; height: 74px; right: auto;
+      background: rgba(255,107,107,.18);
+    }
+    .tl-node {
+      position: absolute; top: 24px; transform: translateX(-50%);
+      width: 96px; text-align: center;
+      font-family: var(--font-mono); font-weight: 700; font-size: 0.82rem;
+      padding: 0.45rem 0.2rem; border-radius: 8px;
+      background: #12161f; border: 1px solid #23283a; color: #d8d8e0;
+      transition: border-color .3s, box-shadow .3s, color .3s;
+    }
+    .tl-node small { display: block; font-weight: 400; font-size: 0.64rem; color: var(--text-secondary); margin-top: 2px; }
+    .tl-node.victim { left: 14%; }
+    .tl-node.transit { left: 50%; }
+    .tl-node.client { left: 86%; }
+    .tl-node.attacker { left: 50%; top: 122px; border-color: rgba(255,107,107,.25); }
+    .tl-node.on { border-color: var(--accent-attention); box-shadow: 0 0 0 1px var(--accent-attention), 0 0 18px rgba(0,255,136,.22); }
+    .tl-node.attacker.on { border-color: var(--accent-reaction); box-shadow: 0 0 0 1px var(--accent-reaction), 0 0 18px rgba(255,107,107,.28); color: var(--accent-reaction); }
+    .tl-badge {
+      position: absolute; left: 50%; top: 152px; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 0.68rem; color: var(--accent-reaction);
+      opacity: 0; transition: opacity .3s; white-space: nowrap;
+    }
+    .tl-badge.show { opacity: 1; }
+    .tl-packet {
+      position: absolute; width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent-attention); box-shadow: 0 0 12px var(--accent-attention);
+      left: 86%; top: 40px; transform: translate(-50%, 0);
+      transition: left .8s ease, top .8s ease, background .4s, box-shadow .4s;
+    }
+    .tl-packet.bad { background: var(--accent-reaction); box-shadow: 0 0 12px var(--accent-reaction); }
+    .tl-rule {
+      position: absolute; left: 50%; top: 14px; transform: translateX(-50%) scale(.6);
+      opacity: 0; text-align: center; pointer-events: none; z-index: 5;
+      font-family: var(--font-mono); font-weight: 800; line-height: 1.5; font-size: 0.9rem;
+      color: var(--accent-yellow); background: rgba(13,17,23,.94);
+      border: 1px solid var(--accent-yellow); border-radius: 10px; padding: 0.6rem 1rem;
+      max-width: calc(100% - 1rem); white-space: normal;
+      transition: opacity .25s, transform .25s;
+    }
+    .tl-rule.flash { opacity: 1; transform: translateX(-50%) scale(1); }
+    .tl-rule .big { font-size: 1.1rem; color: var(--accent-attention); }
+    .timeline-events { list-style: none; padding: 0; margin: 0; display: grid; gap: .3rem; }
+    .timeline-events li {
+      font-family: var(--font-mono); font-size: 0.76rem; color: var(--text-secondary);
+      padding: .32rem .6rem; border-left: 2px solid transparent;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .timeline-events li.active { color: var(--accent-attention); border-left-color: var(--accent-attention); background: rgba(0,255,136,.05); }
+    .timeline-events li.active.bad { color: var(--accent-reaction); border-left-color: var(--accent-reaction); background: rgba(255,107,107,.05); }
+    .tl-caption { font-size: 0.82rem; color: var(--text-secondary); margin-top: 1rem; }
+    .tl-banner { font-family: var(--font-mono); font-weight: 700; color: var(--accent-attention); }
+    @media (max-width: 560px) {
+      .tl-node { width: 78px; font-size: 0.74rem; }
+      .tl-rule { font-size: 0.78rem; }
+      .tl-rule .big { font-size: 0.92rem; }
+    }
+
+    /* === Skip link (accessibilita') === */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 1000;
+      background: var(--accent-attention);
+      color: #0d1117;
+      padding: 0.6rem 1rem;
+      border-radius: 0 0 8px 0;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .skip-link:focus { left: 0; }
+
+    /* === Rispetta chi preferisce meno movimento === */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+      .pipeline-step:hover { transform: none; }
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/la-rotta-rubata.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="La Rotta Rubata">
+  <meta property="og:description" content="Internet instrada fidandosi di chiunque annunci una rotta. Un annuncio BGP piu&#x27; specifico e il traffico di un intero paese cambia strada. Lab riproducibile con FRR in network namespace, casi reali (YouTube 2008, MyEtherWallet 2018), e perche&#x27; RPKI ferma solo meta&#x27; del problema.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/la-rotta-rubata.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-07-10">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="La Rotta Rubata">
+  <meta name="twitter:description" content="Internet instrada fidandosi di chiunque annunci una rotta. Un annuncio BGP piu&#x27; specifico e il traffico di un intero paese cambia strada. Lab riproducibile con FRR in network namespace, casi reali (YouTube 2008, MyEtherWallet 2018), e perche&#x27; RPKI ferma solo meta&#x27; del problema.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"La Rotta Rubata","description":"Internet instrada fidandosi di chiunque annunci una rotta. Un annuncio BGP piu' specifico e il traffico di un intero paese cambia strada. Lab riproducibile con FRR in network namespace, casi reali (YouTube 2008, MyEtherWallet 2018), e perche' RPKI ferma solo meta' del problema.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-07-10","dateModified":"2026-07-10","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/la-rotta-rubata.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <a href="#content" class="skip-link">Salta al contenuto</a>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <main id="content">
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-07-10 | Pinperepette</p>
+    <h1 class="article-page-title">La Rotta <span class="accent">Rubata</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem;">
+      Internet instrada fidandosi di chiunque annunci una rotta. Un annuncio piu' specifico e il traffico di un intero paese cambia strada. Lo smonto in un lab riproducibile, senza toccare la rete reale.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">BGP Hijack</span>
+      <span class="tag tag-highlight">Routing</span>
+      <span class="tag tag-reaction">RPKI</span>
+      <span class="tag tag-amplification">FRR</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <!-- ============================================================
+         SEZIONE 00 - L'ANTEFATTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lucchetto Verde Che Mentiva</h2>
+    <span class="section-number">Sezione 00. L'antefatto</span>
+
+    <p>La iena torna dall'apiario con le mani ancora appiccicose di propoli e un dubbio in testa. Se l'e' portato dietro per tutta la strada, lo capisco da come si siede.</p>
+
+    <p>"Andre, una cosa. Ho letto di uno che si e' fatto svuotare il portafoglio di criptovalute. Ma diceva che aveva controllato: indirizzo giusto, lucchetto verde, tutto in ordine. Com'e' possibile? Il lucchetto non vuol dire che sei sul sito vero?"</p>
+
+    <p>"Il lucchetto vuol dire che stai parlando in modo cifrato con chi ha dimostrato di controllare quel dominio. Il problema e' la parola 'controllare'."</p>
+
+    <p>"Cioe'?"</p>
+
+    <p>"Aprile 2018. Qualcuno dirotta il traffico verso i server DNS di Amazon. Non buca Amazon, non ruba una password. Convince mezzo internet che la strada piu' corta per arrivare a quei server passa da lui. Chi cercava MyEtherWallet finiva su una copia. Copia servita da un server che l'attaccante controllava, con un certificato che il browser accettava. Circa centocinquantamila dollari in Ethereum, spariti in un paio d'ore."</p>
+
+    <p>"E il lucchetto?"</p>
+
+    <p>"Quando controlli la strada verso un dominio, controlli anche le verifiche che una Certificate Authority fa su quel dominio. Le chiedi un certificato, lei ti manda a dimostrare che sei il proprietario rispondendo a una richiesta, e tu rispondi, perche' il traffico passa da te. Il certificato te lo firmano. Vero, valido, verde. Il lucchetto non ha mentito: ha certificato esattamente quello che vedeva. Vedeva te."</p>
+
+    <p>La iena posa la giacca. "Aspetta. Mi stai dicendo che chiunque puo' dire 'il pezzo di internet X passa da me' e gli altri ci credono?"</p>
+
+    <p>"In sostanza si'. Il protocollo che regge tutto il traffico tra le reti si chiama BGP e non ha un modo nativo per verificare chi dice la verita'. Si fida. Da sempre."</p>
+
+    <p>"E questo lo sanno tutti?"</p>
+
+    <p>"Chi fa reti si'. E ogni tanto qualcuno se ne dimentica e mezzo mondo resta senza YouTube per due ore."</p>
+
+    <p>Mi guarda con l'aria di chi ha appena deciso come passero' la serata. "Fammelo vedere. Non a parole. Voglio vedere il traffico che cambia strada."</p>
+
+    <p>Stanotte glielo faccio vedere. Senza toccare un solo router vero.</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number cyan" data-count="75000" data-suffix="+">0</div>
+        <div class="stat-label">Reti che si fidano l'una dell'altra</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number red" data-count="1" data-suffix=" msg">0</div>
+        <div class="stat-label">Per dirottare un blocco di IP</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple" data-count="2" data-suffix=" ore">0</div>
+        <div class="stat-label">YouTube offline nel 2008</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green" data-count="0" data-suffix="">0</div>
+        <div class="stat-label">Exploit necessari</div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 01 - COS'E' DAVVERO BGP
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cos'e' Davvero Internet</h2>
+    <span class="section-number">Sezione 01. Una rete di reti che si fidano</span>
+
+    <p>"Prima di rubare una rotta, capiamo cos'e' una rotta."</p>
+
+    <p>Internet non e' una rete. E' circa settantacinquemila reti separate che hanno deciso di parlarsi. Ognuna si chiama Autonomous System, AS. Un operatore telefonico e' un AS. Un grande cloud e' un AS, spesso piu' di uno. L'universita', la banca, il datacenter: ognuno ha il suo numero, l'ASN. Google e' AS15169. Cloudflare e' AS13335.</p>
+
+    <p>Ogni AS possiede dei blocchi di indirizzi IP, i prefissi. Scritti come <code>104.16.0.0/13</code>: un indirizzo di base e una lunghezza. La lunghezza dice quanti indirizzi ci sono dentro. Piu' il numero dopo la barra e' alto, piu' il blocco e' piccolo e specifico. Un <code>/24</code> sono 256 indirizzi. Un <code>/25</code> ne sono 128: meta' di quel <code>/24</code>, quindi piu' specifico.</p>
+
+    <p>"E come fa il mio pacchetto a sapere quale delle settantacinquemila reti tiene l'indirizzo che cerco?"</p>
+
+    <p>"Se lo raccontano. Ognuno urla ai vicini: 'i prefissi X, Y, Z stanno da me, per arrivarci passate di qui'. Il vicino gira il messaggio ai suoi vicini aggiungendo se stesso in fondo alla lista. Alla fine ogni router del mondo ha una mappa: per ogni prefisso, la catena di AS da attraversare per arrivarci. Quella catena si chiama AS_PATH. Il protocollo che si scambia questi annunci e' BGP, Border Gateway Protocol."</p>
+
+    <div class="arch-diagram fade-in"><span class="a-label"># Come si propaga un annuncio BGP</span>
+
+<span class="a-victim">AS100</span> possiede <span class="a-victim">10.10.0.0/24</span>
+  |
+  |  "10.10.0.0/24 sta da me"   AS_PATH: [<span class="a-victim">100</span>]
+  v
+<span class="a-transit">AS200</span> (transito) lo impara e lo ripropaga
+  |
+  |  "per 10.10.0.0/24 passate da me"  AS_PATH: [<span class="a-transit">200</span> <span class="a-victim">100</span>]
+  v
+<span class="a-transit">AS300</span> (il tuo provider) lo impara
+  |
+  v
+<span class="a-flow">il tuo pacchetto segue la catena a ritroso: 300 -> 200 -> 100</span></div>
+
+    <p>"La cosa che devi tenere a mente e' questa: quando AS100 annuncia 'questo prefisso e' mio', nessuno verifica che sia vero. Il vicino non ha un registro firmato da controllare. Riceve l'annuncio, applica le sue regole di preferenza, e se l'annuncio vince lo usa e lo ripropaga. La fiducia e' l'impostazione predefinita."</p>
+
+    <div class="insight-box fade-in">
+      <p>BGP nasce nel 1989 su un fax. Tre ingegneri, due pagine, il protocollo che ancora oggi regge il traffico globale. Fu progettato tra reti che si conoscevano di persona e si fidavano. Quel presupposto, che gli operatori siano pochi e onesti, non e' mai stato tolto. E' solo cresciuto fino a includere settantamila sconosciuti.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 02 - LE DUE LEVE DEL DIROTTAMENTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Due Leve Per Rubare Una Rotta</h2>
+    <span class="section-number">Sezione 02. Come si vince un annuncio</span>
+
+    <p>"Ok, ma se AS100 dice 'il prefisso e' mio' e io dico la stessa cosa, chi vince?"</p>
+
+    <p>"Dipende, e la parola giusta e' proprio 'dipende'. Prima pero' ti tolgo un'idea sbagliata: non e' che il router mette i due annunci in gara e ne cestina uno. BGP sceglie una rotta migliore <em>per ogni prefisso</em>, separatamente. Se annuncio un prefisso diverso dal tuo, i due non si confrontano nemmeno. Convivono nella tabella, ognuno con la sua rotta."</p>
+
+    <p>La prima leva sfrutta proprio questo. La vittima annuncia <code>10.10.0.0/24</code>. Io annuncio <code>10.10.0.0/25</code>, meta' di quel blocco. Sono due prefissi diversi, quindi restano tutti e due nella tabella, uno accanto all'altro. Quando arriva un pacchetto per <code>10.10.0.5</code>, pero', il piano di inoltro non guarda i percorsi: applica il <strong>longest prefix match</strong> e sceglie il prefisso piu' specifico che contiene quell'indirizzo. Il mio <code>/25</code> e' piu' specifico del <code>/24</code>. Vince lui, e la lunghezza del percorso non c'entra niente. E' il <strong>sub-prefix hijack</strong>. Dove l'annuncio viene accettato e installato, il traffico e' mio. Non "ovunque per magia": dove qualcuno lo accetta. Filtri di prefisso, policy dell'operatore e RPKI lo possono fermare a monte.</p>
+
+    <p>La seconda leva serve quando non posso essere piu' specifico, per esempio perche' molti operatori scartano i <code>/25</code> e la vittima annuncia gia' un <code>/24</code>. Allora annuncio <strong>lo stesso identico prefisso</strong>. Adesso i due si confrontano davvero, perche' sono la stessa rotta, e qui decide la <strong>policy di ogni singola rete</strong>. La lunghezza dell'AS_PATH e' solo uno dei criteri, e nemmeno il primo: prima viene il peso che l'operatore assegna a mano alle rotte, il LOCAL_PREF. Se falsifico il percorso per sembrare vicino all'origine posso vincere per la fetta di internet dove la policy mi da' ragione. E' il <strong>same-prefix hijack</strong>: non prende il mondo, prende un pezzo, e quale pezzo dipende da come ogni rete sceglie.</p>
+
+    <div class="two-panel fade-in">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">Sub-prefix hijack</div>
+        <p>Annunci un prefisso piu' specifico (/25 dentro il /24)</p>
+        <p>Vince nel piano di inoltro: longest prefix match</p>
+        <p>Prende il traffico di ogni rete che lo accetta e installa</p>
+        <p>Rumoroso: e' un prefisso nuovo, i monitor globali lo vedono</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">Same-prefix hijack</div>
+        <p>Annunci lo stesso prefisso con AS_PATH falsificato</p>
+        <p>Compete nella best-path: decide la policy (LOCAL_PREF, poi AS_PATH e altro)</p>
+        <p>Prende solo la fetta dove la policy ti da' ragione</p>
+        <p>Piu' furtivo, ma copertura parziale</p>
+      </div>
+    </div>
+
+    <p>"Fammi capire se ho afferrato. Il piu' specifico vince anche se arriva da uno sconosciuto dall'altra parte del pianeta con un percorso lunghissimo, ammesso che qualcuno gli dia retta?"</p>
+
+    <p>"Esatto. E te lo mostro con quaranta righe di Python, cosi' vedi che non e' magia: e' il piano di inoltro che sceglie il prefisso piu' lungo."</p>
+
+
+    <!-- ============================================================
+         SEZIONE 03 - IL MODELLO DIDATTICO
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Decisione, Smontata in Python</h2>
+    <span class="section-number">Sezione 03. Perche' il piu' specifico vince</span>
+
+    <p>Prima di tirare su i router veri, riduco la scelta al suo osso. Ma serve tenere separati due piani. BGP sceglie una rotta migliore per ogni prefisso, e li' contano le policy dell'operatore, il peso delle rotte, la lunghezza dell'AS_PATH. Il piano di inoltro, invece, quando arriva un pacchetto guarda una cosa sola: tra i prefissi che contengono l'indirizzo, il piu' specifico. Il sub-prefix hijack vive tutto in questo secondo piano, e questo pezzo di codice lo modella.</p>
+
+    <div class="code-block fade-in" data-lang="python">
+<div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="ck">import</span> ipaddress</td></tr>
+<tr><td class="ln">2</td><td class="code"></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="cc"># La FIB: ogni prefisso ha gia' la SUA rotta migliore (best-path, per prefisso).</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="cc"># Il /24 viene dalla vittima, il /25 dall'attaccante con un AS_PATH piu' lungo.</span></td></tr>
+<tr><td class="ln">5</td><td class="code">fib = [</td></tr>
+<tr><td class="ln">6</td><td class="code">    {<span class="cs">"prefix"</span>: <span class="cs">"10.10.0.0/24"</span>, <span class="cs">"as_path"</span>: [<span class="cn">200</span>, <span class="cn">100</span>]},        <span class="cc"># vittima</span></td></tr>
+<tr><td class="ln">7</td><td class="code">    {<span class="cs">"prefix"</span>: <span class="cs">"10.10.0.0/25"</span>, <span class="cs">"as_path"</span>: [<span class="cn">200</span>, <span class="cn">42</span>, <span class="cn">7</span>, <span class="cn">666</span>]}, <span class="cc"># attaccante</span></td></tr>
+<tr><td class="ln">8</td><td class="code">]</td></tr>
+<tr><td class="ln">9</td><td class="code"></td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="ck">def</span> <span class="cf">forward</span>(dest, fib):</td></tr>
+<tr><td class="ln">11</td><td class="code">    <span class="cs">"""Longest prefix match: la regola del piano di inoltro."""</span></td></tr>
+<tr><td class="ln">12</td><td class="code">    ip = ipaddress.ip_address(dest)</td></tr>
+<tr><td class="ln">13</td><td class="code">    match = [r <span class="ck">for</span> r <span class="ck">in</span> fib</td></tr>
+<tr><td class="ln">14</td><td class="code">             <span class="ck">if</span> ip <span class="ck">in</span> ipaddress.ip_network(r[<span class="cs">"prefix"</span>])]</td></tr>
+<tr><td class="ln">15</td><td class="code">    <span class="ck">if</span> <span class="ck">not</span> match:</td></tr>
+<tr><td class="ln">16</td><td class="code">        <span class="ck">return</span> <span class="ck">None</span></td></tr>
+<tr><td class="ln">17</td><td class="code">    <span class="cc"># vince il prefisso piu' specifico. L'AS_PATH non viene guardato.</span></td></tr>
+<tr><td class="ln">18</td><td class="code">    <span class="ck">return</span> <span class="cf">max</span>(match,</td></tr>
+<tr><td class="ln">19</td><td class="code">               key=<span class="ck">lambda</span> r: ipaddress.ip_network(r[<span class="cs">"prefix"</span>]).prefixlen)</td></tr>
+</table></div>
+    </div>
+
+    <p>Il file completo (<code>best_route.py</code>) stampa il dettaglio della scelta:</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">$</span> <span class="t-cmd">python3 best_route.py</span>
+<span class="t-out">destinazione       : 10.10.0.5</span>
+<span class="t-out">rotte che lo coprono:</span>
+<span class="t-out">   10.10.0.0/24     /24  AS_PATH=[200, 100]  -> VITTIMA  (AS100)</span>
+<span class="t-out">   10.10.0.0/25     /25  AS_PATH=[200, 42, 7, 666]  -> ATTACCANTE (AS666)</span>
+<span class="t-out"><span class="t-warn">forwarding sceglie : 10.10.0.0/25  ->  ATTACCANTE (AS666)</span></span>
+<span class="t-out"><span class="t-highlight">nota               : il /25 vince pur avendo l'AS_PATH piu' LUNGO (4 vs 2).</span></span>
+    </div>
+
+    <p>L'indirizzo <code>10.10.0.5</code> sta dentro tutti e due i blocchi. La rotta della vittima ha un percorso di due salti, quella dell'attaccante di quattro: piu' lunga, piu' lontana. Al piano di inoltro non interessa: guarda la lunghezza del prefisso, non quella del percorso, e il <code>/25</code> e' piu' specifico. AS666 vince. Succede cosi' su ogni rete che ha accettato e installato tutte e due le rotte. Non su tutte per forza, ma su quelle si', e il codice che sceglie e' questa <code>max</code> per lunghezza del prefisso.</p>
+
+    <div class="insight-box fade-in">
+      <p>La regola del prefisso piu' specifico non e' un bug. Serve a far funzionare l'aggregazione degli indirizzi: annunci un grande blocco e poi ne ritagli pezzi piccoli per instradarli diversamente. E' utile e necessaria. Il fatto che chiunque possa ritagliare un pezzo del blocco di un altro e vincere e' la stessa feature, vista dal lato sbagliato.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 04 - IL LAB
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Lab: Quattro Reti Su Un Portatile</h2>
+    <span class="section-number">Sezione 04. Router veri, rete finta</span>
+
+    <p>"Bello il Python, ma volevo router veri."</p>
+
+    <p>"E router veri avrai. Solo che non tocchiamo internet. Costruiamo un internet in miniatura dentro il portatile."</p>
+
+    <p>Linux sa creare stack di rete separati e isolati, i network namespace. Ognuno e' una macchina a se': interfacce sue, tabella di routing sua. Li colleghiamo con cavi virtuali, le veth. Su ognuno facciamo girare <code>bgpd</code> di FRRouting, lo stesso demone BGP che gira in produzione su decine di migliaia di reti reali. Quattro namespace, quattro AS, un pezzo di internet che sta in RAM.</p>
+
+    <div class="arch-diagram fade-in"><span class="a-label"># La topologia del lab</span>
+
+        <span class="a-victim">AS100 vittima</span>            <span class="a-attacker">AS666 attaccante</span>
+     annuncia <span class="a-victim">10.10.0.0/24</span>     annuncera' <span class="a-attacker">10.10.0.0/25</span>
+           |                       |
+           |                       |
+           +----------+  +---------+
+                      |  |
+                 <span class="a-transit">AS200 transito</span>
+                      |
+                      |
+                 <span class="a-transit">AS300 client</span>
+                (qui misuriamo dove
+                 finisce il traffico)</div>
+
+    <p>Lo script di setup crea i namespace, tira le veth, assegna gli IP e scrive la configurazione di ognuno. Il cuore e' la config di FRR: poche righe per dire a ogni AS con chi parla e cosa annuncia.</p>
+
+    <div class="code-block fade-in" data-lang="bash">
+<div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc"># crea i quattro AS come namespace isolati</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">for</span> as <span class="ck">in</span> as100 as200 as300 as666; <span class="ck">do</span></td></tr>
+<tr><td class="ln">3</td><td class="code">  ip netns add <span class="cs">"$as"</span></td></tr>
+<tr><td class="ln">4</td><td class="code"><span class="ck">done</span></td></tr>
+<tr><td class="ln">5</td><td class="code"></td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="cc"># cavo virtuale tra vittima (AS100) e transito (AS200)</span></td></tr>
+<tr><td class="ln">7</td><td class="code">ip link add <span class="cv">v12a</span> netns as100 type veth peer <span class="cv">v12b</span> netns as200</td></tr>
+<tr><td class="ln">8</td><td class="code">ip -n as100 addr add <span class="cn">10.1.12.1/30</span> dev v12a</td></tr>
+<tr><td class="ln">9</td><td class="code">ip -n as200 addr add <span class="cn">10.1.12.2/30</span> dev v12b</td></tr>
+<tr><td class="ln">10</td><td class="code"><span class="cc"># ... stesso schema per i cavi AS200-AS300 e AS200-AS666 ...</span></td></tr>
+</table></div>
+    </div>
+
+    <p>La configurazione BGP della vittima e' onesta e minima. Annuncia il suo <code>/24</code> e nient'altro.</p>
+
+    <div class="code-block fade-in" data-lang="frr">
+<div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc">! AS100 - la vittima</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">router bgp</span> <span class="cn">100</span></td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="ck">no bgp</span> ebgp-requires-policy   <span class="cc">! nel lab accetto/annuncio senza route-map</span></td></tr>
+<tr><td class="ln">4</td><td class="code">  <span class="ck">neighbor</span> 10.1.12.2 remote-as <span class="cn">200</span></td></tr>
+<tr><td class="ln">5</td><td class="code">  <span class="ck">address-family</span> ipv4 unicast</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="ck">network</span> <span class="cs">10.10.0.0/24</span>        <span class="cc">! questo prefisso e' mio</span></td></tr>
+<tr><td class="ln">7</td><td class="code">  <span class="ck">exit-address-family</span></td></tr>
+</table></div>
+    </div>
+
+    <p>Il servizio della vittima vive su <code>10.10.0.5</code>, e per capire dove finisce davvero il traffico faccio rispondere quell'IP con un banner: <code>SERVER=VICTIM</code> nel namespace della vittima, <code>SERVER=ATTACKER</code> in quello dell'attaccante. Avvio tutto, aspetto la convergenza, e dal client AS300 guardo la rotta e chiedo chi risponde.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">[client AS300]</span> <span class="t-cmd">show ip bgp 10.10.0.5</span>
+<span class="t-out">BGP routing table entry for <span class="t-ok">10.10.0.0/24</span>, version 1</span>
+<span class="t-out">Paths: (1 available, best #1, table default)</span>
+<span class="t-out">  <span class="t-ok">200 100</span></span>
+<span class="t-out">    10.1.23.1 from 10.1.23.1 (0.0.0.200)</span>
+<span class="t-out">      Origin IGP, valid, external, <span class="t-ok">best</span> (First path received)</span>
+<span class="t-prompt">[transito AS200]</span> <span class="t-cmd">show ip route 10.10.0.5</span>
+<span class="t-out">Routing entry for 10.10.0.0/24</span>
+<span class="t-out">  Known via "bgp", distance 20, metric 0, best</span>
+<span class="t-out">  * <span class="t-ok">10.1.12.1</span>, via v12b, weight 1          <span class="t-out">(next-hop = AS100, la vittima)</span></span>
+<span class="t-prompt">[client AS300]</span> <span class="t-cmd">printf "" | nc -w1 10.10.0.5 80</span>
+<span class="t-out"><span class="t-ok">SERVER=VICTIM  (AS100, quello vero)</span></span>
+    </div>
+
+    <p>Rete pulita. Il client arriva alla vittima passando dal transito, e sull'IP pubblico risponde il server vero. Adesso rompiamo.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 05 - IL DIROTTAMENTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Annuncio Che Ruba Il Traffico</h2>
+    <span class="section-number">Sezione 05. Trenta secondi, una riga</span>
+
+    <p>AS666 non fa niente di sofisticato. Non buca la vittima, non falsifica firme, non sfrutta CVE. Aggiunge una riga alla sua configurazione: annuncia un prefisso che non gli appartiene, e lo annuncia piu' specifico.</p>
+
+    <div class="code-block fade-in" data-lang="frr">
+<div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc">! AS666 - l'attaccante</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">router bgp</span> <span class="cn">666</span></td></tr>
+<tr><td class="ln">3</td><td class="code">  <span class="ck">no bgp</span> ebgp-requires-policy</td></tr>
+<tr><td class="ln">4</td><td class="code">  <span class="ck">neighbor</span> 10.1.26.1 remote-as <span class="cn">200</span></td></tr>
+<tr><td class="ln">5</td><td class="code">  <span class="ck">address-family</span> ipv4 unicast</td></tr>
+<tr><td class="ln">6</td><td class="code">    <span class="ck">network</span> <span class="cs">10.10.0.0/25</span>      <span class="cc">! NON e' mio. E' meta' del /24 della vittima.</span></td></tr>
+<tr><td class="ln">7</td><td class="code">  <span class="ck">exit-address-family</span></td></tr>
+</table></div>
+    </div>
+
+    <p>Ricarico la config di AS666 e riguardo dal client cosa succede a <code>10.10.0.5</code>, che sta dentro il primo <code>/25</code>.</p>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">[client AS300]</span> <span class="t-cmd">show ip bgp</span>
+<span class="t-out">   Network          Next Hop            Metric LocPrf Weight Path</span>
+<span class="t-out">*&gt; <span class="t-ok">10.10.0.0/24</span>     10.1.23.1                              0 200 100 i</span>
+<span class="t-out">*&gt; <span class="t-warn">10.10.0.0/25</span>     10.1.23.1                              0 200 666 i</span>
+<span class="t-out"></span>
+<span class="t-out"><span class="t-out">(le due rotte convivono: prefissi diversi, nessuna gara tra loro)</span></span>
+<span class="t-prompt">[transito AS200]</span> <span class="t-cmd">show ip route 10.10.0.5</span>
+<span class="t-out">Routing entry for <span class="t-warn">10.10.0.0/25</span></span>
+<span class="t-out">  Known via "bgp", distance 20, metric 0, best</span>
+<span class="t-out">  * <span class="t-warn">10.1.26.2</span>, via v26a, weight 1          <span class="t-out">(next-hop = AS666, l'attaccante)</span></span>
+<span class="t-prompt">[client AS300]</span> <span class="t-cmd">printf "" | nc -w1 10.10.0.5 80</span>
+<span class="t-out"><span class="t-warn">SERVER=ATTACKER (AS666, il ladro)</span></span>
+    </div>
+
+    <p>La rotta vera della vittima e' ancora li', nella tabella, accanto a quella dell'attaccante: prefissi diversi, non si sono fatti concorrenza. A cambiare e' il forwarding del transito, che per <code>10.10.0.5</code> ora sceglie il <code>/25</code> e manda tutto ad AS666. Nota una cosa: il <code>traceroute</code> continua a chiudersi su <code>10.10.0.5</code>, perche' l'attaccante impersona lo stesso IP. Da solo non ti direbbe niente. A svelare il dirottamento e' il banner, che adesso risponde <code>SERVER=ATTACKER</code>. Da qui l'attaccante fa quello che vuole: butta i pacchetti e la vittima sparisce, oppure risponde lui fingendosi il server, oppure li inoltra alla vittima vera restando nel mezzo. Leggerne il contenuto, pero', richiede anche di aggirare TLS, come col certificato fraudolento raccontato all'inizio. Il caso dell'inoltro silenzioso e' il piu' pericoloso, perche' il servizio continua a funzionare e nessuno si accorge di niente.</p>
+
+    <p>Rivediamolo al rallentatore, ma stavolta il router sei tu. Sei AS300, il client. Due annunci ti arrivano dal transito, tu installi entrambi, e a un certo punto devi inoltrare un pacchetto. Premi play e guarda dove finisce.</p>
+
+    <section class="hijack-timeline" aria-label="Timeline interattiva del dirottamento BGP: sei AS300">
+      <div class="timeline-head">
+        <span id="timeline-status" role="status" aria-live="polite">00s &middot; la rotta legittima e' attiva</span>
+        <button type="button" id="timeline-play">&#9654; Riproduci il dirottamento</button>
+      </div>
+
+      <div class="timeline-network">
+        <div class="tl-wire"></div>
+        <div class="tl-wire to666"></div>
+        <div class="tl-node victim">AS100<small>10.10.0.0/24</small></div>
+        <div class="tl-node transit">AS200<small>transito</small></div>
+        <div class="tl-node client">AS300<small>client, sei tu</small></div>
+        <div class="tl-node attacker">AS666<small>attaccante</small></div>
+        <div class="tl-badge">annuncia 10.10.0.0/25</div>
+        <div class="tl-packet" aria-hidden="true"></div>
+        <div class="tl-rule" aria-hidden="true"><span class="big">10.10.0.5 &isin; 10.10.0.0/25</span><br>/25 &gt; /24<br>&rarr; AS666</div>
+      </div>
+
+      <ol class="timeline-events">
+        <li data-step="0">00s &middot; la vittima annuncia il /24</li>
+        <li data-step="1">05s &middot; AS666 annuncia il /25</li>
+        <li data-step="2">10s &middot; AS200 accetta la rotta</li>
+        <li data-step="3">15s &middot; AS300 riceve entrambi i prefissi</li>
+        <li data-step="4">20s &middot; longest-prefix match: vince il /25</li>
+        <li data-step="5">30s &middot; 10.10.0.5 risponde come ATTACKER</li>
+      </ol>
+
+      <p class="tl-caption">L'IP pubblico risponde: <span class="tl-banner">SERVER=VICTIM</span></p>
+    </section>
+
+    <div class="warning-box fade-in">
+      <p>Nel 2008 Pakistan Telecom voleva bloccare YouTube solo dentro il Pakistan. Annuncio' un <code>/24</code> piu' specifico dei prefissi di YouTube per dirottare il traffico locale in un buco nero. L'annuncio non resto' locale: sfuggi' al provider a monte e si propago' al mondo. Per circa due ore, chiunque sul pianeta cercasse YouTube veniva instradato verso un router in Pakistan che buttava tutto. La stessa riga di configurazione che hai visto sopra, con un errore su chi doveva sentirla.</p>
+    </div>
+
+    <p>La iena si e' avvicinata allo schermo. "Ferma. Mi stai dicendo che il traceroute prima arrivava al server giusto e adesso arriva all'altro, e l'unica cosa che e' cambiata e' una riga in cui uno ha scritto un numero che non e' suo?"</p>
+
+    <p>"Una riga. E nessuno gliel'ha impedito, perche' nessuno controlla."</p>
+
+    <p>"E chi dovrebbe controllare?"</p>
+
+    <p>"Il vicino. AS200, il transito. Ha accettato l'annuncio di AS666 senza chiedersi se quel prefisso fosse davvero suo. La guerra vera si combatte in quel controllo che non ha fatto."</p>
+
+
+    <!-- ============================================================
+         SEZIONE 06 - CASI REALI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Non E' Teoria: I Dirottamenti Veri</h2>
+    <span class="section-number">Sezione 06. Errori, censura, furti</span>
+
+    <p>Il lab e' finto, i danni no. La stessa meccanica, applicata alla rete reale, ha una cronologia lunga e variata. Alcuni sono errori di configurazione, altri censura di stato finita fuori controllo, altri furti mirati.</p>
+
+    <div style="overflow-x: auto;">
+      <table class="strategy-table fade-in">
+        <thead>
+          <tr>
+            <th>Anno</th>
+            <th>Chi</th>
+            <th>Cosa e' successo</th>
+            <th>Tipo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2008</td>
+            <td>Pakistan Telecom</td>
+            <td>Annuncio piu' specifico dei prefissi di YouTube per censura interna, sfuggito al mondo. YouTube offline circa 2 ore globalmente</td>
+            <td style="color: var(--accent-highlight);">Errore / censura</td>
+          </tr>
+          <tr>
+            <td>2010</td>
+            <td>China Telecom</td>
+            <td>Circa 50.000 prefissi annunciati per errore, tra cui reti di governi e militari. Per 18 minuti una fetta del traffico globale passa dalla Cina</td>
+            <td style="color: var(--accent-highlight);">Route leak</td>
+          </tr>
+          <tr>
+            <td>2018</td>
+            <td>Amazon Route 53</td>
+            <td>Dirottati i prefissi dei DNS di Amazon. Traffico verso MyEtherWallet servito da un clone. Circa 150.000 dollari in ETH rubati</td>
+            <td style="color: var(--accent-attention);">Furto mirato</td>
+          </tr>
+          <tr>
+            <td>2020</td>
+            <td>Rostelecom</td>
+            <td>Oltre 8.000 prefissi tra cui Google, Amazon, Cloudflare, Facebook annunciati brevemente attraverso la rete russa</td>
+            <td style="color: var(--accent-highlight);">Route leak</td>
+          </tr>
+          <tr>
+            <td>2022</td>
+            <td>KLAYswap</td>
+            <td>Hijack dell'infrastruttura di un servizio coreano per servire JavaScript malevolo. Circa 1,9 milioni di dollari sottratti agli utenti</td>
+            <td style="color: var(--accent-attention);">Furto mirato</td>
+          </tr>
+          <tr>
+            <td>2022</td>
+            <td>Celer Bridge</td>
+            <td>Dirottati i prefissi di un bridge cripto, front-end clonato, fondi sottratti. Origine falsificata per passare inosservati</td>
+            <td style="color: var(--accent-attention);">Furto mirato</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Due pattern ricorrono. Gli errori di configurazione, i route leak, fanno danni enormi ma involontari: qualcuno ridistribuisce piu' di quello che dovrebbe e il traffico del mondo cambia strada per minuti. I furti mirati sono chirurgici: pochi prefissi, il tempo di ottenere un certificato o servire uno script, poi via. Se in questa lista il cripto pesa tanto, e' una questione di cronometro. Un dirottamento dura minuti e lascia tracce nei monitor globali, quindi rende solo se il bottino e' immediato e irreversibile. Una transazione su blockchain e' questo.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 07 - LA DIFESA: RPKI
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Difesa: Firmare Chi Possiede Cosa</h2>
+    <span class="section-number">Sezione 07. RPKI e la validazione dell'origine</span>
+
+    <p>"E allora la soluzione qual e'? Un registro firmato di chi possiede cosa, come dicevi tu?"</p>
+
+    <p>"Esatto, e esiste. Si chiama RPKI. Nel suo sistema, chi possiede gli indirizzi firma, tramite la delega che il Regional Internet Registry gli ha dato, una dichiarazione: 'il prefisso <code>10.10.0.0/24</code> puo' essere annunciato solo dall'AS100, e solo fino a lunghezza <code>/24</code>'. Il RIR e' la radice della catena di fiducia, non firma ogni singola dichiarazione. Quella dichiarazione firmata si chiama ROA, Route Origin Authorization."</p>
+
+    <p>Il router confronta ogni annuncio con le ROA e ne ricava un verdetto (RFC 6811): <strong>valid</strong> se origine e lunghezza combaciano, <strong>invalid</strong> se qualcuno annuncia un prefisso che non gli spetta o piu' specifico del consentito, <strong>not-found</strong> se non esiste ancora una ROA. Attento pero': RPKI <em>marca</em>, non butta. Cosa fare di un annuncio <em>invalid</em> resta una scelta di policy dell'operatore. La scelta sana, che ormai fanno in molti, e' scartarlo."</p>
+
+    <p>Nel lab la ROA della vittima direbbe <code>10.10.0.0/24, origine AS100, maxLength /24</code>, e AS200 e' configurato per scartare gli <em>invalid</em>. Per farlo girare senza tirare su un intero validatore RTR, esprimo quella stessa decisione con un filtro esplicito in ingresso da AS666: nega ogni piu'-specifico del <code>/24</code> della vittima. E' un'approssimazione della policy di scarto basata su ROV: il verdetto <em>invalid</em> sarebbe automatico, lo scarto va comunque configurato.</p>
+
+    <div class="code-block fade-in" data-lang="frr">
+<div class="code-wrap"><table>
+<tr><td class="ln">1</td><td class="code"><span class="cc">! AS200 - scarta i piu'-specifici non autorizzati del /24 della vittima</span></td></tr>
+<tr><td class="ln">2</td><td class="code"><span class="ck">ip prefix-list</span> HIJACK seq 5 permit <span class="cs">10.10.0.0/24</span> ge <span class="cn">25</span> le <span class="cn">32</span></td></tr>
+<tr><td class="ln">3</td><td class="code"><span class="ck">route-map</span> FROM666 <span class="ck">deny</span> 5</td></tr>
+<tr><td class="ln">4</td><td class="code">  <span class="ck">match</span> ip address prefix-list HIJACK</td></tr>
+<tr><td class="ln">5</td><td class="code"><span class="ck">route-map</span> FROM666 <span class="ck">permit</span> 10</td></tr>
+<tr><td class="ln">6</td><td class="code"><span class="ck">router bgp</span> <span class="cn">200</span></td></tr>
+<tr><td class="ln">7</td><td class="code">  <span class="ck">neighbor</span> 10.1.26.2 route-map FROM666 <span class="ck">in</span></td></tr>
+</table></div>
+    </div>
+
+    <div class="terminal-output fade-in">
+<span class="t-prompt">[transito AS200]</span> <span class="t-cmd">show ip route 10.10.0.5</span>
+<span class="t-out">Routing entry for <span class="t-ok">10.10.0.0/24</span></span>
+<span class="t-out">  Known via "bgp", distance 20, metric 0, best</span>
+<span class="t-out">  * <span class="t-ok">10.1.12.1</span>, via v12b, weight 1          <span class="t-out">(next-hop di nuovo AS100)</span></span>
+<span class="t-prompt">[client AS300]</span> <span class="t-cmd">printf "" | nc -w1 10.10.0.5 80</span>
+<span class="t-out"><span class="t-ok">SERVER=VICTIM  (AS100, quello vero)</span></span>
+    </div>
+
+    <p>Il <code>/25</code> dell'attaccante non entra piu' nella tabella di AS200: il transito torna a preferire il <code>/24</code> della vittima, e sull'IP pubblico risponde di nuovo il server vero. La stessa riga che prima rubava tutto adesso non supera il primo vicino. In produzione il verdetto <em>invalid</em> arriva dalla ROA firmata invece che da un filtro scritto a mano, ma la decisione finale, buttare, resta la stessa.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">ROA firmata</div>
+        <div class="step-detail">Il titolare firma (via delega RPKI): prefisso -> ASN origine + lunghezza massima</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">Validator</div>
+        <div class="step-detail">Scarica e verifica le ROA, e ne ricava una cache di VRP (prefisso, origine, max)</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">ROV</div>
+        <div class="step-detail">Il router riceve la cache VRP e confronta ogni annuncio: valid, invalid, not-found</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Policy</div>
+        <div class="step-detail">L'operatore puo' scartare gli invalid: pratica sempre piu' diffusa, e il hijack non si propaga</div>
+      </div>
+    </div>
+
+    <p>Grandi reti lo fanno gia'. Cloudflare, Google, Amazon scartano le rotte invalid. Oltre meta' dei prefissi globali oggi ha una ROA. La direzione e' giusta, e negli ultimi anni l'adozione e' cresciuta parecchio.</p>
+
+
+    <!-- ============================================================
+         SEZIONE 08 - I LIMITI DI RPKI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' Non Basta</h2>
+    <span class="section-number">Sezione 08. RPKI firma l'origine, non la strada</span>
+
+    <p>"Quindi problema risolto. Basta che tutti firmino."</p>
+
+    <p>"Meta' problema. RPKI verifica una cosa sola: chi e' l'AS di origine, l'ultimo della catena. Non verifica la catena in mezzo. E questo lascia aperta una porta grande."</p>
+
+    <p>Torniamo alla seconda leva, il same-prefix hijack. L'attaccante non annuncia AS666 come origine. Falsifica il percorso e ci mette in fondo <strong>l'AS100 vero della vittima</strong>. L'annuncio diventa 'il prefisso <code>10.10.0.0/24</code>, origine AS100, e per arrivarci passate da me'. Per RPKI e' <em>valid</em>: origine giusta, lunghezza giusta. La firma controlla l'ultimo anello, e l'ultimo anello e' quello vero. Il fatto che l'attaccante si sia infilato nel mezzo, RPKI non lo vede.</p>
+
+    <div class="arch-diagram fade-in"><span class="a-label"># Forged-origin hijack: passa la validazione RPKI</span>
+
+annuncio dell'attaccante:  <span class="a-attacker">10.10.0.0/24</span>  AS_PATH: [<span class="a-attacker">666</span> <span class="a-victim">100</span>]
+                                            |    |
+                                     l'attaccante  l'origine e' quella VERA
+                                     si mette in    -> ROA valida -> accettato
+                                     mezzo
+
+RPKI controlla solo <span class="a-victim">l'ultimo AS</span> del percorso. Il resto e' fiducia.</div>
+
+    <p>Chiudere anche questa porta richiederebbe di firmare l'intero percorso, non solo l'origine. Esiste, si chiama BGPsec, e ogni router lungo la strada dovrebbe firmare il passaggio. Il problema e' pratico: serve capacita' di calcolo su ogni router, le garanzie complete richiedono adozione lungo tutto il percorso e con adozione parziale restano buchi di fiducia, e nessuno vuole rifare il parco macchine. Il risultato e' che l'adozione e' vicina allo zero. Sta emergendo un compromesso, ASPA, che valida i rapporti tra AS vicini senza firmare ogni salto, ma e' ancora agli inizi.</p>
+
+    <div class="two-panel fade-in">
+      <div class="panel-side panel-left">
+        <div class="panel-side-title">RPKI ferma</div>
+        <p>Sub-prefix hijack (il /25 non autorizzato)</p>
+        <p>Origine sbagliata dichiarata apertamente</p>
+        <p>Route leak accidentali con origine errata</p>
+        <p>Distribuito, in crescita, gia' attivo sui grandi</p>
+      </div>
+      <div class="panel-side panel-right">
+        <div class="panel-side-title">RPKI non ferma</div>
+        <p>Forged-origin: l'attaccante mette l'origine vera in fondo</p>
+        <p>Manipolazione del percorso a monte dell'origine</p>
+        <p>Intercettazione con reinoltro alla vittima</p>
+        <p>Serve firmare la strada, non solo chi la abita</p>
+      </div>
+    </div>
+
+    <div class="insight-box fade-in">
+      <p>RPKI e' la serratura che tutti stanno finalmente montando alla porta. Ferma il ladro che urla 'la casa e' mia'. Non ferma quello che dice 'la casa e' sua, ma il vialetto per arrivarci passa dal mio giardino, fidatevi'. Per quella bugia, per adesso, la difesa vera resta la stessa di sempre: monitorare le tabelle di routing globali e accorgersi in fretta quando una rotta cambia strada senza motivo.</p>
+    </div>
+
+
+    <!-- ============================================================
+         SEZIONE 09 - CONCLUSIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Dubbio Dell'Apiario</h2>
+    <span class="section-number">Sezione 09. Epilogo</span>
+
+    <p>La iena guarda lo schermo con il traceroute che, riga di configurazione dopo riga di configurazione, arriva prima al server giusto, poi al ladro, poi di nuovo al server giusto quando accendo la firma.</p>
+
+    <p>"Quindi il tizio del portafoglio. Il lucchetto era vero."</p>
+
+    <p>"Verissimo. Certificava che stava parlando in modo cifrato con chi aveva dimostrato di controllare il dominio. E in quei minuti chi controllava il dominio, agli occhi del mondo, era l'attaccante. La crittografia ha fatto il suo mestiere alla perfezione. Ha solo protetto la conversazione sbagliata."</p>
+
+    <p>"E la difesa e' firmare chi possiede gli indirizzi."</p>
+
+    <p>"Firmare l'origine, si'. E' il pezzo che stiamo mettendo a posto adesso, dopo trent'anni. Il pezzo del percorso e' ancora scoperto. Internet regge su un protocollo che si fida, e lo stiamo blindando un anello alla volta mentre continua a girare."</p>
+
+    <p>Si alza, riprende la giacca che sa ancora di arnie. "Andre, e poi sarei io quella che non si aggiorna. Domani metto in fila i miei di annunci."</p>
+
+    <p>"Tu non hai un AS."</p>
+
+    <p>"Non ancora."</p>
+
+    <div class="conclusion-box fade-in">
+      <p class="quote">
+        Internet, quando non verifica chi possiede cosa,<br>
+        sa solo chi ha urlato piu' specifico.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem;">
+        Lab: <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/la-rotta-rubata" target="_blank" rel="noopener" style="color: var(--accent-highlight);">scripts/la-rotta-rubata</a>. Script di setup dei namespace, config FRR dei quattro AS, il modello Python della decisione. Zero dipendenze oltre a FRR, tutto in una VM Linux.
+      </p>
+    </div>
+
+  </article>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate &copy; 2026. Contenuti originali di Pinperepette.</p>
+  </footer>
+
+  <script>
+  (function () {
+    var sec = document.querySelector('.hijack-timeline');
+    if (!sec) return;
+    var btn = sec.querySelector('#timeline-play');
+    var statusEl = sec.querySelector('#timeline-status');
+    var packet = sec.querySelector('.tl-packet');
+    var rule = sec.querySelector('.tl-rule');
+    var badge = sec.querySelector('.tl-badge');
+    var nVictim = sec.querySelector('.tl-node.victim');
+    var nTransit = sec.querySelector('.tl-node.transit');
+    var nClient = sec.querySelector('.tl-node.client');
+    var nAttacker = sec.querySelector('.tl-node.attacker');
+    var events = Array.prototype.slice.call(sec.querySelectorAll('.timeline-events li'));
+    var banner = sec.querySelector('.tl-banner');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var timers = [];
+
+    function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+    function reset() {
+      clearTimers();
+      statusEl.className = '';
+      statusEl.innerHTML = "00s &middot; la rotta legittima e' attiva";
+      packet.className = 'tl-packet';
+      packet.style.left = '86%';
+      packet.style.top = '40px';
+      rule.className = 'tl-rule';
+      badge.className = 'tl-badge';
+      [nVictim, nTransit, nClient, nAttacker].forEach(function (n) { n.classList.remove('on'); });
+      events.forEach(function (e) { e.className = ''; });
+      banner.textContent = 'SERVER=VICTIM';
+      banner.style.color = 'var(--accent-attention)';
+    }
+
+    var steps = [
+      function () { nVictim.classList.add('on'); events[0].classList.add('active'); statusEl.innerHTML = '00s &middot; AS100 annuncia <b>10.10.0.0/24</b>'; },
+      function () { nAttacker.classList.add('on'); badge.classList.add('show'); events[1].classList.add('active'); statusEl.innerHTML = '05s &middot; AS666 annuncia <b>10.10.0.0/25</b>'; },
+      function () { nTransit.classList.add('on'); events[2].classList.add('active'); statusEl.innerHTML = '10s &middot; AS200 accetta e propaga'; },
+      function () { nClient.classList.add('on'); events[3].classList.add('active'); packet.style.left = '50%'; statusEl.innerHTML = '15s &middot; AS300 ha entrambe le rotte'; },
+      function () { rule.classList.add('flash'); events[4].classList.add('active'); events[4].classList.add('bad'); statusEl.innerHTML = '20s &middot; longest-prefix match: vince il <b>/25</b>'; timers.push(setTimeout(function () { rule.classList.remove('flash'); }, 1300)); },
+      function () { packet.classList.add('bad'); packet.style.top = '120px'; events[5].classList.add('active'); events[5].classList.add('bad'); statusEl.className = 'hijacked'; statusEl.innerHTML = '30s &middot; 10.10.0.5 risponde come <b>ATTACKER</b>'; banner.textContent = 'SERVER=ATTACKER'; banner.style.color = 'var(--accent-reaction)'; }
+    ];
+
+    function play() {
+      reset();
+      btn.disabled = true;
+      if (reduce) {
+        steps.forEach(function (fn) { fn(); });
+        rule.classList.add('flash');
+        btn.disabled = false;
+        btn.innerHTML = '&#9654; Rivedi';
+        return;
+      }
+      var delays = [150, 1300, 2500, 3700, 4900, 6300];
+      steps.forEach(function (fn, i) { timers.push(setTimeout(fn, delays[i])); });
+      timers.push(setTimeout(function () { btn.disabled = false; btn.innerHTML = '&#9654; Rivedi il dirottamento'; }, 7200));
+    }
+
+    btn.addEventListener('click', play);
+    reset();
+  })();
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

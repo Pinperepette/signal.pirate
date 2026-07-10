@@ -83,6 +83,33 @@
 
     <div class="articles-grid">
 
+      <!-- Article Card: La Rotta Rubata -->
+      <a href="articoli/la-rotta-rubata.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-07-10</div>
+        <h3 class="article-card-title">La Rotta Rubata</h3>
+        <p class="article-card-abstract">
+          Internet non e' una rete, sono settantacinquemila reti separate che si parlano
+          con un protocollo, BGP, che si fida di chiunque annunci una rotta. Nessuno
+          verifica che un prefisso sia davvero tuo: se lo annunci piu' specifico, il
+          traffico cambia strada. Lo smonto in un lab riproducibile, quattro AS come
+          network namespace con bgpd di FRR, dove un attaccante annuncia meta' del blocco
+          della vittima e un banner sull'IP pubblico rivela chi risponde davvero, VICTIM
+          o ATTACKER. Prima pero' la distinzione che quasi tutti sbagliano: il /24 e il
+          /25 non si fanno concorrenza, convivono, ed e' il piano di inoltro a scegliere
+          il piu' specifico. Con una timeline interattiva in cui il router sei tu (sei
+          AS300), i casi reali dal dirottamento di YouTube nel 2008 al furto da
+          MyEtherWallet nel 2018, e la difesa: RPKI firma chi possiede cosa, ma marca
+          l'origine, non la strada, e il forged-origin le passa davanti. Il lucchetto
+          verde puo' essere vero e mentire lo stesso.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">BGP Hijack</span>
+          <span class="tag tag-highlight">Routing</span>
+          <span class="tag tag-reaction">RPKI</span>
+          <span class="tag tag-amplification">FRR</span>
+        </div>
+      </a>
+
       <!-- Article Card: Il Telefono Non Deve Sapere -->
       <a href="articoli/il-telefono-non-deve-sapere.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-07-09</div>
