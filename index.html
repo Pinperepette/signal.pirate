@@ -83,6 +83,33 @@
 
     <div class="articles-grid">
 
+      <!-- Article Card: Il Pixel Che Da' Ordini -->
+      <a href="articoli/il-pixel-che-da-ordini.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-07-13</div>
+        <h3 class="article-card-title">Il Pixel Che Da' Ordini</h3>
+        <p class="article-card-abstract">
+          GhostCommit nasconde una prompt injection nel testo renderizzato di un PNG:
+          invisibile al revisore umano che vede un blob binario, leggibile dall'agente AI
+          con vision. Il vettore e' una pull request che aggiunge un'immagine e un
+          AGENTS.md che vi rimanda; il giorno dopo un agente, chiamato per una feature
+          banale, apre l'immagine e ubbidisce all'ordine mimetizzato: leggi il .env byte
+          per byte, emettilo come tupla di interi in un commit "di feature". Nessun
+          exploit, solo testo e obbedienza; i secret scanner cercano AKIA..., non
+          (65, 75, 73, ...). Lo smonto in un lab riproducibile, dal PNG-payload alla
+          ricostruzione del .env dai commit pubblici, con una PR interattiva che mostra
+          l'immagine come la vede l'agente. Ma la scoperta che conta e' un'altra: Cursor
+          e Antigravity cadono su Sonnet, Gemini e GPT-5.5, mentre Claude Code rifiuta.
+          L'ho riprodotto: un agente pulito, lo stesso vettore, e il rifiuto esplicito.
+          Non e' il modello, e' il guscio.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-reaction">Prompt Injection</span>
+          <span class="tag tag-highlight">AI Agents</span>
+          <span class="tag tag-attention">GhostCommit</span>
+          <span class="tag tag-amplification">Supply Chain</span>
+        </div>
+      </a>
+
       <!-- Article Card: La Rotta Rubata -->
       <a href="articoli/la-rotta-rubata.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-07-10</div>
