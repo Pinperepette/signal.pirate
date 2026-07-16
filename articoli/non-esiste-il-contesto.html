@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Non Esiste Il Contesto | Signal Pirate</title>
+  <meta name="description" content="Un agente che risolve un task e' una funzione. Due contesti che gli fanno dare la stessa risposta sono, per quel task, lo stesso contesto. Da questa banalita' esce context-kernel: un plugin per Claude Code che proietta il repository sul minimo indispensabile e misura di averlo fatto senza rompere la risposta. Deterministico, stdlib, zero chiavi API. pip3 list da 14.900 a 995 token (-93%), pandas -96%, lodash 30 file su 1048, e un canary che si e' morso la coda e ha trovato tre bug veri.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Section Number === */
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+
+    /* === Stats Row === */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.8rem;
+    }
+    .stat-number.green { color: var(--accent-attention); }
+    .stat-number.red { color: var(--accent-reaction); }
+    .stat-number.cyan { color: var(--accent-amplification); }
+    .stat-number.orange { color: var(--accent-rejection); }
+    .stat-number.purple { color: var(--accent-highlight); }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Formula Box (KaTeX) === */
+    .formula-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.08), rgba(0,255,136,0.05));
+      border: 1px solid rgba(124,77,255,0.2);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .formula-box .formula-text {
+      font-size: 1rem;
+      text-align: center;
+    }
+    .formula-box .formula-label {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    /* === Operator Table === */
+    .op-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .op-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .op-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+      vertical-align: top;
+    }
+    .op-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .op-table code { font-size: 0.8rem; }
+
+    /* === Tool Output === */
+    .tool-out {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1.1rem 1.3rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.65;
+      color: #c8c8d8;
+      white-space: pre;
+    }
+    .tool-out .dim { color: #6a6a7a; }
+    .tool-out .keep { color: var(--accent-attention); }
+    .tool-out .foot { color: var(--accent-highlight); }
+
+    /* === Pipeline Figure === */
+    .pipeline {
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pipe-task {
+      background: var(--bg-tertiary);
+      border: 1px dashed var(--accent-amplification);
+      border-radius: 10px;
+      padding: 0.8rem 1.1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      text-align: center;
+      max-width: 560px;
+    }
+    .pipe-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 0.7rem 1.1rem;
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .pipe-step .pipe-op { font-weight: 700; font-size: 0.9rem; }
+    .pipe-step .pipe-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+    .pipe-arrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-attention);
+      padding: 0.35rem 0;
+      text-align: center;
+    }
+    .pipe-step.pipe-pass {
+      border-color: var(--accent-attention);
+      background: linear-gradient(135deg, rgba(0,255,136,0.12), rgba(0,255,136,0.03));
+    }
+    .pipe-step.pipe-pass .pipe-num { color: var(--accent-attention); font-weight: 700; }
+
+    /* === Abstract === */
+    .abstract {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-attention);
+      border-radius: 0 10px 10px 0;
+      padding: 1.3rem 1.5rem;
+      margin: 0 0 2.5rem;
+    }
+    .abstract-h {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+      margin: 0 0 0.8rem;
+    }
+    .abstract p { margin: 0.55rem 0; line-height: 1.55; font-size: 0.95rem; }
+
+    /* === Kicker === */
+    .article-kicker {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      max-width: 640px;
+      margin: 1rem auto 0;
+      line-height: 1.45;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/non-esiste-il-contesto.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Non Esiste Il Contesto">
+  <meta property="og:description" content="Un agente che risolve un task e&#x27; una funzione. Due contesti che gli fanno dare la stessa risposta sono, per quel task, lo stesso contesto. Da questa banalita&#x27; esce context-kernel: un plugin per Claude Code che proietta il repository sul minimo indispensabile e misura di averlo fatto senza rompere la risposta. Deterministico, stdlib, zero chiavi API. pip3 list da 14.900 a 995 token (-93%), pandas -96%, lodash 30 file su 1048, e un canary che si e&#x27; morso la coda e ha trovato tre bug veri.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/non-esiste-il-contesto.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-07-16">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Non Esiste Il Contesto">
+  <meta name="twitter:description" content="Un agente che risolve un task e&#x27; una funzione. Due contesti che gli fanno dare la stessa risposta sono, per quel task, lo stesso contesto. Da questa banalita&#x27; esce context-kernel: un plugin per Claude Code che proietta il repository sul minimo indispensabile e misura di averlo fatto senza rompere la risposta. Deterministico, stdlib, zero chiavi API. pip3 list da 14.900 a 995 token (-93%), pandas -96%, lodash 30 file su 1048, e un canary che si e&#x27; morso la coda e ha trovato tre bug veri.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Non Esiste Il Contesto","description":"Un agente che risolve un task e' una funzione. Due contesti che gli fanno dare la stessa risposta sono, per quel task, lo stesso contesto. Da questa banalita' esce context-kernel: un plugin per Claude Code che proietta il repository sul minimo indispensabile e misura di averlo fatto senza rompere la risposta. Deterministico, stdlib, zero chiavi API. pip3 list da 14.900 a 995 token (-93%), pandas -96%, lodash 30 file su 1048, e un canary che si e' morso la coda e ha trovato tre bug veri.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-07-16","dateModified":"2026-07-16","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/non-esiste-il-contesto.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-07-16 | Pinperepette</p>
+    <h1 class="article-page-title">Non Esiste <span class="accent">Il Contesto</span></h1>
+    <p class="article-kicker">Una teoria task-indotta del context engineering: perche' il contesto e' una proprieta' del task, non dell'input.</p>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+      Un agente che risolve un task e' una funzione. Due contesti che gli fanno dare la stessa risposta sono, per quel task, lo stesso contesto. Da questa banalita' esce un plugin che proietta il repository sul minimo indispensabile, e misura di averlo fatto senza rompere la risposta.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Agenti AI</span>
+      <span class="tag tag-highlight">Contesto</span>
+      <span class="tag tag-reaction">Matematica</span>
+      <span class="tag tag-amplification">Claude Code</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <div class="abstract fade-in">
+      <p class="abstract-h">In breve, senza formule</p>
+      <p>Lavori con un agente su un repository vero e ti accorgi che il contesto che serve davvero e' una briciola. Tutto il resto e' rumore, e lo paghi due volte, in token e nell'attenzione del modello. Poi noti una cosa che sembra ovvia solo dopo averla vista: due contesti che portano l'agente alla stessa risposta, per quel task, sono lo stesso contesto. Quindi il contesto non e' assoluto, e uno piu' piccolo esiste.</p>
+      <p>Ho scritto il codice che se ne approfitta. Si chiama context-kernel, e' un plugin per Claude Code, proietta il repository sul minimo che serve al task e poi controlla di non aver spostato la risposta. Su una sessione reale sono 79% di token in meno, fino al 97% in meno sui file, e su sessanta bug veri il taglio non ha mai buttato via cio' che serviva a risolverli.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 00 - L'OSSERVAZIONE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Due Contesti Diversi, Stessa Risposta</h2>
+    <span class="section-number">Sezione 00. L'articolo determinativo che nessuno guarda</span>
+
+    <p>Qualche settimana fa ho misurato una cosa spiacevole: quando lavori con un agente su un repository vero, la parte utile del contesto e' una briciola. Il resto e' l'harness che si racconta addosso, file riletti identici, output di comandi lunghi come romanzi. In <a href="sei-lo-zero-virgola-uno.html">Sei lo 0,1%</a> ho messo i numeri sotto la lamentela. Bene. Questo e' il pezzo in cui smetto di lamentarmi e costruisco il pezzo di codice che rimette a posto la faccenda. Ma la parte che mi interessa non e' l'ottimizzazione, e' l'osservazione da cui esce. Parte da un articolo determinativo che nessuno guarda: <em>il</em> contesto.</p>
+
+    <p>La molla, per onesta', non e' stata il codice. E' stato un libro: <em>Spectral Theory and Quantum Mechanics</em> di Valter Moretti (Springer), un mattone sulla teoria degli operatori negli spazi di Hilbert, roba di meccanica quantistica che con gli agenti non c'entra niente. Leggendo di proiettori, kernel e decomposizioni spettrali mi e' venuta in mente la cosa che sto per raccontarti: e' lo stesso vocabolario che serve a dire cosa un agente puo' buttare via senza cambiare risposta. Metto le mani avanti subito, prima di riempire l'articolo di formule. Prendo in prestito le parole, proiezione, kernel, classe di equivalenza, non pretendo che qui viva un isomorfismo con quella matematica. E' un'analogia, la uso con cautela: serve a pensare la cosa giusta, non a fare le pulci a un teorema.</p>
+
+    <p>Prendi un agente che risolve un task. Chiamalo <span class="katex-inline">\( Q \)</span>. Dagli in pasto un contesto, cioe' il repository, la conversazione, gli output dei tool, e lui produce una risposta. Questa e' una funzione, niente di piu':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$A_Q : X \longrightarrow Y$$</div>
+      <p class="formula-label">La mappa risposta. X = spazio dei contesti possibili, Y = spazio delle risposte, Q = il task</p>
+    </div>
+
+    <p>Adesso la mossa. Una funzione manda robe diverse sullo stesso valore in continuazione. Due contesti diversi possono darti la stessa identica risposta per quel task. E se ti danno la stessa risposta, per <span class="katex-inline">\( Q \)</span> sono la stessa cosa. Questa e' una relazione di equivalenza, la scrivi cosi':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$x \sim_Q x' \iff A_Q(x) = A_Q(x')$$</div>
+      <p class="formula-label">Due contesti sono equivalenti sotto Q quando producono la stessa risposta</p>
+    </div>
+
+    <p>Da qui esce la frase che regge tutto l'articolo, e il plugin: <strong>non esiste "il" contesto. Il contesto non e' una cosa che l'agente riceve, e' una cosa che il task ritaglia.</strong> Esistono infinite rappresentazioni equivalenti sotto il task, una classe intera, <span class="katex-inline">\( [x]_Q \)</span>. L'agente non ha bisogno del documento. Ha bisogno di <em>un</em> rappresentante qualsiasi della classe. Se sai scegliere un rappresentante piccolo, hai vinto senza aver toccato la risposta. Non stai buttando via informazione, stai scegliendo un altro elemento della stessa classe. Questa mossa ha un nome preciso, ed e' astrazione, non compressione.</p>
+
+    <div class="insight-box fade-in">
+      <p>La distinzione con la compressione non e' un cavillo, e' il cuore della cosa. <code>gzip</code> ti rende il testo piu' piccolo e illeggibile: butta via i bit e per rileggerli devi decomprimere. Qui non butti via niente, scegli un altro elemento della stessa classe di equivalenza, quello piu' piccolo. E' la stessa mossa che sta sotto l'abstract interpretation, la minimizzazione degli automi, le ottimizzazioni dei compilatori: tieni solo cio' che distingue i comportamenti che ti interessano, il resto collassa. L'output resta codice, resta leggibile, resta sufficiente. Dove si puo' per costruzione, dove non si puo' per misura.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 01 - IL PROJECTOR
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Projector, E Cosa Butta Via</h2>
+    <span class="section-number">Sezione 01. Idempotente e answer-preserving</span>
+
+    <p>Scegliere un rappresentante piccolo e' applicare una mappa. La chiamo projector indotto dal task, <span class="katex-inline">\( \pi_Q \)</span>, e le chiedo due sole proprieta':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\pi_Q(\pi_Q(x)) = \pi_Q(x) \qquad\qquad A_Q(\pi_Q(x)) = A_Q(x)$$</div>
+      <p class="formula-label">Idempotente (normalizzare due volte non cambia niente) e answer-preserving (la risposta resta quella)</p>
+    </div>
+
+    <p>Il pedice <span class="katex-inline">\( Q \)</span> non e' decorazione. Cambia la domanda e cambia cosa puoi buttare via. Quello che e' invisibile a "sistema questo KeyError" puo' essere l'unica cosa che conta per "controlla le intestazioni di licenza". Un projector senza indice del task o e' banale o e' sbagliato. Il projector non fa altro che applicare trasformazioni che stanno nel kernel del task:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\ker Q = \{\, T : A_Q(T(x)) = A_Q(x)\ \ \forall x \,\}$$</div>
+      <p class="formula-label">Il kernel del task: le trasformazioni T del contesto che non muovono mai la risposta, qualunque sia il punto di partenza</p>
+    </div>
+
+    <p>Ho scritto <span class="katex-inline">\( T \)</span> e non "<span class="katex-inline">\( x + \delta \)</span>" apposta. Sommare due repository non vuol dire niente, non esiste un piu' tra due codebase. Una trasformazione si': tagliare un file, deduplicare un log, buttare una pagina di documentazione. Una <span class="katex-inline">\( T \)</span> sta nel kernel del task quando, applicata a qualunque contesto, non sposta mai la risposta. Il kernel e' l'insieme di queste mosse gratis. Le millequattrocento pagine di documentazione di pandas che un errore su una <code>merge</code> non guardera' mai. I ventitre installer nella cartella Download quando il task e' rinominare le bollette. Applichi le trasformazioni del kernel, tieni il resto, la risposta non si accorge di niente.</p>
+
+    <!-- ============================================================
+         SEZIONE 02 - DUE KERNEL
+         ============================================================ -->
+    <h2><span class="accent">//</span> Due Kernel Di Natura Diversa</h2>
+    <span class="section-number">Sezione 02. Sintattico e semantico</span>
+
+    <p>Il kernel si spezza in due pezzi, e la forma del plugin viene tutta da questa spaccatura. C'e' la roba invisibile a <em>ogni</em> task, e la roba invisibile solo a <em>questo</em> task.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\ker_{\mathrm{syn}} = \bigcap_{Q} \ker Q \;\subseteq\; \ker Q$$</div>
+      <p class="formula-label">Il kernel sintattico e' l'intersezione su tutti i task: sta dentro il kernel di qualunque Q</p>
+    </div>
+
+    <p>Il <strong>kernel sintattico</strong> non dipende dalla domanda. Sono i codici ANSI di colore, le barre di avanzamento che si ridisegnano venti volte, le righe duplicate consecutive, un file riletto identico a quello che hai gia' in contesto. Roba che nessun task guardera' mai. Poiche' non serve sapere cosa stai facendo per sbatterla fuori, la togli in modo ambientale, con un hook che gira sempre e non chiede niente a nessuno.</p>
+
+    <p>Il <strong>kernel semantico</strong> e' invisibile solo a questo task. Le millequattrocento pagine di pandas per il KeyError. Qui devi sapere qual e' <span class="katex-inline">\( Q \)</span>, e infatti questa e' la parte difficile. Il primo pezzo lo togli gratis e ovunque. Il secondo lo togli quando c'e' un sintomo che ti dice quale task stai risolvendo: uno stack trace, un messaggio d'errore, dei file indiziati. Non c'e' un caso in cui questa distinzione non decida l'architettura. Chi mescola i due finisce per tagliare il codice sorgente prima di aver capito cosa serve, e a quel punto ha rotto la risposta senza accorgersene.</p>
+
+    <!-- ============================================================
+         SEZIONE 03 - I QUATTRO OPERATORI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Il Task State, In Quattro Operatori</h2>
+    <span class="section-number">Sezione 03. T1 ambientale, T2-T4 indotti dal sintomo</span>
+
+    <p>Definisci lo stato del task come il rappresentante canonico piccolo, quello su cui l'agente lavora davvero:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\mathrm{TS}(Q) := \pi_Q(C)$$</div>
+      <p class="formula-label">Il task state. C = il contesto pieno (repo + dialogo), TS(Q) = quello che l'agente vede davvero</p>
+    </div>
+
+    <p>L'agente non lavora mai sul repository. Lavora sul task state. Il projector <span class="katex-inline">\( \pi_Q \)</span> lo fabbrico passando per quattro operatori, ognuno con un mestiere preciso. Il primo agisce sul dialogo, gli altri tre sul codice, e agiscono su fattori diversi del contesto: per questo commutano e l'ordine non fa danni.</p>
+
+    <table class="op-table">
+      <thead>
+        <tr><th>Operatore</th><th>Cosa fa</th><th>Come lo fa</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>T1</strong> normalizza<br><code>compress.py</code></td>
+          <td>Ripulisce gli output dei tool (Bash, Grep, Read) mantenendo il segnale. Ambientale, gira sempre.</td>
+          <td>Dedup, taglio dei codici ANSI e delle barre di avanzamento, elisione testa piu' segnale piu' coda. Su una rilettura identica collassa a un marcatore di tre righe; su un file cambiato ti da' il diff contro la copia gia' in contesto.</td>
+        </tr>
+        <tr>
+          <td><strong>T2</strong> repo slice<br><code>kernel-scout</code></td>
+          <td>Proietta l'intero repository sul working set rilevante per il sintomo. Indotto dal task.</td>
+          <td>Slicer deterministico sul grafo degli import, con budget in token e discesa a livello di simbolo quando il file da solo e' troppo grosso. Ordina seed, dipendenze, importatori, test correlati.</td>
+        </tr>
+        <tr>
+          <td><strong>T3</strong> carta del task<br><code>kernel-extractor</code></td>
+          <td>Estrae i vincoli che il fix deve rispettare, ognuno con citazione <code>file:riga</code>.</td>
+          <td>Converte la massa di codice in proposizioni verificabili: contratti, invarianti, comportamenti presi dai test. Non "leggi tutto", ma "questi dieci vincoli, e da dove vengono".</td>
+        </tr>
+        <tr>
+          <td><strong>T4</strong> verifica<br><code>kernel-verifier</code></td>
+          <td>Giudica il fix contro la carta, vincolo per vincolo. E giudica l'invarianza della risposta.</td>
+          <td>In sessione, zero chiamate API: la verifica di <span class="katex-inline">\( A(x) = A(\pi(x)) \)</span> usa l'abbonamento che gia' paghi, non una chiave nascosta.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>T1 e' un hook PostToolUse: intercetta l'output di un comando dopo che e' stato eseguito e prima che arrivi al modello. Ecco cosa vede l'agente quando lancio un <code>pip3 list</code> su una macchina piena:</p>
+
+    <div class="tool-out"><span class="dim">absl-py                      2.1.0</span>
+<span class="dim">aiohttp                      3.9.5</span>
+<span class="dim">... 1047 righe come queste, ordinate, tutte uguali nella forma ...</span>
+<span class="keep">tensorflow                   2.16.1   # riga tenuta: pacchetto citato nel task</span>
+<span class="dim">urllib3                      2.2.1</span>
+<span class="foot">[context-kernel: 14900 -> 995 token, -93%]</span></div>
+
+    <p>Millecinquantatre righe reali diventano novecentonovantacinque token. Il footer non e' cosmetico, e' un contratto: ti dice esattamente quanto e' stato tolto, cosi' sai che e' successo e quanto. Su una sessione vera, misurata dal contatore che scrive un log a parte, il risparmio complessivo si e' assestato intorno al <strong>meno settantanove per cento</strong> di token, con il segnale intatto.</p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number green">-93%</div>
+        <div class="stat-label">pip3 list<br>14.900 -> 995 token</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">-96%</div>
+        <div class="stat-label">pandas<br>sotto il pavimento a file</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">30 / 1048</div>
+        <div class="stat-label">lodash<br>file nel working set</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">46x</div>
+        <div class="stat-label">slice ripetuto<br>piu' veloce (cache)</div>
+      </div>
+    </div>
+
+    <p>T2 e' quello che mi ha insegnato di piu'. Misurare il budget in file nasconde un muro: certi file sono monoliti da migliaia di righe, e un working set di "tre file" puo' essere piu' pesante di trenta. Misurato in <em>token</em>, il muro si vede. Li' ho smesso di contare i file e ho iniziato a contare i token. La risposta e' scendere sotto il file, al singolo simbolo. Su pandas questo porta il task state al <strong>meno novantasei per cento</strong> sotto il pavimento che avresti tagliando a livello di file. Su lodash, un vero stack trace di <code>node</code> su millequarantotto file diventa un working set di trenta, con tutti e quattro i frame dello stack tenuti a ogni profondita' di taglio.</p>
+
+    <p>Qui la parola "projector" nasconde un pezzo che vale la pena tirare fuori. Quel budget in token non e' un parametro di comodo, cambia la proiezione. Con un milione di token di finestra puoi tenere molto, dipendenze lontane e qualche file di contorno. Con ottomila devi essere spietato, il seed e poco altro. Il projector quindi non dipende solo dal task, dipende anche dalle risorse:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\pi_{(Q,\,B)} : X \longrightarrow X$$</div>
+      <p class="formula-label">Il projector dipende dal task Q e dal budget B. Stesso bug, finestra diversa, rappresentante diverso</p>
+    </div>
+
+    <p>Stesso bug, stesso repository, ma la fetta giusta a ottomila token e la fetta giusta a un milione non sono la stessa fetta. Lo slicer lo affronta scendendo una scala: chiusura piena, poi dipendenze fino a due salti, poi uno solo, finche' non sta nel budget. La proiezione e' relativa al task e alla tasca.</p>
+
+    <h2><span class="accent">//</span> Il Duale Mancante: Il Supporto Del Task</h2>
+    <span class="section-number">Sezione 04. Non il working set, il motivo della risposta</span>
+
+    <p>Ho definito il task state, cioe' quello che l'agente vede. Gli manca il duale, e il duale e' la parte piu' interessante. Chiamalo supporto del task:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\mathrm{Supp}(Q, x) \;\subseteq\; \mathrm{TS}(Q) \;\subseteq\; x$$</div>
+      <p class="formula-label">Il supporto: l'insieme minimo di informazioni che giustificano la risposta. Sta dentro il working set, che sta dentro il contesto</p>
+    </div>
+
+    <p>Il supporto non e' il contesto, e non e' nemmeno il working set. E' il motivo per cui la risposta e' quella: le poche proposizioni che, se le togli, la risposta cambia davvero. Il task state e' generoso, tiene anche roba di contorno per sicurezza. Il supporto e' avaro, tiene solo cio' che giustifica. Qui <strong>T3 smette di essere un operatore tra i quattro e diventa il piu' ambizioso</strong>: la carta del task, i vincoli con citazione <code>file:riga</code>, e' un tentativo di costruire proprio <span class="katex-inline">\( \mathrm{Supp}(Q,x) \)</span>. Non "leggi tutto il working set", ma "ecco le dieci proposizioni che reggono la risposta, e da dove vengono". Un fix che le rispetta tutte e' corretto per costruzione, nei limiti di cio' che la carta ha saputo vedere.</p>
+
+    <!-- ============================================================
+         SEZIONE 04 - SUFFICIENZA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Non Prometto Che Basti, Lo Misuro</h2>
+    <span class="section-number">Sezione 05. Sessanta bug veri, zero persi per strada</span>
+
+    <p>Answer-preserving e' facile da scrivere in una formula e difficile da garantire con l'analisi statica pura. Un import dinamico, un container di dependency injection, una configurazione che sceglie la classe a runtime: tutte cose invisibili al grafo degli import. Quindi il plugin non da' per scontato che la fetta basti, lo verifica misurando.</p>
+
+    <p>Sembra una precisazione da poco. Non lo e', e' un cambio di paradigma. Lo schema che oggi si vede quasi ovunque, e quello di qui, sono le stesse parole in ordine diverso:</p>
+
+    <div class="tool-out"><span class="dim">compressione     ->   LLM      ->   </span><span class="foot">speriamo</span>
+<span class="keep">trasformazione   ->   misura   ->   LLM</span></div>
+
+    <p>Nella prima riga comprimi, passi il risultato al modello e incroci le dita: se hai buttato via la cosa sbagliata te ne accorgi dalla risposta storta, quando ormai e' tardi. Nella seconda trasformi, <em>misuri</em> che la trasformazione non abbia spostato la risposta, e solo dopo passi al modello. Il punto di controllo si sposta prima dell'LLM invece che dopo. La differenza sembra piccola perche' sono le stesse tre parole. In pratica e' la distanza tra un sistema che speri funzioni e uno che sai dove sbaglia.</p>
+
+    <p>Il benchmark e' l'atto del misurare. Prendi sessanta bug veri, di quelli con uno stack trace e un fix noto. Per ognuno lasci che context-kernel tagli il contesto, poi controlli una cosa sola: nella fetta rimasta c'e' ancora tutto quello che serve per risolvere quel bug? In termini dell'articolo, la fetta contiene il supporto?</p>
+
+    <p>La risposta e' si' in tutti e sessanta i casi, a ogni livello di taglio. Il dato interessante e' il perche'. Quello che rovina la fetta non e' quanto tagli in profondita', e' sbagliare il punto di partenza. Tagliare la chiusura del grafo, che sembra la cosa aggressiva, e' quasi gratis. Sbagliare il seed, che sembra un dettaglio, ti fa perdere il caso. E il benchmark si e' ripagato da solo. La prima volta ne risolveva cinquantuno su sessanta. Ho guardato i nove che mancavano, e non era la profondita' del taglio: era un bug vero di seeding, path assoluti ambigui dentro la root del progetto. Corretto, con un test di regressione che adesso lo tiene fermo.</p>
+
+    <p>C'e' un punto che ho sottovalutato a lungo. Di tutti i pezzi, quello che conta di piu' non e' il projector, e non e' lo slicer. E' <span class="katex-inline">\( T_4 \)</span>, la verifica. Il resto della teoria e' elegante, e potrebbe essere sbagliato: "answer-preserving" resta una parola finche' qualcuno non prova a mostrarti che la risposta e' cambiata. <span class="katex-inline">\( T_4 \)</span> e' quel qualcuno. La verifica di invarianza, il benchmark dei sessanta casi, il canary, sono l'apparato che puo' dire di no. Senza, avrei una teoria che non si puo' smentire, cioe' la peggior specie di teoria. Con, ho qualcosa che un esperimento puo' rompere. Tengo la seconda.</p>
+
+    <div class="insight-box fade-in">
+      <p>Centodiciassette test, solo libreria standard, girano in circa sette secondi. Zero dipendenze, zero chiamate API. La verifica dell'invarianza della risposta gira dentro la sessione, con l'abbonamento che gia' hai. Nessuna chiave nel repository, controllato con un grep. Questa non e' una scelta di stile, e' la condizione perche' uno strumento che decide cosa l'agente vede sia esso stesso ispezionabile e ripetibile.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 05 - IL PAGE FAULT
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Inverso Non Esiste, Esiste L'Accesso</h2>
+    <span class="section-number">Sezione 06. L'onesto indebolimento: page fault</span>
+
+    <p>Qui va detta la cosa scomoda. Gli operatori si concatenano senza attriti: applichi <span class="katex-inline">\( T_2 \)</span> dopo <span class="katex-inline">\( T_1 \)</span>, scrivi <span class="katex-inline">\( T_2(T_1(C)) \)</span>, e ne componi quanti ne vuoi, il risultato e' ancora una proiezione valida. Quello che non puoi fare e' tornare indietro. Non esiste un <span class="katex-inline">\( \pi_Q^{-1} \)</span> che ti ridia quello che hai tolto: l'inverso di una proiezione non e' un'operazione, e' un percorso di accesso. Se ti serve una cosa proiettata via, non la "decomprimi", la vai a prendere. Questo e' il page fault, e nel plugin e' un meccanismo di prima classe, non un errore.</p>
+
+    <p>Le esclusioni sono dichiarate, non silenziose. Lo slicer, quando taglia, scrive cosa ha lasciato fuori e perche'. Se poi si scopre che serviva, la si recupera con una lettura mirata, e il conto di quella lettura e' piccolo e visibile. L'ho misurato su un bug vero, usando i bug del plugin stesso come task <span class="katex-inline">\( Q \)</span>:</p>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number green">1 / 14</div>
+        <div class="stat-label">slice statica<br>-93% sui sorgenti</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number cyan">4 / 14</div>
+        <div class="stat-label">con i page fault<br>working set reale, -71%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">2 / 2</div>
+        <div class="stat-label">fault<br>riparati, ~15 righe lette</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number orange">12 / 12</div>
+        <div class="stat-label">vincoli<br>verdetto PASS</div>
+      </div>
+    </div>
+
+    <p>Lo slicer statico da solo aveva sotto-sliciato: i test caricavano il modulo via <code>importlib</code> e subprocess, un arco che il grafo degli import non vede. I due page fault dichiarati hanno corretto il working set da uno a quattro sorgenti su quattordici, senza che la slice andasse invalidata. La carta del task, i dieci vincoli con citazione, ha intercettato due cose che il fix fatto a mano aveva sbagliato: una tensione con un test legacy, e una deviazione su un invariante che il primo tentativo aveva calpestato. Il verificatore ha chiuso con dodici vincoli su dodici rispettati. La lezione e' che l'onesta' sulle esclusioni costa meno del rumore che eviti.</p>
+
+    <!-- ============================================================
+         SEZIONE 06 - IL CANARY
+         ============================================================ -->
+    <h2><span class="accent">//</span> Lo Strumento Che Si E' Morso La Coda</h2>
+    <span class="section-number">Sezione 07. Il canary, e tre bug veri</span>
+
+    <p>Un hook che riscrive quello che l'agente vede e' pericoloso in un modo particolare: il contratto con l'harness non e' documentato, e puo' cambiarti sotto i piedi. Se un giorno la forma dell'output cambia e la tua sostituzione non viene applicata, il modello riceve la roba integrale e tu non te ne accorgi. Per questo ogni sostituzione lascia un canarino: registra il footer esatto che dovrebbe comparire, e poi controlla che sia comparso davvero. Non e' una garanzia che il contratto tenga, e' una difesa che ti avvisa nell'istante in cui si rompe.</p>
+
+    <p>Ha funzionato per davvero. Un allarme del canary ha segnalato una compressione che risultava applicata ma non lo era. Tirando il filo sono usciti tre bug veri. Il primo era il peggiore: le Read non venivano mai compresse. Per una Read la risposta del tool e' annidata in un modo diverso da Bash, e l'estrazione cercava la chiave nel posto sbagliato, quindi il testo estratto era vuoto e la compressione un no-op da sempre. Il secondo: il canary si dichiarava soddisfatto per un match troppo generoso, scattava anche sui contenuti che <em>citavano</em> il footer, tipo i log del progetto o i transcript riletti dalle sessioni headless. Il terzo, trovato mentre sistemavo i primi due: un output che veniva solo da <code>stderr</code> finiva distrutto invece che compresso.</p>
+
+    <div class="warning-box fade-in">
+      <p>Mentre scrivevo questo articolo ho aperto il README del plugin per controllare un numero. L'hook di compressione ha eliso i passaggi di prosa piu' densi e mi ha lasciato un footer in fondo, <code>[context-kernel: ... -78%]</code>. Lo strumento ha compresso la mia lettura della sua stessa documentazione. Ho letto i file a pezzi piccoli per stare sotto la soglia. Un tool che decide cosa vedi, applicato a te che lo studi: e' esattamente il motivo per cui il footer e il canary non sono optional.</p>
+    </div>
+
+    <p>Messa in fila, la corsa completa di quel bug, dal repository al verdetto, e' questa. Numeri veri, presi dalla telemetria della pipeline:</p>
+
+    <figure class="pipeline">
+      <div class="pipe-task">Task: "il canary segnala una compressione mai applicata, c'e' un test rosso. Trova il bug e sistemalo."</div>
+      <div class="pipe-arrow">&darr;</div>
+      <div class="pipe-step"><span class="pipe-op">Repository</span><span class="pipe-num">14 sorgenti del plugin</span></div>
+      <div class="pipe-arrow">&darr; &nbsp; T1 normalizza gli output, il kernel sintattico</div>
+      <div class="pipe-step"><span class="pipe-op">Output ripuliti</span><span class="pipe-num">una Read 2.464 &rarr; 832 token</span></div>
+      <div class="pipe-arrow">&darr; &nbsp; T2 slice del repo dal sintomo</div>
+      <div class="pipe-step"><span class="pipe-op">Working set</span><span class="pipe-num">14 &rarr; 4 sorgenti (1 statico + 3 page fault)</span></div>
+      <div class="pipe-arrow">&darr; &nbsp; T3 carta del task</div>
+      <div class="pipe-step"><span class="pipe-op">Supporto</span><span class="pipe-num">10 vincoli citati file:riga</span></div>
+      <div class="pipe-arrow">&darr; &nbsp; l'LLM lavora sul supporto</div>
+      <div class="pipe-step"><span class="pipe-op">Fix</span><span class="pipe-num">i tre bug sistemati</span></div>
+      <div class="pipe-arrow">&darr; &nbsp; T4 verifica adversarial</div>
+      <div class="pipe-step pipe-pass"><span class="pipe-op">Verdetto</span><span class="pipe-num">12 / 12 vincoli, PASS</span></div>
+    </figure>
+
+    <p>Il modello non ha mai visto i quattordici sorgenti, ne le migliaia di righe dei log di quella sessione. Ha visto quattro file, dieci vincoli e un test rosso. Ha prodotto il fix, e un altro giro di pipeline lo ha promosso a dodici vincoli su dodici. Questa e' la teoria di sopra applicata una volta sola, dall'inizio alla fine.</p>
+
+    <!-- ============================================================
+         SEZIONE 08 - L'OGGETTO
+         ============================================================ -->
+    <h2><span class="accent">//</span> L'Oggetto: context-kernel</h2>
+    <span class="section-number">Sezione 08. Cosa installi, e il conto che torna</span>
+
+    <p>Fin qui l'idea. L'implementazione si chiama <strong>context-kernel</strong>, e' un plugin nativo per Claude Code con un ripiego per Codex, e non ha niente sotto che non puoi leggere: solo libreria standard di Python, zero dipendenze, zero chiavi API. Registra da solo l'hook <span class="katex-inline">\( T_1 \)</span>, cioe' la compressione ambientale col canary, due tool MCP per lo slice (<code>kernel_slice</code> e <code>kernel_repo_slice</code>), cinque skill e tre agent per la pipeline <span class="katex-inline">\( T_2 \)</span>-<span class="katex-inline">\( T_4 \)</span>. Versione 0.9.1, licenza MIT, il codice sta su <a href="https://github.com/pinperepette/context-kernel" target="_blank" rel="noopener">GitHub</a>.</p>
+
+    <div class="tool-out"><span class="keep"># dal marketplace, due righe</span>
+/plugin marketplace add pinperepette/context-kernel
+/plugin install context-kernel</div>
+
+    <p>Adesso il conto. La parte che importa non e' "quanto taglia", e' "quanto taglia senza spostare la risposta". Sui token il risparmio e' quello che hai gia' visto pezzo per pezzo, messo in fila:</p>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number green">-79%</div><div class="stat-label">token<br>su sessione reale</div></div>
+      <div class="stat-card"><div class="stat-number cyan">-93%</div><div class="stat-label">pip3 list<br>14.900 -> 995</div></div>
+      <div class="stat-card"><div class="stat-number purple">60 / 60</div><div class="stat-label">bug reali risolti<br>anche dopo il taglio</div></div>
+      <div class="stat-card"><div class="stat-number orange">0</div><div class="stat-label">chiavi API<br>tutto in sessione</div></div>
+    </div>
+
+    <p>Gli stessi numeri, caso per caso, cosi' non devi fidarti sulla parola:</p>
+
+    <table class="op-table">
+      <thead><tr><th>Caso reale</th><th>Prima</th><th>Dopo</th><th>Task riuscito</th></tr></thead>
+      <tbody>
+        <tr><td>pip3 list (output di un comando)</td><td>14.900 token</td><td>995 token</td><td>segnale tenuto</td></tr>
+        <tr><td>Read di un file sorgente</td><td>2.464 token</td><td>832 token</td><td>file leggibile</td></tr>
+        <tr><td>lodash, stack trace di node</td><td>1.048 file</td><td>30 file</td><td>4/4 frame tenuti</td></tr>
+        <tr><td>repo del plugin, bug del canary</td><td>14 sorgenti</td><td>4 sorgenti</td><td>verifier 12/12</td></tr>
+        <tr><td>sessione di lavoro intera</td><td>baseline</td><td>-79% token</td><td>lavoro finito</td></tr>
+      </tbody>
+    </table>
+
+    <p>L'agente continua a risolvere gli stessi casi. Il modo pulito di vederlo e' mettere la proiezione indotta dal task accanto al troncamento cieco, quello che tanti strumenti fanno tagliando testa e coda a naso:</p>
+
+    <table class="op-table">
+      <thead><tr><th>Contesto rimosso</th><th>Proiezione (context-kernel)</th><th>Troncamento cieco</th></tr></thead>
+      <tbody>
+        <tr><td>fino al 40%</td><td>risposta intatta</td><td>risposta intatta</td></tr>
+        <tr><td>oltre il 40%</td><td>risposta intatta</td><td>inizia a perdere la risposta</td></tr>
+        <tr><td>fino al 75%</td><td>risposta intatta</td><td>gia' crollato</td></tr>
+      </tbody>
+    </table>
+
+    <p style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); text-align:center; margin-top:-0.5rem;">Curva rate-distortion misurata: la proiezione lascia nella fetta tutto il necessario anche togliendo il settantacinque per cento del contesto; tagliare alla cieca perde la risposta gia' oltre il quaranta per cento.</p>
+
+    <p>Questo e' il senso di risparmiare senza perdere performance. Il risparmio arriva perche' togli solo quello che il task non usera' mai, e la risposta resta identica: per costruzione dove si puo', per misura dove non si puo'. In piu' due regali. Lo slice ripetuto va <strong>quarantasei volte</strong> piu' veloce grazie alla cache del manifest, e la verifica non costa una chiamata in piu' perche' gira in sessione. Centodiciassette test in circa sette secondi ti dicono se qualcosa si e' rotto prima che lo scopra l'agente.</p>
+
+    <p>Una cosa, per onesta', che forse leggendo hai gia' pensato. La teoria di sopra e' piu' generale del plugin. La proiezione indotta dal task non ha niente di specifico a Claude Code: ovunque un modello riceve piu' contesto di quanto il task ne chieda, la stessa mossa vale, con altri hook, un altro linguaggio, un altro harness. context-kernel e' dove l'ho misurata, non dove finisce. Se preferisci vederlo come l'implementazione particolare di un'idea piu' grande, lo vedi giusto.</p>
+
+    <div class="conclusion-box">
+      <p class="quote">Non esiste "il" contesto.<br>Esiste la classe delle cose che danno la stessa risposta, e il rappresentante piu' piccolo che scegli tu.</p>
+    </div>
+
+    <p>Se dovessi dirti qual e' la cosa originale, non ti direi "il projector", ne "il kernel", ne i quattro operatori. Ti direi questa, la stessa di apertura: <strong>il contesto non e' un input assoluto, e' un oggetto relativo al task.</strong> Se questa premessa non ti convince, probabilmente non ti convincera' nemmeno il resto. Se invece la accetti, i quattro operatori, il page fault, la discesa al simbolo vengono quasi da soli: c'e' una classe di contesti equivalenti, ne scegli uno piccolo, e il lavoro diventa astrarre, poi misurare di non aver spostato la risposta. I numeri li puoi rifare tu, e' tutto deterministico e offline.</p>
+
+    <p>E' anche il motivo per cui la chiamo un'idea e non un pacchetto di feature: non sposta la soluzione, sposta la definizione del problema. Chi la prende sul serio non si chiede piu' "come comprimo il contesto", si chiede "cosa, di questo contesto, e' il task a renderlo tale".</p>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Nota.</strong> context-kernel e' un plugin nativo per Claude Code, con un ripiego per Codex. Tutto e' libreria standard di Python, deterministico e offline; la sola cosa che usa il modello e' la verifica di invarianza, che gira in sessione con l'abbonamento e non con una chiave. I numeri vengono da misure ripetibili: <code>pip3 list</code> reale (14.900 -> 995 token), il benchmark di sessanta bug veri (in tutti la fetta tagliata bastava a risolverli), pandas e lodash su stack trace veri, e la telemetria della pipeline su un bug reale del plugin stesso. Centodiciassette test in circa sette secondi. Licenza MIT. I blocchi qui sopra sono estratti, condensati per leggibilita'; il codice integro sta nel repo. Panna, come al solito, non ha letto una riga e sta benissimo.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+</body>
+</html>

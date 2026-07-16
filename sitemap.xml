@@ -2,9 +2,21 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pinperepette.github.io/signal.pirate/</loc>
-    <lastmod>2026-07-10</lastmod>
+    <lastmod>2026-07-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/non-esiste-il-contesto.html</loc>
+    <lastmod>2026-07-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/il-pixel-che-da-ordini.html</loc>
+    <lastmod>2026-07-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://pinperepette.github.io/signal.pirate/articoli/la-rotta-rubata.html</loc>
