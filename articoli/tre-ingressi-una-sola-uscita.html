@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tre Ingressi, Una Sola Uscita | Signal Pirate</title>
+  <meta name="description" content="Il 19 luglio 2026 un matematico, Levent Alpoge, annuncia su X che la congettura di Jacobi e' falsa. Un controesempio esplicito in tre variabili, trovato con Claude Fable 5 durante la finale dei Mondiali. La spiegazione piu' semplice possibile: una macchina che non piega mai localmente, eppure manda tre punti diversi nello stesso posto. E il modo per verificarlo da soli, senza fidarsi di nessuno.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,77,77,0.08), rgba(255,170,0,0.04));
+      border-left: 3px solid var(--accent-rejection);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Abstract === */
+    .abstract {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-attention);
+      border-radius: 0 10px 10px 0;
+      padding: 1.3rem 1.5rem;
+      margin: 0 0 2.5rem;
+    }
+    .abstract-h {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+      margin: 0 0 0.8rem;
+    }
+    .abstract p { margin: 0.55rem 0; line-height: 1.55; font-size: 0.95rem; }
+
+    /* === Kicker === */
+    .article-kicker {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      max-width: 640px;
+      margin: 1rem auto 0;
+      line-height: 1.45;
+    }
+
+    /* === Tweet quote === */
+    .tweet-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .tweet-box .handle {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin: 0 0 0.7rem;
+    }
+    .tweet-box p { margin: 0; }
+
+    /* === Code snippet === */
+    .code-snippet {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .code-snippet pre {
+      margin: 0;
+      white-space: pre;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .code-snippet .cmt { color: var(--text-secondary); }
+
+    /* === Diagram box === */
+    .diagram-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.4rem 1rem 1.1rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+    .diagram-box pre {
+      display: inline-block;
+      text-align: left;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .diagram-box .hit { color: var(--accent-rejection); font-weight: 700; }
+    .diagram-box .ok { color: var(--accent-attention); font-weight: 700; }
+    .diagram-box .cap {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin: 1rem 0 0;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/tre-ingressi-una-sola-uscita.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Tre Ingressi, Una Sola Uscita">
+  <meta property="og:description" content="La congettura di Jacobi resiste dal 1939. Il 19 luglio 2026 cade, con un controesempio esplicito trovato con Claude Fable 5 durante la finale dei Mondiali. La spiegazione piu' semplice possibile, piu' il modo per verificarlo da soli.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/tre-ingressi-una-sola-uscita.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-07-20">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tre Ingressi, Una Sola Uscita">
+  <meta name="twitter:description" content="La congettura di Jacobi resiste dal 1939. Il 19 luglio 2026 cade, con un controesempio esplicito trovato con Claude Fable 5 durante la finale dei Mondiali. La spiegazione piu' semplice possibile.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Tre Ingressi, Una Sola Uscita","description":"La congettura di Jacobi resiste dal 1939. Il 19 luglio 2026 cade, con un controesempio esplicito trovato con Claude Fable 5 durante la finale dei Mondiali. La spiegazione piu' semplice possibile, piu' il modo per verificarlo da soli.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-07-20","dateModified":"2026-07-20","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/tre-ingressi-una-sola-uscita.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-07-20 | Pinperepette</p>
+    <h1 class="article-page-title">Tre Ingressi, <span class="accent">Una Sola Uscita</span></h1>
+    <p class="article-kicker">Una congettura di matematica resisteva dal 1939. E' caduta la sera della finale dei Mondiali, con un controesempio che chiunque puo' controllare a mano.</p>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+      La congettura diceva: una certa classe di formule non puo' mai mandare due punti diversi nello stesso posto. Alpoge, con Claude Fable 5, ne ha scritta una che ne manda tre. Fine della congettura.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Matematica</span>
+      <span class="tag tag-highlight">Congetture</span>
+      <span class="tag tag-reaction">AI</span>
+      <span class="tag tag-amplification">Claude Fable 5</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <div class="abstract fade-in">
+      <p class="abstract-h">In breve, senza formule</p>
+      <p>C'e' un tipo di problema in matematica che si chiama congettura: una cosa che tutti credono vera ma nessuno e' riuscito a dimostrare. Quella di Jacobi e' aperta dal 1939. Buttala cosi': immagina una macchina che trasforma punti. Guardata da molto vicino funziona sempre alla perfezione: non rompe niente, non incolla niente, non perde informazioni. Per quasi novant'anni si e' creduto che questo bastasse a garantire che funzionasse bene anche vista tutta intera, da lontano. Era falso.</p>
+      <p>Il 19 luglio 2026 il matematico Levent Alpoge ha pubblicato su X una formula che rompe la regola: non schiaccia mai da vicino, eppure prende <strong>tre punti diversi e li manda esattamente nello stesso posto</strong>. La congettura, presa alla lettera, e' falsa. La formula l'ha trovata lavorando con Claude Fable 5, il modello di Anthropic, la sera della finale dei Mondiali. E la cosa bella e' che non devi credere a nessuno: e' tre righe di conti, le rifai e vedi.</p>
+      <p>Ma la parte grossa non e' la formula. E' <em>come si arriva a pescarla</em> in un oceano di formule possibili. Quello, molto piu' della congettura, e' il pezzo che secondo me fra dieci anni ci ricorderemo.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 00 - LA VICENDA
+         ============================================================ -->
+    <h2><span class="accent">//</span> Un Teorema In Un Tweet</h2>
+    <span class="section-number">Sezione 00. La sera della finale</span>
+
+    <p>La sera del 19 luglio 2026 compare su X un messaggio dal tono piu' da chat che da rivista scientifica. Lo firma <a href="https://x.com/__alpoge__" target="_blank" rel="noopener">Levent Alpoge</a>, e non e' un account a caso: dottorato a Princeton sotto Manjul Bhargava (medaglia Fields), premio Morgan 2015, un periodo a Harvard, oggi ricercatore ad Anthropic. Uno che nel suo campo, la teoria dei numeri e la geometria algebrica, sa esattamente di cosa parla.</p>
+
+    <div class="tweet-box fade-in">
+      <p class="handle">@__alpoge__ &middot; 19 lug 2026</p>
+      <p><em>"hello there the jacobian conjecture is false"</em>. Grazie al mio caro amico Akhil per avermelo chiesto, e al mio altro caro amico Fable per aver lavorato durante la finale dei Mondiali.</p>
+    </div>
+
+    <p>Sotto, la formula. Nessun articolo di trenta pagine, nessuna dimostrazione lunga come un romanzo: una mappa esplicita in tre variabili e tre punti che la fanno cadere. "Akhil" e' Akhil Mathew, un altro matematico, quello che ha posto la domanda giusta. "Fable" e' Claude Fable 5, il modello di Anthropic, che durante Argentina-vattelapesca invece di guardare la partita macinava algebra. Il tono e' leggero, il contenuto no: se i conti tornano (e tornano) e' la caduta di un problema aperto da ottantasette anni.</p>
+
+    <p>Prima di arrivare ai conti serve capire cosa diceva la congettura. E qui, promesso, niente prerequisiti. Bastano una macchina e un'idea sola.</p>
+
+    <!-- ============================================================
+         SEZIONE 01 - COS'E' LA CONGETTURA
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Macchina Che Dovrebbe Tornare Indietro</h2>
+    <span class="section-number">Sezione 01. Locale contro globale</span>
+
+    <p>Parti da una cosa che usi ogni giorno: Google Maps. Scrivi un indirizzo, lui ti porta in un punto preciso della mappa. Ingresso l'indirizzo, uscita un punto. Ecco, una <em>funzione</em> matematica fa esattamente questo: prende un punto e lo trasforma in un altro punto. Tutto qui, niente di esoterico.</p>
+
+    <p>La macchina di cui parliamo fa la stessa cosa, ma lavora con tre numeri per volta. Le dai una terna <span class="katex-inline">\( (x, y, z) \)</span>, lei te ne restituisce un'altra. E' una formula fatta solo di somme e moltiplicazioni, quella che i matematici chiamano <strong>polinomiale</strong>: nessuna divisione, nessuna radice strana. Solo conti elementari, tanti.</p>
+
+    <p>Di una macchina cosi' vuoi spesso sapere una cosa: <strong>posso tornare indietro?</strong> Se mi dici l'uscita, riesco a risalire con certezza all'ingresso da cui e' partita? Pensa al guardaroba di un locale. Lasci la giacca, ti danno un numero: quel numero e' l'uscita, la giacca l'ingresso. Se ogni giacca ha il suo numero diverso, a fine serata torni, dici il numero, riprendi la <em>tua</em> giacca. La macchina "si inverte", tutto liscio. Ma se il guardarobiere combina il guaio e da' <strong>lo stesso numero a due persone diverse</strong>, sei fregato: al ritiro, con quel numero in mano, non sai piu' quale delle due giacche sia la tua. L'informazione e' persa, indietro non si torna. Ecco: una macchina che manda due ingressi diversi sulla stessa uscita e' esattamente un guardaroba che stampa numeri doppioni.</p>
+
+    <p>Adesso il pezzo centrale, prendilo con calma perche' e' tutto qui. Torna alla mappa. Esiste un modo per controllare, in un singolo punto, se li' intorno la trasformazione sta <em>strappando</em> o <em>schiacciando</em> la mappa, oppure la sta solo stirando in modo pulito. Quel controllo ha un nome, lo <strong>Jacobiano</strong>, ed e' solo un numero che calcoli punto per punto. Se viene zero, li' la macchina appiattisce, incolla insieme direzioni diverse, perde una dimensione: da vicino sta gia' rovinando l'informazione. Se viene diverso da zero, li' intorno e' tutto pulito, nessuno strappo, nessuno schiacciamento, da vicino la macchina e' perfettamente reversibile.</p>
+
+    <p>E qui casca l'asino. Se guardi la mappa con la lente d'ingrandimento, punto per punto, tutto sembra perfetto: nessuno strappo da nessuna parte. La domanda della congettura e' esattamente questa: <strong>puo' esserci comunque un problema visto da lontano?</strong> Tutto a posto da vicino, ma un disastro nell'insieme?</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>L'analogia che regge tutto.</strong> Pensa a un foglio di gomma che la macchina stira e curva. Lo Jacobiano diverso da zero in ogni punto vuol dire che il foglio non fa mai <em>una grinza</em>: nessuna piega secca, nessun punto in cui due lembi si accavallano e si toccano. Curvare quanto vuoi, si'; ma mai schiacciare due parti l'una sull'altra. Localmente, guardando qualsiasi zona con la lente, vedi sempre una stiratura ordinata e pulita. La domanda della congettura e': se il foglio non fa una grinza da nessuna parte, e' possibile che due angoli lontani finiscano comunque incollati nello stesso punto?</p>
+    </div>
+
+    <p>Una macchina il cui Jacobiano non e' mai zero in nessun punto, cioe' che da vicino non sbaglia mai un colpo, ha un nome tecnico: <strong>mappa di Keller</strong>. Non lasciarti intimidire dall'etichetta, vuol dire solo quello: "pulita ovunque, vista da vicino". E la <strong>congettura di Jacobi</strong>, buttata li' dal tedesco Ott-Heinrich Keller nel 1939, diceva esattamente questo:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\det J_F \neq 0 \ \text{ovunque} \quad \overset{?}{\Longrightarrow} \quad F \ \text{si inverte (globalmente)}$$</div>
+      <p class="formula-label">Se lo Jacobiano non e' mai zero, allora la macchina torna sempre indietro. Questo era il sospetto, per 87 anni.</p>
+    </div>
+
+    <p>Detta a parole: <strong>se non schiacci mai niente da vicino, allora da lontano non puoi mai sovrapporti.</strong> Sembra ragionevole. Sembra quasi ovvio. In due dimensioni, con conti abbastanza semplici, e' davvero cosi'. E per decenni fior di matematici l'hanno data quasi per scontata, dimostrandone pezzi, casi particolari, versioni ridotte. Il "quasi" e' il punto di tutta la storia.</p>
+
+    <!-- ============================================================
+         SEZIONE 02 - IL CONTROESEMPIO
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Formula Che Non Torna Indietro</h2>
+    <span class="section-number">Sezione 02. Il controesempio, in chiaro</span>
+
+    <p>Per far cadere una congettura non serve una teoria. Ne basta <em>un</em> caso che la contraddice: un <strong>controesempio</strong>. Uno solo, ma vero. Alpoge e Fable ne hanno costruito uno in tre variabili. Poniamo, per accorciare, <span class="katex-inline">\( u = 1 + xy \)</span>. La macchina e' questa:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$F(x,y,z) = \begin{pmatrix} u^3 z + y^2 u\,(4+3xy) \\[4pt] y + 3x\,u^2 z + 3x y^2 (4+3xy) \\[4pt] 2x - 3x^2 y - x^3 z \end{pmatrix}, \qquad u = 1+xy$$</div>
+      <p class="formula-label">La mappa di Alpoge. Solo somme e prodotti: una formula polinomiale, come promesso.</p>
+    </div>
+
+    <p>Fa impressione ma non lasciarti intimidire: sono solo somme e moltiplicazioni impilate. La macchina prende tre numeri e ne restituisce tre. Ora le due cose che contano, quelle che uccidono la congettura.</p>
+
+    <p><strong>Primo: non fa una grinza.</strong> Se fai il controllo Jacobiano in un punto qualsiasi (il numero che ne esce si chiama <em>determinante</em>, ma puoi leggerlo come "l'esito del controllo"), viene sempre lo stesso valore:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\det J_F = -2$$</div>
+      <p class="formula-label">Costante, e diverso da zero. In nessun punto la macchina schiaccia. E' una mappa di Keller a tutti gli effetti.</p>
+    </div>
+
+    <p>Viene sempre lo stesso valore, in ogni punto, e non e' mai zero. Vuol dire che da vicino questa macchina e' impeccabile: esattamente il tipo di macchina di cui la congettura giurava non potesse mai sovrapporsi. Solo che, come vedi tra un attimo, si sovrappone lo stesso.</p>
+
+    <p><strong>Secondo: si sovrappone.</strong> Prendi questi tre punti, tre ingressi ben diversi tra loro:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$(0,\,0,\,-\tfrac14) \qquad (1,\,-\tfrac32,\,\tfrac{13}{2}) \qquad (-1,\,\tfrac32,\,\tfrac{13}{2})$$</div>
+      <p class="formula-label">Tre ingressi distinti. Nessuno somiglia agli altri.</p>
+    </div>
+
+    <p>Dagli tutti e tre in pasto alla macchina. Escono tutti e tre nello stesso identico posto:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$F(0,0,-\tfrac14) = F(1,-\tfrac32,\tfrac{13}{2}) = F(-1,\tfrac32,\tfrac{13}{2}) = (-\tfrac14,\,0,\,0)$$</div>
+      <p class="formula-label">Tre ingressi, una sola uscita. Da qui il titolo, e la caduta della congettura.</p>
+    </div>
+
+    <p>Se le formule ti scivolano addosso, tienti solo questo disegno in testa. Torna al guardaroba: normalmente ogni giacca ha il suo numero, e tu torni a casa con la tua.</p>
+
+    <div class="diagram-box fade-in">
+<pre>COSI' DOVREBBE ANDARE  (e per 87 anni si pensava dovesse):
+
+    ingresso A  ─────────▶  <span class="ok">●</span>
+    ingresso B  ─────────▶  <span class="ok">◆</span>
+    ingresso C  ─────────▶  <span class="ok">○</span>
+    tre ingressi diversi, tre uscite diverse
+
+
+COSI' VA DAVVERO,  con la formula di Alpoge:
+
+    ( 0 ,  0 , −1/4 )  ──┐
+    ( 1 ,−3/2, 13/2 )  ──┼────▶  <span class="hit">(−1/4, 0, 0)</span>
+    (−1 , 3/2, 13/2 )  ──┘
+    tre ingressi diversi, <span class="hit">UNA</span> sola uscita</pre>
+      <p class="cap">tre giacche diverse, lo stesso identico numero</p>
+    </div>
+
+    <p>Questo, per la congettura, <strong>non dovrebbe poter succedere</strong>. E invece succede. Punto. Adesso il perche' e' facile.</p>
+
+    <div class="insight-box fade-in">
+      <p>Ecco il colpo. La macchina non fa una grinza da nessuna parte (Jacobiano <span class="katex-inline">\( -2 \)</span>, mai zero), eppure da lontano tre punti finiscono incollati sullo stesso risultato <span class="katex-inline">\( (-\tfrac14, 0, 0) \)</span>. Se ti dico "l'uscita e' <span class="katex-inline">\( (-\tfrac14,0,0) \)</span>, da dove sono partito?", non puoi rispondere: sono tre posti possibili e non c'e' modo di scegliere. La macchina non torna indietro, ed era esattamente cio' che la congettura dava per impossibile. Il nocciolo e' questo: quello che si vede da vicino, punto per punto, non basta a dire cosa fa la macchina presa tutta intera.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 03 - VERIFICABILE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Non Devi Fidarti Di Nessuno</h2>
+    <span class="section-number">Sezione 03. Perche' questo controesempio e' speciale</span>
+
+    <p>Qui c'e' la cosa che rende questa storia diversa da mille altri "ho risolto un grande problema" che girano ogni settimana. Di solito una dimostrazione e' lunga, delicata, e per giudicarla devi essere del mestiere e leggerti trenta pagine sperando che al passaggio 17 non ci sia un buco. Qui no. Qui c'e' una <strong>formula e tre punti</strong>. O quei tre punti finiscono nello stesso posto, oppure no. Non c'e' spazio per l'opinione.</p>
+
+    <p>Non l'ho preso sulla fiducia. L'ho rifatto io, con l'aritmetica esatta (frazioni vere, niente numeri approssimati), e il risultato e' quello dichiarato:</p>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number">-2</div>
+        <div class="stat-label">determinante Jacobiano<br>costante, mai zero</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3</div>
+        <div class="stat-label">ingressi distinti<br>sulla stessa uscita</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">87</div>
+        <div class="stat-label">anni di congettura<br>dal 1939 al 2026</div>
+      </div>
+    </div>
+
+    <p>Se hai Python e la libreria SymPy, sono <em>letteralmente</em> le dieci righe qui sotto. Non un pseudocodice, non un "lascio la cosa come esercizio": questo lo incolli in un terminale e gira.</p>
+
+    <div class="code-snippet fade-in">
+<pre>import sympy as sp
+x, y, z = sp.symbols('x y z')
+u = 1 + x*y
+F = [ u**3*z + y**2*u*(4 + 3*x*y),
+      y + 3*x*u**2*z + 3*x*y**2*(4 + 3*x*y),
+      2*x - 3*x**2*y - x**3*z ]
+
+J = sp.Matrix([[sp.diff(f, v) for v in (x, y, z)] for f in F])
+print(J.det())          <span class="cmt"># -2   (costante, mai zero)</span>
+
+for p in [(0, 0, sp.Rational(-1, 4)),
+          (1, sp.Rational(-3, 2), sp.Rational(13, 2)),
+          (-1, sp.Rational(3, 2), sp.Rational(13, 2))]:
+    print([sp.simplify(f.subs({x: p[0], y: p[1], z: p[2]})) for f in F])
+<span class="cmt"># -> [-1/4, 0, 0]   tutte e tre le volte</span></pre>
+    </div>
+
+    <p>Definisci la formula, chiedi il determinante della matrice delle derivate (viene <span class="katex-inline">\( -2 \)</span>), poi sostituisci i tre punti e guardi le uscite (identiche). Aritmetica esatta, frazioni vere, zero approssimazioni. Nessuna chiave, nessun servizio, nessuna magia: gira sul tuo computer, offline, in un secondo. Volendo bastano anche Wolfram Alpha, o carta, pazienza e un pomeriggio libero. <strong>Questo</strong> e' il senso di "verificabile": la verita' non dipende da chi te la racconta. E' il motivo per cui l'ho rifatto io prima di scrivere una riga di questo pezzo, e per cui puoi rifarlo tu adesso senza fidarti nemmeno di me.</p>
+
+    <div class="insight-box fade-in">
+      <p>E' anche il motivo per cui il fatto che l'abbia trovato un'intelligenza artificiale, in questo caso, conta relativamente poco per stabilirne la verita'. Che la formula l'abbia scritta Alpoge, Fable, o un piccione addestrato, non cambia niente: i tre punti collassano o non collassano. La macchina non sa mentire sui propri conti. L'AI ha aiutato a <em>trovare</em> l'ago nel pagliaio; verificare che sia davvero un ago non richiede fidarsi dell'AI.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 04 - IL METODO
+         ============================================================ -->
+    <h2><span class="accent">//</span> La Verifica e' Un Secondo. Trovarla, No.</h2>
+    <span class="section-number">Sezione 04. Il pezzo che fara' scuola</span>
+
+    <p>Ok, adesso la roba che conta davvero, quella per cui secondo me fra dieci anni ci ricorderemo di 'sta serata. E, spoiler, non e' la congettura.</p>
+
+    <p>Torna un attimo su quello che abbiamo appena fatto insieme. Verificare il controesempio: due secondi. Butti la formula in SymPy, chiedi il determinante, sostituisci i tre punti, guardi le uscite. Lo fa chiunque, a occhi chiusi. Ma <em>trovarla</em>, quella formula? Eh. Tutta un'altra faccenda.</p>
+
+    <p>Fermati a pensarci. Lo spazio delle formule candidate non e' grande, e' <strong>infinito</strong>. E dentro quell'oceano c'e' una manciata microscopica di formule che rispettano tutti i paletti insieme: Jacobiano costante e diverso da zero, punti che collassano, gradi che tornano. I conti li fa qualsiasi computer in un lampo. Il casino e' un altro: in mezzo a quell'oceano, capire <strong>quali</strong> formule vale davvero la pena provare.</p>
+
+    <p>Vuoi un'idea di quanto sia grande "praticamente infinito"? Rimpiccioliamo il problema all'osso: mettiamo solo coefficienti interi tra <span class="katex-inline">\( -10 \)</span> e <span class="katex-inline">\( 10 \)</span>, e grado al massimo sei. In tre variabili un polinomio cosi' ha 84 coefficienti; la mappa ha tre componenti, quindi 252 numeri da scegliere, ognuno tra 21 valori possibili. Fanno <span class="katex-inline">\( 21^{252} \)</span>, un numero con piu' di <strong>trecento cifre</strong>. Per darti la scala: gli atomi in tutto l'universo osservabile sono circa <span class="katex-inline">\( 10^{80} \)</span>, ottanta cifre, una briciola al confronto. E questa e' la versione <em>rimpicciolita</em>, con paletti assurdi che il controesempio vero manco rispetta. Con numeri del genere e' chiaro che provare le formule a una a una non e' un'opzione: il difficile e' capire in quale zona di quello spazio conviene andare a cercare.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Da "cerca una dimostrazione" a "cerca un oggetto".</strong> Qui c'e' il ribaltamento, ed e' piu' profondo di quanto sembri. Per quasi novant'anni il problema suonava: <em>trovami la dimostrazione</em> che la congettura e' vera. Una dimostrazione e' <strong>linguaggio</strong>: un discorso lungo che dev'essere giusto a ogni singola riga, basta un anello debole e crolla tutto. Adesso il problema diventa: <em>trovami un oggetto</em> che la rompe. Un oggetto e' una cosa sola, finita, che o funziona o no. E' un cambio quasi filosofico, e non e' un dettaglio, perche' i modelli linguistici sono molto piu' forti a sfornare oggetti (una formula, un pezzo di codice, un esempio) che a reggere una dimostrazione lunga senza scivolare a meta'. Sposti il problema su un terreno dove il modello gioca in casa. E se fai informatica 'sto schema lo conosci gia' con un altro nome: e' <strong>fuzzing</strong>. Non provi che il programma e' corretto, gli spari addosso input finche' uno lo manda in crash. Qui l'input che fa crashare la congettura e' una formula, e il crash sono tre punti nello stesso posto.</p>
+    </div>
+
+    <p>Ed e' qui che entra il modello, e qui mi fermo un secondo, perche' <em>come</em> esattamente Claude abbia contribuito, riga per riga, oggi non lo sappiamo (ci torno nella prossima sezione). Quella che segue e' la lettura che in tanti stanno facendo, e ha una sua logica: <strong>se</strong> il workflow fosse davvero quello che molti stanno ipotizzando, il ruolo del modello non sarebbe enumerare lo spazio alla cieca, ma <strong>proporre candidati molto piu' promettenti della ricerca esaustiva</strong>. Invece di provare tutto, punti dritto verso le zone che hanno una faccia sensata. Non e' garantito che il tiro vada a segno, ma se restringe l'oceano a una pozzanghera, in quella pozzanghera i conti li chiudi in un secondo.</p>
+
+    <p>Questo, se le cose stanno cosi', e' il cambio di paradigma vero. Non "l'AI ha risolto un problema di matematica", che detto cosi' non vuol dire niente. Ma: un pezzo di ricerca che era <em>un problema di ragionamento</em> si trasforma in <em>un problema di ricerca in uno spazio</em>, e la ricerca la affidi a qualcosa che restringe il campo invece di setacciarlo tutto. La formula, alla fine, e' solo l'ultimo passo: il lavoro vero sta nel restringere il campo prima di arrivarci.</p>
+
+    <!-- ============================================================
+         SEZIONE 05 - COSA HA FATTO FABLE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Cosa Ha Fatto Fable (E Cosa Non Sappiamo)</h2>
+    <span class="section-number">Sezione 05. Onesta', che non guasta mai</span>
+
+    <p>Adesso freno un secondo, che e' facile prendere la palla e correre troppo. Che ruolo abbia avuto davvero il modello, riga per riga, <strong>non lo sappiamo</strong>. Alpoge attribuisce il ritrovamento a Claude Fable 5, e ci credo, ma non e' ancora uscita una descrizione tecnica del processo. Quindi non te lo racconto come un fatto: <strong>non e' pubblico quanto del lavoro l'abbia fatto in autonomia il modello e quanto l'abbia guidato il matematico.</strong> Quello che e' chiaro e' la forma della collaborazione: la domanda giusta l'ha posta un umano (Akhil Mathew), la rotta l'ha tenuta un umano (Alpoge), il modello stava nel giro. Chi ha girato quale manopola, e quanto forte, lo sapremo quando lo scriveranno nero su bianco. Fino ad allora, e' ipotesi, e la tengo tale.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Le cautele, che vanno dette.</strong> Nel momento in cui scrivo il risultato <em>non</em> e' ancora passato dalla revisione tra pari, non c'e' un paper su arXiv col timbro, e ufficialmente il problema resta "aperto" finche' la comunita' non firma. Ma occhio alla differenza col solito annuncio-bomba: qui non aspetti mesi per sapere se e' vero. Il controesempio e' un conto finito, non un ragionamento da spulciare a caccia del buco nascosto. Diversi matematici l'hanno gia' rifatto nelle ore dopo il post. Essere fluenti nell'algebra non vuol dire aver ragione, d'accordo, ma un'uguaglianza che chiunque riproduce sul suo computer, quella non mente.</p>
+    </div>
+
+    <p>E un'ultima cosa, se no passa un messaggio troppo gonfio. "La congettura di Jacobi e' falsa" vale alla lettera: <em>l'enunciato generale</em>, cosi' com'e' scritto, ha un controesempio in dimensione tre. Non vuol dire che crolli tutta la matematica che ci stava intorno. Un mucchio di risultati parziali reggono benissimo nei loro casi (in due dimensioni, o sotto ipotesi piu' strette). A cadere e' l'affermazione generale, non tutti i risultati che le stanno intorno. Ed e' comunque enorme: una domanda che ha tenuto testa a generazioni di matematici, adesso, una risposta ce l'ha, ed e' negativa.</p>
+
+    <!-- ============================================================
+         SEZIONE 06 - NON E' UN CASO ISOLATO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dove L'Abbiamo Gia' Visto</h2>
+    <span class="section-number">Sezione 06. Lo stesso ballo, un'altra pista</span>
+
+    <p>E se ti sembra di aver gia' visto questo film, e' perche' un po' l'hai visto. <strong>AlphaTensor</strong> che scova algoritmi nuovi per moltiplicare matrici. <strong>AlphaGeometry</strong> che risolve problemi di geometria da olimpiade. <strong>FunSearch</strong> che tira fuori costruzioni inedite in combinatoria. <strong>AlphaDev</strong> che sputa routine di ordinamento piu' veloci di quelle limate a mano per trent'anni. Fanno tutti lo stesso ballo: non dimostrano, esplorano. Generano, verificano, scartano, ripetono.</p>
+
+    <p>Con l'avvertenza grossa, di nuovo, perche' e' onesto ripeterla: qui il workflow interno non e' pubblico, quindi che la storia di Alpoge sia <em>davvero</em> un altro fotogramma di questa serie e' una <strong>chiave di lettura</strong>, non un fatto gia' accertato. Ma e' una lettura coerente con tutto il resto, e se regge, la Jacobian Conjecture non e' un colpo isolato: e' l'ennesima faccia dello stesso schema.</p>
+
+    <p>E lo schema, sotto sotto, e' sempre uno solo: un'<strong>asimmetria</strong>. Ci sono problemi dove <em>generare</em> una risposta e' difficilissimo ma <em>verificarla</em> e' quasi gratis. Una formula che rompe una congettura. Un exploit che buca un sistema. Una query SQL che tira fuori esattamente il dato giusto. Una regex, un algoritmo piu' veloce, un programma che passa tutti i test. In tutti questi casi trovare l'ago costa fatica, dolore, mesi; controllare che sia davvero un ago costa secondi. Ed e' precisamente il terreno dove un modello che sforna tanti candidati plausibili, appoggiato a un verificatore che non perdona, diventa una macchina da guerra. La matematica di stasera, vista cosi', e' solo l'esempio piu' recente.</p>
+
+    <div class="conclusion-box">
+      <p class="quote">Per quasi un secolo abbiamo costruito software per <em>verificare</em> le idee.<br>Adesso cominciamo ad avere software che <em>producono</em> idee verificabili.</p>
+    </div>
+
+    <p>Per quasi novant'anni questo problema e' stato nelle mani dei matematici. Dal 20 luglio 2026 potrebbe essere diventato anche un problema di <strong>ricerca automatica</strong>. Non perche' l'AI capisca la matematica meglio di un umano, non e' questo il punto, e chi la racconta cosi' ha capito male il film. Ma perche' sa spazzare spazi di possibilita' enormi e fermarsi nell'istante esatto in cui trova un oggetto che chiunque, dopo, puo' verificarsi da solo. Un umano fa la domanda, il modello esplora, un verificatore taglia via gli sbagliati, e in fondo al nastro resta una cosa sola su cui nessuno deve fidarsi di nessuno.</p>
+
+    <p>Se di questa storia ci restera' qualcosa, scommetto che non sara' il controesempio. Sara' il metodo.</p>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Fonti.</strong> Il post originale e' di <a href="https://x.com/__alpoge__" target="_blank" rel="noopener">Levent Alpoge (@__alpoge__)</a>, 19 luglio 2026. Spiegazione tecnica e verifica su <a href="https://jacobianfun.org/jacobian-explained" target="_blank" rel="noopener">jacobianfun.org</a>. Copertura giornalistica: <a href="https://forklog.com/en/anthropics-claude-fable-5-finds-counterexample-to-1939-jacobian-conjecture/" target="_blank" rel="noopener">ForkLog</a>, <a href="https://officechai.com/ai/an-anthropic-researcher-says-fable-just-helped-him-disprove-the-85-year-old-jacobian-conjecture/" target="_blank" rel="noopener">OfficeChai</a>. Contesto sulla congettura: <a href="https://en.wikipedia.org/wiki/Jacobian_conjecture" target="_blank" rel="noopener">Wikipedia</a>. Il determinante <span class="katex-inline">\( -2 \)</span> e il collasso dei tre punti li ho verificati personalmente in aritmetica esatta con SymPy prima di scrivere questo pezzo. Alla data di pubblicazione manca ancora la revisione tra pari formale. Panna, come al solito, non ha letto una riga e sta benissimo.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+</body>
+</html>
