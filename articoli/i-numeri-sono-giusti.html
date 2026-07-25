@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I numeri sono giusti (la conclusione no) | Signal Pirate</title>
+  <meta name="description" content="Mi mandano un articolo: l'Italia è sempre più sicura, e se pensi il contrario è colpa dei media. Ho ricontrollato ogni cifra sui dati ISTAT: tornano tutte. Il problema sta dopo. Il grosso del calo è concentrato nei furti, e ISTAT stessa avverte di non leggere quei cali così.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .spc-fig{ margin: 2rem 0; }
+    .spc-mount, .spc-dag{
+      --accent: var(--accent-reaction, #ff6b6b);
+      --accent-soft: rgba(255,107,107,0.16);
+      --s1: var(--accent-amplification, #4ecdc4);
+      --s1-soft: rgba(78,205,196,0.18);
+      --s2: var(--accent-rejection, #ff8800);
+      --ink: var(--text-primary, #e0e0e0);
+      --ink2: var(--text-primary, #e0e0e0);
+      --muted: var(--text-secondary, #8888aa);
+      --surface: var(--bg-secondary, #12121a);
+      --grid: rgba(136,136,170,0.16);
+      --line: rgba(136,136,170,0.32);
+      --pos: var(--accent-attention, #00ff88);
+      --neg: var(--accent-reaction, #ff6b6b);
+      width:100%; overflow-x:auto;
+    }
+    .spc-mount svg, .spc-dag svg{ display:block; width:100%; height:auto; max-width:660px; margin:0 auto; }
+    .spc-dag svg{ min-width:480px; max-width:560px; }
+    .spc-cap{ font-family: var(--font-mono); font-size:0.75rem; color: var(--text-secondary);
+      text-align:center; margin-top:0.7rem; line-height:1.5; }
+    .spc-mount .grid{ stroke:var(--grid); stroke-width:1; }
+    .spc-mount .axis{ stroke:var(--line); stroke-width:1; }
+    .spc-mount .tick{ fill:var(--muted); font-size:12px; }
+    .spc-mount .tickx{ fill:var(--muted); font-size:11.5px; }
+    .spc-mount .axlbl{ fill:var(--muted); font-size:12px; font-weight:600; }
+    .spc-mount .val{ fill:var(--ink2); font-size:12px; font-weight:600; }
+    .spc-mount .rowlbl{ fill:var(--ink2); font-size:12.5px; }
+    .spc-mount .bar{ fill:var(--s1); }
+    .spc-mount .bar.it{ fill:var(--accent); }
+    .spc-mount .bar.neg{ fill:var(--neg); }
+    .spc-mount .barb{ fill:var(--s2); }
+    .spc-mount .dot{ fill:var(--s1); opacity:.82; }
+    .spc-mount .dot.it{ fill:var(--accent); opacity:1; }
+    .spc-mount .trend{ stroke:var(--muted); stroke-width:1.5; stroke-dasharray:5 4; opacity:.7; }
+    .spc-mount .ptlbl{ fill:var(--ink); font-size:12px; font-weight:700; }
+    .spc-mount .larea{ fill:var(--accent-soft); }
+    .spc-mount .ln{ fill:none; stroke-width:2.6; }
+    .spc-mount .ln.it{ stroke:var(--accent); } .spc-mount .ln.a{ stroke:var(--s1); } .spc-mount .ln.b{ stroke:var(--s2); }
+    .spc-mount .dt.it{ fill:var(--accent); } .spc-mount .dt.a{ fill:var(--s1); } .spc-mount .dt.b{ fill:var(--s2); }
+    .spc-mount .legend text{ fill:var(--ink2); font-size:12.5px; }
+    .spc-mount .hit{ fill:transparent; cursor:pointer; }
+    .spc-mount .cf-zero{ stroke:var(--muted); stroke-width:1.4; stroke-dasharray:4 3; opacity:.75; }
+    .spc-mount .cf-line{ stroke:var(--muted); stroke-width:2.4; }
+    .spc-mount .cf-line.sig{ stroke:var(--accent); }
+    .spc-mount .cf-cap{ stroke:var(--muted); stroke-width:2; }
+    .spc-mount .cf-cap.sig{ stroke:var(--accent); }
+    .spc-mount .cf-dot{ fill:var(--muted); }
+    .spc-mount .cf-dot.sig{ fill:var(--accent); }
+    .spc-mount .cf-lbl{ fill:var(--ink2); font-size:13px; }
+    .spc-mount .bp-dot{ opacity:.85; }
+    .spc-mount .bp-sud{ fill:var(--accent); } .spc-mount .bp-no{ fill:var(--s1); } .spc-mount .bp-est{ fill:var(--s2); }
+    .spc-mount .bp-it{ fill:var(--accent); stroke:var(--ink); stroke-width:1.5; }
+    .spc-mount .bp-itlbl{ fill:var(--ink); font-size:12.5px; font-weight:800; }
+    .spc-mount .bp-load{ stroke:var(--muted); stroke-width:1.5; opacity:.8; }
+    .spc-mount .bp-loadlbl{ fill:var(--muted); font-size:11px; font-weight:600; }
+    .spc-mount .bp-axis{ stroke:var(--line); stroke-width:1.2; stroke-dasharray:3 3; }
+    .spc-mount .net-edge{ stroke:var(--accent); opacity:.4; }
+    .spc-mount .net-node{ fill:var(--s1); }
+    .spc-mount .net-it{ fill:var(--accent); }
+    .spc-mount .net-lbl{ fill:var(--ink); font-size:13px; font-weight:700; }
+    .spc-mount .net-val{ fill:var(--muted); font-size:11.5px; }
+    .spc-mount .net-itlbl{ fill:var(--ink); font-size:13px; font-weight:800; letter-spacing:.05em; }
+    .spc-mount .hist-a-fill{ fill:var(--accent); opacity:.32; }
+    .spc-mount .hist-a-line{ fill:none; stroke:var(--accent); stroke-width:1.6; }
+    .spc-mount .hist-b-fill{ fill:var(--s1); opacity:.24; }
+    .spc-mount .hist-b-line{ fill:none; stroke:var(--s1); stroke-width:1.6; }
+    .spc-dag .dnode rect{ fill:var(--bg-secondary,#12121a); stroke:rgba(136,136,170,.35); stroke-width:1.5; }
+    .spc-dag .dnode.root rect{ fill:rgba(255,107,107,.15); stroke:var(--accent-reaction,#ff6b6b); stroke-width:2; }
+    .spc-dag .dnode.sep rect{ stroke:var(--accent-reaction,#ff6b6b); stroke-dasharray:5 4; }
+    .spc-dag .dnode .t1{ fill:var(--text-primary,#e0e0e0); font-size:14px; font-weight:700; text-anchor:middle; }
+    .spc-dag .dnode .t2{ fill:var(--text-secondary,#8888aa); font-size:11px; text-anchor:middle; }
+    .spc-dag .dedge{ stroke:var(--text-secondary,#8888aa); stroke-width:1.6; fill:none; }
+    .spc-dag .dedge.sep{ stroke:var(--accent-reaction,#ff6b6b); stroke-dasharray:5 4; }
+    .spc-dag .darrow{ fill:var(--text-secondary,#8888aa); }
+    .spc-dag .darrow.sep{ fill:var(--accent-reaction,#ff6b6b); }
+    #tt{ position:fixed; pointer-events:none; z-index:9999; background:var(--bg-tertiary, #1a1a2e);
+      color:var(--text-primary, #e0e0e0); border:1px solid rgba(136,136,170,.3);
+      padding:7px 10px; border-radius:6px; font-size:12.5px; line-height:1.4; opacity:0; transition:opacity .08s;
+      max-width:250px; box-shadow:0 6px 20px rgba(0,0,0,.4); font-family: var(--font-mono); }
+    #tt b{ color:var(--accent-amplification, #4ecdc4); }
+  .article-content p.spc-quote{ border-left:3px solid var(--accent-amplification,#4ecdc4);
+      padding-left:1.2rem; margin:1.8rem 0; color:var(--text-secondary); font-style:italic; }
+  .article-content .tldr{ border:1px solid var(--border-subtle, rgba(136,136,170,0.28)); border-radius:10px;
+      padding:1.3rem 1.7rem; margin:2.4rem 0; background:rgba(136,136,170,0.07); }
+  .article-content .tldr p:first-child{ margin-top:0; font-family:var(--font-mono); font-size:.82rem;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--accent-amplification,#4ecdc4); }
+  .article-content .tldr ul{ margin:.9rem 0 0; padding-left:1.15rem; }
+  .article-content .tldr li{ margin:.55rem 0; }
+  .article-content .tldr p:last-child{ margin-bottom:0; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-07-25 | Pinperepette</p>
+    <h1 class="article-page-title">I numeri sono giusti <span class="accent">(la conclusione no)</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Mi mandano un articolo: l'Italia è sempre più sicura, la criminalità è calata, e se pensi il contrario è colpa dei media. Ho ricontrollato ogni cifra sui dati ISTAT e tornano tutte. Poi ho guardato cosa c'è sotto.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Dati</span>
+      <span class="tag tag-highlight">Criminalità</span>
+      <span class="tag tag-reaction">Italia</span>
+      <span class="tag tag-amplification">Statistica</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <p>La Iena mi manda un articolo: <a href="https://www.lorenzoruffino.it/p/litalia-e-un-paese-sempre-piu-sicuro" target="_blank" rel="noopener">«L'Italia è un paese sempre più sicuro»</a>, di Lorenzo Ruffino, uscito il 23 luglio. La tesi sta nel titolo: l'Italia è uno dei paesi più sicuri d'Europa e lo è ogni anno di più, la criminalità è calata, e se gli italiani pensano il contrario è colpa dei media e della politica. Vai a leggertelo prima, se vuoi, tanto qui sotto non contesto un solo numero suo. Sono andato a controllare le cifre una per una sui dati ISTAT, aspettandomi la solita forzatura. Non c'è. Tornano tutte: il meno 18 per cento dal 2007, i furti da 1.636.656 a 1.054.599, le rapine in banca da 3.050 a 63, gli omicidi mafiosi da 119 a 17. Nessun numero gonfiato, nessuna fonte piegata. È un lavoro fatto bene, e lo dico senza denti stretti.</p>
+
+    <p>Ed è esattamente per questo che mi sono messo a scrivere: quando i numeri sono giusti e la conclusione non torna lo stesso, il problema sta nel passaggio in mezzo. Allora me lo sono ripreso dall'inizio e l'ho seguito sezione per sezione, nel suo ordine. Quello che segue non contesta un solo dato.</p>
+
+    <div class="tldr">
+      <p>Se hai cinque minuti</p>
+      <p>Ho ricontrollato tutti i numeri dell'articolo di Lorenzo Ruffino. Sono corretti. Il problema non sono i dati, è quello che ci viene costruito sopra.</p>
+      <ul>
+        <li>il meno 18 per cento dei reati dal 2007 sta quasi tutto in due cose: i <strong>furti di auto e motorini</strong>, che da soli valgono il <strong>52 per cento</strong> del calo complessivo, e le <strong>ingiurie</strong>, che dal 2016 non sono più reato. Insieme fanno il <strong>64 per cento</strong> della discesa, e al netto loro il quadro cambia radicalmente;</li>
+        <li>gli omicidi sono davvero crollati, ma la discesa si ferma intorno al 2018, e il titolo parla di un miglioramento continuo che i dati recenti non mostrano;</li>
+        <li>i confronti partono quasi sempre da anni eccezionali, il 1991 per gli omicidi e il 2007 per i reati, una scelta che enfatizza il calo;</li>
+        <li>la criminalità si è spostata: negli anni del Covid i reati di strada sono crollati e le truffe online sono salite. Ma il rimbalzo c'è già stato: rispetto al 2019, cioè a prima del Covid, le rapine in pubblica via sono a <strong>più 24 per cento</strong> e le estorsioni a <strong>più 34</strong>;</li>
+        <li>la controprova basata sulle vittime è molto meno netta di quanto sembri, perché lo stesso ISTAT avverte che il confronto è influenzato dalla pandemia;</li>
+        <li>l'articolo conclude che la percezione degli italiani è sbagliata e causata dai media, ma quel passaggio non viene dimostrato dai dati presentati. <strong>Anzi</strong>: guardando le categorie una per una, quella percezione segue piuttosto bene quello che succede davvero.</li>
+      </ul>
+      <p>La mia critica non è che i numeri siano falsi. È che gli stessi numeri permettono conclusioni molto più prudenti.</p>
+    </div>
+
+    <h2>Il calo dal picco del 2007</h2>
+
+    <p>Qui c'è una frase che sembra una nota a piè di pagina e invece è una mina. Il calo, scrive, viene dai furti, e «da soli hanno perso più di quanto abbia perso l'intero totale». Fermiamoci un secondo su cosa vuol dire. Se una singola voce cala più del totale, allora tutto il resto messo insieme è aumentato. Non è un'opinione, è una sottrazione: il totale fa meno 533.799, i furti da soli meno 582.057.</p>
+
+    <p>Per fare il conto per bene mi sono costruito la partizione vera, 35 categorie di primo livello che non si sovrappongono e che sommano <em>esattamente</em> al totale, tutti e diciannove gli anni, scarto zero. E lì, mannaia la puttana, è saltata fuori una cosa che nell'articolo non c'è.</p>
+
+    <p>Le <strong>ingiurie</strong>. Nel 2007 erano 61.737 denunce. Oggi sono zero. Non perché gli italiani abbiano smesso di insultarsi, sarebbe la notizia del secolo: perché nel 2016 le hanno depenalizzate. Il decreto legislativo 7/2016 le ha trasformate in illecito civile e da lì sono uscite dalla statistica. Guarda la serie: 58.620 nel 2015, 15.781 nel 2016, 2.064 nel 2017, poi il nulla. Sessantamila reati spariti per via legislativa, non per condotta, che da soli fanno l'<strong>11,6 per cento</strong> del calo. E la domanda ovvia è: cosa le ha sostituite? Niente. Nel flusso di polizia non esiste nessun codice «diffamazione» o «molestie» pronto ad accoglierle, e negli anni attorno alla depenalizzazione non si gonfia nessuna voce in modo compatibile. La gente ha continuato a insultarsi esattamente come prima, solo che da un certo giorno non è più roba da caserma. Nel 2016 il totale perde il <strong>7,4 per cento</strong>, uno dei tonfi più ripidi della serie insieme al 2008 e al 2020 del lockdown, e le sole ingiurie ne spiegano il <strong>21 per cento</strong>. Sommati ai furti: <strong>120,6 per cento</strong>. Sopra cento. Che tradotto vuol dire: tutto il resto della criminalità italiana, messo insieme, è cresciuto. Il calo del titolo sta in una voce sola e in un reato che hanno cancellato.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="0"></div>
+      <figcaption class="spc-cap">Contributo di ogni voce alla variazione 2007-2024. Categorie di primo livello che sommano esattamente al totale. Fonte: ISTAT.</figcaption>
+    </figure>
+
+    <p>Quanto è cresciuto, il resto? Al netto dei soli furti i delitti denunciati sono a <strong>più 3,7 per cento sul 2007</strong> e a <strong>più 9,3 sul 2019</strong>. E dentro i furti conviene guardare cosa è calato davvero: <strong>auto e motorini</strong>. Furti di ciclomotori meno 85 per cento, furti in auto in sosta meno 138 mila, autovetture meno 69 mila. Messi in fila, i furti di auto, moto e motorini fanno da soli <strong>278.955 delitti in meno</strong>, cioè il <strong>52 per cento dell'intero calo della criminalità italiana</strong>. Con le ingiurie si arriva al 64.</p>
+
+    <p>È una gran bella notizia se hai un motorino. Lo è un po' meno se la usi per spiegare a qualcuno che la sua paura è irrazionale, perché la ragione per cui non ti rubano più il motorino è che ci hanno messo l'immobilizer, non che è cambiato il paese.</p>
+
+    <p>E c'è un filo che tiene insieme tutto il calo vero, basta mettere in fila le tre voci che lo fanno: <strong>veicoli, banche, mafia</strong>. I furti di auto e motorini, mezzo calo nazionale, sono crollati per l'immobilizer. Le rapine in banca sono passate da 3.050 a 63, meno 98 per cento, perché le filiali si sono blindate e i contanti allo sportello non ci sono quasi più. Gli omicidi mafiosi da 119 a 17, perché è finita una guerra. Tre storie diverse con una cosa sola in comune: <strong>sono i posti dove la persona non c'è</strong>. Bersagli che si sono difesi con la tecnologia, con le procedure o con la fine di un conflitto, non perché il paese sia diventato più mite. E infatti dove la persona c'è, la casa, la strada, il conto online, il calo non si vede: furti in abitazione fermi ai livelli del 2007, rapine in pubblica via su del 24 per cento dal 2019, truffe più che raddoppiate. <strong>Si sono blindati i bersagli che potevano permetterselo. Le persone no.</strong></p>
+
+    <p>Nella stessa sezione c'è poi una mossa che vale la pena guardare da vicino: «senza i reati digitali il calo complessivo sarebbe più ripido, si arriva al 26 per cento in meno contro il 18 del totale». È vero, l'ho verificato. Solo che, dannato systemd, è la stessa identica operazione che sto contestando, fatta al contrario: togli la voce che cresce e il calo diventa più bello. Togli i furti e il segno si inverte. Togli le ingiurie e il calo si assottiglia. Si può levare qualunque cosa e ottenere qualunque risultato, ed è proprio questo il punto: <strong>una cifra aggregata che cambia così tanto a seconda di cosa ci metti dentro non è una misura della sicurezza di un paese, è una scelta editoriale.</strong></p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="1"></div>
+      <figcaption class="spc-cap">Il totale scende, tutto ciò che non è furto sale. Base 100 = 2007. Fonte: ISTAT.</figcaption>
+    </figure>
+
+    <p>Poi c'è la faccenda dell'anno di partenza, che sembra un tecnicismo da pignoli e invece decide tutto. <em>Sempre più</em> sicuro è una frase sulla direzione di marcia: non dice che stiamo bene, dice che stiamo migliorando adesso. E la direzione di marcia la misuri da dove sei, non da un picco di diciassette anni fa. Se parto dal 2007, che è il massimo mai registrato in Italia, il calo è del <strong>18,2 per cento</strong>. Se parto dal 2019, che è l'ultimo anno normale prima che ci chiudessero in casa, siamo a <strong>più 4,2</strong>. Stesso dato, stesso archivio, segno opposto: cambia solo dove appoggi il righello.</p>
+
+    <p>E il più 4,2 non l'ho scovato io scavando negli allegati: sta nell'articolo. Solo che sta in una subordinata, incastrato fra due cifre che tirano dall'altra parte, «il 4,2 per cento in più rispetto al 2019 <em>ma ancora</em> il 18 per cento in meno rispetto al picco». È un numero che, messo in cima, cambia tutto. Messo lì in mezzo, non lo legge nessuno.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="2"></div>
+      <figcaption class="spc-cap">Variazione 2019-2024 per tipo di reato: il confronto con l'ultimo anno pre-Covid, non col minimo da lockdown. Fonte: ISTAT.</figcaption>
+    </figure>
+
+    <p>Chiudo la sezione con il 1926, che l'articolo tira fuori per dire che allora c'erano meno reati e più violenza. Lì però si confrontano le azioni penali avviate dall'autorità giudiziaria nel 1926 con i delitti denunciati alle forze di polizia nel 2024: due grandezze diverse, prodotte da apparati statali che non hanno niente in comune, in un'epoca in cui la gente denunciava una frazione di quanto denuncia oggi. L'articolo lo riconosce, scrive che «il confronto vale come ordine di grandezza», e subito dopo ne ricava un «paradosso istruttivo». Se il confronto non regge, kernel maledetto, non regge nemmeno il paradosso.</p>
+
+    <h2>Omicidi ai minimi storici</h2>
+
+    <p>Qui l'articolo ha ragione, e lo dico subito senza girarci intorno, per onestà intellettuale. Gli omicidi consumati sono crollati sul serio. Anche togliendo tutta la componente mafiosa il calo resta di circa tre quarti. Non è un trucco statistico, è una delle trasformazioni più profonde della storia recente del paese, e chi la nega è disonesto quanto chi la usa male. Una precisazione però mettiamola subito, perché vale per tutto quello che segue: a crollare sono gli omicidi <em>riusciti</em>. Se conti anche i tentativi il calo si dimezza, e dal 2020 la somma dei due risale. Ci arrivo fra poco.</p>
+
+    <p>Il problema è che quella discesa, dal 2018, si è fermata. Lo si vede a occhio guardando il grafico, ma «a occhio» non mi basta: è esattamente il tipo di occhiometro che sto contestando a lui, e se lo uso io vale zero. Ho fatto il test, e visto che di solito questa roba si cita e basta, spiego anche cosa vuol dire.</p>
+
+    <p>Il test si chiama Mann-Kendall. In pratica prende tutte le coppie di anni possibili e per ognuna chiede: quello dopo sta più in alto o più in basso di quello prima? Poi tira le somme. Se scendono tutte viene meno 1, se salgono tutte più 1, se si pareggiano viene zero. Sul periodo <strong>2006-2017</strong> viene <strong>meno 0,909</strong>: quasi ogni coppia dice «giù», una scala all'ingiù. Sul periodo <strong>2018-2024</strong> viene <strong>più 0,195</strong>, cioè le coppie che salgono e quelle che scendono quasi si annullano.</p>
+
+    <p>Poi c'è la probabilità che quel risultato esca per puro caso, se in realtà una tendenza non ci fosse. Nel primo periodo è <strong>sotto una su diecimila</strong>. Nel secondo è del <strong>54 per cento</strong>: come tirare una monetina. Quel più 0,195 non è una salita debole, è rumore.</p>
+
+    <p>Infine quanto è ripida la discesa, misurata con una pendenza che si chiama Theil-Sen: invece di tirare una retta sola attraverso tutti i punti, che un singolo anno storto può sbilanciare, calcola la pendenza fra ogni coppia di punti e prende quella di mezzo. Nel primo periodo fa <strong>meno 21,9 omicidi l'anno</strong>. Nel secondo fa più 2,0, ma con un margine che va da meno 13 a più 17. E qui sta il punto: siccome quel margine <strong>contiene lo zero</strong>, non si può nemmeno dire da che parte stia andando. Giù, ferma o su sono tutte compatibili con i dati. Non è che ho misurato una risalita: dal 2018 non c'è più niente da misurare.</p>
+
+    <p>A questo punto arriva l'obiezione furba, quella che mi farei da solo: «eh, ma il 2018 te lo sei scelto tu per far tornare i conti». Giusto. E infatti non me lo sono scelto: gliel'ho fatto scegliere alla macchina. Esiste un test apposta, si chiama sup-F, e funziona così: prova <em>tutti</em> i punti di rottura possibili nella serie, per ognuno misura di quanto migliora la descrizione dei dati rispetto a una riga dritta, e tiene il migliore. Poi si controlla se quel miglioramento è tanto grande da non poter essere un caso, generando migliaia di serie finte senza nessuna rottura dentro e vedendo quante volte capita per sbaglio.</p>
+
+    <p>Risultato: la rottura migliore cade nel <strong>2018</strong>, e su quattromila serie generate senza rottura una così capita <strong>una volta su mille</strong>. Non è un artefatto e non è una mia scelta: è nei dati. Ho anche misurato quanto è precisa quella data rimescolando i residui duemila volte, e l'intervallo va dal <strong>2018 al 2020</strong>. Comunque la giri, da lì in avanti la discesa non c'è più. Il motore era la fine della violenza mafiosa e ha finito la corsa: gli omicidi di tipo mafioso oggi sono 17, il 5,2 per cento del totale, da lì non c'è più un cazzo da recuperare.</p>
+
+    <p>C'è un ultimo modo di dirlo, forse il più brutale. Prendi il ritmo di discesa del periodo buono, il 2006-2017, e chiediti dove saremmo oggi se fosse continuato: <strong>253 omicidi nel 2024</strong>. Ne abbiamo avuti <strong>326</strong>, cioè settantatré in più, il <strong>29 per cento sopra</strong> la traiettoria su cui il paese stava viaggiando.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="3"></div>
+      <figcaption class="spc-cap">Omicidi volontari e componente mafiosa. La rottura di tendenza stimata dai dati cade nel 2018. Fonte: ISTAT.</figcaption>
+    </figure>
+
+    <p>Sul punto di partenza aggiungo una nota, senza farne una battaglia. Quel meno 83 per cento si conta dal 1991, che non è un anno qualunque: è il picco della guerra di mafia, l'anno prima di Capaci e via d'Amelio, con oltre 700 di quei 1.916 omicidi attribuiti alla criminalità organizzata. Che quei morti in meno siano un guadagno enorme è fuori discussione (Grazia, Graziella e Grazie al cazzo). Ma chi legge quella percentuale immagina un paese pacificatosi da solo, non un conflitto che si è chiuso.</p>
+
+    <p>C'è poi una cosa che quel grafico non può mostrare per come è costruito: conta gli omicidi <em>consumati</em>, quelli riusciti. I tentati non ci sono. E i tentati raccontano un'altra storia: dal 2006 al 2024 i consumati fanno meno 47,5 per cento, i tentati meno 22,1. Le volte in cui in Italia qualcuno prova ad ammazzare qualcun altro sono scese del 30 per cento, non del 47. La differenza è la quota di aggressioni che finisce con un morto, passata dal 29,7 al 22,2 per cento. Perché, i dati non lo dicono: può pesare il soccorso che arriva prima, può pesare il fatto che sono quasi sparite le esecuzioni fatte da professionisti, che sono quelle che riescono quasi sempre, e dentro ci sarà anche una quota di violenza in meno. L'unica cosa certa è che quel meno 47,5 sovrastima il calo della violenza. E i tentati, dal 2020, stanno risalendo: da 876 a 1.143, più 30,5 per cento.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="4"></div>
+      <figcaption class="spc-cap">Consumati e tentati, base 100 = 2006. Il grafico dell'articolo mostra solo la prima linea. Fonte: ISTAT.</figcaption>
+    </figure>
+
+    <p>Sempre in questa sezione l'articolo scrive una cosa giusta e la lascia lì: che il calo «è stato invece molto più lento per gli omicidi maturati in famiglia», citando il lavoro di Marzio Barbagli, e che «proprio per questo il loro peso sul totale continua a salire». Vero. Solo che non viene quantificato, e i numeri ci sono. Dal 2007 al 2024 le vittime uomini passano da 479 a 215, meno 55,1 per cento; le donne da 148 a 113, meno 23,6, con la serie piatta nell'ultimo decennio. La quota di vittime donne sale dal 23,6 al 34,5 per cento. Il grande calo degli omicidi italiani è, in larghissima parte, il calo di uomini ammazzati da altri uomini in contesti criminali e di strada. Per una donna, il cui rischio sta in casa e nelle relazioni, quel meno 83 per cento racconta una storia solo in parte sua: il rischio è sceso anche per lei, ma molto meno.</p>
+
+    <p>Verrebbe da fare un ragionamento semplice: se gli omicidi sono crollati dell'83 per cento, allora sarà crollato anche il pericolo per le donne, e possiamo smettere di parlarne. È esattamente l'inferenza che un numero aggregato invita a fare, ed è sbagliata. I numeri per sesso ci sono e dicono un'altra cosa.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="5"></div>
+      <figcaption class="spc-cap">Vittime di omicidio per sesso, base 100 = 2007. Fonte: ISTAT, flusso vittime.</figcaption>
+    </figure>
+
+    <p>E se guardi <em>dove</em> muoiono, il quadro si chiude. Nel 2024, secondo il Ministero dell'Interno, le donne uccise sono state 111 e <strong>96 di loro, l'86 per cento, sono state ammazzate in ambito familiare o affettivo</strong>: 59 dal partner o dall'ex. ISTAT, che conta con criteri un po' diversi, arriva a 106 femminicidi presunti su 116 vittime donne, di cui 62 dentro la coppia e 37 per mano di un altro parente. Le tre fonti danno 111, 113 e 116, perché ognuna include e esclude cose diverse, ma il quadro non cambia di una virgola. E il tasso di donne uccise dal partner o dall'ex è <strong>fermo a 0,21 ogni 100 mila donne</strong>. Fermo, mentre tutto il resto dimezzava.</p>
+
+    <p>Nel 2026 ci sono ancora le guerre, e in un paese di cinquantanove milioni di abitanti ci sono ancora <strong>cinquantanove uomini</strong> che non hanno capito che non si ammazza la propria moglie. Uno ogni milione di abitanti. E quel numero non si muove da dieci anni.</p>
+
+    <p>Su X gliel'ho chiesto apposta, e me lo riporto qui perché è tutto il punto. Ho preso il ragionamento dell'articolo, quello per cui i reati calano e quindi la paura è un'invenzione di media e politica, e l'ho applicato pari pari a questa categoria:</p>
+
+    <p class="spc-quote">«Quindi, seguendo questo ragionamento, possiamo dire che anche l'emergenza femminicidi è un'invenzione di media e politica? O quel principio vale solo quando fa comodo?»</p>
+
+    <p>Era una provocazione. Se la regola è «il dato aggregato scende, quindi chi ha paura è manipolato», allora deve valere anche qui, perché anche qui il dato aggregato degli omicidi scende. Solo che nessuno se la sente di dirlo, e ha ragione a non dirselo. <strong>Una regola di inferenza che applichi solo dove ti conviene non è una regola, è una preferenza.</strong> Il femminicidio lo fa vedere meglio di qualunque altra voce, perché è il caso in cui il dato aggregato e il fenomeno vanno platealmente in due direzioni diverse.</p>
+
+    <p>Cinquantanove è sempre troppo, e su questo non c'è niente da discutere: sono cinquantanove donne che dovevano essere vive. Ma è anche un numero che non regge il peso delle teorie generali che ci si appoggiano sopra. Da un fenomeno che riguarda un uomo ogni milione di abitanti non si deduce com'è fatta un'intera società, né in un senso né nell'altro. Vale per chi lo usa per raccontare un paese intero come una caserma, e vale identico per chi lo usa per dire che non è successo niente. I numeri dicono una cosa sola, e la dicono bene: succede in casa, succede fra persone che si conoscono, e a differenza di tutto il resto <strong>non sta scendendo</strong>. Il perché non sta in questa tabella, e chi te lo racconta partendo da questa tabella te lo sta vendendo.</p>
+
+    <p>Il posto più pericoloso per una donna in Italia <strong>non è la strada, è casa sua</strong>. Nessuna delle misure di cui si discute quando si parla di sicurezza, più pattuglie, più telecamere, più espulsioni, tocca il luogo dove le donne muoiono davvero. È il caso più netto di tutto il pezzo: un indicatore aggregato che cala, un titolo che ne fa una notizia rassicurante, e sotto un fenomeno fermo.</p>
+
+
+    <h2>Il confronto con il resto d'Europa</h2>
+
+    <p>Sugli omicidi siamo secondi in Europa dietro il Lussemburgo, e nel 2022 eravamo primi. Vero, e non c'è niente da obiettare. Il problema è che se la gara te la scegli tu, la vinci sempre. Nello stesso paragrafo l'articolo scrive che i furti in abitazione «in Italia sono rimasti sui livelli del 2008, mentre nella mediana dei paesi europei calavano del 42 per cento» e che «siamo con Romania e Francia uno dei tre paesi dell'Unione dove il tasso non è sceso».</p>
+
+    <p>Ecco: quei due fatti stanno a tre righe di distanza e ricevono un trattamento completamente diverso. Il primo finisce nel titolo e nella conclusione. Il secondo entra come «fanno eccezione» e viene subito ridimensionato passando al picco del 2014, da cui la discesa è del 39 per cento. Ma il picco del 2014 è un altro paletto scelto ad arte: rispetto al 2007 quella voce è ferma, e dal minimo del 2020 risale da quattro anni di fila. E se la domanda è perché gli italiani si sentano meno sicuri di quanto i numeri direbbero, l'indicatore su cui siamo un'anomalia negativa europea è di gran lunga il più pertinente dei due. Perché «mi sento sicuro a casa mia» ha a che fare col portone forzato, non col tasso di omicidi: nessuno si affaccia alla finestra la sera e pensa «vabbè, però siamo secondi dopo il Lussemburgo».</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="6"></div>
+      <figcaption class="spc-cap">Furti in abitazione denunciati: rispetto al 2007 la voce è ferma, e dal 2020 risale. Fonte: ISTAT.</figcaption>
+    </figure>
+
+    <p>Subito dopo arriva il <em>crime drop</em> e la spiegazione che l'articolo adotta: la diffusione dei dispositivi di sicurezza, blocco elettronico delle auto e porte blindate, che ha tolto le occasioni. Solo che quella spiegazione, se la prendi sul serio, porta da un'altra parte. Racconta benissimo il crollo dei furti d'auto e <strong>non dice niente su una «società sempre meno violenta»</strong>: l'immobilizer non ha reso nessuno più buono, ha solo reso l'auto una rottura di coglioni da rubare. E quella stessa letteratura prevede che il crimine si <em>sposti</em> dove le difese non ci sono. Che è esattamente la sezione successiva.</p>
+
+    <h2>I reati che aumentano</h2>
+
+    <p>Qui l'articolo elenca tutto con precisione: truffe e frodi informatiche da 109 mila a 286 mila, il 12 per cento di tutti i crimini; accessi abusivi ai sistemi da 2.394 a quasi 27 mila, undici volte tanto; violenze sessuali al massimo storico; estorsioni più che raddoppiate. E poi scrive la frase che secondo me è la più importante di tutto il pezzo: <em>«la fisionomia dell'insicurezza è cambiata più della sua quantità, con meno reati di strada e più reati a distanza»</em>.</p>
+
+    <p>È giusta. Ed è anche una previsione, quindi si può testare. L'ho fatto.</p>
+
+    <p>Ho preso le 35 categorie della partizione e per ogni anno ho costruito il vettore delle quote, cioè come si distribuiscono i reati fra le voci. Poi ho misurato due cose. Quanto è cambiata la <em>quantità</em>, che è banale, la variazione del totale rispetto al 2007. E quanto è cambiata la <em>forma</em>, con la distanza in variazione totale fra la composizione di ogni anno e quella del 2007: metà della somma dei valori assoluti delle differenze fra le quote. Ha un'interpretazione diretta e per niente astratta, è la quota di tutti i delitti che dovrebbe cambiare categoria per riportare il mix a com'era.</p>
+
+    <p>Nel 2024 la quantità è cambiata del 18,2 per cento. La composizione del <strong>17,3</strong>. E siccome le ingiurie depenalizzate da sole spostano il mix, ho rifatto il conto togliendole: quantità 16,4, composizione <strong>16,7</strong>. Al netto dell'artefatto legislativo <strong>la forma cambia leggermente più della quantità</strong>. La frase che l'articolo scrive a metà pezzo e poi abbandona è vera, e adesso ha un numero sotto.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="7"></div>
+      <figcaption class="spc-cap">Quanto è cambiata la quantità dei reati e quanto è cambiata la loro composizione, rispetto al 2007. Le due curve viaggiano insieme. Fonte: ISTAT, elaborazione mia su 35 categorie mutuamente esclusive.</figcaption>
+    </figure>
+
+    <p>Prima che qualcuno dica che quel 17,3 è rumore di conteggio: no. Ho simulato due anni identici lasciando che i conteggi ballassero per puro caso statistico, e la distanza che ne esce è <strong>0,09 punti</strong>. Quella osservata è <strong>187 volte tanto</strong>. Non è rumore, è un trasloco.</p>
+
+    <p>E siccome «distanza fra composizioni» detto così è una roba che non si mangia, l'ho aperta per vedere chi la produce. I <strong>furti</strong> passano dal 55,8 al <strong>44,0 per cento</strong> di tutti i delitti denunciati: da soli valgono un terzo dell'intero cambiamento. Le <strong>truffe e frodi informatiche</strong> fanno il percorso opposto, dal 4,1 all'<strong>11,9</strong>, quasi il triplo della quota. Poi le ingiurie che vanno a zero per decreto, e gli accessi abusivi ai sistemi che da un decimale diventano una voce vera. Le prime otto voci spiegano il <strong>93 per cento</strong> di tutto lo spostamento.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="8"></div>
+      <figcaption class="spc-cap">Variazione della quota di ogni reato sul totale, 2007-2024, in punti percentuali. Fonte: ISTAT, elaborazione mia.</figcaption>
+    </figure>
+
+    <p>Detta in italiano: non è che gli italiani hanno smesso di fregarsi a vicenda. Si fregano da un'altra parte, e in quell'altra parte le statistiche ci vedono male, perché ci arriva un quarto di quello che succede.</p>
+
+    <p>C'è poi un secondo modo di guardare la stessa cosa, e qui mi si è storto il naso. Finora ho contato i <em>delitti</em>, cioè i fatti. ISTAT però pubblica anche i <em>denunciati</em>, cioè le persone finite in mano alle forze dell'ordine per quel reato. Due misure dello stesso fenomeno: uno si aspetta che vadano d'accordo. Non vanno d'accordo per niente.</p>
+
+    <p>Dal 2007 al 2024 i furti come fatti calano del 2,6 per cento l'anno, ma le persone denunciate per furto <em>crescono</em> dell'1 per cento l'anno. Le rapine: fatti meno 3,3, persone più 1. Gli scippi: fatti meno 3,1, persone più 3,8. Su sedici categorie che ho messo a confronto, <strong>sette cambiano segno a seconda di quale delle due serie guardi</strong>, e sono tutte quelle di strada.</p>
+
+    <p>La spiegazione comoda è che le forze dell'ordine identifichino molta più gente di prima. Ogni cento furti denunciati, nel 2007 finivano a registro 5,2 persone, oggi 9,6; per gli scippi si passa da 5 a <strong>16,1</strong>, per le rapine in pubblica via da 29 a <strong>69,9</strong>. Messa così sembra che il sistema funzioni molto meglio, e in parte è probabile che sia vero.</p>
+
+    <p>Solo che quel rapporto ha i delitti denunciati al denominatore. E se la gente denuncia meno, il denominatore si accorcia e <strong>il rapporto sale da solo</strong>, senza che nessuno sia diventato più bravo a prendere i ladri. Per distinguere le due cose servirebbe sapere quanto si denuncia reato per reato. ISTAT lo misura per due soli reati, e tutti e due vanno nella stessa direzione: per gli <strong>scippi</strong> la voglia di denunciare crolla dall'88,9 al 68,2 per cento e il rapporto persone su delitti <em>triplica</em>; per le <strong>truffe informatiche</strong> la voglia di denunciare sale dal 18,4 al 24,1 e il rapporto <em>scende</em>, da 38,4 a 25,6. Due casi su due, movimenti opposti.</p>
+
+    <p>Due punti non sono una prova, e non la spaccio per tale. Ma bastano per non poter dire «la polizia è migliorata» e chiuderla lì: <strong>una fetta di quel numero è gente che ha smesso di andare a denunciare, ricomparsa sotto forma di percentuale.</strong> Il problema del sommerso non è una mia fissazione che torna: è che appena cambi strumento di misura te lo ritrovi davanti da un'altra porta.</p>
+
+    <p>Il che vuol dire una cosa precisa: se la forma cambia quanto la quantità, allora un titolo che misura solo la quantità sta buttando via metà dell'informazione. Metà, misurata. E la metà buttata via è proprio quella in cui la gente vive.</p>
+
+    <h2>La controprova delle vittime</h2>
+
+    <p>Questa è la sezione che regge tutto il resto, e la cito per intero perché è quella su cui casca il palco.</p>
+
+    <p class="spc-quote">«Si potrebbe pensare che a calare siano solo le denunce, perché gli italiani si sarebbero rassegnati a tenersi i torti subiti. Ma per rispondere esiste uno strumento costruito apposta: l'indagine sulla sicurezza dei cittadini, con cui l'Istat intervista a distanza di alcuni anni decine di migliaia di persone chiedendo quali reati abbiano subito, denunciati o no. L'ultima edizione, condotta nel 2022-2023 su circa 29 mila persone e pubblicata a giugno 2025, conferma la discesa raccontata dalle statistiche di polizia.»</p>
+
+    <p>Rileggi la prima riga e la seconda. Il dubbio è: «forse a calare sono solo le denunce». La risposta è: «esiste uno strumento costruito apposta». <strong>Apposta per cosa?</strong> Per andare a chiedere alla gente cosa ha subìto <em>senza passare dalle denunce</em>. Cioè: quello strumento esiste perché il dubbio è fondato. Nessuno si mette a bussare a ventinovemila porte per un problema che non c'è. La frase che dovrebbe archiviare la questione poggia su un'indagine che esiste solo perché la questione è seria, e questo l'articolo non lo dice.</p>
+
+    <p>Poi c'è cosa quell'indagine dice davvero. Sono andato a leggermelo, il report di giugno 2025. A pagina 3, commentando proprio i cali che dovrebbero confermare la discesa, ISTAT scrive:</p>
+
+    <p class="spc-quote">«La netta diminuzione di quasi tutti i reati potrebbe essere collegata anche al periodo pandemico, che potrebbe aver indotto cambiamenti nelle strategie di difesa adottate dai cittadini o nelle condotte criminose.»</p>
+
+    <p>L'istituto che ha fatto la rilevazione mette le mani avanti sulla propria rilevazione. Nell'articolo quella riga non c'è, e l'indagine viene citata come conferma indipendente.</p>
+
+    <p>E non è un'ipotesi buttata lì, perché il meccanismo ISTAT lo misura. Il borseggio dipende da dove ti trovi: chi prende i mezzi pubblici tutti i giorni ha una probabilità di essere borseggiato <em>cinque volte</em> più alta di chi non li prende mai, 2,8 per cento contro 0,5. E fra le due edizioni l'uso dei mezzi è sceso, <em>«probabilmente ancora legato agli effetti lunghi del periodo pandemico»</em>: a scriverlo è ISTAT, non io. Se sui tram sale meno gente i borseggi calano da soli, con esattamente gli stessi borseggiatori di prima. Una fetta del crollo dei reati predatori non è meno criminalità: <strong>figa, è che non c'è gente in giro</strong>.</p>
+
+    <p>Il periodo, del resto, si vede a occhio nudo nelle denunce del 2020, l'anno che l'articolo stesso archivia come «anno dei lockdown»: borseggi meno 46 per cento, furti in abitazione meno 33,8, rapine in pubblica via meno 16,7, mentre le truffe informatiche salivano da 212 a 248 mila casi. Nel 2020 gli italiani non erano diventati più onesti. Era sparita l'occasione. Con le strade vuote non è che uno si mette a fare volontariato: va dove c'è la gente, e la gente stava online.</p>
+
+    <p>Una precisazione la devo fare, altrimenti dimostro troppo e non dimostro niente: questo vale per borseggi, scippi, rapine, furti. Non vale per gli omicidi, che nel 2020 fanno meno 9,1 per cento contro il meno 46 dei borseggi, perché per ammazzare qualcuno non ti serve il tram pieno. Il calo lungo degli omicidi è vero e col Covid non c'entra una mazza.</p>
+
+    <h3>Il grafico che accompagna la sezione</h3>
+
+    <p>Sotto quel paragrafo c'è un grafico intitolato «Il calo dei reati si vede anche tra le vittime», con cinque voci: reati predatori nel complesso, furti nell'abitazione principale, borseggi, furti di oggetti personali, rapine. Cinque frecce, tutte verso sinistra, tutte in calo. Sono tutti reati che hanno bisogno della vittima presente di persona, cioè esattamente la famiglia su cui agisce l'effetto di cui sopra. Ma il punto non è cosa c'è. È cosa manca.</p>
+
+    <p>Il rapporto ISTAT da cui vengono quei numeri si intitola, per intero, così:</p>
+
+    <p class="spc-quote">«In calo i reati a danno dei cittadini, <strong>crescono le truffe legate agli strumenti bancari</strong>»</p>
+
+    <p>Il titolo della fonte ha due metà e il grafico ne disegna una. Il sommario è ancora più esplicito: «tra le truffe informatiche aumentano soltanto quelle che colpiscono chi usa gli strumenti bancari online. <strong>Stabili le vittime di scippi</strong>». Le sottrazioni di denaro via home banking, dice il rapporto, sono <strong>aumentate del 74 per cento</strong>.</p>
+
+    <p>Nessuna delle due voci sta nel grafico. Gli scippi sono l'unico reato predatorio che non cala, e sono l'unico che non c'è, mentre ci sono i «furti di oggetti personali», che invece calano. Le truffe bancarie sono l'unica voce in crescita, e non c'è. Per correttezza va detto che ISTAT accompagna quel più 74 con un correttivo suo, gli utenti dei servizi bancari online sono cresciuti «di più del 25 per cento», quindi una parte è più gente esposta. Ma resta che un grafico intitolato «il calo dei reati», al plurale e senza aggettivi, è costruito con le cinque voci che scendono e senza le due che il rapporto segnala come stabile e in aumento.</p>
+
+    <h3>Gli scippi, dove il conto si chiude da solo</h3>
+
+    <p>E qui arriva il pezzo che preferisco, perché non richiede di fidarsi di me: sono tre numeri di ISTAT che combaciano. Primo, le vittime di scippo dichiarate all'indagine sono <strong>rimaste stabili</strong>. Secondo, per gli scippi la voglia di denunciare è crollata <strong>dall'88,9 al 68,2 per cento</strong>, ed è l'unico reato in cui invece di salire scende. Terzo: se le vittime sono le stesse e a denunciare va il 68 invece dell'88,9, le denunce devono calare del 23,3 per cento per il solo cambio di abitudine. Sono andato a vedere di quanto sono calate davvero. <strong>Ventiquattro virgola sei.</strong></p>
+
+    <p>Combaciano. Nelle statistiche di polizia gli scippi risultano meno 41 per cento dal 2007 e sembrano uno dei successi del calo della criminalità italiana. Nel periodo in cui possiamo controllare, quel calo non contiene un solo scippo in meno: è una vittima su cinque che ha smesso di andare a denunciare, perché tanto lo sa come va a finire. Ecco cosa succede quando misuri la criminalità contando i moduli compilati.</p>
+
+    <p>L'ultimo paragrafo della sezione è quello che mi ha convinto che il problema è metodologico e non politico. L'articolo scrive che la propensione a denunciare è aumentata, aggressioni dal 20 al 41 per cento, e che quindi «le statistiche ufficiali sottostimano il calo reale anziché esagerarlo». Poi, tre righe dopo, scrive che «viene denunciato solo un quarto circa delle truffe informatiche» e che quindi la crescita registrata è «una sottostima del fenomeno reale». <strong>È lo stesso correttivo, applicato in due direzioni, e solo il primo arriva nel titolo.</strong> Il secondo resta chiuso in un paragrafo chiamato «punto cieco» e non tocca mai la cifra di copertina, che pure dipende da lui.</p>
+
+    <h2>La paura va per conto suo</h2>
+
+    <p>Su questa sezione ho poco da obiettare: la percezione, nel lungo periodo, è davvero migliorata, e i numeri che porta sono quelli. Segnalo solo cosa succede quando arriva il dato più recente. L'articolo lo scrive: nell'indagine annuale del rapporto Bes le famiglie che percepiscono un rischio di criminalità nella propria zona «sono tornate a crescere, di oltre tre punti percentuali tra il 2023 e il 2024». E aggiunge, correttamente, che è un'indagine diversa e che i livelli non si confrontano.</p>
+
+    <p>Vero. Ma l'indagine su cui poggia tutta la controprova si ferma al 2022-2023, mentre il Bes è annuale e arriva al 2024. Quando la serie aggiornata conferma la tesi si cita, quando la contraddice ci si ricorda che è un'altra indagine. E il movimento che l'articolo stesso definisce «vero» va nella stessa direzione di tutto il resto: denunce che risalgono dal 2021, furti in abitazione su da quattro anni, omicidi fermi dal 2018.</p>
+
+    <h2>Una parentesi che l'articolo non apre</h2>
+
+    <p>C'è una domanda che il pezzo non si fa e che mi faranno comunque, quindi tanto vale mettercela io: chi è che delinque? Qui vado piano, perché è il punto in cui è più facile prendere il numero che fa comodo e scappare.</p>
+
+    <p>Comincio da quello che scontenta tutti. Nel 2022 sono state denunciate 818.832 persone: <strong>548.265 italiane e 270.567 straniere</strong>. Due denunciati su tre hanno il passaporto italiano. Quindi chi dice che a delinquere «sono gli stranieri» sta dicendo una cosa falsa nel senso più banale del termine. Detto questo, il tasso è un'altra faccenda e nasconderlo sarebbe fare il gioco che sto contestando: rapportati alla popolazione residente, gli italiani denunciati sono 1.015 ogni 100.000 e gli stranieri 5.378, <strong>5,3 volte tanto</strong>. E no, non si spiega col fatto che sono più giovani e più maschi: ho controllato sui soli maschi adulti e il rapporto invece di scendere sale a 5,6.</p>
+
+    <figure class="spc-fig fade-in">
+      <div class="spc-mount" data-idx="9"></div>
+      <figcaption class="spc-cap">Denunciati ogni 100.000 residenti, 2022. Il rapporto è 5,3 a 1. Fonte: ISTAT, elaborazione mia.</figcaption>
+    </figure>
+
+    <p>Quello su cui vado cauto è cosa ci puoi costruire sopra, e il motivo è il denominatore. Quel tasso divide i denunciati stranieri per gli stranieri <em>residenti</em>, quelli iscritti all'anagrafe. Gli irregolari finiscono al numeratore, perché quando li denunciano li contano, ma non al denominatore, perché all'anagrafe non ci sono: stai dividendo per un numero più piccolo di quello vero. Attenzione a cosa vuol dire e a cosa non vuol dire: vuol dire che il rapporto reale è probabilmente più basso di 5,3, non vuol dire affatto che sia uguale a quello degli italiani. Ed è lo stesso tipo di problema per cui, in tutto il pezzo, ho scritto che un indicatore col denominatore sbagliato non dimostra quello che sembra. Vale anche quando il risultato mi piacerebbe.</p>
+
+    <h2>In conclusione</h2>
+
+    <p>L'articolo chiude così: «abbiamo una percezione completamente sbagliata, dovuta a media che preferiscono l'allarmismo e a una politica che sfrutta questo per prendere voti», e «la politica e il sistema mediatico ne sono i principali responsabili».</p>
+
+    <p>È l'unico passaggio di tutto il pezzo in cui una conclusione forte non poggia su un numero. Vengono osservate due cose vere, che la cronaca nera occupa molto spazio e che molti italiani credono la criminalità in aumento, e si conclude che la prima causa la seconda. Non c'è un confronto fra chi guarda molta e poca cronaca nera, non c'è una variazione nel tempo messa in relazione con la paura. E il perno empirico, il conteggio delle notizie del Tg1, è del <strong>2010</strong>: quindici anni fa, un mondo in cui ci si informava col telegiornale delle otto, prima delle notifiche push e dei gruppi di quartiere. Anche il 72 per cento che crede la criminalità in aumento viene da quella stessa rilevazione, e viene messo a confronto con percezioni raccolte oltre un decennio dopo.</p>
+
+    <p>Ma la cosa più grossa sta sotto, e vale per tutto l'articolo. <strong>«Sicurezza» non è una grandezza che si misura.</strong> Non esiste uno strumento che te la legge, come il termometro legge la temperatura: è un concetto, e per parlarne devi scegliere un indicatore che stia al suo posto. Nell'articolo ne vengono usati cinque, il totale dei delitti denunciati, gli omicidi, l'indagine sulle vittime, i sondaggi sulla percezione e la classifica europea, e ognuno risponde a una domanda diversa.</p>
+
+    <p>Scegliere un indicatore non è il peccato, è inevitabile, lo faccio anch'io in ogni riga di questo pezzo. Il peccato è quando l'indicatore diventa la definizione della cosa. Se «l'Italia è più sicura» vuol dire «il totale dei delitti denunciati è più basso», la frase è vera per costruzione e non c'è niente da discutere, solo che a quel punto non dice più quello che il lettore capisce quando la legge. Si vede subito: se sicurezza vuol dire probabilità di essere ammazzato, la tesi regge, con la riserva del pianoro; se vuol dire probabilità di subire un reato, non regge, perché al netto dei furti il totale sale; se vuol dire probabilità di subire un reato che richiede qualcuno davanti a te, dipende da un confronto che la fonte stessa dichiara sporcato dalla pandemia; se vuol dire quanto ti senti sicuro, dipende da quale indagine guardi e da che anno.</p>
+
+    <p>Ecco perché uno che si sente insicuro non è detto che stia sbagliando i conti. Magari sta usando un'altra definizione, e magari una più vicina alla sua giornata: la truffa sul conto, il portone forzato, il telefono sparito in metro, la denuncia che non sporgi più perché tanto lo sai come va a finire. Sono tutte cose che nell'articolo ci sono, elencate una per una con precisione, e che poi non pesano mai sulla conclusione. Per dirgli che ha torto bisognerebbe prima mettersi d'accordo su cosa stiamo misurando, e quel passaggio non c'è.</p>
+
+    <p>Rovesciamo allora la domanda con cui l'articolo si chiude. Lì ci si chiede perché gli italiani abbiano paura mentre i numeri migliorano, e la risposta è che qualcuno gliel'ha messa in testa. Ma i numeri che riguardano loro non migliorano per niente.</p>
+
+    <p>Il furto in casa è fermo ai livelli di diciassette anni fa e risale da quattro, e siamo uno dei tre soli paesi europei dove non è sceso. Le truffe sono cresciute del 137 per cento, e in caserma ne arriva una su quattro: quel numero è un pavimento, non un tetto. Gli scippi, negli anni in cui si può controllare, non sono calati: sono calate le denunce di scippo, e lo dimostrano i conti di ISTAT che combaciano al decimale. Gli omicidi sono fermi dal 2018 e stanno il 29 per cento sopra la traiettoria su cui il paese viaggiava, i tentati risalgono dal 2020, e le donne che muoiono in casa sono le stesse di dieci anni fa.</p>
+
+    <p>Se sommi tutto questo non ti viene fuori un paese manipolato. Ti viene fuori un paese in cui il rischio si è spostato, e si è spostato esattamente verso le cose che una persona incontra nella sua giornata: il conto corrente, il portone di casa, la strada la sera. La percezione non è scollegata dai fatti: è l'ultimo pezzo di realtà rimasto in mano alle persone, dopo che il totale aggregato ha smesso di raccontarla.</p>
+
+    <p><strong>La gente non si sente meno sicura perché glielo hanno messo in testa. Si sente meno sicura perché, sulle cose che le capitano davvero, lo è.</strong></p>
+
+    <h2>Appendice: le tecniche usate <span class="accent">(e perché funzionano)</span></h2>
+
+    <p>Quasi tutto quello che ho contestato qui sopra ha un nome in letteratura, e la cosa interessante è che <strong>quasi nessuna di queste tecniche è un errore</strong>. Sono scelte legittime, spesso inevitabili: chiunque maneggi dei dati deve decidere da che anno partire, come raggruppare, quale indicatore usare. Le usano i giornalisti, i politici, le aziende e anche i ricercatori. Diventano un problema in un solo caso: <strong>quando il lettore non viene avvertito che una scelta diversa avrebbe prodotto una conclusione diversa.</strong></p>
+
+    <p>Non sto dicendo che siano state applicate apposta, e non ho modo di saperlo. Metto la lista perché serve a leggere il prossimo articolo, non a giudicare questo. E perché io stesso, in questo pezzo, ne ho usate almeno tre: ci arrivo alla fine.</p>
+
+    <p><strong>1. Scelta della base temporale</strong> <em>(cherry picking temporale, reference point effect)</em>. Prendere come riferimento un massimo o un minimo storico. Stesso dataset, conclusioni opposte: meno 18,2 per cento dal 2007, più 4,2 dal 2019.</p>
+
+    <p><strong>2. Aggregazione</strong> <em>(aggregation bias)</em>. Sommare fenomeni molto diversi in un indicatore solo. Il totale può migliorare mentre quasi tutte le componenti peggiorano: qui il calo è fatto di furti e di un reato abolito, e tutto il resto sale.</p>
+
+    <p><strong>3. Effetto composizione</strong> <em>(composition effect, cugino del paradosso di Simpson)</em>. Quando cambia il peso relativo delle categorie, il totale smette di descrivere le parti. Qui l'ho misurato: la forma è cambiata quanto la quantità.</p>
+
+    <p><strong>4. Scelta dell'esito</strong> <em>(outcome selection, outcome reporting bias)</em>. Misurare gli omicidi consumati invece di consumati più tentati, il totale invece del dato per sesso. L'esito che scegli decide di quanto è grande il calo.</p>
+
+    <p><strong>5. Scelta dell'indicatore</strong> <em>(indicator selection)</em>. Per la classifica europea si usano gli omicidi, dove siamo secondi; i furti in abitazione, dove siamo fra i tre peggiori, restano in una parentesi.</p>
+
+    <p><strong>6. Selezione nella visualizzazione</strong> <em>(selective visualization)</em>. Il grafico mostra cinque voci che scendono e lascia fuori le due che il rapporto segnala come stabile e in aumento.</p>
+
+    <p><strong>7. Cambio di definizione nel tempo</strong> <em>(definitional drift)</em>. Se un reato smette di essere reato, la serie scende senza che sia cambiato niente nel mondo. Le ingiurie valgono l'11,6 per cento del calo.</p>
+
+    <p><strong>8. Correttivo asimmetrico</strong>. Applicare una correzione metodologica solo dove aiuta la tesi. Il sommerso viene usato per dire che il calo è sottostimato, e non per dire che il totale lo è.</p>
+
+    <p><strong>9. Salto causale</strong> <em>(correlation-causation, causal leap)</em>. Osservare due cose vere insieme, la cronaca nera abbondante e la paura diffusa, e concludere che la prima causa la seconda senza misurare il legame.</p>
+
+    <p><strong>10. Il concetto mai definito</strong> <em>(construct validity)</em>. È la più importante e la meno visibile. «Sicurezza» non si misura: si sceglie un indicatore che la rappresenti. Quando l'indicatore prende il posto del concetto senza che nessuno lo dichiari, la frase diventa vera per costruzione e smette di dire quello che il lettore capisce.</p>
+
+    <p>E le mie. Ho scelto anch'io un anno base, il 2019, perché mi conviene per parlare di direzione di marcia: è una scelta, l'ho dichiarata, e chi vuole può rifare i conti dal 2007. Ho scelto io la partizione in 35 categorie e la distanza in variazione totale fra le composizioni: altre scelte avrebbero dato numeri un po' diversi, anche se il quadro regge pure con la divergenza di Jensen-Shannon. E ho usato per un attimo un rapporto col denominatore rotto, quello sui denunciati stranieri, salvo poi dire perché non dimostra quello che sembra. <strong>Non esiste il modo neutro di guardare dei dati. Esiste il modo dichiarato.</strong></p>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary); border-top: 1px solid var(--border-subtle, rgba(136,136,170,0.15)); padding-top: 1.5rem; margin-top: 2.5rem;"><strong>Nota sul metodo.</strong> Quello che è verificato: tutte le serie 2006-2024 vengono da ISTAT via SDMX, flusso <code>73_67_DF_DCCV_DELITTIPS_1</code> (delitti denunciati dalle forze di polizia), dato nazionale. Ho ricontrollato una per una le cifre citate nell'articolo di partenza e risultano tutte corrette: la critica non riguarda i dati. Le vittime di omicidio per sesso vengono dal flusso <code>73_230_DF_DCCV_AUTVITTPS_1</code>, che conta le vittime e non i fatti, quindi i totali non coincidono con l'altro flusso. I denunciati italiani e stranieri sono gli autori di delitto denunciati, divisi per la popolazione residente. Le citazioni di ISTAT vengono dal report <em>«Reati contro la persona e la proprietà: vittime ed eventi», anno 2022-2023</em>, pubblicato il 9 giugno 2025: da lì arrivano il titolo del comunicato, l'avvertenza sul periodo pandemico, il rischio quintuplicato di borseggio per chi usa i mezzi, il calo del loro utilizzo, l'aumento del 74 per cento delle sottrazioni via home banking, la stabilità degli scippi subìti e i tassi di denuncia (scippi consumati dall'88,9 al 68,2 per cento). Le interviste sono state fatte fra novembre 2022 e luglio 2023 e riguardano i 12 mesi precedenti. I dati sulle donne uccise nel 2024 e sul contesto in cui muoiono vengono dal report del Ministero dell'Interno al 31 dicembre 2024 (111 vittime donne, 96 in ambito familiare o affettivo, 59 per mano di partner o ex) e dal report ISTAT <em>«Le vittime di omicidio», anno 2024</em>, pubblicato il 25 novembre 2025 (106 femminicidi presunti su 116 vittime donne). Le tre fonti contano con criteri diversi, per questo i totali non coincidono: nel testo lo dico.<br><br>Sui conti che ho fatto io. La partizione in 35 categorie di primo livello è verificata: somma esattamente al totale pubblicato in tutti e diciannove gli anni, scarto zero. La distanza fra composizioni è la distanza in variazione totale fra i vettori delle quote, metà della somma dei valori assoluti delle differenze; ripetuta con la divergenza di Jensen-Shannon dà lo stesso quadro. Va detto che confronta due grandezze concettualmente diverse, una variazione di livello e una distanza fra distribuzioni: sono entrambe percentuali ma non la stessa unità, quindi la lettura corretta è «stesso ordine di grandezza», non un pareggio al decimale. Sugli omicidi ho usato il test di Mann-Kendall con la pendenza di Theil-Sen, e la rottura di tendenza è stimata con una regressione a due segmenti che cerca il punto di taglio minimizzando la somma dei quadrati: 2006-2017 tau meno 0,909 con p sotto 0,0001, 2018-2024 tau più 0,195 con p uguale a 0,54, rottura nel 2018.<br><br>Quello che resta ragionamento, e lo dichiaro: il dato sugli omicidi mafiosi del 1991, oltre 700 su 1.916 secondo le statistiche delle forze di polizia dell'epoca, va preso come ordine di grandezza. Il conto sugli scippi è aritmetica su tre valori ISTAT, ma resta un confronto fra due edizioni di un'indagine campionaria. Sul divario italiani-stranieri ho controllato sesso ed età con le classi disponibili, che sono grossolane: non è una standardizzazione fine.<br><br>Ultima cosa, che vale sempre: queste statistiche contano i reati denunciati. Una parte non viene mai registrata, e la voglia di denunciare cambia negli anni e da reato a reato. È esattamente il motivo per cui il correttivo va applicato da tutte e due le parti, non solo da quella che fa comodo. Articolo esaminato: <a href="https://www.lorenzoruffino.it/p/litalia-e-un-paese-sempre-piu-sicuro" target="_blank" rel="noopener">«L'Italia è un paese sempre più sicuro»</a>, 23 luglio 2026.</p>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <div id="tt"></div>
+
+  <script src="../js/main.js"></script>
+  <script>
+const CHARTS = [{"idx": 0, "type": "hbar", "title": "Chi ha fatto il calo: contributo di ogni voce alla variazione 2007-2024", "x_label": "Voce", "y_label": "Variazione 2007-2024 (numero di delitti)", "note": "Categorie di primo livello, mutuamente esclusive, che sommano esattamente al totale in tutti gli anni. Il calo complessivo è di 533.799 delitti: i soli furti ne fanno 582.057 e le ingiurie, che dal 2016 non sono più reato, altri 61.737. Tutto il resto, in somma, è aumentato.", "series": [{"name": "Variazione 2007-2024", "points": [{"label": "furti", "x": 0, "y": -582057}, {"label": "danneggiamenti", "x": 1, "y": -106545}, {"label": "ingiurie (depenalizzate nel 2016)", "x": 2, "y": -61737}, {"label": "tutte le altre voci", "x": 3, "y": -37817}, {"label": "rapine", "x": 4, "y": -22501}, {"label": "accessi abusivi ai sistemi", "x": 5, "y": 23074}, {"label": "altri delitti", "x": 6, "y": 88408}, {"label": "truffe e frodi informatiche", "x": 7, "y": 165376}]}]}, {"idx": 1, "type": "line", "title": "Il totale cala, ma tutto ciò che non è furto no", "x_label": "Anno", "y_label": "Numeri indice (2007 = 100)", "note": "ISTAT, delitti denunciati dalle forze di polizia (flusso 73_67). Base 100 = 2007. Al netto dei furti i delitti sono più alti oggi che nel 2007.", "series": [{"name": "totale dei delitti", "points": [{"label": "2006", "x": 0, "y": 94.5}, {"label": "2007", "x": 1, "y": 100.0}, {"label": "2008", "x": 2, "y": 92.4}, {"label": "2009", "x": 3, "y": 89.7}, {"label": "2010", "x": 4, "y": 89.4}, {"label": "2011", "x": 5, "y": 94.2}, {"label": "2012", "x": 6, "y": 96.1}, {"label": "2013", "x": 7, "y": 98.6}, {"label": "2014", "x": 8, "y": 95.9}, {"label": "2015", "x": 9, "y": 91.6}, {"label": "2016", "x": 10, "y": 84.8}, {"label": "2017", "x": 11, "y": 82.8}, {"label": "2018", "x": 12, "y": 80.9}, {"label": "2019", "x": 13, "y": 78.5}, {"label": "2020", "x": 14, "y": 64.8}, {"label": "2021", "x": 15, "y": 71.7}, {"label": "2022", "x": 16, "y": 76.9}, {"label": "2023", "x": 17, "y": 79.8}, {"label": "2024", "x": 18, "y": 81.8}]}, {"name": "totale al netto dei furti", "points": [{"label": "2006", "x": 0, "y": 91.5}, {"label": "2007", "x": 1, "y": 100.0}, {"label": "2008", "x": 2, "y": 101.6}, {"label": "2009", "x": 3, "y": 101.2}, {"label": "2010", "x": 4, "y": 100.0}, {"label": "2011", "x": 5, "y": 100.5}, {"label": "2012", "x": 6, "y": 100.1}, {"label": "2013", "x": 7, "y": 103.2}, {"label": "2014", "x": 8, "y": 95.6}, {"label": "2015", "x": 9, "y": 94.4}, {"label": "2016", "x": 10, "y": 88.0}, {"label": "2017", "x": 11, "y": 89.8}, {"label": "2018", "x": 12, "y": 91.0}, {"label": "2019", "x": 13, "y": 94.9}, {"label": "2020", "x": 14, "y": 90.9}, {"label": "2021", "x": 15, "y": 99.7}, {"label": "2022", "x": 16, "y": 99.7}, {"label": "2023", "x": 17, "y": 101.8}, {"label": "2024", "x": 18, "y": 103.7}]}, {"name": "furti", "points": [{"label": "2006", "x": 0, "y": 96.9}, {"label": "2007", "x": 1, "y": 100.0}, {"label": "2008", "x": 2, "y": 85.1}, {"label": "2009", "x": 3, "y": 80.5}, {"label": "2010", "x": 4, "y": 81.0}, {"label": "2011", "x": 5, "y": 89.2}, {"label": "2012", "x": 6, "y": 92.9}, {"label": "2013", "x": 7, "y": 95.0}, {"label": "2014", "x": 8, "y": 96.1}, {"label": "2015", "x": 9, "y": 89.4}, {"label": "2016", "x": 10, "y": 82.3}, {"label": "2017", "x": 11, "y": 77.3}, {"label": "2018", "x": 12, "y": 72.9}, {"label": "2019", "x": 13, "y": 65.5}, {"label": "2020", "x": 14, "y": 44.1}, {"label": "2021", "x": 15, "y": 49.6}, {"label": "2022", "x": 16, "y": 58.8}, {"label": "2023", "x": 17, "y": 62.4}, {"label": "2024", "x": 18, "y": 64.4}]}]}, {"idx": 2, "type": "hbar", "title": "Variazione 2019-2024: quasi tutto è tornato sopra il pre-pandemia", "x_label": "Reato", "y_label": "Variazione 2019-2024 (%)", "note": "Confronto con il 2019, ultimo anno prima del Covid, non con il minimo da lockdown del 2020. ISTAT, flusso 73_67.", "series": [{"name": "Variazione 2019-2024 (%)", "points": [{"label": "accessi abusivi ai sistemi", "x": 0, "y": 66.4}, {"label": "violenze sessuali", "x": 1, "y": 39.9}, {"label": "truffe e frodi informatiche", "x": 2, "y": 34.9}, {"label": "estorsioni", "x": 3, "y": 34.2}, {"label": "rapine in pubblica via", "x": 4, "y": 24.4}, {"label": "rapine", "x": 5, "y": 18.3}, {"label": "furti con strappo", "x": 6, "y": 8.0}, {"label": "TOTALE dei delitti", "x": 7, "y": 4.2}, {"label": "lesioni dolose", "x": 8, "y": 3.2}, {"label": "furti con destrezza", "x": 9, "y": 2.7}, {"label": "omicidi volontari", "x": 10, "y": 2.5}, {"label": "furti", "x": 11, "y": -1.6}, {"label": "furti in abitazione", "x": 12, "y": -5.9}]}]}, {"idx": 3, "type": "line", "title": "Omicidi volontari e componente mafiosa: la discesa si ferma nel 2018", "x_label": "Anno", "y_label": "Omicidi volontari consumati", "note": "ISTAT, flusso 73_67. Dal 2018 la serie è un pianoro: 331, 318, 289, 304, 331, 341, 326. Gli omicidi mafiosi sono ormai il 5,2% del totale.", "series": [{"name": "omicidi volontari", "points": [{"label": "2006", "x": 0, "y": 621.0}, {"label": "2007", "x": 1, "y": 627.0}, {"label": "2008", "x": 2, "y": 611.0}, {"label": "2009", "x": 3, "y": 586.0}, {"label": "2010", "x": 4, "y": 526.0}, {"label": "2011", "x": 5, "y": 550.0}, {"label": "2012", "x": 6, "y": 528.0}, {"label": "2013", "x": 7, "y": 502.0}, {"label": "2014", "x": 8, "y": 475.0}, {"label": "2015", "x": 9, "y": 469.0}, {"label": "2016", "x": 10, "y": 400.0}, {"label": "2017", "x": 11, "y": 368.0}, {"label": "2018", "x": 12, "y": 331.0}, {"label": "2019", "x": 13, "y": 318.0}, {"label": "2020", "x": 14, "y": 289.0}, {"label": "2021", "x": 15, "y": 304.0}, {"label": "2022", "x": 16, "y": 331.0}, {"label": "2023", "x": 17, "y": 341.0}, {"label": "2024", "x": 18, "y": 326.0}]}, {"name": "di cui di tipo mafioso", "points": [{"label": "2006", "x": 0, "y": 109.0}, {"label": "2007", "x": 1, "y": 119.0}, {"label": "2008", "x": 2, "y": 106.0}, {"label": "2009", "x": 3, "y": 90.0}, {"label": "2010", "x": 4, "y": 69.0}, {"label": "2011", "x": 5, "y": 53.0}, {"label": "2012", "x": 6, "y": 68.0}, {"label": "2013", "x": 7, "y": 52.0}, {"label": "2014", "x": 8, "y": 45.0}, {"label": "2015", "x": 9, "y": 43.0}, {"label": "2016", "x": 10, "y": 48.0}, {"label": "2017", "x": 11, "y": 44.0}, {"label": "2018", "x": 12, "y": 19.0}, {"label": "2019", "x": 13, "y": 28.0}, {"label": "2020", "x": 14, "y": 16.0}, {"label": "2021", "x": 15, "y": 21.0}, {"label": "2022", "x": 16, "y": 17.0}, {"label": "2023", "x": 17, "y": 19.0}, {"label": "2024", "x": 18, "y": 17.0}]}]}, {"idx": 4, "type": "line", "title": "Omicidi consumati e tentati: due storie diverse", "x_label": "Anno", "y_label": "Numeri indice (2006 = 100)", "note": "Il grafico che gira mostra solo i consumati. I tentati calano meno della metà, e dal 2020 risalgono. La quota di aggressioni che finisce in morte scende dal 29,7% al 22,2%.", "series": [{"name": "omicidi consumati", "points": [{"label": "2006", "x": 0, "y": 100.0}, {"label": "2007", "x": 1, "y": 101.0}, {"label": "2008", "x": 2, "y": 98.4}, {"label": "2009", "x": 3, "y": 94.4}, {"label": "2010", "x": 4, "y": 84.7}, {"label": "2011", "x": 5, "y": 88.6}, {"label": "2012", "x": 6, "y": 85.0}, {"label": "2013", "x": 7, "y": 80.8}, {"label": "2014", "x": 8, "y": 76.5}, {"label": "2015", "x": 9, "y": 75.5}, {"label": "2016", "x": 10, "y": 64.4}, {"label": "2017", "x": 11, "y": 59.3}, {"label": "2018", "x": 12, "y": 53.3}, {"label": "2019", "x": 13, "y": 51.2}, {"label": "2020", "x": 14, "y": 46.5}, {"label": "2021", "x": 15, "y": 49.0}, {"label": "2022", "x": 16, "y": 53.3}, {"label": "2023", "x": 17, "y": 54.9}, {"label": "2024", "x": 18, "y": 52.5}]}, {"name": "tentati omicidi", "points": [{"label": "2006", "x": 0, "y": 100.0}, {"label": "2007", "x": 1, "y": 108.2}, {"label": "2008", "x": 2, "y": 110.4}, {"label": "2009", "x": 3, "y": 91.7}, {"label": "2010", "x": 4, "y": 89.2}, {"label": "2011", "x": 5, "y": 95.4}, {"label": "2012", "x": 6, "y": 90.4}, {"label": "2013", "x": 7, "y": 83.2}, {"label": "2014", "x": 8, "y": 85.1}, {"label": "2015", "x": 9, "y": 81.9}, {"label": "2016", "x": 10, "y": 73.5}, {"label": "2017", "x": 11, "y": 74.8}, {"label": "2018", "x": 12, "y": 71.5}, {"label": "2019", "x": 13, "y": 69.4}, {"label": "2020", "x": 14, "y": 59.7}, {"label": "2021", "x": 15, "y": 63.2}, {"label": "2022", "x": 16, "y": 69.3}, {"label": "2023", "x": 17, "y": 70.4}, {"label": "2024", "x": 18, "y": 77.9}]}]}, {"idx": 5, "type": "line", "title": "Vittime di omicidio: per le donne il crollo non c'è stato", "x_label": "Anno", "y_label": "Numeri indice (2007 = 100)", "note": "ISTAT, flusso 73_230, vittime di omicidio per sesso. Uomini meno 55,1%, donne meno 23,6%. La quota di vittime donne sale dal 23,6% al 34,5%.", "series": [{"name": "vittime uomini", "points": [{"label": "2007", "x": 1, "y": 100.0}, {"label": "2008", "x": 2, "y": 96.5}, {"label": "2009", "x": 3, "y": 86.8}, {"label": "2010", "x": 4, "y": 77.7}, {"label": "2011", "x": 5, "y": 77.9}, {"label": "2012", "x": 6, "y": 77.9}, {"label": "2013", "x": 7, "y": 67.0}, {"label": "2014", "x": 8, "y": 68.9}, {"label": "2015", "x": 9, "y": 68.5}, {"label": "2016", "x": 10, "y": 55.5}, {"label": "2017", "x": 11, "y": 53.2}, {"label": "2018", "x": 12, "y": 44.5}, {"label": "2019", "x": 13, "y": 43.4}, {"label": "2020", "x": 14, "y": 35.9}, {"label": "2021", "x": 15, "y": 38.2}, {"label": "2022", "x": 16, "y": 42.6}, {"label": "2023", "x": 17, "y": 45.9}, {"label": "2024", "x": 18, "y": 44.9}]}, {"name": "vittime donne", "points": [{"label": "2007", "x": 1, "y": 100.0}, {"label": "2008", "x": 2, "y": 99.3}, {"label": "2009", "x": 3, "y": 115.5}, {"label": "2010", "x": 4, "y": 104.7}, {"label": "2011", "x": 5, "y": 108.1}, {"label": "2012", "x": 6, "y": 107.4}, {"label": "2013", "x": 7, "y": 122.3}, {"label": "2014", "x": 8, "y": 99.3}, {"label": "2015", "x": 9, "y": 96.6}, {"label": "2016", "x": 10, "y": 92.6}, {"label": "2017", "x": 11, "y": 77.7}, {"label": "2018", "x": 12, "y": 81.8}, {"label": "2019", "x": 13, "y": 77.7}, {"label": "2020", "x": 14, "y": 77.7}, {"label": "2021", "x": 15, "y": 84.5}, {"label": "2022", "x": 16, "y": 86.5}, {"label": "2023", "x": 17, "y": 83.8}, {"label": "2024", "x": 18, "y": 76.4}]}]}, {"idx": 6, "type": "line", "title": "Furti in abitazione denunciati: quattro anni consecutivi di risalita", "x_label": "Anno", "y_label": "Furti in abitazione denunciati", "note": "Rispetto al 2007 la voce è ferma (meno 6,7%). L'articolo la misura dal picco del 2014 e ottiene meno 39%.", "series": [{"name": "furti in abitazione", "points": [{"label": "2006", "x": 0, "y": 141601.0}, {"label": "2007", "x": 1, "y": 166838.0}, {"label": "2008", "x": 2, "y": 150761.0}, {"label": "2009", "x": 3, "y": 150843.0}, {"label": "2010", "x": 4, "y": 169163.0}, {"label": "2011", "x": 5, "y": 204891.0}, {"label": "2012", "x": 6, "y": 237355.0}, {"label": "2013", "x": 7, "y": 251422.0}, {"label": "2014", "x": 8, "y": 255886.0}, {"label": "2015", "x": 9, "y": 234726.0}, {"label": "2016", "x": 10, "y": 214053.0}, {"label": "2017", "x": 11, "y": 195824.0}, {"label": "2018", "x": 12, "y": 191374.0}, {"label": "2019", "x": 13, "y": 165329.0}, {"label": "2020", "x": 14, "y": 109503.0}, {"label": "2021", "x": 15, "y": 124715.0}, {"label": "2022", "x": 16, "y": 133802.0}, {"label": "2023", "x": 17, "y": 147660.0}, {"label": "2024", "x": 18, "y": 155590.0}]}]}, {"idx": 7, "type": "line", "title": "La quantità e la forma: quanto è cambiato il totale e quanto è cambiato il mix", "x_label": "Anno", "y_label": "Distanza dal 2007 (%)", "note": "In una serie la variazione assoluta del totale dei delitti rispetto al 2007. Nell'altra la distanza in variazione totale fra la composizione dei reati di ogni anno e quella del 2007, calcolata su 35 categorie mutuamente esclusive: è la quota di delitti che dovrebbe cambiare categoria per riportare il mix a quello di partenza. Le due curve viaggiano insieme: la forma dell'insicurezza è cambiata quanto la sua quantità.", "series": [{"name": "variazione della quantità", "points": [{"label": "2006", "x": 0, "y": 5.5}, {"label": "2007", "x": 1, "y": 0.0}, {"label": "2008", "x": 2, "y": 7.6}, {"label": "2009", "x": 3, "y": 10.3}, {"label": "2010", "x": 4, "y": 10.6}, {"label": "2011", "x": 5, "y": 5.8}, {"label": "2012", "x": 6, "y": 3.9}, {"label": "2013", "x": 7, "y": 1.4}, {"label": "2014", "x": 8, "y": 4.1}, {"label": "2015", "x": 9, "y": 8.4}, {"label": "2016", "x": 10, "y": 15.2}, {"label": "2017", "x": 11, "y": 17.2}, {"label": "2018", "x": 12, "y": 19.1}, {"label": "2019", "x": 13, "y": 21.5}, {"label": "2020", "x": 14, "y": 35.2}, {"label": "2021", "x": 15, "y": 28.3}, {"label": "2022", "x": 16, "y": 23.1}, {"label": "2023", "x": 17, "y": 20.2}, {"label": "2024", "x": 18, "y": 18.2}]}, {"name": "cambiamento della composizione", "points": [{"label": "2006", "x": 0, "y": 1.6}, {"label": "2007", "x": 1, "y": 0.0}, {"label": "2008", "x": 2, "y": 4.9}, {"label": "2009", "x": 3, "y": 6.8}, {"label": "2010", "x": 4, "y": 6.6}, {"label": "2011", "x": 5, "y": 4.0}, {"label": "2012", "x": 6, "y": 2.7}, {"label": "2013", "x": 7, "y": 4.4}, {"label": "2014", "x": 8, "y": 4.4}, {"label": "2015", "x": 9, "y": 5.0}, {"label": "2016", "x": 10, "y": 7.4}, {"label": "2017", "x": 11, "y": 9.5}, {"label": "2018", "x": 12, "y": 11.4}, {"label": "2019", "x": 13, "y": 14.8}, {"label": "2020", "x": 14, "y": 23.0}, {"label": "2021", "x": 15, "y": 22.0}, {"label": "2022", "x": 16, "y": 18.2}, {"label": "2023", "x": 17, "y": 17.5}, {"label": "2024", "x": 18, "y": 17.3}]}]}, {"idx": 8, "type": "hbar", "title": "Come è cambiata la forma: variazione della quota di ogni reato sul totale, 2007-2024", "x_label": "Reato", "y_label": "Variazione della quota sul totale (punti percentuali)", "note": "I furti passano dal 55,8 al 44,0 per cento di tutti i delitti denunciati, le truffe e frodi informatiche dal 4,1 all'11,9. Le prime otto voci spiegano il 93 per cento dell'intero cambiamento di composizione.", "series": [{"name": "Variazione della quota (punti)", "points": [{"label": "furti", "x": 0, "y": -11.85}, {"label": "ingiurie (abolite nel 2016)", "x": 1, "y": -2.1}, {"label": "danneggiamenti", "x": 2, "y": -1.52}, {"label": "rapine", "x": 3, "y": -0.55}, {"label": "ricettazione", "x": 4, "y": -0.47}, {"label": "incendi", "x": 5, "y": -0.34}, {"label": "estorsioni", "x": 6, "y": 0.28}, {"label": "tutte le altre voci", "x": 7, "y": 0.5}, {"label": "lesioni dolose", "x": 8, "y": 0.62}, {"label": "accessi abusivi ai sistemi", "x": 9, "y": 0.99}, {"label": "altri delitti", "x": 10, "y": 6.63}, {"label": "truffe e frodi informatiche", "x": 11, "y": 7.81}]}]}, {"idx": 9, "type": "bar", "title": "Denunciati ogni 100.000 residenti, 2022", "x_label": "", "y_label": "Denunciati ogni 100.000 residenti", "note": "ISTAT, autori di delitto denunciati, divisi per la popolazione residente. Il tasso degli stranieri è 5,3 volte quello degli italiani. Attenzione al denominatore: gli irregolari finiscono al numeratore ma non nella popolazione residente.", "series": [{"name": "Denunciati per 100.000 residenti", "points": [{"label": "Italiani", "x": 0, "y": 1015.3}, {"label": "Stranieri", "x": 1, "y": 5378.3}]}]}];
+
+function renderHist(c,W){
+  const S=c.series; const H=300, m={t:34,r:18,b:44,l:44};
+  const all=[].concat(...S.map(s=>s.points)); const xs=all.map(p=>p.x), ys=all.map(p=>p.y);
+  const xmn=Math.min(...xs), xmx=Math.max(...xs); let ymx=Math.max(...ys);
+  const ticks=niceTicks(0,ymx,4); ymx=ticks[ticks.length-1];
+  const pw=W-m.l-m.r, ph=H-m.t-m.b; const X=v=>m.l+pw*(v-xmn)/(xmx-xmn), Y=v=>m.t+ph*(ymx-v)/ymx;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  ticks.forEach(t=>{const y=Y(t);svg.appendChild(el('line',{class:'grid',x1:m.l,y1:y,x2:W-m.r,y2:y}));});
+  [-1,-0.5,0,0.5,1].forEach(t=>{ if(t>=xmn&&t<=xmx){ const x=X(t); const tx=el('text',{class:'tickx',x:x,y:H-m.b+16,'text-anchor':'middle'}); tx.textContent=fmt(t); svg.appendChild(tx);} });
+  const x0=X(0); svg.appendChild(el('line',{class:'cf-zero',x1:x0,y1:m.t,x2:x0,y2:H-m.b}));
+  const cls=['hist-a','hist-b'];
+  S.forEach((s,si)=>{ const pts=s.points.slice().sort((a,b)=>a.x-b.x);
+    let d='M'+X(pts[0].x)+' '+Y(0); pts.forEach(p=>d+=' L'+X(p.x)+' '+Y(p.y)); d+=' L'+X(pts[pts.length-1].x)+' '+Y(0)+' Z';
+    svg.appendChild(el('path',{class:cls[si]+'-fill',d:d}));
+    let dl=''; pts.forEach((p,i)=>dl+=(i?'L':'M')+X(p.x)+' '+Y(p.y)+' '); svg.appendChild(el('path',{class:cls[si]+'-line',d:dl}));
+  });
+  const lg=el('g',{class:'legend'}); let lx=m.l;
+  S.forEach((s,si)=>{ lg.appendChild(el('rect',{class:cls[si]+'-fill',x:lx,y:8,width:13,height:13,rx:2}));
+    const t=el('text',{x:lx+18,y:19}); t.textContent=s.name; lg.appendChild(t); lx+=34+s.name.length*7.2; });
+  svg.appendChild(lg);
+  const ax=el('text',{class:'axlbl',x:m.l+pw/2,y:H-4,'text-anchor':'middle'}); ax.textContent=c.x_label; svg.appendChild(ax);
+  return svg;
+}
+
+const TT = document.getElementById('tt');
+function tip(html,e){ TT.innerHTML=html; TT.style.opacity=1;
+  let x=e.clientX+14, y=e.clientY+14;
+  if(x+240>innerWidth) x=e.clientX-240; TT.style.left=x+'px'; TT.style.top=y+'px'; }
+function untip(){ TT.style.opacity=0; }
+const NS='http://www.w3.org/2000/svg';
+function el(n,a){ const x=document.createElementNS(NS,n); for(const k in a) x.setAttribute(k,a[k]); return x; }
+function fmt(v){ return (Math.round(v*100)/100).toLocaleString('it-IT'); }
+
+function niceTicks(min,max,n){
+  const span=max-min||1, step0=span/n, mag=Math.pow(10,Math.floor(Math.log10(step0)));
+  const norm=step0/mag; let step= norm<1.5?1: norm<3?2: norm<7?5:10; step*=mag;
+  const lo=Math.floor(min/step)*step, hi=Math.ceil(max/step)*step; const t=[];
+  for(let v=lo; v<=hi+1e-9; v+=step) t.push(Math.round(v*1e6)/1e6); return t;
+}
+
+function renderBar(c,W){ // vertical bars, single series, supports negatives + Italia highlight
+  const pts=c.series[0].points.slice(); const H=340;
+  const m={t:14,r:16,b:96,l:56};
+  const vals=pts.map(p=>p.y); let mn=Math.min(0,...vals), mx=Math.max(0,...vals);
+  const ticks=niceTicks(mn,mx,5); mn=Math.min(mn,ticks[0]); mx=Math.max(mx,ticks[ticks.length-1]);
+  const pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const Y=v=> m.t+ph*(mx-v)/(mx-mn);
+  const bw=pw/pts.length, bin=Math.min(bw*0.62,64);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  ticks.forEach(t=>{ const y=Y(t);
+    svg.appendChild(el('line',{class:'grid',x1:m.l,y1:y,x2:W-m.r,y2:y}));
+    const tx=el('text',{class:'tick',x:m.l-8,y:y+4,'text-anchor':'end'}); tx.textContent=fmt(t); svg.appendChild(tx); });
+  const y0=Y(0);
+  pts.forEach((p,i)=>{ const cx=m.l+bw*i+bw/2; const x=cx-bin/2;
+    const yv=Y(p.y); const y=Math.min(yv,y0), h=Math.abs(yv-y0);
+    const it=/itali/i.test(p.label); const neg=p.y<0;
+    const r=el('rect',{class:'bar'+(it?' it':neg?' neg':''),x:x,y:y,width:bin,height:Math.max(h,1),rx:3});
+    svg.appendChild(r);
+    const vt=el('text',{class:'val',x:cx,y:(p.y>=0?y-6:y+h+15),'text-anchor':'middle'}); vt.textContent=fmt(p.y); svg.appendChild(vt);
+    const lb=el('text',{class:'tickx',x:cx,y:H-m.b+16,'text-anchor':'end',transform:`rotate(-30 ${cx} ${H-m.b+16})`});
+    lb.textContent=p.label; svg.appendChild(lb);
+    const hit=el('rect',{class:'hit',x:m.l+bw*i,y:m.t,width:bw,height:ph});
+    hit.addEventListener('mousemove',e=>tip('<b>'+p.label+'</b><br>'+c.y_label+': '+fmt(p.y),e));
+    hit.addEventListener('mouseleave',untip); svg.appendChild(hit);
+  });
+  svg.appendChild(el('line',{class:'axis',x1:m.l,y1:y0,x2:W-m.r,y2:y0}));
+  return svg;
+}
+
+function renderHBar(c,W){ // horizontal bars, supports negatives + Italia
+  const pts=c.series[0].points.slice(); const rowh=32, m={t:10,r:54,b:28,l:200};
+  const H=m.t+m.b+rowh*pts.length;
+  const vals=pts.map(p=>p.y); let mn=Math.min(0,...vals), mx=Math.max(0,...vals);
+  const ticks=niceTicks(mn,mx,5); mn=Math.min(mn,ticks[0]); mx=Math.max(mx,ticks[ticks.length-1]);
+  const pw=W-m.l-m.r; const X=v=> m.l+pw*(v-mn)/(mx-mn); const x0=X(0);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  ticks.forEach(t=>{ const x=X(t);
+    svg.appendChild(el('line',{class:'grid',x1:x,y1:m.t,x2:x,y2:H-m.b}));
+    const tx=el('text',{class:'tickx',x:x,y:H-m.b+16,'text-anchor':'middle'}); tx.textContent=fmt(t); svg.appendChild(tx); });
+  pts.forEach((p,i)=>{ const cy=m.t+rowh*i+rowh/2; const xv=X(p.y);
+    const x=Math.min(xv,x0), w=Math.abs(xv-x0); const it=/itali/i.test(p.label); const neg=p.y<0;
+    svg.appendChild(el('rect',{class:'bar'+(it?' it':neg?' neg':''),x:x,y:cy-rowh*0.32,width:Math.max(w,1),height:rowh*0.64,rx:3}));
+    const lb=el('text',{class:'rowlbl',x:m.l-10,y:cy+4,'text-anchor':'end'}); lb.textContent=p.label; svg.appendChild(lb);
+    const vt=el('text',{class:'val',x:(p.y>=0?xv+7:xv-7),y:cy+4,'text-anchor':(p.y>=0?'start':'end')}); vt.textContent=fmt(p.y); svg.appendChild(vt);
+    const hit=el('rect',{class:'hit',x:m.l,y:cy-rowh/2,width:pw,height:rowh});
+    hit.addEventListener('mousemove',e=>tip('<b>'+p.label+'</b><br>'+fmt(p.y),e));
+    hit.addEventListener('mouseleave',untip); svg.appendChild(hit);
+  });
+  svg.appendChild(el('line',{class:'axis',x1:x0,y1:m.t,x2:x0,y2:H-m.b}));
+  return svg;
+}
+
+function renderLine(c,W){
+  const series=c.series; const multi=series.length>1; const H=multi?350:320; const m={t:multi?32:16,r:20,b:40,l:56};
+  const all=[].concat(...series.map(s=>s.points));
+  const xs=all.map(p=>p.x), ys=all.map(p=>p.y);
+  let ymn=Math.min(...ys), ymx=Math.max(...ys); const pad=(ymx-ymn)*0.12||1; ymn-=pad; ymx+=pad;
+  const ticks=niceTicks(ymn,ymx,5); ymn=Math.min(ymn,ticks[0]); ymx=Math.max(ymx,ticks[ticks.length-1]);
+  const xmn=Math.min(...xs), xmx=Math.max(...xs); const pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const X=v=>m.l+pw*(v-xmn)/(xmx-xmn), Y=v=>m.t+ph*(ymx-v)/(ymx-ymn);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  ticks.forEach(t=>{ const y=Y(t); svg.appendChild(el('line',{class:'grid',x1:m.l,y1:y,x2:W-m.r,y2:y}));
+    const tx=el('text',{class:'tick',x:m.l-8,y:y+4,'text-anchor':'end'}); tx.textContent=fmt(t); svg.appendChild(tx); });
+  const base=series[0].points.slice().sort((a,b)=>a.x-b.x);
+  base.forEach((p,i)=>{ if(i%3===0||i===base.length-1){ const tx=el('text',{class:'tickx',x:X(p.x),y:H-m.b+18,'text-anchor':'middle'}); tx.textContent=p.label; svg.appendChild(tx);} });
+  const colorOf=(s,idx)=>/itali/i.test(s.name)?'it':(idx===0?'a':(idx===1?'b':'it'));
+  series.forEach((s,si)=>{ const pts=s.points.slice().sort((a,b)=>a.x-b.x); const cc=colorOf(s,si);
+    let dpath=''; pts.forEach((p,i)=>dpath+=(i?'L':'M')+X(p.x)+' '+Y(p.y)+' ');
+    if(!multi){ const area=dpath+'L'+X(pts[pts.length-1].x)+' '+Y(ymn)+' L'+X(pts[0].x)+' '+Y(ymn)+' Z'; svg.appendChild(el('path',{class:'larea',d:area})); }
+    svg.appendChild(el('path',{class:'ln '+cc,d:dpath}));
+    pts.forEach((p,i)=>{ const emph=(!multi&&i===pts.length-1); svg.appendChild(el('circle',{class:'dt '+cc,cx:X(p.x),cy:Y(p.y),r:emph?4.5:(multi?3:2.6)}));
+      const hit=el('circle',{class:'hit',cx:X(p.x),cy:Y(p.y),r:11});
+      hit.addEventListener('mousemove',e=>tip('<b>'+s.name+'</b>, '+p.label+'<br>'+c.y_label+': '+fmt(p.y),e));
+      hit.addEventListener('mouseleave',untip); svg.appendChild(hit); });
+  });
+  if(multi){ const lg=el('g',{class:'legend'}); let lx=m.l;
+    series.forEach((s,si)=>{ const cc=colorOf(s,si); lg.appendChild(el('rect',{class:'dt '+cc,x:lx,y:6,width:13,height:13,rx:2}));
+      const t=el('text',{x:lx+18,y:17}); t.textContent=s.name; lg.appendChild(t); lx+=34+s.name.length*7.2; }); svg.appendChild(lg); }
+  return svg;
+}
+
+function renderScatter(c,W){
+  const cs=c.series[0].points, it=(c.series[1]?c.series[1].points:[]);
+  const all=cs.concat(it); const H=430; const m={t:16,r:20,b:48,l:52};
+  const xs=all.map(p=>p.x), ys=all.map(p=>p.y);
+  let xmn=Math.min(...xs),xmx=Math.max(...xs),ymn=Math.min(...ys),ymx=Math.max(...ys);
+  const xp=(xmx-xmn)*0.06,yp=(ymx-ymn)*0.10; xmn-=xp;xmx+=xp;ymn-=yp;ymx+=yp;
+  const xt=niceTicks(xmn,xmx,5),yt=niceTicks(ymn,ymx,5);
+  xmn=Math.min(xmn,xt[0]);xmx=Math.max(xmx,xt[xt.length-1]);ymn=Math.min(ymn,yt[0]);ymx=Math.max(ymx,yt[yt.length-1]);
+  const pw=W-m.l-m.r,ph=H-m.t-m.b; const X=v=>m.l+pw*(v-xmn)/(xmx-xmn),Y=v=>m.t+ph*(ymx-v)/(ymx-ymn);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  yt.forEach(t=>{const y=Y(t);svg.appendChild(el('line',{class:'grid',x1:m.l,y1:y,x2:W-m.r,y2:y}));
+    const tx=el('text',{class:'tick',x:m.l-8,y:y+4,'text-anchor':'end'});tx.textContent=fmt(t);svg.appendChild(tx);});
+  xt.forEach(t=>{const x=X(t);const tx=el('text',{class:'tickx',x:x,y:H-m.b+16,'text-anchor':'middle'});tx.textContent=fmt(t);svg.appendChild(tx);});
+  // regressione lineare su tutti i punti
+  const n=all.length,sx=xs.reduce((a,b)=>a+b,0),sy=ys.reduce((a,b)=>a+b,0);
+  const sxx=xs.reduce((a,b)=>a+b*b,0),sxy=all.reduce((a,p)=>a+p.x*p.y,0);
+  const b=(n*sxy-sx*sy)/(n*sxx-sx*sx),a=(sy-b*sx)/n;
+  svg.appendChild(el('line',{class:'trend',x1:X(xmn),y1:Y(a+b*xmn),x2:X(xmx),y2:Y(a+b*xmx)}));
+  cs.forEach(p=>{const cc=el('circle',{class:'dot',cx:X(p.x),cy:Y(p.y),r:5});
+    cc.addEventListener('mousemove',e=>tip('<b>'+p.label+'</b><br>'+c.x_label+': '+fmt(p.x)+'<br>'+c.y_label+': '+fmt(p.y),e));
+    cc.addEventListener('mouseleave',untip);svg.appendChild(cc);});
+  it.forEach(p=>{svg.appendChild(el('circle',{class:'dot it',cx:X(p.x),cy:Y(p.y),r:8}));
+    const tl=el('text',{class:'ptlbl',x:X(p.x)+12,y:Y(p.y)+4});tl.textContent=p.label;svg.appendChild(tl);
+    const cc=el('circle',{class:'hit',cx:X(p.x),cy:Y(p.y),r:12});
+    cc.addEventListener('mousemove',e=>tip('<b>'+p.label+'</b><br>'+c.x_label+': '+fmt(p.x)+'<br>'+c.y_label+': '+fmt(p.y),e));
+    cc.addEventListener('mouseleave',untip);svg.appendChild(cc);});
+  const ax=el('text',{class:'axlbl',x:m.l+pw/2,y:H-6,'text-anchor':'middle'});ax.textContent=c.x_label;svg.appendChild(ax);
+  const ay=el('text',{class:'axlbl',x:0,y:0,'text-anchor':'middle',transform:`translate(14 ${m.t+ph/2}) rotate(-90)`});ay.textContent=c.y_label;svg.appendChild(ay);
+  return svg;
+}
+
+function renderGrouped(c,W){
+  const cats=c.series[0].points.map(p=>p.label); const H=360; const m={t:44,r:16,b:72,l:56};
+  const vals=[].concat(...c.series.map(s=>s.points.map(p=>p.y)));
+  let mn=Math.min(0,...vals), mx=Math.max(0,...vals);
+  const ticks=niceTicks(mn,mx,5); mn=Math.min(mn,ticks[0]); mx=Math.max(mx,ticks[ticks.length-1]);
+  const pw=W-m.l-m.r,ph=H-m.t-m.b; const Y=v=>m.t+ph*(mx-v)/(mx-mn); const y0=Y(0);
+  const gw=pw/cats.length, ns=c.series.length, bw=Math.min(gw*0.30,42);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  ticks.forEach(t=>{const y=Y(t);svg.appendChild(el('line',{class:'grid',x1:m.l,y1:y,x2:W-m.r,y2:y}));
+    const tx=el('text',{class:'tick',x:m.l-8,y:y+4,'text-anchor':'end'});tx.textContent=fmt(t);svg.appendChild(tx);});
+  const cls=['bar','barb'];
+  cats.forEach((cat,i)=>{ const gx=m.l+gw*i+gw/2;
+    c.series.forEach((s,j)=>{ const p=s.points[i]; const off=(j-(ns-1)/2)*(bw+4); const cx=gx+off;
+      const yv=Y(p.y); const y=Math.min(yv,y0), h=Math.abs(yv-y0); const neg=p.y<0;
+      svg.appendChild(el('rect',{class:cls[j]+(neg&&j===1?' neg':''),x:cx-bw/2,y:y,width:bw,height:Math.max(h,1),rx:3}));
+      const vt=el('text',{class:'val',x:cx,y:(p.y>=0?y-5:y+h+13),'text-anchor':'middle'});vt.textContent=fmt(p.y);svg.appendChild(vt);
+      const hit=el('rect',{class:'hit',x:cx-bw/2,y:m.t,width:bw,height:ph});
+      hit.addEventListener('mousemove',e=>tip('<b>'+s.name+'</b><br>'+cat+': '+fmt(p.y),e));
+      hit.addEventListener('mouseleave',untip);svg.appendChild(hit);
+    });
+    const lb=el('text',{class:'tickx',x:gx,y:H-m.b+18,'text-anchor':'end',transform:`rotate(-18 ${gx} ${H-m.b+18})`});
+    lb.textContent=cat;svg.appendChild(lb);
+  });
+  svg.appendChild(el('line',{class:'axis',x1:m.l,y1:y0,x2:W-m.r,y2:y0}));
+  const lg=el('g',{class:'legend'});
+  let lx=m.l;
+  c.series.forEach((s,j)=>{ lg.appendChild(el('rect',{class:cls[j],x:lx,y:8,width:13,height:13,rx:2}));
+    const t=el('text',{x:lx+18,y:19});t.textContent=s.name;lg.appendChild(t);
+    lx += 34 + s.name.length*6.6; });
+  svg.appendChild(lg);
+  return svg;
+}
+
+function renderCoef(c,W){
+  const pts=c.series[0].points; const rowh=44, m={t:14,r:30,b:42,l:190}; const H=m.t+m.b+rowh*pts.length;
+  const vals=[]; pts.forEach(p=>{vals.push(p.x,p.lo,p.hi);});
+  let mn=Math.min(0,...vals), mx=Math.max(0,...vals);
+  const ticks=niceTicks(mn,mx,5); mn=Math.min(mn,ticks[0]); mx=Math.max(mx,ticks[ticks.length-1]);
+  const pw=W-m.l-m.r; const X=v=>m.l+pw*(v-mn)/(mx-mn);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  ticks.forEach(t=>{ const x=X(t); svg.appendChild(el('line',{class:'grid',x1:x,y1:m.t,x2:x,y2:H-m.b}));
+    const tx=el('text',{class:'tickx',x:x,y:H-m.b+16,'text-anchor':'middle'}); tx.textContent=fmt(t); svg.appendChild(tx); });
+  const x0=X(0); svg.appendChild(el('line',{class:'cf-zero',x1:x0,y1:m.t,x2:x0,y2:H-m.b}));
+  pts.forEach((p,i)=>{ const cy=m.t+rowh*i+rowh/2; const sig=p.sig?' sig':'';
+    svg.appendChild(el('line',{class:'cf-line'+sig,x1:X(p.lo),y1:cy,x2:X(p.hi),y2:cy}));
+    svg.appendChild(el('line',{class:'cf-cap'+sig,x1:X(p.lo),y1:cy-5,x2:X(p.lo),y2:cy+5}));
+    svg.appendChild(el('line',{class:'cf-cap'+sig,x1:X(p.hi),y1:cy-5,x2:X(p.hi),y2:cy+5}));
+    svg.appendChild(el('circle',{class:'cf-dot'+sig,cx:X(p.x),cy:cy,r:6}));
+    const lb=el('text',{class:'cf-lbl',x:m.l-14,y:cy+4,'text-anchor':'end'}); lb.textContent=p.label; svg.appendChild(lb);
+    const vt=el('text',{class:'val',x:X(p.x),y:cy-11,'text-anchor':'middle'}); vt.textContent=fmt(p.x); svg.appendChild(vt);
+    const hit=el('rect',{class:'hit',x:m.l,y:cy-rowh/2,width:pw,height:rowh});
+    hit.addEventListener('mousemove',e=>tip('<b>'+p.label+'</b><br>beta: '+fmt(p.x)+'<br>IC 95%: da '+fmt(p.lo)+' a '+fmt(p.hi)+'<br>'+(p.sig?'significativo':'non significativo'),e));
+    hit.addEventListener('mouseleave',untip); svg.appendChild(hit);
+  });
+  const ax=el('text',{class:'axlbl',x:m.l+pw/2,y:H-4,'text-anchor':'middle'}); ax.textContent=c.x_label; svg.appendChild(ax);
+  return svg;
+}
+
+function renderBiplot(c,W){
+  const pts=c.series[0].points, loads=c.series[1].points; const H=520, m={t:38,r:22,b:48,l:50};
+  const sx=pts.map(p=>p.x), sy=pts.map(p=>p.y);
+  let xmn=Math.min(...sx), xmx=Math.max(...sx), ymn=Math.min(...sy), ymx=Math.max(...sy);
+  const xp=(xmx-xmn)*0.10, yp=(ymx-ymn)*0.14; xmn-=xp;xmx+=xp;ymn-=yp;ymx+=yp;
+  const pw=W-m.l-m.r, ph=H-m.t-m.b; const X=v=>m.l+pw*(v-xmn)/(xmx-xmn), Y=v=>m.t+ph*(ymx-v)/(ymx-ymn);
+  const maxL=Math.max(...loads.map(l=>Math.max(Math.abs(l.x),Math.abs(l.y))));
+  const maxS=Math.max(Math.abs(xmn),Math.abs(xmx),Math.abs(ymn),Math.abs(ymx)); const k=0.80*maxS/maxL;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const defs=el('defs'); const mk=el('marker',{id:'bpah',markerWidth:'8',markerHeight:'8',refX:'6',refY:'3',orient:'auto'});
+  mk.appendChild(el('path',{class:'bp-loadlbl',d:'M0,0 L6,3 L0,6 Z'})); defs.appendChild(mk); svg.appendChild(defs);
+  svg.appendChild(el('line',{class:'bp-axis',x1:X(0),y1:m.t,x2:X(0),y2:H-m.b}));
+  svg.appendChild(el('line',{class:'bp-axis',x1:m.l,y1:Y(0),x2:W-m.r,y2:Y(0)}));
+  const cls={'Sud':'bp-sud','Nord/Ovest':'bp-no','Est':'bp-est'};
+  pts.forEach(p=>{ const it=/itali/i.test(p.label);
+    svg.appendChild(el('circle',{class:'bp-dot '+(it?'bp-it':(cls[p.reg]||'bp-no')),cx:X(p.x),cy:Y(p.y),r:it?7:4.5}));
+    if(it){ const t=el('text',{class:'bp-itlbl',x:X(p.x)+11,y:Y(p.y)+4}); t.textContent='Italia'; svg.appendChild(t); }
+    const hit=el('circle',{class:'hit',cx:X(p.x),cy:Y(p.y),r:10});
+    hit.addEventListener('mousemove',e=>tip('<b>'+p.label+'</b><br>'+p.reg,e)); hit.addEventListener('mouseleave',untip); svg.appendChild(hit); });
+  loads.forEach(l=>{ const ex=X(k*l.x), ey=Y(k*l.y); const right=(k*l.x)>=0;
+    svg.appendChild(el('line',{class:'bp-load',x1:X(0),y1:Y(0),x2:ex,y2:ey,'marker-end':'url(#bpah)'}));
+    const t=el('text',{class:'bp-loadlbl',x:ex+(right?5:-5),y:ey+((k*l.y)>=0?-5:12),'text-anchor':right?'start':'end'}); t.textContent=l.label; svg.appendChild(t); });
+  const axx=el('text',{class:'axlbl',x:m.l+pw/2,y:H-6,'text-anchor':'middle'}); axx.textContent=c.x_label; svg.appendChild(axx);
+  const axy=el('text',{class:'axlbl',x:0,y:0,'text-anchor':'middle',transform:`translate(13 ${m.t+ph/2}) rotate(-90)`}); axy.textContent=c.y_label; svg.appendChild(axy);
+  const lg=el('g',{class:'legend'}); let lx=m.l;
+  [['Sud','bp-sud'],['Nord/Ovest','bp-no'],['Est','bp-est']].forEach(it2=>{ lg.appendChild(el('circle',{class:it2[1],cx:lx+6,cy:12,r:5}));
+    const t=el('text',{x:lx+16,y:16}); t.textContent=it2[0]; lg.appendChild(t); lx+=42+it2[0].length*7.2; });
+  svg.appendChild(lg); return svg;
+}
+
+function renderNetwork(c,W){
+  const pts=c.series[0].points; const H=520; const cx=W/2, cy=H/2-6, R=168;
+  const maxv=Math.max(...pts.map(p=>p.value)); const n=pts.length;
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'});
+  const pos=pts.map((p,i)=>{ const ang=(-90+i*(360/n))*Math.PI/180; return {p, x:cx+R*Math.cos(ang), y:cy+R*Math.sin(ang), ang}; });
+  pos.forEach(o=>{ const w=1.5+o.p.value/maxv*20;
+    svg.appendChild(el('line',{class:'net-edge',x1:cx,y1:cy,x2:o.x,y2:o.y,'stroke-width':w.toFixed(1),'stroke-linecap':'round'}));
+    const hit=el('line',{class:'hit',x1:cx,y1:cy,x2:o.x,y2:o.y,'stroke-width':Math.max(w,16),stroke:'transparent'});
+    hit.addEventListener('mousemove',e=>tip('<b>Italia → '+o.p.label+'</b><br>'+fmt(o.p.value)+' mld €<br>'+o.p.brands,e)); hit.addEventListener('mouseleave',untip); svg.appendChild(hit); });
+  pos.forEach(o=>{ const r=8+4.2*Math.sqrt(o.p.value); const right=Math.cos(o.ang)>=-0.01;
+    svg.appendChild(el('circle',{class:'net-node',cx:o.x,cy:o.y,r:r.toFixed(1)}));
+    const lx=o.x+(right?r+7:-(r+7)), anc=right?'start':'end';
+    const t=el('text',{class:'net-lbl',x:lx,y:o.y-1,'text-anchor':anc}); t.textContent=o.p.label; svg.appendChild(t);
+    const v=el('text',{class:'net-val',x:lx,y:o.y+14,'text-anchor':anc}); v.textContent=fmt(o.p.value)+' mld €'; svg.appendChild(v);
+    const hit=el('circle',{class:'hit',cx:o.x,cy:o.y,r:r+4});
+    hit.addEventListener('mousemove',e=>tip('<b>'+o.p.label+'</b><br>'+fmt(o.p.value)+' mld €<br>'+o.p.brands,e)); hit.addEventListener('mouseleave',untip); svg.appendChild(hit); });
+  svg.appendChild(el('circle',{class:'net-it',cx:cx,cy:cy,r:26}));
+  const it=el('text',{class:'net-itlbl',x:cx,y:cy+46,'text-anchor':'middle'}); it.textContent='ITALIA'; svg.appendChild(it);
+  return svg;
+}
+
+const R={bar:renderBar,hbar:renderHBar,line:renderLine,scatter:renderScatter,grouped:renderGrouped,coef:renderCoef,biplot:renderBiplot,network:renderNetwork,hist:renderHist};
+document.querySelectorAll('.spc-mount').forEach(div=>{
+  const c=CHARTS[+div.dataset.idx]; const W=780;
+  const fn=R[c.type]; if(!fn) return; div.innerHTML=''; div.appendChild(fn(c,W));
+});
+
+  </script>
+</body>
+</html>
