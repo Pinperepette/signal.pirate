@@ -1,0 +1,12 @@
+caso                               ?         run1     run2     run3     run4   esito
+----------------------------------------------------------------------------------------
+reso parziale, con coupon          A         3000     3000     2700     3000   ** 2 RISPOSTE DIVERSE **
+reso totale, ordine sotto soglia   B         1499     1499     1499     1499   concordi
+reso totale, con coupon            A+B       3199     3199     3199     3199   concordi
+reso fa scendere sotto soglia      C         2501     2501     3000     3000   ** 2 RISPOSTE DIVERSE **
+reso piccolo sotto soglia          C+D          0        0      150      150   ** 2 RISPOSTE DIVERSE **
+non rende niente                   -            0        0        0        0   concordi
+coupon > articoli resi             A+D       1000     1000      700     1000   ** 2 RISPOSTE DIVERSE **
+ordine vuoto                       -            0        0        0        0   concordi
+----------------------------------------------------------------------------------------
+casi su cui le quattro funzioni 'dimostrate corrette' non concordano: 4/8

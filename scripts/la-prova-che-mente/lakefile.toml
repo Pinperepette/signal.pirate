@@ -1,0 +1,10 @@
+name = "la-prova-che-mente"
+version = "0.1.0"
+defaultTargets = ["la-prova-che-mente"]
+
+[[lean_lib]]
+name = "LaProvaCheMente"
+
+[[lean_exe]]
+name = "la-prova-che-mente"
+root = "Main"
