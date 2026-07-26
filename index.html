@@ -83,6 +83,34 @@
 
     <div class="articles-grid">
 
+      <!-- Article Card: Fallo scrivere a quattro agenti -->
+      <a href="articoli/fallo-scrivere-a-quattro-agenti.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-07-26</div>
+        <h3 class="article-card-title">Fallo Scrivere a Quattro Agenti</h3>
+        <p class="article-card-abstract">
+          Il test di divergenza: dai lo stesso requisito a quattro agenti separati, fai girare le
+          quattro implementazioni sugli stessi input, guarda dove litigano. Dove litigano non hai
+          un bug, hai un requisito che non hai mai scritto. L'ho provato su un calcolo di rimborso
+          da e-commerce: quattro implementazioni, tutte con teoremi di correttezza dimostrati, che
+          su 4 casi su 8 pagano cifre diverse allo stesso cliente. Un cliente che rende un articolo
+          da un euro e cinquanta riceve zero euro oppure un euro e cinquanta a seconda di quale hai
+          messo in produzione. E il colpo vero: ogni garanzia dimostrata regge su ogni divergenza,
+          perché una specifica è un insieme di vincoli e quei vincoli avevano più di una soluzione.
+          Perché non lo faceva nessuno prima? Quattro implementazioni indipendenti costavano otto
+          giorni/uomo, oggi costano venti minuti: non è che non ci avessero pensato, era
+          economicamente folle. Dentro anche i tre controlli da cinque minuti (lo stub che ritorna
+          sempre null, gli unicorni a tre corna, la mutazione puntata sulla specifica) e in
+          appendice cinque proprietà universali: la monotonia da sola ha scovato un errore da
+          soglia che due implementazioni su quattro avevano e nessuno aveva notato.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">Metodo</span>
+          <span class="tag tag-highlight">Testing</span>
+          <span class="tag tag-reaction">LLM</span>
+          <span class="tag tag-amplification">Specifiche</span>
+        </div>
+      </a>
+
       <!-- Article Card: I numeri sono giusti (la conclusione no) -->
       <a href="articoli/i-numeri-sono-giusti.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-07-25</div>

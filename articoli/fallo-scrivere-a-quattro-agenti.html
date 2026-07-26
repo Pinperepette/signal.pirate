@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fallo scrivere a quattro agenti | Signal Pirate</title>
+  <meta name="description" content="Il test di divergenza (divergence test): dai lo stesso requisito a quattro agenti separati, fai girare le quattro implementazioni sugli stessi input, e guarda dove non sono d'accordo. Dove divergono non hai un bug, hai un requisito che non hai mai scritto. L'ho provato su un calcolo di rimborso: quattro implementazioni con teoremi di correttezza dimostrati, e su metà dei casi pagano cifre diverse allo stesso cliente. Più i tre controlli da cinque minuti e le cinque proprietà che ammazzano intere classi di bug.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.4rem;
+    }
+
+    .tldr {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      padding: 1.4rem 1.6rem;
+      margin: 2rem 0;
+    }
+    .tldr > p:first-child {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+      margin: 0 0 0.7rem;
+    }
+    .tldr ul { margin: 0.7rem 0 0; padding-left: 1.2rem; }
+    .tldr li { margin-bottom: 0.5rem; line-height: 1.6; }
+
+    .code-block {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 1.1rem 1.3rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: #c9d1d9;
+      white-space: pre;
+    }
+    .code-block .cm { color: #8b949e; }
+    .code-block .kw { color: #ff7b72; }
+    .code-block .ok { color: #3fb950; }
+    .code-block .no { color: #ff6b6b; }
+    .code-block .hl { color: #d2a8ff; font-weight: 700; }
+
+    .tbl-wrap { overflow-x: auto; margin: 1.6rem 0; }
+    table.dati { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    table.dati th, table.dati td {
+      padding: 0.65rem 0.75rem; text-align: left; vertical-align: top;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    table.dati th {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-secondary); font-weight: 600;
+    }
+    table.dati td.num {
+      font-family: var(--font-mono); text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    table.dati tr.spacca td { background: rgba(255,107,107,0.08); }
+    .si { color: #3fb950; font-weight: 700; }
+    .no2 { color: #ff6b6b; font-weight: 700; }
+
+    /* scheda controllo */
+    .controllo {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.3rem 1.5rem;
+      margin: 1.8rem 0;
+    }
+    .controllo dl { margin: 0; display: grid; grid-template-columns: 120px 1fr; gap: 0.5rem 1rem; }
+    .controllo dt {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-secondary); padding-top: 0.15rem;
+    }
+    .controllo dd { margin: 0; line-height: 1.6; }
+    @media (max-width: 620px) {
+      .controllo dl { grid-template-columns: 1fr; gap: 0.15rem; }
+      .controllo dd { margin-bottom: 0.7rem; }
+    }
+
+    .key-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      margin: 1.8rem 0;
+      font-size: 1.05rem; line-height: 1.7;
+    }
+    .key-box p { margin: 0; }
+    .key-box p + p { margin-top: 0.8rem; }
+
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction, #ff6b6b);
+      border-radius: 8px;
+      padding: 1.1rem 1.3rem;
+      margin: 1.6rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.65; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem; margin: 1.8rem 0;
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px; padding: 1.2rem; text-align: center;
+    }
+    .stat-number {
+      font-family: var(--font-mono); font-size: 1.7rem;
+      font-weight: 800; color: var(--accent); display: block;
+    }
+    .stat-label {
+      font-size: 0.78rem; color: var(--text-secondary);
+      margin-top: 0.35rem; line-height: 1.4;
+    }
+
+    .tecnica {
+      background: linear-gradient(135deg, rgba(0,200,140,0.10), rgba(0,140,255,0.05));
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.5rem 1.7rem;
+      margin: 2rem 0;
+    }
+    .tecnica-nome {
+      font-family: var(--font-mono);
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--text-secondary); margin: 0 0 0.5rem;
+    }
+    .tecnica h3 { margin: 0 0 0.9rem; font-size: 1.35rem; }
+    .tecnica ol { margin: 0.6rem 0 0; padding-left: 1.3rem; }
+    .tecnica li { margin-bottom: 0.45rem; line-height: 1.6; }
+
+    .prima-dopo {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      gap: 1rem; align-items: center; margin: 1.8rem 0;
+    }
+    .pd-box {
+      background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+      border-radius: 10px; padding: 1.2rem; text-align: center;
+    }
+    .pd-costo {
+      font-family: var(--font-mono); font-size: 1.5rem; font-weight: 800;
+      display: block; margin-bottom: 0.3rem;
+    }
+    .pd-box.ieri .pd-costo { color: #ff6b6b; }
+    .pd-box.oggi .pd-costo { color: #3fb950; }
+    .pd-label { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45; }
+    .pd-freccia { font-family: var(--font-mono); color: var(--text-secondary); font-size: 1.3rem; }
+    @media (max-width: 620px) {
+      .prima-dopo { grid-template-columns: 1fr; }
+      .pd-freccia { transform: rotate(90deg); }
+    }
+
+    .appendice {
+      border-top: 2px solid var(--border-subtle);
+      margin-top: 3rem; padding-top: 2rem;
+    }
+    .appendice-label {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--text-secondary);
+    }
+
+    .conclusion-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.6rem 1.8rem;
+      margin: 2.2rem 0;
+    }
+    .metodo {
+      font-size: 0.88rem; color: var(--text-secondary);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1.4rem; margin-top: 2.5rem; line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#content" class="skip-link">Salta al contenuto</a>
+
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <main id="content">
+
+    <header class="article-header">
+    <p class="article-meta">2026-07-26 | Pinperepette</p>
+    <h1 class="article-page-title">Fallo scrivere a quattro agenti<span class="accent" style="display:block; font-size:0.72em; margin-top:0.35em">(il bug è dove non sono d'accordo)</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+      Dai lo stesso requisito a quattro agenti separati, fai girare le quattro implementazioni sugli stessi input, guarda dove litigano. Dove litigano non hai un bug: hai un requisito che non hai mai scritto. Costa venti minuti, e fino a tre anni fa era economicamente impensabile.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Metodo</span>
+      <span class="tag tag-highlight">Testing</span>
+      <span class="tag tag-reaction">LLM</span>
+      <span class="tag tag-amplification">Specifiche</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <p>Robert C. Martin, meglio conosciuto come Uncle Bob, autore di <em>Clean Code</em> e fra i firmatari del Manifesto Agile, uno dei nomi più influenti del software engineering moderno, ha scritto una cosa che ha fatto quattro milioni di visualizzazioni: non legge più una riga del codice scritto dai suoi agenti. Li circonda di vincoli, test, coverage, mutation testing, e si fida del recinto. Non del codice: del recinto.</p>
+
+    <p>È la mossa giusta, perché il collo di bottiglia si è girato. Prima costava scrivere e leggere era gratis. Adesso l'agente ti sputa cinquemila righe in quaranta secondi, e leggerle davvero, non scrollarle col mouse fingendo di capire, ti porta via un'ora. Anche tu hai smesso... non raccontarmi balle.</p>
+
+    <p>Il problema è che il recinto non lo misura nessuno. Ci fidiamo della nostra suite di test come ci fidiamo di Panna, la cagnona di casa: è grossa, quindi i ladri non entrano. Figurati se si fa comprare con un biscottino da uno sconosciuto. E poi l'ho portata all'asilo per cani, quello con la retta mensile. Se ci fosse ancora mio nonno mi porterebbe in periferia a calci nel culo.</p>
+
+    <p>Il punto è che a Panna, un ladro, non gliel'ha mai presentato nessuno.</p>
+
+    <p>Ci ho passato una giornata sopra. Ho usato un dimostratore di teoremi, non perché l'articolo parli di verifica formale, ma perché volevo risposte verificabili invece di opinioni a cazzo di cane: quando dico che una specifica non basta, voglio poterlo dimostrare invece che sostenerlo. Quella parte sta in fondo, nella nota sul metodo, insieme al codice.</p>
+
+    <p>Quello che ne è uscito, invece, non c'entra niente con la verifica formale e vale per chiunque stia spedendo codice scritto da un agente. È una tecnica che <strong>costa venti minuti, non richiede di installare niente</strong>, e trova una classe di problemi che nessun altro strumento vede. Comincio da quella.</p>
+
+    <div class="tldr">
+      <p>Se hai cinque minuti</p>
+      <ul>
+        <li><strong>Il test di divergenza</strong> (<em>divergence test</em>). Dai lo stesso requisito a quattro agenti che non si parlano. Fai girare le quattro implementazioni sugli stessi input. Confronta. Dove divergono, hai un <strong>requisito mancante</strong>, non un bug.</li>
+        <li>L'ho provato su un calcolo di rimborso da e-commerce. Quattro implementazioni, tutte con teoremi di correttezza dimostrati, che <strong>su 4 casi su 8 pagano cifre diverse</strong> allo stesso cliente: 0,00 &euro; oppure 1,50 &euro; a seconda di quale hai messo in produzione.</li>
+        <li>E il colpo vero: <strong>ogni garanzia dimostrata regge su ogni divergenza.</strong> Non erano specifiche scritte male. Erano vincoli con più di una soluzione.</li>
+        <li><strong>Perché non lo faceva nessuno prima:</strong> quattro implementazioni indipendenti costavano quattro sviluppatori per due giorni. Oggi costano un caffè. Non è che non ci avessero pensato, era economicamente folle.</li>
+        <li>Più tre controlli da cinque minuti l'uno, e in appendice cinque proprietà che ammazzano intere classi di bug. La monotonia, da sola, ha scovato un errore che due implementazioni su quattro avevano e nessuno aveva notato.</li>
+      </ul>
+    </div>
+
+    <h2><span class="section-number">01 &middot; La tecnica</span>Il test di divergenza</h2>
+
+    <p>Comincio dal nome, perché senza nome una tecnica non la cita nessuno.</p>
+
+    <div class="tecnica">
+      <p class="tecnica-nome">La tecnica</p>
+      <h3>Test di divergenza <span style="color:var(--text-secondary); font-weight:400">(divergence test)</span></h3>
+      <p>Usa più agenti come <strong>generatori di interpretazioni indipendenti</strong> dello stesso requisito, e tratta il loro disaccordo come un rilevatore di specifica incompleta.</p>
+      <ol>
+        <li>Prendi il requisito così com'è scritto, dritto per dritto. Non aggiustarlo, non chiarirlo.</li>
+        <li>Dallo a quattro o cinque agenti <strong>separati</strong> che non si vedono fra loro: nessuno legge l'output degli altri, nessuno sa che gli altri esistono. Stesso prompt, ambienti isolati, firma della funzione fissa così le implementazioni sono confrontabili.</li>
+        <li>Fai girare tutte le implementazioni sugli stessi input, scelti per toccare i casi limite del dominio.</li>
+        <li><code>diff</code>.</li>
+        <li>Ogni punto di divergenza è <strong>una decisione che non hai preso</strong>. Nominala, scrivila nel requisito, ricomincia. E mica lo fai a mano, porco bash: quattro chiamate in parallelo e un diff sono venti righe di script.</li>
+      </ol>
+    </div>
+
+    <p>Il nome me lo sto inventando adesso, mettiamolo in chiaro: non è un termine della letteratura, è un'etichetta che mi serve per poterne parlare. In inglese lo descriverei come <em>specification divergence testing</em>, se serve il nome lungo per fare il figo. Le tecniche a cui assomiglia, quelle vere e con i loro nomi veri, le metto in fila fra due paragrafi.</p>
+
+    <p>La cosa importante da capire, e che ribalta l'intuizione: <strong>il disaccordo non è il problema, è l'output.</strong> Se quattro modelli competenti leggono la stessa frase e ne tirano fuori quattro comportamenti diversi, non sono i modelli a essere rotti. È la frase.</p>
+
+    <p>Prima li usavamo per scrivere codice. Questo è un uso diverso: <strong>rilevatori di requisiti mancanti</strong> (<em>specification ambiguity detection</em>). E funziona proprio perché i modelli sono bravi, non nonostante. Un modello scarso sbaglia e basta; quattro modelli bravi che divergono ti stanno dicendo che il testo ammetteva più letture ragionevoli.</p>
+
+    <h3>Cosa esiste già, e cosa cambia</h3>
+
+    <p>Prima che qualcuno commenti "ma è solo X", mettiamo le cose in fila, perché di roba imparentata ce n'è parecchia e nessuna fa esattamente questo.</p>
+
+    <div class="tbl-wrap">
+      <table class="dati">
+        <thead>
+          <tr><th>tecnica esistente</th><th>cosa fa</th><th>differenza</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Self-consistency</strong><br><span style="font-size:0.8rem;color:var(--text-secondary)">Wang et al., 2022</span></td>
+            <td>lo <em>stesso</em> modello genera più catene di ragionamento e si tiene la risposta più frequente</td>
+            <td>lì la divergenza è <strong>rumore da votare via</strong>. Qui è il risultato. Non voto niente.</td>
+          </tr>
+          <tr>
+            <td><strong>Multi-agent debate</strong><br><span style="font-size:0.8rem;color:var(--text-secondary)">Du et al., 2023</span></td>
+            <td>gli agenti si leggono a vicenda, discutono e convergono</td>
+            <td>qui gli agenti <strong>non devono parlarsi</strong>. Se si parlano convergono, e convergendo cancellano il segnale che sto cercando.</td>
+          </tr>
+          <tr>
+            <td><strong>LLM-as-a-judge</strong><br><span style="font-size:0.8rem;color:var(--text-secondary)">Zheng et al., 2023</span></td>
+            <td>un modello valuta gli output degli altri</td>
+            <td>qui non giudica nessun modello. Giudica un <code>diff</code>, e poi decide un umano.</td>
+          </tr>
+          <tr class="spacca">
+            <td><strong>Differential testing</strong><br><span style="font-size:0.8rem;color:var(--text-secondary)">McKeeman, 1998</span></td>
+            <td>più implementazioni della stessa cosa, confronto degli output per trovare bug</td>
+            <td><strong>stesso meccanismo, conclusione opposta.</strong> Vedi sotto.</td>
+          </tr>
+          <tr>
+            <td><strong>N-version programming</strong><br><span style="font-size:0.8rem;color:var(--text-secondary)">Chen e Avizienis, 1978</span></td>
+            <td>più implementazioni girano in produzione e si vota a runtime</td>
+            <td>qui si lavora a <strong>design time</strong>: le implementazioni sono un oracolo sulla specifica e poi si buttano via tutte tranne una.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>La riga che conta è la quarta, e vale la pena fermarcisi perché è il vero contributo.</p>
+
+    <p>Il differential testing classico prende due implementazioni, le confronta, e quando divergono conclude: <strong>una delle due è rotta</strong>. È così che si testano i compilatori: dai lo stesso programma a GCC e Clang, se sputano risultati diversi uno dei due ha un bug. La specifica, in quel mondo, è data per buona e la colpa è sempre del codice.</p>
+
+    <div class="key-box">
+      <p>Il test di divergenza gira l'attribuzione di colpa: <strong>le implementazioni si assumono corrette, e la divergenza accusa la specifica.</strong></p>
+      <p>Stessa macchina, imputato diverso. E cambia tutto, perché cambia cosa fai dopo: non apri il debugger, apri il documento dei requisiti.</p>
+    </div>
+
+    <p>Che poi non è un cavillo accademico, porca race condition. Se leggi una divergenza come un bug ti metti a cercare l'errore dentro il codice, e nel mio esperimento non l'avresti trovato: <strong>tutte e quattro le implementazioni erano corrette</strong> rispetto a quello che il ticket diceva davvero. Avresti perso una giornata a fissare codice giusto.</p>
+
+    <h2><span class="section-number">02 &middot; L'esperimento</span>Quattro rimborsi, quattro cifre</h2>
+
+    <p>L'ho provato su un ticket da e-commerce come ne girano diecimila. Un cliente rende una parte di un ordine, calcola quanto rimborsargli. Ogni articolo ha il suo prezzo, all'acquisto c'era un coupon a importo fisso, la spedizione costa 4,99 &euro; ed è gratis sopra i 50,00.</p>
+
+    <p>Sembra tutto specificato, eh? Col cazzo. E le cose che mancano, nella vita vera, non te le segnala nessuno con il neon lampeggiante:</p>
+
+    <ul>
+      <li>il coupon si ripartisce sugli articoli resi, o no?</li>
+      <li>la spedizione si rimborsa?</li>
+      <li>se il reso parziale fa scendere l'ordine <em>sotto</em> la soglia della spedizione gratis, glieli riaddebiti i 4,99?</li>
+      <li>il rimborso può venire negativo? e se viene, lo tagli a zero?</li>
+    </ul>
+
+    <p>Quattro domande che nel ticket non ci sono. Il tuo agente risponderà comunque a tutte e quattro. Non a caso, eh: con sicurezza. E in quattro modi diversi.</p>
+
+    <p>Quattro agenti indipendenti, ambienti isolati, stesso prompt, zero comunicazione fra loro, nessun accenno al fatto che ci fossero ambiguità. Nessuno di loro sapeva di essere una cavia, e mi dispiace fino a un certo punto. Hanno prodotto quattro implementazioni, tutte compilanti, tutte con teoremi di sicurezza veri e dimostrati.</p>
+
+    <p>Poi le ho caricate nello stesso file e le ho fatte girare sugli stessi otto ordini.</p>
+
+    <div class="code-block">caso                                     run1   run2   run3   run4
+------------------------------------------------------------------
+reso parziale, con coupon                3000   3000   <span class="no">2700</span>   3000   <span class="no">&larr; 2 risposte</span>
+reso totale, ordine sotto soglia         1499   1499   1499   1499
+reso totale, con coupon                  3199   3199   3199   3199
+reso fa scendere sotto soglia            <span class="no">2501   2501</span>   3000   3000   <span class="no">&larr; 2 risposte</span>
+reso piccolo sotto soglia                <span class="no">   0      0</span>    150    150   <span class="no">&larr; 2 risposte</span>
+non rende niente                            0      0      0      0
+coupon maggiore degli articoli resi      1000   1000    <span class="no">700</span>   1000   <span class="no">&larr; 2 risposte</span>
+ordine vuoto                                0      0      0      0
+------------------------------------------------------------------
+                          non concordano su 4 casi su 8</div>
+
+    <p>Guarda la terzultima riga con divergenza. Un cliente rende un articolo da 1,50 &euro; da un ordine che stava appena sopra la soglia:</p>
+
+    <div class="stats-row">
+      <div class="stat-card"><span class="stat-number">0,00 &euro;</span><span class="stat-label">quello che gli rimborsano due implementazioni</span></div>
+      <div class="stat-card"><span class="stat-number">1,50 &euro;</span><span class="stat-label">quello che gli rimborsano le altre due</span></div>
+    </div>
+
+    <p>Stesso cliente, stesso ordine, stesso reso. Cambia solo quale delle quattro hai deployato martedì. Praticamente testa o croce, ma con la pipeline verde.</p>
+
+    <p>Due a due, e nessuna delle due è rotta: due hanno deciso che il reso ti fa perdere la spedizione gratis e riaddebitano, due hanno deciso che gratis una volta è gratis per sempre. Sulla riga sopra la stessa scelta vale 4,99 &euro; su un ordine da 60. Entrambe sono politiche che esistono nel mondo reale.</p>
+
+    <p>E adesso la parte che mi ha fatto stare zitto un minuto davanti al terminale. Ho preso ogni garanzia che gli agenti avevano dimostrato e l'ho controllata su ogni divergenza.</p>
+
+    <div class="key-box">
+      <p><strong>Reggono tutte.</strong> Porco linker, tutte. Zero e centocinquanta sono entrambi non negativi, entrambi minori di quanto il cliente ha pagato, entrambi monotoni, entrambi danno zero sul reso nullo e tutto sul reso totale.</p>
+      <p>Le quattro specifiche sono tutte vere, tutte dimostrate, e tutte soddisfatte da tutte e quattro le implementazioni <em>anche dove queste pagano cifre diverse</em>.</p>
+    </div>
+
+    <p>Non è che fossero scritte male. È che <strong>una specifica è un insieme di vincoli, e quei vincoli avevano più di una soluzione.</strong> La dimostrazione certifica i vincoli. Non certifica che i vincoli bastassero, e nessun controllo sul singolo pezzo di codice può accorgersene: serve <em>confrontare due interpretazioni diverse</em>. Ecco perché questa tecnica trova cose che le altre non vedono.</p>
+
+    <p>Nota per chi usa metodi formali: la versione rigorosa di questo controllo si scrive come un teorema, e vale la pena saperlo perché è esattamente la stessa domanda.</p>
+
+    <div class="code-block"><span class="kw">theorem</span> determinata : &forall; f g, Spec f &rarr; Spec g &rarr; &forall; x, f x = g x</div>
+
+    <p>"Due funzioni qualunque che soddisfano la mia specifica fanno la stessa cosa." Se lo dimostri, non restano gradi di libertà. Se non ci riesci, il punto dove la dimostrazione si rompe ti dice quale decisione manca. Il test di divergenza è la versione empirica di questo teorema: non ti dà la garanzia universale, ma costa venti minuti invece di una giornata, e sul mio caso ha trovato esattamente le stesse quattro ambiguità.</p>
+
+    <h2><span class="section-number">03 &middot; L'economia</span>Perché nessuno lo faceva prima</h2>
+
+    <p>Questa tecnica non è complicata. Non richiede matematica, non richiede tool nuovi, e chiunque abbia mai lavorato con requisiti ambigui capisce l'idea in dieci secondi.</p>
+
+    <p>Allora perché non la usava nessuno?</p>
+
+    <p>Perché era <strong>economicamente folle</strong>.</p>
+
+    <div class="prima-dopo">
+      <div class="pd-box ieri">
+        <span class="pd-costo">8 giorni/uomo</span>
+        <span class="pd-label">quattro sviluppatori<br>per due giorni,<br>a implementare la stessa cosa<br>senza parlarsi</span>
+      </div>
+      <div class="pd-freccia">&rarr;</div>
+      <div class="pd-box oggi">
+        <span class="pd-costo">20 minuti</span>
+        <span class="pd-label">quattro agenti in parallelo,<br>qualche euro di token,<br>il tempo di un caffè</span>
+      </div>
+    </div>
+
+    <p>Provate a proporlo a un capo nel 2015. "Ciao, vorrei che quattro persone del team implementassero la stessa identica funzione, separatamente, senza parlarsi, e poi buttiamo via tre implementazioni su quattro." Vi avrebbero riso in faccia, tolto il badge, e avrebbero avuto ragione su tutta la linea: per un rimborso da e-commerce, otto giorni/uomo per scoprire quattro ambiguità è un prezzo che non paga nessuno.</p>
+
+    <p>Infatti l'unico posto dove si è fatto sul serio è l'avionica, con la N-version programming, dove il budget lo permetteva perché l'alternativa era un aereo che cade. Fuori da lì è rimasta una curiosità accademica per quarant'anni.</p>
+
+    <div class="key-box">
+      <p>Non è che nessuno ci avesse pensato. <strong>Il conto non tornava.</strong></p>
+      <p>Adesso torna, e questo è il punto che secondo me quasi tutti si stanno perdendo: la cosa che è diventata economica <strong>non è scrivere codice</strong>. È <strong>generare interpretazioni divergenti dello stesso requisito</strong>. Sono due cose diverse, e la seconda è esattamente lo strumento che serviva per il problema creato dalla prima.</p>
+    </div>
+
+    <p>Il codice a costo zero ha creato un problema: più output di quanto tu riesca a verificare. E lo stesso crollo di costi ha reso disponibile lo strumento diagnostico che prima era fuori budget. Non capita spesso che una tecnologia porti in dote anche l'antidoto ai guai che combina.</p>
+
+    <h2><span class="section-number">04 &middot; La procedura</span>Cosa fare quando divergono</h2>
+
+    <p>Il test ti sputa fuori un elenco di righe rosse. Poi cosa ci fai? Questa è la parte operativa, ed è un ciclo.</p>
+
+    <p><strong>Passo 1. Non guardare il codice.</strong> Lo so che ti prude la mano sul tasto per aprire i quattro file. Tienila ferma. È il modo più veloce per convincerti che ha ragione quella scritta come l'avresti scritta tu. Guarda solo gli input e gli output divergenti.</p>
+
+    <p><strong>Passo 2. Nomina la decisione.</strong> Per ogni riga rossa, scrivi la domanda in italiano. Nel mio caso:</p>
+
+    <div class="code-block"><span class="cm">riga: "reso fa scendere sotto soglia", 2501 contro 3000</span>
+domanda: <span class="hl">se il reso parziale fa scendere l'ordine sotto la soglia
+          della spedizione gratuita, riaddebitiamo la spedizione?</span></div>
+
+    <p>Se non riesci a formulare la domanda, la divergenza è un bug vero di una delle implementazioni. Va bene lo stesso, l'hai trovato.</p>
+
+    <p><strong>Passo 3. Porta la domanda a chi può rispondere.</strong> Che quasi mai sei tu. La domanda sopra è per il product owner, o per chi gestisce la logistica, o per chi ha scritto la policy dei resi. Trenta secondi del loro tempo, e vale più di tre giorni di refactoring.</p>
+
+    <p><strong>Passo 4. Scrivi la risposta nel requisito.</strong> Non in una issue, non in un commento su Slack: dentro il testo che darai agli agenti. Una riga.</p>
+
+    <p><strong>Passo 5. Rilancia.</strong> Stesso test, requisito aggiornato. Se le divergenze si azzerano, il requisito è completo abbastanza. Se ne restano, ripeti. Converge in fretta, perché ogni giro toglie una decisione.</p>
+
+    <p>La cosa notevole è cosa produce questo ciclo come effetto collaterale: <strong>un requisito che non ammette più letture divergenti</strong>. Che è la definizione operativa di specifica completa, ottenuta senza scrivere un teorema.</p>
+
+    <h2><span class="section-number">05 &middot; Gli altri tre</span>Controlli da cinque minuti</h2>
+
+    <p>Il test di divergenza risponde alla domanda difficile: <em>la mia specifica misura tutto?</em> Ci sono altre tre domande, più piccole, che costano pochissimo e che conviene fare comunque. Le metto in fila veloce.</p>
+
+    <h3>La tua suite passa anche su una funzione che non fa niente?</h3>
+
+    <p>Sostituisci l'implementazione con uno stub che ritorna sempre <code>null</code>, lista vuota, zero. Lancia la suite. <strong>Quello che passa non stava misurando il tuo codice.</strong></p>
+
+    <p>Fallo adesso, che ci metti cinque minuti. Poi torna qui, che ne riparliamo con più calma.</p>
+
+    <p>Nella tua codebase è quella classe di test che asserisce solo metà del contratto:</p>
+
+    <div class="code-block"><span class="kw">def</span> test_cerca():
+    r = cerca(dati, target)
+    <span class="kw">if</span> r:
+        <span class="kw">assert</span> r.valore == target   <span class="cm"># verissimo. verde. inutile.</span></div>
+
+    <p>Perfettamente vero, e completamente muto su cosa deve succedere quando <code>r</code> è vuoto, che è esattamente il caso in cui la funzione ti sta fregando. Ce l'hai. Non fare finta di no: ce l'hai anche tu, tre o quattro, e uno l'hai scritto la settimana scorsa.</p>
+
+    <p>Nel laboratorio l'ho visto nella sua forma pura, e ha pure un nome: teorema indebolito. Dice "se la funzione restituisce un indice, lì dentro c'è davvero ciò che cercavi". È vero, è utile, mi è costato quarantadue righe di dimostrazione onesta. E non dice niente su cosa succede quando la funzione <em>tace</em>, quindi vale anche per una funzione che non trova mai niente e non guarda nemmeno l'array. Cinque righe di prova, check verde.</p>
+
+    <p>Dettaglio che fa ridere male: Lean ha un comando che ti dice su quali fondamenta logiche poggia una dimostrazione, e la funzione che non fa niente aveva le fondamenta <strong>più pulite di tutto il file</strong>. Porca cache invalidation, se avessi classificato i teoremi per purezza logica avrebbe vinto <code>return null</code>.</p>
+
+    <h3>Le tue precondizioni descrivono qualcosa che esiste?</h3>
+
+    <p>In logica, se le premesse sono impossibili la conclusione è vera gratis.</p>
+
+    <div class="key-box">
+      <p>"Tutti i miei unicorni hanno tre corna."</p>
+      <p>Vera. Non perché io abbia unicorni tricorni in giardino: è vera perché non ho unicorni. Non esiste un mio unicorno che la smentisca, quindi la frase regge. E, porco compilatore, vale allo stesso modo anche "tutti i miei unicorni hanno quattro corna".</p>
+    </div>
+
+    <p>Nel codice si traveste da ipotesi che una per una sembrano ragionevoli, tipo "l'array è ordinato crescente" più "l'array è strettamente decrescente" più "ha almeno due elementi": insieme non hanno nessun modello, quindi il teorema è vero e non parla di niente. Oppure si traveste da igiene, tipo una precondizione che letta bene dice "l'array è vuoto" scritto in modo che non si veda.</p>
+
+    <p><strong>Regola:</strong> per ogni test o teorema con precondizioni, esibisci un caso concreto e non degenere che le soddisfa. Nel property testing significa guardare quanto scartano i tuoi filtri: se <code>assume</code> butta via il 99 per cento dei casi generati, stai testando il vuoto. Hypothesis ha già l'health check <code>filter_too_much</code>, QuickCheck ha <code>cover</code> e <code>classify</code>. Ci sono, e non li guarda nessuno. Nel model checking si chiama <em>vacuity detection</em> e sta in giro dal 1997.</p>
+
+    <h3>La specifica si accorge se rompi il codice?</h3>
+
+    <p>Rompi l'implementazione apposta: cambia un <code>&lt;</code> in <code>&le;</code>, sposta un <code>+1</code>, inverti un ramo. Se la specifica non se ne accorge, la specifica è decorativa.</p>
+
+    <p>È <strong>la mossa di Uncle Bob spostata di un livello</strong>: lui muta il codice per testare i test, tu muti il codice per testare la <em>specifica</em>. Stesso strumento che hai già installato (Stryker, mutmut, cosmic-ray, PIT), domanda diversa: non "i miei unit test uccidono i mutanti" ma "le mie <em>proprietà</em> uccidono i mutanti".</p>
+
+    <p>C'è anche un premio. Quando la specifica giusta rifiuta il codice rotto, ti dice pure dove guardare: nel mio lab la dimostrazione falliva in un punto solo, il ramo esatto dell'off-by-one, e nel controesempio compariva <code>mid - 1</code>, cioè proprio l'elemento che la funzione si stava mangiando.</p>
+
+    <h2><span class="section-number">06 &middot; L'ordine</span>La prova va per ultima</h2>
+
+    <p>Messe insieme, queste quattro cose girano l'ordine delle operazioni. Non questo:</p>
+
+    <div class="code-block"><span class="no">specifica  &rarr;  prova  &rarr;  merge</span></div>
+
+    <p>Ma questo:</p>
+
+    <div class="code-block"><span class="ok">specifica
+    &darr;
+4-5 agenti indipendenti
+    &darr;
+test di divergenza
+    &darr;
+risoluzione delle ambiguità</span>      <span class="cm">&larr; qui c'è il lavoro vero</span><span class="ok">
+    &darr;
+prova
+    &darr;
+merge</span></div>
+
+    <p>Tradotto in cose da fare domani mattina:</p>
+
+    <ul>
+      <li><strong>Non chiedere come prima cosa "dimostra che è corretto".</strong> Chiedi prima: <em>"trova tutte le ambiguità di questa specifica"</em>. Nel mio caso ce n'erano quattro e il ticket sembrava completo.</li>
+      <li><strong>Chiedi i casi al contrario:</strong> <em>"fammi venti scenari in cui due persone ragionevoli prenderebbero decisioni diverse"</em>. È la cosa che i modelli fanno meglio e che nessuno gli chiede mai.</li>
+      <li><strong>Poi il test di divergenza</strong>, che è la verifica empirica che quelle ambiguità erano tutte.</li>
+      <li><strong>La prova è l'ultima fase.</strong> Dimostrare presto ti congela l'ambiguità dentro un teorema, e da lì è molto più difficile tirarla fuori: adesso ha un check verde davanti e sembra a posto.</li>
+      <li><strong>Se quattro implementazioni formalmente corrette danno risultati diversi, fermati.</strong> Non hai un problema di codice. Hai un problema di prodotto, e nessuno strumento tecnico te lo risolve.</li>
+    </ul>
+
+    <h2><span class="section-number">07 &middot; Il residuo</span>Quello che resta da leggere sei tu</h2>
+
+    <p>Fatti i controlli, quanto resta scoperto? Poco, ma non zero, e vale la pena essere precisi.</p>
+
+    <p>Sul rimborso ho fatto il conto per intero, dimostrandolo. Anche mettendo insieme tutte le garanzie più la monotonia, resta in piedi una politica demenziale del tipo "ti ridiamo metà di quello che rendi": soddisfa ogni singolo vincolo dell'elenco. <strong>Nessuna proprietà generica ti dirà mai quale politica voleva l'azienda.</strong></p>
+
+    <p>A quel punto non c'è più niente da dedurre, c'è solo da decidere. E la decisione, scritta, è una riga:</p>
+
+    <div class="code-block"><span class="cm">// "su un reso parziale rimborsi esattamente la merce resa, punto"</span>
+&forall; totale reso,  0 &le; reso &lt; totale  &rarr;  rimborso(totale, reso) = reso</div>
+
+    <p>Aggiunta quella riga, la specifica ha esattamente una soluzione: due implementazioni qualunque che la rispettano coincidono ovunque, e questo si dimostra. Il buco è chiuso.</p>
+
+    <div class="conclusion-box">
+      <p>Il punto della procedura non è eliminare la decisione umana. È <strong>ridurla a una riga con nome e cognome</strong>, che qualcuno legge in dieci secondi e approva.</p>
+      <p>Uncle Bob quindi ha ragione, e più di quanto creda. Lui dice che non legge il codice, legge i vincoli. La versione forte è che <strong>i vincoli sono l'unica cosa che valga ancora la pena leggere</strong>, e che il mestiere si sta spostando lì tutto quanto.</p>
+      <p>Quella riga non se ne va, e non è pigrizia degli informatici: non esiste nessun teorema che puoi enunciare per dire "e questi vincoli sono tutti quelli che servivano", perché per enunciarlo dovresti già avere la specifica completa, che è precisamente la cosa che ti manca. L'intenzione non è un oggetto matematico.</p>
+      <p>Ma una riga, porco kernel, si legge.</p>
+    </div>
+
+    <div class="appendice">
+      <p class="appendice-label">Appendice</p>
+      <h2 style="margin-top:0.3rem">Cinque proprietà che vale sempre la pena scrivere</h2>
+
+      <p>Il test di divergenza ti dice che manca qualcosa. Questa appendice ti dice <strong>cosa scrivere</strong>. Sono cinque proprietà generiche, valide in qualunque dominio, che non c'entrano niente con l'AI e si scrivono come property test in dieci righe l'una. Ognuna ammazza una classe di bug che a mano non cerca nessuno.</p>
+
+      <h3>1. Monotonia</h3>
+
+      <p><em>Più input in una direzione non può mai dare meno output.</em> Rendere più articoli non può rimborsare meno. Comprare di più non può costare meno.</p>
+
+      <p><strong>Ammazza i bug da riattraversamento di soglia.</strong> Ed è il risultato più concreto di tutto il lavoro, perché il bug l'ha trovato lei, da sola: aggiungendo la monotonia alla specifica del rimborso, una delle due politiche cade.</p>
+
+      <div class="code-block"><span class="cm">// politica "riaddebito la spedizione", ordine da 51,00 EUR</span>
+rendi 1,00 EUR  &rarr;  ti danno 1,00 EUR
+rendi 2,00 EUR  &rarr;  ti danno <span class="no">0,00 EUR</span>      <span class="no">&larr; rendere di più rimborsa di meno</span></div>
+
+      <p>Errore vero, in codice che due implementazioni su quattro avevano scritto, che non aveva notato nessuno. Nemmeno io, che ero lì apposta a cercare rogne. Se nel tuo dominio c'è una soglia, e c'è quasi sempre (spedizione gratis, sconto quantità, scaglione fiscale, fascia di prezzo, rate limiting), mettila in specifica e dormi meglio.</p>
+
+      <h3>2. Idempotenza</h3>
+
+      <p><em>Applicare due volte deve dare lo stesso risultato di applicare una volta.</em></p>
+
+      <p><strong>Ammazza tutta la famiglia dei doppi:</strong> doppio click sul bottone paga, retry automatico dopo un timeout, webhook consegnato due volte, job riprocessato dopo un crash, utente che ricarica la pagina di conferma. Se non hai questa proprietà scritta da qualche parte, prima o poi addebiti due volte a qualcuno, e lo scopri dal ticket di supporto delle 23:40, non dalla pipeline. E non sarà colpa di un bug: sarà colpa di un requisito che non hai mai enunciato.</p>
+
+      <h3>3. Composizionalità</h3>
+
+      <p><em>Fare in due passi deve dare lo stesso risultato di fare in un passo solo.</em></p>
+
+      <p><strong>Ammazza le discrepanze fra batch e singolo</strong>, che sono fra le più violate in assoluto perché il codice del batch e quello del singolo sono quasi sempre due strade diverse che nessuno confronta mai.</p>
+
+      <p>Curiosità: uno dei quattro agenti l'ha dimostrata <strong>spontaneamente</strong> sul rimborso, che due resi separati danno lo stesso di un reso unico, e nessuno gliel'aveva chiesta. Gli altri tre no.</p>
+
+      <h3>4. Conservazione</h3>
+
+      <p><em>Quello che entra esce. Niente si crea, niente si perde, nemmeno un centesimo.</em></p>
+
+      <p><strong>Ammazza le perdite da arrotondamento nelle ripartizioni pro quota</strong>, che sono la piaga di ogni sistema che divide soldi fra più voci. L'ho provata sul codice vero di uno dei quattro agenti, quello che ripartiva il coupon pro quota. Ordine da 100,00 &euro;, tre articoli, coupon da 10,00:</p>
+
+      <div class="code-block">rendendo i tre articoli <span class="hl">uno alla volta</span>, in totale:   <span class="no">90,01 EUR</span>
+rendendoli <span class="hl">tutti insieme</span>:                            <span class="ok">90,00 EUR</span></div>
+
+      <p>Porca divisione intera: un centesimo che appare a seconda di come impacchetti il reso. Su un ordine è ridicolo, su dieci milioni è una voce di bilancio, su un marketplace è un arbitraggio che qualcuno prima o poi trova, e quel qualcuno ha molto più tempo libero di te. Quel codice ha un teorema di correttezza dimostrato, e nessuna delle proprietà scelte dall'agente vede la cosa.</p>
+
+      <h3>5. Limiti</h3>
+
+      <p><em>Il risultato sta sempre dentro un intervallo che sai giustificare.</em> Mai negativo, mai più di quanto il cliente ha pagato, mai fuori dai bordi dell'array.</p>
+
+      <p><strong>Ammazza gli errori di segno, gli underflow e la classe di problemi in cui il sistema regala soldi.</strong> È la più ovvia delle cinque ed è anche l'unica che gli agenti scrivono da soli con una certa regolarità: tre su quattro l'avevano messa senza che nessuno gliela chiedesse.</p>
+
+      <div class="key-box">
+        <p>Queste cinque non dicono <em>cosa</em> deve fare il tuo software. Dicono cosa non deve fare mai, in qualunque dominio.</p>
+        <p>Se domani ne aggiungi due alla codebase che hai per le mani, hai già guadagnato la giornata. Poi vai a casa presto, non lo dico a nessuno.</p>
+      </div>
+    </div>
+
+    <div class="metodo">
+      <p><strong>Nota sul metodo.</strong> Tutto quello che c'è qui sopra è riproducibile. Lean 4.32.1, senza mathlib. Il laboratorio, i due esperimenti, i controlli formalizzati e gli script di analisi stanno in <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/la-prova-che-mente" target="_blank" rel="noopener">scripts/la-prova-che-mente</a>, e <code>./dimostra.sh</code> esegue tutta la sequenza. Le asserzioni sull'output di Lean sono verificate con <code>#guard_msgs</code>, quindi se una mia affermazione fosse falsa la build fallirebbe.</p>
+      <p>Sul test di divergenza: quattro run indipendenti, ambienti isolati, prompt identico e neutro, firma della funzione fissata per rendere confrontabili le implementazioni, nessun accenno al fatto di essere osservati. Gli otto casi di test sono scelti per isolare una alla volta le quattro decisioni non specificate. Il confronto carica le quattro implementazioni nello stesso file e le valuta sugli stessi input. <strong>N = 4</strong>: abbastanza per mostrare che la divergenza esiste, non per stimarne la frequenza.</p>
+      <p>Un esperimento che mi ha dato torto, e lo lascio scritto: prima del rimborso avevo fatto lo stesso identico test su una <em>ricerca binaria</em>, aspettandomi che qualche agente prendesse scorciatoie. Nessuno l'ha fatto. Quattro su quattro hanno prodotto la specifica completa e implementazioni corrette, 240 casi di test differenziale e zero divergenze. Il motivo è istruttivo: la ricerca binaria è l'esempio canonico della verifica formale e la sua specifica è folklore, quindi il modello non l'ha progettata, l'ha ricordata. <strong>Il test di divergenza non dice niente su problemi che stanno nei manuali.</strong> Serve esattamente dove non c'è una risposta canonica, cioè su tutto quello che scrivi per lavoro.</p>
+      <p>Sui controlli della sezione 05: sono dimostrati come teoremi in <code>LaProvaCheMente/Chiusura.lean</code>, non sono pseudocodice. <code>#print axioms</code> su ognuno restituisce solo <code>propext</code> e <code>Quot.sound</code>, cioè la logica di base di Lean: nessun <code>sorry</code>, nessun assioma iniettato. Nel laboratorio ho scritto una ricerca binaria rotta al 43 per cento (perde 3 elementi su 7 realmente presenti) e ci ho dimostrato sopra cinque teoremi di correttezza che compilano tutti e sono veri tutti: <code>#print axioms</code>, che è lo strumento standard, ne intercetta <strong>due su cinque</strong>, i tre controlli di questo articolo arrivano a <strong>cinque su cinque</strong>. La specifica onesta costa 103 righe di dimostrazione, la truffa più economica ne costa 8.</p>
+      <p>Il modello del rimborso usato per la dimostrazione di determinatezza è minimo, totale dell'ordine e totale reso senza coupon, perché entrambe le divergenze da 4,99 &euro; misurate avevano coupon a zero: è la riduzione più piccola che riproduce fedelmente il fenomeno osservato. Se rifai il giro e ti viene diverso, scrivimi.</p>
+    </div>
+
+  </article>
+
+  </main>
+
+  <footer class="footer">
+    <p>Signal Pirate &copy; 2026. Contenuti originali di Pinperepette.</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
