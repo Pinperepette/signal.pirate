@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Famoso per un po' di brutta stampa | Signal Pirate</title>
+  <meta name="description" content="Una storia vera, raccontata solo con le email del fascicolo Epstein desecretato dal Dipartimento di Giustizia. Dal luglio 2011 all'aprile 2017: l'ufficio di Bill Gates, i verbali sulle trattative con i talebani, la bozza della conferenza mondiale sulle pandemie, e il modulo del registro dei sex offender spedito all'isola. Ogni documento è cliccabile.">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Famoso per un po' di brutta stampa ;)">
+  <meta property="og:description" content="Una storia vera raccontata solo con le email del fascicolo Epstein. Dal 2011 al 2017: l'ufficio di Gates, i talebani e la polio, la conferenza mondiale sulle pandemie, e il modulo del registro dei sex offender spedito all'isola.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/famoso-per-un-po-di-brutta-stampa.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Famoso per un po' di brutta stampa ;)">
+  <meta name="twitter:description" content="Sei anni di email, in ordine. Dall'ufficio di Bill Gates al modulo del registro dei sex offender spedito a Little St James. Ogni documento è cliccabile.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* ---- articolo: componenti proprie, sopra il CSS del sito ---- */
+    .bst{
+      --bg: var(--bg-primary);
+      --fg: var(--text-primary);
+      --muted: var(--text-secondary);
+      --rule: var(--border-subtle);
+      --accent: var(--accent-reaction);
+      --accent2: var(--accent-amplification);
+      --panel: var(--bg-secondary);
+    }
+    .bst .lede{ font-size: 1.12rem; color: var(--text-primary); }
+    .bst .lede::first-letter{
+      float: left; font-family: var(--font-mono); font-size: 3.1rem; line-height: .82;
+      padding: .08em .12em 0 0; font-weight: 700; color: var(--accent);
+    }
+    .bst blockquote.pull{
+      margin: 2.8rem 0; padding: 0; border: 0;
+      font-family: var(--font-mono); font-size: 1.15rem; line-height: 1.4;
+      font-weight: 700; color: var(--text-primary);
+    }
+    .bst blockquote.pull::before{
+      content: ""; display: block; width: 46px; height: 2px;
+      background: var(--accent); margin-bottom: 1.1rem;
+    }
+
+    /* marcatore di data che scandisce il racconto */
+    .bst h2{ margin-top: 3.4rem; }
+    .bst .quando{
+      font-family: var(--font-mono); font-size: .68rem; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--accent);
+      margin: 3.4rem 0 -1.4rem;
+    }
+    .bst .quando + h2{ margin-top: 1.9rem; }
+
+    /* il documento: intestazione mail + corpo */
+    .bst .doc{
+      margin: 2.4rem 0; background: var(--panel);
+      border: 1px solid var(--rule); border-radius: 6px;
+      overflow: hidden;
+    }
+    .bst .doc .hd{
+      padding: .85rem 1.1rem; border-bottom: 1px solid var(--rule);
+      font-family: var(--font-mono); font-size: .74rem; line-height: 1.75;
+      color: var(--muted); white-space: pre-wrap; word-break: break-word;
+    }
+    .bst .doc .hd b{ color: var(--text-secondary); font-weight: 600; }
+    .bst .doc .bd{
+      padding: 1.1rem 1.1rem; font-family: var(--font-mono);
+      font-size: .88rem; line-height: 1.7; color: var(--text-primary);
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .bst .doc .tr{
+      padding: .95rem 1.1rem 1.1rem; border-top: 1px dashed var(--rule);
+      font-size: .9rem; line-height: 1.62; color: var(--muted);
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .bst .doc .tr .lab{
+      display: block; font-family: var(--font-mono); font-size: .62rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--accent); opacity: .8; margin-bottom: .5rem;
+    }
+    .bst .doc .ft{
+      padding: .6rem 1.1rem; border-top: 1px solid var(--rule);
+      font-family: var(--font-mono); font-size: .66rem; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted);
+      display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .bst .cod{
+      color: var(--accent); font-family: var(--font-mono);
+      font-size: .66rem; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .bst .doc .ft .cod{ font-size: inherit; letter-spacing: inherit; }
+    .bst .cod a{
+      color: var(--accent); text-decoration: none;
+      border-bottom: 1px dotted currentColor; padding-bottom: 1px;
+    }
+    .bst .cod a:hover{ border-bottom-style: solid; }
+    .bst .cod a::after{ content: " \2197"; font-size: .9em; opacity: .7; }
+
+    /* mappa dei voli */
+    .bst .mappa{
+      margin: 2.6rem 0; background: var(--panel);
+      border: 1px solid var(--rule); border-radius: 6px;
+      padding: 1.3rem 1.1rem 1.1rem;
+    }
+    .bst .mappa .cap{
+      font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: .25rem;
+    }
+    .bst .mappa .tit{
+      font-family: var(--font-mono); font-size: .98rem; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 1rem; line-height: 1.3;
+    }
+    .bst .mappa .wrap{ overflow-x: auto; }
+    .bst .mappa svg{ display: block; width: 100%; min-width: 34rem; height: auto; }
+    .bst .mappa .grat line{ stroke: var(--rule); stroke-width: 1; opacity: .5; }
+    .bst .mappa .rotte path{ fill: none; stroke: var(--text-secondary); stroke-linecap: round; }
+    .bst .mappa .rotte path.hot{ stroke: var(--accent); }
+    .bst .mappa .scali circle{ fill: var(--text-secondary); opacity: .55; }
+    .bst .mappa .scali circle.big{ fill: var(--accent); opacity: 1; }
+    .bst .mappa .lab text{
+      font-family: var(--font-mono); font-size: 11.5px; fill: var(--text-primary);
+    }
+    .bst .mappa .lab .n{ fill: var(--accent); font-weight: 700; }
+    .bst .mappa figcaption{
+      font-size: .84rem; line-height: 1.6; color: var(--muted); margin-top: 1rem;
+      padding-top: .8rem; border-top: 1px solid var(--rule);
+    }
+
+    /* elenco relatori */
+    .bst .relatori{ margin: 2.2rem 0; border-top: 1px solid var(--rule); }
+    .bst .relatori .r{
+      display: grid; grid-template-columns: 13rem 1fr; gap: .9rem;
+      padding: .66rem 0; border-bottom: 1px solid var(--rule);
+      font-size: .9rem; line-height: 1.5; color: var(--muted);
+    }
+    .bst .relatori .n{ color: var(--text-primary); font-weight: 600; }
+    @media (max-width: 620px){
+      .bst .relatori .r{ grid-template-columns: 1fr; gap: .05rem; }
+    }
+
+    /* agenda del giorno */
+    .bst .agenda{ margin: 2.4rem 0; border-top: 1px solid var(--rule); }
+    .bst .agenda .r{
+      display: grid; grid-template-columns: 5.6rem 1fr; gap: .9rem;
+      padding: .7rem 0; border-bottom: 1px solid var(--rule);
+      font-size: .9rem; line-height: 1.5; color: var(--text-primary);
+    }
+    .bst .agenda .h{
+      font-family: var(--font-mono); font-size: .76rem; color: var(--accent);
+      padding-top: .18em; white-space: nowrap;
+    }
+    .bst .agenda .r span{ color: var(--muted); }
+    @media (max-width: 620px){
+      .bst .agenda .r{ grid-template-columns: 1fr; gap: .1rem; }
+    }
+
+    /* blocchi di servizio */
+    .bst .caveat{
+      border: 1px solid var(--rule); border-left: 3px solid var(--muted);
+      padding: 1.3rem 1.3rem .3rem; margin: 2.8rem 0; font-size: .92rem; line-height: 1.6;
+    }
+    .bst .caveat .label{
+      font-family: var(--font-mono); font-size: .66rem; letter-spacing: .13em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: .8rem;
+    }
+    .bst .apparatus{
+      margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--rule);
+      font-size: .88rem; line-height: 1.6; color: var(--muted);
+    }
+    .bst .apparatus h3{ font-family: var(--font-mono); font-size: .98rem; color: var(--text-primary); margin: 2rem 0 .8rem; }
+    .bst .apparatus ul{ padding-left: 1.1rem; margin: 0 0 1.2rem; }
+    .bst .apparatus li{ margin-bottom: .55rem; }
+    .bst code{
+      font-family: var(--font-mono); font-size: .86em;
+      background: var(--panel); border: 1px solid var(--rule);
+      border-radius: 3px; padding: .08em .35em;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-08-02 | Pinperepette</p>
+    <h1 class="article-page-title">Famoso per un po' di brutta stampa <span class="accent">;)</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Sei anni di email, in ordine di data. Dall'ufficio di Bill Gates alla bozza della conferenza mondiale sulle pandemie, fino al modulo del registro dei sex offender spedito all'isola. Ogni documento è cliccabile: leggeteli e decidete voi.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-reaction">Documenti</span>
+      <span class="tag tag-highlight">Epstein</span>
+      <span class="tag tag-amplification">Potere</span>
+      <span class="tag tag-attention">OSINT</span>
+    </div>
+  </header>
+
+  <article class="article-content bst">
+
+<p class="lede">Voglio raccontarvi una storia vera. Non ci metto niente di mio: sono email, e le potete aprire tutte. Sotto ogni documento c'è il suo codice, ci cliccate sopra e vi si apre il PDF originale sul sito del Dipartimento di Giustizia americano. Io le ho messe solo in ordine di data. Comincia con un invito del calendario.</p>
+
+<p class="quando">l'antefatto</p>
+<h2>Le rotte</h2>
+
+<p>Prima di cominciare serve sapere di che uomo stiamo parlando, e per quello ci sono i registri di volo dei suoi due aerei: un Boeing 727 immatricolato N908JE, 706 voli, e un Gulfstream N909JE, 320 voli. In tutto 1.034 tratte, 140 scali, 270 rotte diverse. Questa è la forma che disegnano.</p>
+
+<figure class="mappa">
+  <div class="cap">mappa</div>
+  <div class="tit">1.034 voli registrati sui due aerei di Jeffrey Epstein</div>
+  <div class="wrap">
+<svg viewBox="0 0 1160 395" role="img" aria-label="Mappa delle rotte dei voli">
+<title>Rotte dei voli registrati sui log</title>
+<g class="grat">
+<line x1="66.4" y1="34" x2="66.4" y2="361"/>
+<line x1="190.7" y1="34" x2="190.7" y2="361"/>
+<line x1="314.9" y1="34" x2="314.9" y2="361"/>
+<line x1="439.2" y1="34" x2="439.2" y2="361"/>
+<line x1="563.4" y1="34" x2="563.4" y2="361"/>
+<line x1="687.7" y1="34" x2="687.7" y2="361"/>
+<line x1="811.9" y1="34" x2="811.9" y2="361"/>
+<line x1="936.2" y1="34" x2="936.2" y2="361"/>
+<line x1="1060.4" y1="34" x2="1060.4" y2="361"/>
+<line x1="54" y1="322.3" x2="1106" y2="322.3"/>
+<line x1="54" y1="236.2" x2="1106" y2="236.2"/>
+<line x1="54" y1="150.2" x2="1106" y2="150.2"/>
+<line x1="54" y1="64.1" x2="1106" y2="64.1"/>
+</g>
+<g class="rotte">
+<path class="" d="M469.9,128.9 Q457.5,133.6 448.5,143.5" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.9,141.0 Q406.9,200.2 395.4,272.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.9,141.0 Q773.4,182.7 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1208.9,-18.9 Q1139.5,38.2 1103.7,120.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1071.8,89.8 1103.7,120.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M363.0,223.0 Q415.6,194.2 449.3,144.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M383.8,232.0 Q235.2,179.4 78.9,200.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M397.0,264.8 Q354.4,312.0 338.0,373.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M177.3,192.9 Q236.0,302.4 338.0,373.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1080.7,73.0 Q1081.1,72.9 1081.5,72.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1066.5,63.2 1081.5,72.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1080.3,90.9 1120.2,118.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1120.2,118.7 Q1444.4,144.8 1745.1,21.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M2215.6,189.3 Q2000.5,48.7 1745.1,21.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M2215.6,189.3 Q2096.3,220.5 2004.1,302.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M2004.1,302.4 Q2004.0,300.9 2003.2,299.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1921.9,482.6 Q1984.5,400.9 2003.2,299.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1893.8,374.7 Q1894.9,432.0 1921.9,482.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M2012.4,451.8 Q1999.3,511.0 2014.4,569.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1722.2,432.6 Q1851.8,536.2 2014.4,569.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1519.0,277.1 Q1601.9,379.2 1722.2,432.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1080.7,73.0 Q1275.4,227.6 1519.0,277.1" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1034.5,35.5 1008.5,34.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1008.5,34.7 Q715.7,22.6 449.3,144.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M472.2,129.8 Q472.4,239.2 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M431.9,291.6 Q457.3,219.0 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1120.2,118.7 Q1105.9,91.1 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1011.4,186.9 Q1074.0,165.9 1120.2,118.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1004.5,201.4 Q1009.7,195.0 1011.4,186.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1004.5,201.4 Q931.2,170.5 851.9,176.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M475.5,138.2 Q421.1,192.0 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1059.1,446.1 Q987.9,286.3 851.9,176.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1059.1,446.1 Q1093.3,438.9 1120.6,416.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1120.6,416.9 Q1204.0,486.8 1310.1,511.3" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1330.3,717.4 Q1344.9,612.0 1310.1,511.3" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1214.5,786.7 Q1280.7,765.9 1330.3,717.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1059.1,446.1 Q1095.9,635.1 1214.5,786.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1059.1,446.1 Q1114.6,262.2 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1165.2,15.8 Q1116.1,34.2 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1165.2,15.8 Q1267.1,40.4 1369.1,16.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1311.1,-20.2 Q1335.8,4.9 1369.1,16.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M986.5,40.9 Q1156.1,49.3 1311.1,-20.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M986.5,40.9 Q705.5,28.3 449.3,144.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1029.2,174.4 Q756.2,194.6 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M177.3,192.9 Q115.9,171.1 51.2,179.5" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M675.5,696.1 Q642.0,497.9 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1070.8,441.3 Q842.6,521.2 675.5,696.1" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1070.8,441.3 Q1119.9,258.3 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M258.3,210.7 Q321.1,254.4 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M258.3,210.7 Q222.7,190.1 181.7,187.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M181.7,187.9 Q123.5,179.3 67.7,198.1" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M67.7,198.1 Q73.1,200.4 78.9,200.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1030.9,145.9 Q1099.2,156.4 1164.8,134.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.3,144.7 Q739.9,215.1 1030.9,145.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.6,103.1 Q403.9,177.6 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.3,144.7 Q417.9,208.1 418.8,278.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M175.2,156.9 Q312.8,182.5 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M427.5,156.0 Q438.8,151.8 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M427.5,156.0 Q453.2,257.7 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1097.6,56.4 Q1087.1,62.6 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1097.6,56.4 Q1134.6,23.0 1152.4,-23.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1152.4,-23.6 Q1443.4,69.8 1745.1,21.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1745.1,21.0 Q1840.8,192.8 2004.1,302.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M2004.1,302.4 Q1971.3,256.9 1921.5,231.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M2026.3,149.5 Q1964.1,177.8 1921.5,231.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M-182.0,-32.0 Q900.4,323.7 2026.3,149.5" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.3,144.7 Q154.8,-19.5 -182.0,-32.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M373.8,150.2 Q425.7,261.2 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.3,144.7 Q442.6,148.8 438.6,155.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M490.3,108.8 Q789.8,161.7 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M490.3,108.8 Q465.5,121.8 449.3,144.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1116.1,70.2 1178.6,63.3" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1080.7,73.0 Q1130.8,79.9 1178.6,63.3" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M456.7,139.3 Q451.4,139.9 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M456.7,139.3 Q411.8,194.9 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M333.5,134.8 Q349.7,207.4 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1083.1,154.0 Q1091.6,113.2 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1083.1,154.0 Q964.9,137.4 851.9,176.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M383.8,232.0 Q427.0,196.2 449.3,144.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M363.0,223.0 Q414.6,193.0 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M522.2,336.6 Q524.1,336.5 525.8,335.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M397.0,264.8 Q452.9,315.7 525.8,335.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M333.5,134.8 Q202.3,144.5 89.7,212.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M397.0,264.8 Q398.0,240.2 387.8,217.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M397.0,264.8 Q387.0,229.6 362.1,202.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M362.1,202.9 Q411.7,183.0 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M475.5,138.2 Q475.1,243.0 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M177.3,192.9 Q215.5,212.0 258.2,211.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M258.2,211.7 Q321.2,254.9 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M48.0,169.8 Q59.9,188.6 78.9,200.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M48.0,169.8 Q112.7,194.9 181.7,187.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M461.6,334.5 Q437.7,291.9 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M461.6,334.5 Q491.7,342.8 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M398.3,147.1 Q423.2,150.8 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M398.3,147.1 Q385.7,145.7 373.8,150.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M46.7,170.6 Q59.3,189.2 78.9,200.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M106.6,183.9 Q78.2,170.1 46.7,170.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M106.6,183.9 Q116.9,198.4 132.6,206.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M397.0,264.8 Q271.8,204.0 132.6,206.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1080.7,73.0 Q1101.6,114.7 1139.3,142.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M993.9,222.4 Q1076.2,199.9 1139.3,142.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1019.2,202.4 Q1037.4,164.2 1036.3,121.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1038.0,82.3 1036.3,121.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1009.0,24.0 Q1030.3,41.8 1057.4,48.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M490.3,108.8 Q759.8,128.7 1009.0,24.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M608.4,73.3 Q519.3,88.7 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M575.4,76.6 Q463.6,149.3 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M575.4,76.6 Q828.5,135.4 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1011.4,186.9 Q1021.8,182.8 1029.2,174.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1017.7,111.9 1011.4,186.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M454.9,143.3 Q404.7,179.6 376.4,234.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M448.5,143.5 Q462.2,248.9 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M410.6,166.2 Q391.9,213.8 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M410.6,166.2 Q431.6,158.9 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1080.0,75.1 Q755.4,33.0 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1120.2,118.7 Q1105.4,92.1 1080.0,75.1" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1120.2,118.7 Q1130.6,113.0 1137.3,103.3" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1103.7,120.6 Q1097.9,94.0 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M313.6,162.5 Q382.7,168.7 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M313.6,162.5 Q244.6,159.3 181.7,187.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M177.3,192.9 Q318.9,200.7 448.5,143.5" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M608.4,73.3 Q521.0,88.1 449.9,141.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M-106.4,-42.7 Q473.2,157.6 1080.7,73.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M-106.4,-42.7 Q149.7,115.9 449.9,141.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M177.3,192.9 Q319.8,199.6 449.9,141.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M449.9,141.0 Q405.9,178.5 383.8,232.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M396.9,267.4 Q436.9,211.1 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M396.9,267.4 Q397.2,266.1 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M447.0,142.9 Q468.8,251.9 537.7,339.1" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M383.1,269.3 Q387.9,250.7 383.8,232.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M383.1,269.3 Q390.6,268.7 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M106.6,183.9 Q90.8,188.6 78.9,200.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M51.2,179.5 Q115.4,199.4 181.7,187.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M422.3,160.0 Q451.1,260.3 522.2,336.6" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M373.8,150.2 Q366.6,152.5 361.2,157.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M361.2,157.9 Q405.9,160.7 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M333.5,134.8 Q251.2,143.1 181.7,187.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M79.6,202.3 Q132.4,207.3 181.7,187.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M79.6,202.3 Q270.4,216.7 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M454.6,137.4 Q410.5,194.2 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M454.6,137.4 Q450.1,139.2 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M461.9,141.9 Q454.3,140.6 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M461.9,141.9 Q466.1,140.0 468.9,136.4" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M468.9,136.4 Q457.2,137.0 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M175.2,156.9 Q121.9,166.9 78.9,200.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M175.2,156.9 Q296.7,187.3 418.8,159.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M422.3,160.0 Q420.7,159.2 418.8,159.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M472.2,129.8 Q472.9,134.4 475.5,138.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M383.8,232.0 Q379.8,232.4 376.4,234.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1080.7,73.0 Q1105.3,94.9 1137.3,103.3" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q1090.7,85.2 1137.3,103.3" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M1057.4,48.0 Q742.5,21.6 449.9,141.0" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M522.2,336.6 Q534.1,360.4 555.5,376.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M397.0,264.8 Q462.9,339.5 555.5,376.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M442.7,154.8 Q406.6,204.3 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M442.7,154.8 Q446.3,149.4 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M386.7,248.7 Q389.9,258.0 397.0,264.8" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M386.7,248.7 Q429.5,203.0 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M296.5,195.5 Q191.0,179.3 89.7,212.7" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M258.3,210.7 Q279.2,207.7 296.5,195.5" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M258.3,210.7 Q248.0,223.8 244.8,240.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M298.9,200.3 Q267.0,213.8 244.8,240.2" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M177.3,192.9 Q318.2,200.2 447.0,142.9" stroke-width="0.52" opacity="0.20"/>
+<path class="" d="M446.1,144.2 Q407.1,198.6 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M461.8,307.0 Q434.5,278.1 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M461.8,307.0 Q434.5,278.1 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M469.9,128.9 Q458.5,132.5 449.9,141.0" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1057.4,48.0 Q741.7,23.3 449.3,144.7" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M472.2,129.8 Q418.4,188.3 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1080.7,73.0 Q1089.9,101.9 1111.4,123.5" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M449.3,144.7 Q646.8,208.8 851.9,176.2" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M469.9,128.9 Q471.6,134.2 475.5,138.2" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1214.5,786.7 Q1262.6,762.6 1294.4,719.3" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1080.7,73.0 Q953.9,97.2 851.9,176.2" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1029.2,174.4 Q1067.1,129.9 1080.7,73.0" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1152.4,-23.6 Q1180.1,-14.5 1208.9,-18.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M385.9,250.9 Q389.8,259.2 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M177.3,192.9 Q127.3,184.6 78.9,200.0" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M469.9,128.9 Q457.7,134.3 449.3,144.7" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M397.0,264.8 Q368.1,389.1 398.7,512.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M175.2,156.9 Q273.1,237.4 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M397.0,264.8 Q389.9,263.7 383.2,266.0" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M383.8,137.1 Q414.7,147.6 447.0,142.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M419.5,155.2 Q434.7,152.3 447.0,142.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M469.9,128.9 Q468.5,132.5 468.9,136.4" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M469.9,128.9 Q462.9,113.6 449.6,103.1" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M548.6,346.9 Q536.7,338.6 522.2,336.6" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M469.9,128.9 Q471.2,239.0 522.2,336.6" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M448.5,143.5 Q447.8,143.0 447.0,142.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1080.7,73.0 Q756.1,32.4 448.5,143.5" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M490.3,108.8 Q776.0,142.6 1046.0,43.0" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M490.3,108.8 Q465.3,121.1 448.5,143.5" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1057.4,48.0 Q740.2,22.7 446.1,144.2" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M256.6,211.3 Q320.4,254.9 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M177.3,192.9 Q214.8,211.6 256.6,211.3" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1057.4,48.0 Q1062.0,45.6 1065.0,41.3" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1071.1,41.1 Q1068.0,40.5 1065.0,41.3" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M608.4,73.3 Q843.6,112.7 1071.1,41.1" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M490.3,108.8 Q464.5,120.6 447.0,142.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M422.3,160.0 Q397.1,209.4 397.0,264.8" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M454.9,143.3 Q451.0,142.1 447.0,142.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M421.2,157.3 Q435.8,153.2 447.0,142.9" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M447.0,142.9 Q417.9,155.1 397.6,179.2" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M420.0,171.6 Q407.9,172.7 397.6,179.2" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M447.0,142.9 Q403.3,114.7 351.5,109.4" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M1137.3,103.3 Q1149.6,112.8 1164.9,115.6" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M373.8,150.2 Q413.0,154.7 449.9,141.0" stroke-width="0.60" opacity="0.22"/>
+<path class="" d="M490.3,108.8 Q424.9,175.6 397.0,264.8" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M418.8,159.2 Q395.2,209.3 397.0,264.8" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M449.3,144.7 Q246.0,114.3 51.2,179.5" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M431.9,291.6 Q417.7,274.0 397.0,264.8" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M851.9,176.2 Q667.8,216.8 522.2,336.6" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M418.8,159.2 Q434.9,154.4 447.0,142.9" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M449.6,103.1 Q443.5,122.7 447.0,142.9" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M373.8,150.2 Q412.2,156.5 449.3,144.7" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M397.0,264.8 Q245.7,194.2 78.9,200.0" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M106.6,183.9 Q143.6,194.9 181.7,187.9" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M522.2,336.6 Q529.7,339.7 537.7,339.1" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M397.0,264.8 Q249.6,201.9 89.7,212.7" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M475.5,138.2 Q460.7,137.1 447.0,142.9" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M395.4,272.4 Q451.1,319.7 522.2,336.6" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M177.3,192.9 Q180.1,190.9 181.7,187.9" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M181.7,187.9 Q132.7,189.3 89.7,212.7" stroke-width="0.66" opacity="0.24"/>
+<path class="" d="M446.1,144.2 Q461.1,249.5 522.2,336.6" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M448.5,143.5 Q408.2,197.9 397.0,264.8" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M449.9,141.0 Q462.6,247.5 522.2,336.6" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M395.4,272.4 Q397.1,268.8 397.0,264.8" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M490.3,108.8 Q781.1,146.4 1057.4,48.0" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M177.3,192.9 Q278.5,255.2 397.0,264.8" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M177.3,192.9 Q319.1,201.4 449.3,144.7" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M51.2,179.5 Q62.6,193.1 78.9,200.0" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M1046.0,43.0 Q1059.7,62.2 1080.7,73.0" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M89.7,212.7 Q85.8,205.1 78.9,200.0" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M1080.7,73.0 Q755.4,31.9 447.0,142.9" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M422.3,160.0 Q436.7,154.4 447.0,142.9" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M376.4,234.7 Q422.7,197.2 447.0,142.9" stroke-width="0.71" opacity="0.25"/>
+<path class="" d="M1057.4,48.0 Q1066.0,63.3 1080.7,73.0" stroke-width="0.76" opacity="0.26"/>
+<path class="" d="M418.8,278.9 Q409.6,269.2 397.0,264.8" stroke-width="0.76" opacity="0.26"/>
+<path class="" d="M438.6,155.6 Q444.3,150.2 447.0,142.9" stroke-width="0.76" opacity="0.26"/>
+<path class="" d="M175.2,156.9 Q174.7,173.1 181.7,187.9" stroke-width="0.76" opacity="0.26"/>
+<path class="" d="M333.5,134.8 Q389.3,152.4 447.0,142.9" stroke-width="0.76" opacity="0.26"/>
+<path class="" d="M454.9,143.3 Q411.4,197.1 397.0,264.8" stroke-width="0.76" opacity="0.26"/>
+<path class="" d="M608.4,73.3 Q844.6,129.8 1080.7,73.0" stroke-width="0.81" opacity="0.27"/>
+<path class="" d="M608.4,73.3 Q479.7,143.6 397.0,264.8" stroke-width="0.81" opacity="0.27"/>
+<path class="" d="M447.0,142.9 Q256.1,127.3 78.9,200.0" stroke-width="0.81" opacity="0.27"/>
+<path class="" d="M376.4,234.7 Q383.1,252.2 397.0,264.8" stroke-width="0.81" opacity="0.27"/>
+<path class="" d="M363.0,223.0 Q375.0,248.0 397.0,264.8" stroke-width="0.88" opacity="0.29"/>
+<path class="" d="M469.9,128.9 Q417.1,188.1 397.0,264.8" stroke-width="0.88" opacity="0.29"/>
+<path class="" d="M383.8,232.0 Q386.4,250.0 397.0,264.8" stroke-width="0.95" opacity="0.31"/>
+<path class="" d="M373.8,150.2 Q411.3,155.3 447.0,142.9" stroke-width="0.95" opacity="0.31"/>
+<path class="" d="M449.3,144.7 Q773.6,184.6 1080.7,73.0" stroke-width="0.99" opacity="0.31"/>
+<path class="" d="M373.8,150.2 Q371.6,210.3 397.0,264.8" stroke-width="0.99" opacity="0.31"/>
+<path class="" d="M181.7,187.9 Q128.8,181.6 78.9,200.0" stroke-width="0.99" opacity="0.31"/>
+<path class="" d="M449.9,141.0 Q408.6,196.5 397.0,264.8" stroke-width="1.02" opacity="0.32"/>
+<path class="" d="M397.0,264.8 Q298.5,200.5 181.7,187.9" stroke-width="1.05" opacity="0.33"/>
+<path class="" d="M449.3,144.7 Q462.7,249.4 522.2,336.6" stroke-width="1.30" opacity="0.38"/>
+<path class="" d="M181.7,187.9 Q319.7,197.2 447.0,142.9" stroke-width="1.41" opacity="0.40"/>
+<path class="hot" d="M469.9,128.9 Q456.8,133.1 447.0,142.9" stroke-width="1.78" opacity="0.47"/>
+<path class="hot" d="M447.0,142.9 Q461.4,248.8 522.2,336.6" stroke-width="1.88" opacity="0.49"/>
+<path class="hot" d="M449.3,144.7 Q408.7,198.4 397.0,264.8" stroke-width="2.03" opacity="0.52"/>
+<path class="hot" d="M397.0,264.8 Q451.0,315.7 522.2,336.6" stroke-width="2.42" opacity="0.59"/>
+<path class="hot" d="M397.0,264.8 Q436.6,209.8 447.0,142.9" stroke-width="3.45" opacity="0.75"/>
+</g>
+<g class="scali">
+<circle class="big" cx="522.2" cy="336.6" r="3.68"/>
+<circle class="" cx="446.1" cy="144.2" r="1.85"/>
+<circle class="big" cx="397.0" cy="264.8" r="5.00"/>
+<circle class="" cx="461.8" cy="307.0" r="1.63"/>
+<circle class="" cx="461.8" cy="307.0" r="1.63"/>
+<circle class="" cx="448.5" cy="143.5" r="1.98"/>
+<circle class="big" cx="469.9" cy="128.9" r="2.73"/>
+<circle class="big" cx="449.9" cy="141.0" r="2.23"/>
+<circle class="big" cx="449.3" cy="144.7" r="3.18"/>
+<circle class="" cx="395.4" cy="272.4" r="1.85"/>
+<circle class="big" cx="1080.7" cy="73.0" r="2.58"/>
+<circle class="" cx="1208.9" cy="-18.9" r="1.68"/>
+<circle class="" cx="1103.7" cy="120.6" r="1.68"/>
+<circle class="big" cx="1057.4" cy="48.0" r="2.20"/>
+<circle class="" cx="490.3" cy="108.8" r="2.04"/>
+<circle class="" cx="363.0" cy="223.0" r="1.91"/>
+<circle class="" cx="418.8" cy="159.2" r="1.85"/>
+<circle class="big" cx="177.3" cy="192.9" r="2.13"/>
+<circle class="" cx="51.2" cy="179.5" r="1.88"/>
+<circle class="big" cx="78.9" cy="200.0" r="2.36"/>
+<circle class="" cx="383.8" cy="232.0" r="2.02"/>
+<circle class="" cx="338.0" cy="373.4" r="1.63"/>
+<circle class="" cx="1081.5" cy="72.6" r="1.63"/>
+<circle class="" cx="1120.2" cy="118.7" r="1.79"/>
+<circle class="" cx="1745.1" cy="21.0" r="1.72"/>
+<circle class="" cx="2215.6" cy="189.3" r="1.63"/>
+<circle class="" cx="2004.1" cy="302.4" r="1.72"/>
+<circle class="" cx="2003.2" cy="299.6" r="1.63"/>
+<circle class="" cx="1921.9" cy="482.6" r="1.63"/>
+<circle class="" cx="1893.8" cy="374.7" r="1.56"/>
+<circle class="" cx="2012.4" cy="451.8" r="1.56"/>
+<circle class="" cx="2014.4" cy="569.7" r="1.63"/>
+<circle class="" cx="1722.2" cy="432.6" r="1.63"/>
+<circle class="" cx="1519.0" cy="277.1" r="1.63"/>
+<circle class="" cx="1008.5" cy="34.7" r="1.63"/>
+<circle class="" cx="472.2" cy="129.8" r="1.72"/>
+<circle class="big" cx="447.0" cy="142.9" r="4.64"/>
+<circle class="" cx="431.9" cy="291.6" r="1.72"/>
+<circle class="" cx="1111.4" cy="123.5" r="1.63"/>
+<circle class="" cx="1011.4" cy="186.9" r="1.72"/>
+<circle class="" cx="1004.5" cy="201.4" r="1.63"/>
+<circle class="" cx="851.9" cy="176.2" r="1.91"/>
+<circle class="" cx="475.5" cy="138.2" r="1.85"/>
+<circle class="big" cx="181.7" cy="187.9" r="2.77"/>
+<circle class="" cx="1046.0" cy="43.0" r="1.79"/>
+<circle class="" cx="1059.1" cy="446.1" r="1.72"/>
+<circle class="" cx="1120.6" cy="416.9" r="1.63"/>
+<circle class="" cx="1310.1" cy="511.3" r="1.63"/>
+<circle class="" cx="1330.3" cy="717.4" r="1.63"/>
+<circle class="" cx="1214.5" cy="786.7" r="1.72"/>
+<circle class="" cx="1294.4" cy="719.3" r="1.63"/>
+<circle class="" cx="1165.2" cy="15.8" r="1.63"/>
+<circle class="" cx="1369.1" cy="16.0" r="1.63"/>
+<circle class="" cx="1311.1" cy="-20.2" r="1.63"/>
+<circle class="" cx="986.5" cy="40.9" r="1.63"/>
+<circle class="" cx="1029.2" cy="174.4" r="1.72"/>
+<circle class="" cx="608.4" cy="73.3" r="2.04"/>
+<circle class="" cx="418.8" cy="278.9" r="1.79"/>
+<circle class="" cx="675.5" cy="696.1" r="1.63"/>
+<circle class="" cx="1070.8" cy="441.3" r="1.63"/>
+<circle class="big" cx="373.8" cy="150.2" r="2.26"/>
+<circle class="" cx="438.6" cy="155.6" r="1.79"/>
+<circle class="" cx="258.3" cy="210.7" r="1.72"/>
+<circle class="" cx="67.7" cy="198.1" r="1.63"/>
+<circle class="" cx="1164.8" cy="134.7" r="1.56"/>
+<circle class="" cx="1030.9" cy="145.9" r="1.63"/>
+<circle class="" cx="449.6" cy="103.1" r="1.79"/>
+<circle class="" cx="175.2" cy="156.9" r="1.91"/>
+<circle class="" cx="427.5" cy="156.0" r="1.63"/>
+<circle class="" cx="1097.6" cy="56.4" r="1.63"/>
+<circle class="" cx="1152.4" cy="-23.6" r="1.72"/>
+<circle class="" cx="1921.5" cy="231.2" r="1.63"/>
+<circle class="" cx="2026.3" cy="149.5" r="1.63"/>
+<circle class="" cx="-182.0" cy="-32.0" r="1.63"/>
+<circle class="" cx="385.9" cy="250.9" r="1.63"/>
+<circle class="" cx="398.7" cy="512.9" r="1.63"/>
+<circle class="" cx="1178.6" cy="63.3" r="1.63"/>
+<circle class="" cx="456.7" cy="139.3" r="1.63"/>
+<circle class="" cx="333.5" cy="134.8" r="1.85"/>
+<circle class="" cx="106.6" cy="183.9" r="1.79"/>
+<circle class="" cx="1083.1" cy="154.0" r="1.63"/>
+<circle class="" cx="537.7" cy="339.1" r="1.72"/>
+<circle class="" cx="525.8" cy="335.7" r="1.56"/>
+<circle class="" cx="525.8" cy="335.7" r="1.56"/>
+<circle class="" cx="383.2" cy="266.0" r="1.63"/>
+<circle class="" cx="89.7" cy="212.7" r="1.95"/>
+<circle class="" cx="387.8" cy="217.9" r="1.56"/>
+<circle class="" cx="362.1" cy="202.9" r="1.63"/>
+<circle class="" cx="383.8" cy="137.1" r="1.63"/>
+<circle class="" cx="419.5" cy="155.2" r="1.63"/>
+<circle class="" cx="468.9" cy="136.4" r="1.72"/>
+<circle class="" cx="548.6" cy="346.9" r="1.63"/>
+<circle class="" cx="256.6" cy="211.3" r="1.72"/>
+<circle class="" cx="1065.0" cy="41.3" r="1.72"/>
+<circle class="" cx="1071.1" cy="41.1" r="1.72"/>
+<circle class="" cx="258.2" cy="211.7" r="1.63"/>
+<circle class="" cx="48.0" cy="169.8" r="1.63"/>
+<circle class="" cx="461.6" cy="334.5" r="1.63"/>
+<circle class="" cx="398.3" cy="147.1" r="1.63"/>
+<circle class="" cx="46.7" cy="170.6" r="1.63"/>
+<circle class="" cx="132.6" cy="206.6" r="1.63"/>
+<circle class="" cx="1139.3" cy="142.4" r="1.63"/>
+<circle class="" cx="993.9" cy="222.4" r="1.56"/>
+<circle class="" cx="1019.2" cy="202.4" r="1.56"/>
+<circle class="" cx="1036.3" cy="121.8" r="1.63"/>
+<circle class="" cx="1009.0" cy="24.0" r="1.63"/>
+<circle class="" cx="422.3" cy="160.0" r="1.85"/>
+<circle class="" cx="376.4" cy="234.7" r="1.95"/>
+<circle class="" cx="575.4" cy="76.6" r="1.63"/>
+<circle class="" cx="454.9" cy="143.3" r="1.85"/>
+<circle class="" cx="421.2" cy="157.3" r="1.63"/>
+<circle class="" cx="410.6" cy="166.2" r="1.63"/>
+<circle class="" cx="1080.0" cy="75.1" r="1.63"/>
+<circle class="" cx="1137.3" cy="103.3" r="1.76"/>
+<circle class="" cx="313.6" cy="162.5" r="1.63"/>
+<circle class="" cx="-106.4" cy="-42.7" r="1.63"/>
+<circle class="" cx="396.9" cy="267.4" r="1.63"/>
+<circle class="" cx="383.1" cy="269.3" r="1.63"/>
+<circle class="" cx="397.6" cy="179.2" r="1.72"/>
+<circle class="" cx="420.0" cy="171.6" r="1.63"/>
+<circle class="" cx="361.2" cy="157.9" r="1.63"/>
+<circle class="" cx="79.6" cy="202.3" r="1.63"/>
+<circle class="" cx="454.6" cy="137.4" r="1.63"/>
+<circle class="" cx="461.9" cy="141.9" r="1.63"/>
+<circle class="" cx="351.5" cy="109.4" r="1.63"/>
+<circle class="" cx="1164.9" cy="115.6" r="1.63"/>
+<circle class="" cx="555.5" cy="376.2" r="1.63"/>
+<circle class="" cx="442.7" cy="154.8" r="1.63"/>
+<circle class="" cx="386.7" cy="248.7" r="1.63"/>
+<circle class="" cx="296.5" cy="195.5" r="1.63"/>
+<circle class="" cx="244.8" cy="240.2" r="1.63"/>
+<circle class="" cx="298.9" cy="200.3" r="1.56"/>
+</g>
+<g class="lab">
+<text x="455.0" y="146.3" text-anchor="start">Teterboro <tspan class="n">410</tspan></text>
+<text x="405.0" y="268.2" text-anchor="start">Palm Beach <tspan class="n">505</tspan></text>
+<text x="530.2" y="340.0" text-anchor="start">St. Thomas <tspan class="n">203</tspan></text>
+<text x="441.3" y="148.1" text-anchor="end">New York JFK <tspan class="n">123</tspan></text>
+<text x="477.9" y="132.3" text-anchor="start">Boston Bedford <tspan class="n">69</tspan></text>
+<text x="173.7" y="191.3" text-anchor="end">Santa Fe <tspan class="n">73</tspan></text>
+<text x="1072.7" y="76.4" text-anchor="end">Parigi Le Bourget <tspan class="n">54</tspan></text>
+<text x="1049.4" y="51.4" text-anchor="end">Londra Luton <tspan class="n">25</tspan></text>
+<text x="70.9" y="203.4" text-anchor="end">Van Nuys <tspan class="n">36</tspan></text>
+<text x="381.8" y="153.6" text-anchor="start">Columbus <tspan class="n">29</tspan></text>
+<text x="457.9" y="144.4" text-anchor="start">Westchester <tspan class="n">27</tspan></text>
+<text x="169.3" y="196.3" text-anchor="end">Albuquerque <tspan class="n">21</tspan></text>
+</g>
+</svg>
+  </div>
+  <figcaption>Ogni arco è una rotta, lo spessore è il numero di tratte percorse. In evidenza le sei rotte sopra i quarantotto voli. I numeri accanto ai nomi sono i passaggi per quello scalo. La dorsale è una sola: Teterboro, l'aeroporto privato di New York, giù a Palm Beach, e da lì a St. Thomas, l'isolotto delle Isole Vergini americane accanto a Little St James. Palm Beach e Teterboro da sole fanno 196 voli.</figcaption>
+</figure>
+
+<p>Nelle liste passeggeri le persone sono quasi sempre iniziali. «JE» compare 867 volte, «GM» ventiquattro. Ogni tanto qualcuno è scritto per esteso: Bill Clinton, e in un caso «PRESIDENT WILLIAM J. CLINTON». Alan Dershowitz. David Rockwell.</p>
+
+<p>Su questi registri non c'è l'anno, solo il giorno e il mese: sono i log diventati pubblici con le cause civili, e raccontano gli anni <em>prima</em>. Prima del giugno 2008, quando Jeffrey Epstein si dichiara colpevole in Florida e viene iscritto al registro dei sex offender.</p>
+
+<p>La storia che voglio raccontarvi comincia dopo.</p>
+
+<p class="quando">6 luglio 2011</p>
+<h2>Un'ora, di venerdì pomeriggio</h2>
+
+<p>Bill Gates inoltra una mail a un indirizzo Gmail. Non scrive niente di suo, gira e basta un appuntamento che si era messo in agenda la settimana prima.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Bill Gates
+<b>To:</b> "Jeffrey Epstein (jeevacation@gmail.com)"
+<b>Subject:</b> FW: 3:30-4:30pm Billg Meeting w/Jeffrey Epstein (Boris)
+<b>Date:</b> Wed, 06 Jul 2011</div>
+  <div class="bd">When: Friday, July 15, 2011 3:30 PM-4:30 PM (UTC-08:00) Pacific Time
+Where: BMGF Campus | Bill's Office</div>
+  <div class="tr"><span class="lab">in italiano</span>Quando: venerdì 15 luglio 2011, 15:30-16:30, ora del Pacifico.
+Dove: campus BMGF, ufficio di Bill.</div>
+  <div class="ft"><span>invito del calendario</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00640503.pdf" target="_blank" rel="noopener">EFTA00640503</a></span></div>
+</div>
+
+<p>Un'ora nell'ufficio di Bill Gates, dentro il campus della Bill &amp; Melinda Gates Foundation. Il «Boris» tra parentesi è Boris Nikolic, il consigliere scientifico di Gates.</p>
+
+<p>Tre anni prima, nel giugno 2008, Jeffrey Epstein si era dichiarato colpevole in Florida ed era stato iscritto al registro dei sex offender.</p>
+
+<p class="quando">16 novembre 2011</p>
+<h2>Le presentazioni</h2>
+
+<p>Quattro mesi dopo, Nikolic scrive una mail contrassegnata come urgente. Presenta Epstein a due persone della fondazione: Gabrielle Fitzgerald, vicedirettrice per le politiche di salute globale, e Richard Henriques, il direttore finanziario.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Boris Nikolic (bgC3)
+<b>To:</b> Gabrielle Fitzgerald; Jeffrey Epstein (jeevacation@gmail.com)
+<b>Subject:</b> Introduction - Jeffery - Gabrielle/Dick
+<b>Importance:</b> High</div>
+  <div class="bd">Jeffrey meet Gabrielle, Gabrielle meet Jeffrey!
+
+Gabrielle you heard about Jeffrey few times. He is a friend and a financial guru. Also he is notorious for some bad press ;)
+
+Jeffrey, Gabrielle Fitzgerald is a Deputy Director, Global Health Policy &amp; Advocacy at BMGF. She is really a star in her job. She is visiting NYC with Dick (Richard Henriques, CFO of BMGF) this Friday. [...] After all, you are the one who proposed DAF concept to Bill on several occasions as well as worked on it with Jes of JPM.</div>
+  <div class="tr"><span class="lab">in italiano</span>Jeffrey conosci Gabrielle, Gabrielle conosci Jeffrey!
+
+Gabrielle, di Jeffrey ti ho parlato diverse volte. È un amico e un guru della finanza. Ed è anche famoso per un po' di brutta stampa ;)
+
+Jeffrey, Gabrielle Fitzgerald è vicedirettrice per le politiche e l'advocacy di salute globale alla BMGF. Nel suo lavoro è davvero un fuoriclasse. Venerdì è a New York con Dick (Richard Henriques, il direttore finanziario della BMGF). [...] Dopotutto sei tu quello che ha proposto a Bill il concetto di DAF in diverse occasioni, e che ci ha lavorato con Jes di JPM.</div>
+  <div class="ft"><span>presentazione</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01739579.pdf" target="_blank" rel="noopener">EFTA01739579</a></span></div>
+</div>
+
+<p>Il punto e virgola con la parentesi è nell'originale.</p>
+
+<p>L'ultima riga dice perché lo stanno presentando: il DAF, il <em>donor advised fund</em>, uno strumento con cui i grandi donatori accantonano soldi per la beneficenza incassando subito il vantaggio fiscale. Epstein l'aveva proposto a Bill «diverse volte», e ci aveva lavorato «con Jes di JPM», cioè Jes Staley, allora ai vertici di JPMorgan.</p>
+
+<p>L'incontro si fa quel venerdì. Il sabato mattina Fitzgerald ringrazia: la conversazione è stata «straordinariamente illuminante» e aiuterà «a portare la discussione interna al livello successivo». Epstein risponde nel giro di mezz'ora.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Jeffrey Epstein &lt;jeevacation@gmail.com&gt;
+<b>To:</b> Gabrielle Fitzgerald
+<b>Date:</b> Sat, 19 Nov 2011</div>
+  <div class="bd">I'm glad we met. please feel free to bounce ideas off of me. everything will be kept in the strictest of confidences.</div>
+  <div class="tr"><span class="lab">in italiano</span>Sono contento che ci siamo conosciuti. Sentiti pure libero di scambiare idee con me: tutto sarà mantenuto nella più stretta riservatezza.</div>
+  <div class="ft"><span>risposta</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00924343.pdf" target="_blank" rel="noopener">EFTA00924343</a></span></div>
+</div>
+
+<p class="quando">16 dicembre 2011</p>
+<h2>Il tavolo</h2>
+
+<p>Fitzgerald gli scrive di nuovo, «spero sia l'ultima mail di logistica», per confermare un appuntamento del 6 gennaio alle 11. In fondo c'è la lista dei partecipanti.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Gabrielle Fitzgerald
+<b>To:</b> jeevacation@gmail.com
+<b>Subject:</b> January 6</div>
+  <div class="bd">We are confirmed for Friday, January 6 at 11 am. A list of participants is below.
+
+1. Dick Henriques, CFO
+2. Connie Collingsworth, General Counsel
+3. Julie Sunderland, Director, Program Related Investment
+4. Jenna Brereton, Program Officer, Private Donor Engagement
+5. Boris
+6. Gabrielle</div>
+  <div class="tr"><span class="lab">in italiano</span>Siamo confermati per venerdì 6 gennaio alle 11. Qui sotto la lista dei partecipanti.
+
+1. Dick Henriques, direttore finanziario
+2. Connie Collingsworth, responsabile dell'ufficio legale
+3. Julie Sunderland, direttrice degli investimenti collegati ai programmi
+4. Jenna Brereton, responsabile dei rapporti con i donatori privati
+5. Boris
+6. Gabrielle</div>
+  <div class="ft"><span>convocazione</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01850504.pdf" target="_blank" rel="noopener">EFTA01850504</a></span></div>
+</div>
+
+<p>Il direttore finanziario e il capo dell'ufficio legale della fondazione, insieme.</p>
+
+<p>Qui la storia salta un anno. Non perché in mezzo non succeda niente, ma perché quello che succede in mezzo somiglia a quello che avete appena letto: inviti, presentazioni, gente che si conosce. Il documento che riprende il filo non è un invito. È un contratto.</p>
+
+<p class="quando">17 gennaio 2013</p>
+<h2>Un accordo riservato</h2>
+
+<p>Arriva sulla casella di Epstein una mail con oggetto «FW: World Bank Assignment, Letter of Appointment». In allegato c'è la bozza di un accordo fra la Banca Mondiale e la Gates Foundation, con scritto sopra «Confidential».</p>
+
+<div class="doc">
+  <div class="hd"><b>Documento:</b> The World Bank, Memorandum of Agreement
+<b>Data:</b> 14 gennaio 2013
+<b>Classificazione:</b> Confidential, Draft
+<b>Inoltrato a:</b> jeevacation@gmail.com, 17 gennaio 2013</div>
+  <div class="bd">Memorandum of Agreement Between the International Bank for Reconstruction and Development (the World Bank) and Bill and Melinda Gates Foundation (BMGF)
+
+This Agreement is with respect to the appointment of Ms [...] under the auspices of the World Bank's Secondment Program. [...] will be assigned to the World Bank Institute [...] as a Senior Advisor under a special assignment appointment for a period of thirty months. [...]
+
+It is understood that the BMGF will continue to pay salary and related staff benefit costs while [she] is on assignment with the World Bank.</div>
+  <div class="tr"><span class="lab">in italiano</span>Accordo fra la Banca Internazionale per la Ricostruzione e lo Sviluppo (la Banca Mondiale) e la Bill and Melinda Gates Foundation.
+
+Il presente accordo riguarda la nomina della signora [...] nell'ambito del programma di distacco della Banca Mondiale. [...] sarà assegnata al World Bank Institute [...] come consulente senior, con un incarico speciale della durata di trenta mesi. [...]
+
+Resta inteso che la BMGF continuerà a corrispondere lo stipendio e i relativi oneri contributivi mentre [lei] è in distacco presso la Banca Mondiale.</div>
+  <div class="ft"><span>bozza riservata</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA01145534.pdf" target="_blank" rel="noopener">EFTA01145534</a></span> <span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00952607.pdf" target="_blank" rel="noopener">EFTA00952607</a></span></div>
+</div>
+
+<p>Una dirigente della Gates Foundation va a lavorare alla Banca Mondiale per trenta mesi, continuando a essere pagata dalla fondazione. Il suo nome è oscurato nella copia rilasciata. La bozza è marcata riservata, e sta negli archivi di Epstein tre giorni dopo essere stata scritta.</p>
+
+<p class="quando">15 febbraio 2013</p>
+<h2>Volo per la Florida</h2>
+
+<p>Epstein manda un messaggio per avvisare chi viaggia con lui.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Jeffrey Epstein
+<b>Date:</b> Fri, 15 Feb 2013</div>
+  <div class="bd">larry summers, former treasury secretary, and former president of harvard will be flying with us to florida. He and his wife lisa are on their way to miami</div>
+  <div class="tr"><span class="lab">in italiano</span>larry summers, ex segretario al tesoro ed ex presidente di harvard volerà con noi in florida. Lui e sua moglie lisa stanno arrivando a miami</div>
+  <div class="ft"><span>trascrizione OCR</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01905563.pdf" target="_blank" rel="noopener">EFTA01905563</a></span></div>
+</div>
+
+<p>Fin qui si può leggere tutto come una normale rete di conoscenze, di quelle che a certi livelli si intrecciano da sole. Un uomo ricco che frequenta uomini ricchi, e qualcuno che fa le presentazioni.</p>
+
+<p>Da adesso in avanti cambia l'argomento. Non più chi conosce chi, ma di che cosa si parla.</p>
+
+<p class="quando">9 giugno 2013</p>
+<h2>La polio, i talebani e i droni</h2>
+
+<p>L'International Peace Institute è un istituto di ricerca affacciato sul Palazzo di Vetro, presieduto allora da Terje Rød-Larsen, il diplomatico norvegese degli accordi di Oslo. Nel 2013 ha un programma finanziato dalla Gates Foundation. Questa è l'intestazione del budget.</p>
+
+<div class="doc">
+  <div class="hd"><b>Documento:</b> IPI, Polio Eradication and Peace &amp; Health
+<b>Sostenuto da:</b> Bill &amp; Melinda Gates Foundation
+<b>Budget:</b> 2013</div>
+  <div class="bd">SUPPORT OF BMGF POLIO ERADICATION PROGRAM
+For Afghanistan, Pakistan, Nigeria, and Somalia (as applicable):
+threat assessment, survey, facilitation, communications strategy, and monitoring &amp; evaluation</div>
+  <div class="tr"><span class="lab">in italiano</span>SOSTEGNO AL PROGRAMMA DI ERADICAZIONE DELLA POLIO DELLA BMGF
+Per Afghanistan, Pakistan, Nigeria e Somalia (ove applicabile):
+valutazione delle minacce, ricognizione, facilitazione, strategia di comunicazione, monitoraggio e valutazione</div>
+  <div class="ft"><span>budget, 4,35 milioni di dollari</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA01087637.pdf" target="_blank" rel="noopener">EFTA01087637</a></span></div>
+</div>
+
+<p>La fondazione paga un istituto di studi sulla pace per far entrare i vaccinatori dove c'è la guerra. Valutazione delle minacce, mediazione, strategia di comunicazione.</p>
+
+<p>Il 9 giugno Rød-Larsen inoltra a Epstein i <em>talking points</em> aggiornati in vista di un incontro a Parigi il giorno dopo, con allegato il rapporto di missione dell'IPI. Dentro c'è una notizia uscita sulla stampa pachistana: una lettera consegnata da un «emissario personale» di Bill Gates a Imran Khan, allora capo dell'opposizione, per chiedergli di intercedere con i talebani e far passare la campagna di vaccinazione. E c'è la risposta dei talebani, ottenuta con quella che il documento chiama una «discreta indagine riservata», non ancora pubblica.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Terje Rød-Larsen
+<b>To:</b> jeevacation@gmail.com
+<b>Subject:</b> Fw: updated Talking Points Polio for Paris 10 June 2013
+<b>Allegato:</b> IPI_Mission_Report.doc</div>
+  <div class="bd">«BG can try as much as he wishes to use Imran Khan or others to convince the Taliban, but these efforts will not yield the desired results, because Imran Khan is not our leader, we do not follow him, he cannot dictate to us, we are not answerable to him, he follows a "secular" line, we want an "Islamic" explanation on polio vaccination!»
+
+[...] the "false" news has already had the undesired effect of tying a high-profile US citizen to Pak's polio eradication, on the heels of the droning of the Pak Taliban No. 2</div>
+  <div class="tr"><span class="lab">in italiano</span>«BG può provarci quanto vuole a usare Imran Khan o altri per convincere i talebani, ma questi sforzi non porteranno ai risultati sperati, perché Imran Khan non è il nostro leader, non lo seguiamo, non può dettarci nulla, non gli dobbiamo rispondere, lui segue una linea "laica", noi vogliamo una spiegazione "islamica" sulla vaccinazione antipolio!»
+
+[...] la notizia «falsa» ha già avuto l'effetto indesiderato di legare un cittadino statunitense di alto profilo all'eradicazione della polio in Pakistan, subito dopo l'uccisione con un drone del numero due dei talebani pachistani</div>
+  <div class="ft"><span>rapporto di missione IPI</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00962574.pdf" target="_blank" rel="noopener">EFTA00962574</a></span> <span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01971207.pdf" target="_blank" rel="noopener">EFTA01971207</a></span></div>
+</div>
+
+<p>Ricevere dei documenti è una cosa. Si può finire in una lista di distribuzione senza averlo chiesto, e non significa granché.</p>
+
+<p>Un mese dopo, però, lo stesso rapporto si vede dall'altro lato.</p>
+
+<p class="quando">8 luglio 2013</p>
+<h2>Cosa devo dire alla fondazione?</h2>
+
+<p>Andrea Pfanzelter dirige la sede viennese dell'IPI. Deve fare una telefonata con i responsabili della Gates Foundation e non sa cosa dire. Scrive a Epstein alle 6:48 del mattino.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Andrea Pfanzelter
+<b>To:</b> Jeffrey Epstein</div>
+  <div class="bd">Jeff pls need guidance here..what to discuss with them???</div>
+  <div class="tr"><span class="lab">in italiano</span>Jeff per favore mi serve una guida qui..cosa discuto con loro???</div>
+  <div class="ft"><span>la domanda</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01970240.pdf" target="_blank" rel="noopener">EFTA01970240</a></span></div>
+</div>
+
+<p>Lui risponde alle 11.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Jeffrey Epstein
+<b>To:</b> Andrea Pfanzelter</div>
+  <div class="bd">Bill approved the 5 million, ask questions, . try to have the paki lady on the phone as well. ask them if they read your analuysis of the situation. . proposed concrete next steps.</div>
+  <div class="tr"><span class="lab">in italiano</span>Bill ha approvato i cinque milioni, fai domande, . cerca di avere al telefono anche la signora pakistana. chiedi loro se hanno letto la tua analisi della situazione. . proposto prossimi passi concreti.</div>
+  <div class="ft"><span>la risposta, refusi compresi</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01970240.pdf" target="_blank" rel="noopener">EFTA01970240</a></span></div>
+</div>
+
+<p>Un finanziamento da cinque milioni approvato da Bill Gates. La direttrice dell'istituto lo apprende da Epstein, prima della telefonata, insieme alle istruzioni su come condurla.</p>
+
+<p>Se fosse rimasta una mail isolata probabilmente non ci avrei fatto caso. Il punto è il tono. Fino a qui abbiamo letto persone che gli chiedono consigli: adesso, per la prima volta, è lui che dà istruzioni.</p>
+
+<p class="quando">24 luglio 2013</p>
+<h2>«Non voglio che resti traccia»</h2>
+
+<p>Boris Nikolic sta lasciando i suoi incarichi: la Gates Foundation e bgC3, la società personale di Gates. Larry Cohen, capo di gabinetto di Gates, gli manda la bozza dell'annuncio con i ringraziamenti. Nikolic risponde che «servirà parecchio lavoro» e chiede gli altri documenti, quelli con i termini economici. Poi gira tutto a Epstein.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Jeffrey Epstein &lt;jeevacation@gmail.com&gt;
+<b>To:</b> Boris Nikolic
+<b>Subject:</b> Re: FW: Draft Email</div>
+  <div class="bd">do not send anymore emails. do not. do not say it needs work do not respsond except to ask for deal points. please. ask for his proposal. please use these words. I do not want any record of you negotiating this in any way ..</div>
+  <div class="tr"><span class="lab">in italiano</span>non mandare altre email. non farlo. non dire che serve lavoro non rispondere se non per chiedere i termini dell'accordo. per favore. chiedi la sua proposta. per favore usa queste parole. Non voglio che resti traccia della tua trattativa, in nessun modo ..</div>
+  <div class="ft"><span>istruzioni</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00873298.pdf" target="_blank" rel="noopener">EFTA00873298</a></span></div>
+</div>
+
+<p>Il contratto di cui si sta parlando è nel fascicolo. Si intitola <em>Transition and Release Agreement</em>, è datato agosto 2013, e queste sono le parti che lo sottoscrivono: bgC3 LLC, <strong>William H. Gates</strong>, <strong>Melinda F. Gates</strong>, Watermark Estate Management Services, la <strong>Bill &amp; Melinda Gates Foundation</strong> e il dottor Boris Nikolic.</p>
+
+<div class="doc">
+  <div class="hd"><b>Documento:</b> Transition and Release Agreement
+<b>Data:</b> agosto 2013</div>
+  <div class="bd">THIS TRANSITION AND RELEASE AGREEMENT, dated August 2013, by and among bgC3 LLC (the "Company"), William H. Gates ("WHG"), Melinda F. Gates ("MFG"), Watermark Estate Management Services, LLC ("WEMS"), the Bill &amp; Melinda Gates Foundation ("BMGF") [...] and Dr. Boris Nikolic</div>
+  <div class="tr"><span class="lab">in italiano</span>IL PRESENTE ACCORDO DI TRANSIZIONE E LIBERATORIA, datato agosto 2013, fra bgC3 LLC (la «Società»), William H. Gates («WHG»), Melinda F. Gates («MFG»), Watermark Estate Management Services LLC («WEMS»), la Bill &amp; Melinda Gates Foundation («BMGF») [...] e il dottor Boris Nikolic</div>
+  <div class="ft"><span>contratto</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA01083266.pdf" target="_blank" rel="noopener">EFTA01083266</a></span></div>
+</div>
+
+<p class="quando">16 settembre 2013</p>
+<h2>«Adesso sarà libero»</h2>
+
+<p>Il giorno prima Lawrence Summers si è ritirato dalla corsa alla presidenza della Federal Reserve. Ehud Barak, ex primo ministro israeliano, inoltra a Epstein il flash del <em>Financial Times</em> e ci aggiunge due righe.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> ehud barak
+<b>To:</b> Jeffrey Epstein
+<b>Subject:</b> Fwd: Summers withdraws from Fed race</div>
+  <div class="bd">A major blow to a friend. Lest BO takes him to replace JL.
+Now he'll probably be free in the next few days. EB</div>
+  <div class="tr"><span class="lab">in italiano</span>Un brutto colpo per un amico. Semmai BO lo prende per sostituire JL.
+Adesso probabilmente sarà libero nei prossimi giorni. EB</div>
+  <div class="ft"><span>notizia inoltrata, con commento</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01957627.pdf" target="_blank" rel="noopener">EFTA01957627</a></span></div>
+</div>
+
+<p>Quattro giorni dopo, un promemoria di casa.</p>
+
+<div class="doc">
+  <div class="hd"><b>Subject:</b> Alert - 7:30 BILL &amp; Melinda GATES to arrive the house</div>
+  <div class="bd">September 20, 2013 7:30 PM : 7:30 BILL &amp; Melinda GATES to arrive the house</div>
+  <div class="tr"><span class="lab">in italiano</span>20 settembre 2013, ore 19:30: alle 19:30 BILL e Melinda GATES arrivano a casa</div>
+  <div class="ft"><span>promemoria</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA02127127.pdf" target="_blank" rel="noopener">EFTA02127127</a></span></div>
+</div>
+
+<p>Siamo nel 2014. A questo punto della lettura certi nomi tornano da soli: Nikolic, Rød-Larsen, Pfanzelter, Summers. Gli argomenti invece cambiano di continuo, e nei prossimi due documenti diventano il più semplice di tutti.</p>
+
+<p>I soldi.</p>
+
+<p class="quando">24 e 28 marzo 2014</p>
+<h2>Il biglietto</h2>
+
+<p>Da Vienna partono tre fatture. Le manda Camilla Reksten-Monsen dell'IPI, in copia Andrea Pfanzelter, e finiscono a Epstein che le gira subito a Richard Kahn, l'uomo che gli tiene i conti. Il nome degli allegati dice già tutto: dentro la stringa c'è scritto per esteso a chi è intestato il biglietto.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Camilla Reksten-Monsen (IPI)
+<b>Cc:</b> Andrea Pfanzelter
+<b>Subject:</b> FW: travel invoices/credit, Lawrence summers
+<b>Date:</b> 24 marzo 2014
+<b>Allegati:</b> INVNO31612FORBSL0022205CNAMELAWRENCEHENRYSUMMERS.pdf
+    INVNO31605FORBSL0022234CNAMELAWRENCEHENRYSUMMERS.pdf
+    INVNO31582FORBSL0022205CNAMELAWRENCEHENRYSUMMERS.pdf</div>
+  <div class="bd">As discussed in Azerbaijan, attached are the invoices for Larry Summers' flights to Kazakhstan.
+
+[...] There were three because we changed his ticket. Mr. Summers had requested the flights be first class, which wasn't available on all the flights at first, but then became available so we cancelled his original ticket and reissued the ticket to be all first class.</div>
+  <div class="tr"><span class="lab">in italiano</span>Come discusso in Azerbaigian, in allegato le fatture per i voli di Larry Summers verso il Kazakistan.
+
+[...] Erano tre perché abbiamo cambiato il biglietto. Il signor Summers aveva chiesto che i voli fossero tutti in prima classe, cosa che all'inizio non era disponibile su tutte le tratte, poi lo è diventata, quindi abbiamo annullato il biglietto originale e lo abbiamo riemesso tutto in prima classe.</div>
+  <div class="ft"><span>fatture di viaggio</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00986206.pdf" target="_blank" rel="noopener">EFTA00986206</a></span></div>
+</div>
+
+<p>Quattro giorni dopo arriva la richiesta di autorizzazione alla spesa.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> bellaklein
+<b>To:</b> Jeffrey Epstein
+<b>Subject:</b> Re: travel invoices/credit, Lawrence summers
+<b>Date:</b> Fri, 28 Mar 2014</div>
+  <div class="bd">requested to reimburse International Peace Institute for Lawrence Summers flight. The ticket cost is $14,158.88. Please confirm it is approved to reimburse from Enhanced Education.
+
+Thank you,
+Bella</div>
+  <div class="tr"><span class="lab">in italiano</span>è stato chiesto di rimborsare all'International Peace Institute il volo di Lawrence Summers. Il biglietto costa 14.158,88 dollari. Per favore conferma che è approvato il rimborso a valere su Enhanced Education.
+
+Grazie,
+Bella</div>
+  <div class="ft"><span>autorizzazione di spesa</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00987011.pdf" target="_blank" rel="noopener">EFTA00987011</a></span></div>
+</div>
+
+<p>La risposta di Epstein è di tre lettere.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Jeffrey Epstein &lt;jeevacation@gmail.com&gt;
+<b>Date:</b> Fri, 28 Mar 2014, 15:53</div>
+  <div class="bd">yes</div>
+  <div class="ft"><span>approvazione</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00987011.pdf" target="_blank" rel="noopener">EFTA00987011</a></span></div>
+</div>
+
+<p>Quattordicimila dollari di biglietto in prima classe per il Kazakistan, pagati attingendo a Enhanced Education, una delle entità di Epstein.</p>
+
+<p class="quando">6 aprile 2014</p>
+<h2>«Sentiti libero di modificare»</h2>
+
+<p>Nove giorni dopo, di domenica mattina presto, Summers gli manda una mail con oggetto «STUFF».</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Lawrence H. Summers
+<b>To:</b> Jeffrey Epstein
+<b>Subject:</b> STUFF
+<b>Date:</b> Sun, 6 Apr 2014, 4:30</div>
+  <div class="bd">jeff--here goes. feel free to edit
+
+Kazakhstan faces critical financial and economic challenges over the next several years. These include: (i) establishing and maintaining a suitable exchange rate regime in the face of likely financial instability [...] (iii) maintaining a multi-vector approach to international economic policy in a world where Russian truculence is increasing, America may be turning inwards, and China is becoming increasingly assertive. [...]
+
+Surmounting each of these challenges requires an approach that melds a broad and high level political perspective with technical economic expertise. This is what Lawrence Summers would bring.</div>
+  <div class="tr"><span class="lab">in italiano</span>jeff--ecco qua. sentiti libero di modificare
+
+Il Kazakistan affronta sfide finanziarie ed economiche cruciali nei prossimi anni. Fra queste: (i) stabilire e mantenere un regime di cambio adeguato a fronte di una probabile instabilità finanziaria [...] (iii) mantenere un approccio multivettoriale alla politica economica internazionale in un mondo in cui la truculenza russa cresce, l'America potrebbe ripiegarsi su sé stessa e la Cina si fa sempre più assertiva. [...]
+
+Superare ognuna di queste sfide richiede un approccio che unisca una prospettiva politica ampia e di alto livello a competenze economiche tecniche. Questo è ciò che Lawrence Summers porterebbe.</div>
+  <div class="ft"><span>bozza di proposta</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01930265.pdf" target="_blank" rel="noopener">EFTA01930265</a></span></div>
+</div>
+
+<p>Un ex segretario al Tesoro degli Stati Uniti scrive di sé stesso in terza persona, elenca i problemi del Kazakistan, chiude spiegando cosa porterebbe in dote Lawrence Summers, e manda il testo a Epstein perché lo sistemi lui.</p>
+
+<p class="quando">31 agosto 2014</p>
+<h2>«Grazie per averli spinti»</h2>
+
+<p>C'è una domanda che a questo punto viene naturale: come faceva, un uomo con quella condanna, a presentarsi in quelle stanze? La risposta sta in una mail di manutenzione, mandata di domenica sera a un certo Tyler Shears.</p>
+
+<div class="doc">
+  <div class="hd"><b>To:</b> Tyler Shears; jeffrey epstein
+<b>Subject:</b> updated sites
+<b>Date:</b> Sunday, August 31, 2014, 19:12</div>
+  <div class="bd">Hi Tyler,
+the following sites have new content on them-- thanks for boosting them:
+
+  www.jeffreyepstein.org
+  www.jeffreyepsteinfoundation.com
+  www.jeffreyepsteinscience.com
+  www.jeffreyepsteineducation.com
+  www.jeffreyepsteinblog.com
+
+«Jeffrey Epstein Philanthropy supports innovative research and programs in science, medicine, education and international affair...»
+
+«The Jeffrey Epstein VI Foundation, founded in 2000 by Jeffrey Epstein, sponsors cutting edge science research around the world.»
+
+I also updated all the social media pages: facebook, twitter, google+ and linkedIN. I have 5 more sites to do. will send by tomorrow.</div>
+  <div class="tr"><span class="lab">in italiano</span>Ciao Tyler,
+questi siti hanno contenuti nuovi, grazie per averli spinti:
+
+[i cinque indirizzi]
+
+«La filantropia di Jeffrey Epstein sostiene ricerca e programmi innovativi in campo scientifico, medico, educativo e negli affari internazionali...»
+
+«La Jeffrey Epstein VI Foundation, fondata nel 2000 da Jeffrey Epstein, finanzia ricerca scientifica d'avanguardia in tutto il mondo.»
+
+Ho aggiornato anche tutte le pagine social: facebook, twitter, google+ e linkedIN. Ne ho altri cinque da fare, te li mando domani.</div>
+  <div class="ft"><span>gestione dei siti</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2011/EFTA02369692.pdf" target="_blank" rel="noopener">EFTA02369692</a></span></div>
+</div>
+
+<p>Dieci siti intestati al proprio nome, qualcuno pagato per spingerli, tutti i social aggiornati in blocco. La frase sulla ricerca scientifica d'avanguardia non è la descrizione di un'attività: è uno slogan, e in queste carte compare solo dove l'ha messo lui.</p>
+
+<p>Nel fascicolo c'è anche il pezzo che manca, cioè la ragione per cui quel lavoro serviva. È la stampa di una pagina di risultati di Google per «jeffrey epstein», conservata insieme al resto.</p>
+
+<div class="doc">
+  <div class="hd"><b>Documento:</b> stampa di una ricerca su Google
+<b>Termine cercato:</b> jeffrey epstein</div>
+  <div class="bd">Jeffrey Edward Epstein [...] is an American financier and science and education philanthropist
+
+JEFFREY EPSTEIN VI FOUNDATION  ·  www.jeffreyepsteinfoundation.com
+
+Jeffrey Epstein Philanthropy Overview  ·  www.jeffreyepstein.org
+
+Jeffrey Epstein, International Moneyman of Mystery
+nymag.com  ·  He's Palm Beach [...] Nobel Prize-winning scientists, CEOs like Leslie Wexner of The Limited, socialite...
+
+NEW YORK, Feb 19, 2011 /PRNewswire/ Jeffrey Epstein, one of the largest funders of science around the world and the founder of the...
+
+Jeffrey Epstein Sex Offender, Yes. Billionaire, No - Forbes
+Feb 2011 · Palm Beach pervert Jeffrey Epstein is all over the news today thanks to a [...] story in the UK's Daily Mail linking the convicted pedophile...
+
+Searches related to Jeffrey epstein:
+net worth · disney · scandal · hair transplant · rhinoplasty · vanity fair · prince andrew</div>
+  <div class="tr"><span class="lab">in italiano</span>Nella pagina dei risultati ci sono, nell'ordine: la voce di Wikipedia che lo definisce «filantropo della scienza e dell'istruzione», tre dei suoi siti, il profilo del New York Magazine che lo chiama «uomo di denaro internazionale del mistero» citando gli scienziati premi Nobel, un comunicato stampa a sua firma del febbraio 2011 che lo presenta come «uno dei maggiori finanziatori della scienza al mondo».
+
+E poi, sulla stessa pagina, il titolo di Forbes: «Sex offender sì, miliardario no», che lo chiama «il pervertito di Palm Beach» e «il pedofilo condannato».
+
+In fondo, le ricerche correlate, cioè quello che la gente cercava davvero insieme al suo nome: patrimonio, disney, scandalo, trapianto di capelli, rinoplastica, vanity fair, principe andrea.</div>
+  <div class="ft"><span>monitoraggio della reputazione</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2011/EFTA02725622.pdf" target="_blank" rel="noopener">EFTA02725622</a></span></div>
+</div>
+
+<p>Questa è l'operazione vista dal di dentro: da una parte i comunicati stampa che si autoproduceva e i dieci siti da spingere, dall'altra la pagina di Google che non voleva vedere e che infatti si era stampato.</p>
+
+<p>Torneremo su questi indirizzi più avanti, quando arriverà la posta da Albany.</p>
+
+<p>Chiuso quel capitolo, il documento successivo è di una settimana dopo, ed è la cosa più banale che possa esistere in un archivio: l'agenda di un lunedì qualunque.</p>
+
+<p class="quando">8 settembre 2014</p>
+<h2>Una giornata</h2>
+
+<p>La manda la segretaria, il venerdì prima.</p>
+
+<div class="agenda">
+  <div class="r"><div class="h">10:00</div><div>Bill Gates e Tom Pritzker al Park Hyatt <span>(JOJO TI PORTA)</span></div></div>
+  <div class="r"><div class="h">11:30</div><div>A piedi fino all'ufficio di Leon Black con Bill Gates <span>(forse anche Pritzker)</span></div></div>
+  <div class="r"><div class="h">12:00</div><div>Larry Summers si unisce da Leon con Bill Gates <span>«Is this happening??»</span></div></div>
+  <div class="r"><div class="h">14:00</div><div>Mort Zuckerman ti incontra con Bill Gates</div></div>
+  <div class="r"><div class="h">15:00</div><div>Kathy Ruemmler al Four Seasons con Bill Gates</div></div>
+</div>
+
+<p style="font-family: var(--font-mono); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-secondary); margin-top: -1.4rem; margin-bottom: 2.4rem;"><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01749938.pdf" target="_blank" rel="noopener">EFTA01749938</a></span></p>
+
+<p>Tom Pritzker degli hotel Hyatt. Leon Black, fondatore di Apollo Global Management. Mort Zuckerman, editore. E Kathryn Ruemmler, che fino a pochi mesi prima era stata l'avvocato capo della Casa Bianca di Obama.</p>
+
+<p>Chiuso quel PDF ne apro un altro. È una mail di tre righe, con un allegato, e sembra ordinaria fino a quando non si apre l'allegato.</p>
+
+<p class="quando">20 marzo 2015</p>
+<h2>La prova generale</h2>
+
+<p>Arriva una mail con un allegato.</p>
+
+<div class="doc">
+  <div class="hd"><b>To:</b> Jeffrey Epstein &lt;Jeevacation@gmail.com&gt;
+<b>Subject:</b> Fwd: Preparing for pandemics
+<b>Date:</b> Fri, 20 Mar 2015
+<b>Allegato:</b> 18032015 Geneva meeting_on_pandemics_Agenda.docx</div>
+  <div class="bd">Please find attached a draft agenda for the meeting on preparing for pandemics, as requested.
+
+Let's discuss next steps, for example how to officially involve the WHO and ICRC (i.e. co-branding).
+
+Best regards, and I hope we can pull this off!</div>
+  <div class="tr"><span class="lab">in italiano</span>In allegato trovi una bozza di agenda per l'incontro sulla preparazione alle pandemie, come richiesto.
+
+Discutiamo i prossimi passi, per esempio come coinvolgere ufficialmente l'OMS e il CICR (cioè il co-branding).
+
+Un caro saluto, e spero che riusciamo a farcela!</div>
+  <div class="ft"><span>bozza riservata</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00654215.pdf" target="_blank" rel="noopener">EFTA00654215</a></span></div>
+</div>
+
+<p><em>As requested.</em> L'aveva chiesta lui. E il mittente vuole discutere con lui come portare dentro ufficialmente l'Organizzazione mondiale della sanità e la Croce Rossa internazionale.</p>
+
+<p>L'allegato è l'agenda di una conferenza intitolata <em>Preparing for Pandemics: Lessons Learned for More Effective Responses</em>, Ginevra, maggio 2015. È una bozza di lavoro: al posto dei giorni ci sono ancora i segnaposto «XX May 2015». Questi sono i relatori.</p>
+
+<div class="relatori">
+  <div class="r"><div class="n">Margaret Chan</div><div>direttrice generale, Organizzazione mondiale della sanità</div></div>
+  <div class="r"><div class="n">Jim Yong Kim</div><div>presidente, Banca Mondiale</div></div>
+  <div class="r"><div class="n">Peter Maurer</div><div>presidente, Comitato internazionale della Croce Rossa</div></div>
+  <div class="r"><div class="n">Joanne Liu</div><div>presidente internazionale, Medici Senza Frontiere</div></div>
+  <div class="r"><div class="n">David Nabarro</div><div>inviato speciale ONU per l'Ebola</div></div>
+  <div class="r"><div class="n">Hamid Jafari</div><div>direttore, Global Polio Eradication Initiative</div></div>
+  <div class="r"><div class="n">Terje Rød-Larsen</div><div>presidente, International Peace Institute</div></div>
+  <div class="r"><div class="n">Erez Manela</div><div>storico di Harvard, specializzato in polio</div></div>
+</div>
+
+<p style="font-family: var(--font-mono); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--text-secondary); margin-top: -1.4rem; margin-bottom: 2.4rem;"><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00654216.pdf" target="_blank" rel="noopener">EFTA00654216</a></span></p>
+
+<p>La sessione 3 si intitola <em>Actionable Solutions for more effective preparedness</em>, parla il presidente della Banca Mondiale, e una delle domande in agenda è: «Quali meccanismi finanziari vanno messi in piedi?».</p>
+
+<p>Nel fascicolo c'è anche il documento di impianto della conferenza.</p>
+
+<div class="doc">
+  <div class="hd"><b>Documento:</b> IPI, Preparing for Pandemics
+<b>Sezione:</b> I. Dangerously unprepared</div>
+  <div class="bd">As Bill Gates stressed at a recent meeting of the Global Alliance for Vaccines and Immunization in Berlin (on 27 January), and as Jim Yong Kim, President of the World Bank, recently pointed out, the world is dangerously unprepared for future pandemics, and we have to plan to deal with them as we would plan to prepare ourselves for war.</div>
+  <div class="tr"><span class="lab">in italiano</span>Come ha sottolineato Bill Gates a un recente incontro della Global Alliance for Vaccines and Immunization a Berlino (il 27 gennaio), e come ha rilevato Jim Yong Kim, presidente della Banca Mondiale, il mondo è pericolosamente impreparato alle pandemie future, e dobbiamo pianificare per affrontarle come pianificheremmo per prepararci a una guerra.</div>
+  <div class="ft"><span>documento di impianto</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2011/EFTA02679133.pdf" target="_blank" rel="noopener">EFTA02679133</a></span></div>
+</div>
+
+<p>Va detta subito una cosa, perché altrimenti il quadro viene storto. Undici giorni prima che quella bozza arrivasse a Epstein, la Gates Foundation aveva risposto alla richiesta di finanziare la conferenza. Aveva detto di no.</p>
+
+<div class="doc">
+  <div class="hd"><b>Da:</b> Bill &amp; Melinda Gates Foundation, Seattle
+<b>A:</b> IPI, Dr. Terje Rod-Larsen, President, Vienna
+<b>Data:</b> 9 marzo 2015</div>
+  <div class="bd">Thank you for the opportunity to review your proposal for a convening of experts to discuss how we can most effectively address and prevent pandemics. [...]
+
+During this process, I learned that many of the groups in IPI's proposal are already in discussions with Gates Foundation staff about pandemic preparedness and response in the lead-up to the World Health Assembly and G7, where it will be a key topic. For this reason, as well as the number of high-level meetings our staff have already committed to, we regret that we cannot provide the requested support.
+
+However, if IPI moves forward with a convening, please let us know if you would like a Gates Foundation representative to attend. [...]
+
+Amy K. Carter, Deputy Director, Family Interest Grants</div>
+  <div class="tr"><span class="lab">in italiano</span>Grazie per l'opportunità di esaminare la vostra proposta di una riunione di esperti su come affrontare e prevenire le pandemie nel modo più efficace. [...]
+
+Nel corso di questo processo ho appreso che molti dei soggetti presenti nella proposta dell'IPI sono già in discussione con il personale della Gates Foundation sulla preparazione e la risposta alle pandemie, in vista dell'Assemblea Mondiale della Sanità e del G7, dove sarà un tema centrale. Per questa ragione, e per il numero di incontri di alto livello che il nostro personale ha già in calendario, siamo spiacenti di non poter fornire il sostegno richiesto.
+
+Tuttavia, se l'IPI andrà avanti con la riunione, fateci sapere se desiderate la presenza di un rappresentante della Gates Foundation. [...]</div>
+  <div class="ft"><span>lettera di diniego</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA01196853.pdf" target="_blank" rel="noopener">EFTA01196853</a></span></div>
+</div>
+
+<p>Quindi la fondazione non finanzia la conferenza, si offre di mandare qualcuno, e nel dirlo scrive che quei soggetti stanno <em>già</em> discutendo di preparazione pandemica con il suo personale, in vista dell'Assemblea Mondiale della Sanità e del G7.</p>
+
+<p>Undici giorni dopo, la bozza dell'agenda con i nomi dei relatori arriva sulla casella di Epstein. Su sua richiesta.</p>
+
+<p class="quando">9 aprile 2015</p>
+<h2>La posta</h2>
+
+<p>Tre settimane dopo l'agenda di Ginevra, parte una lettera da Albany. Non la manda un istituto di ricerca: la manda lo Stato di New York.</p>
+
+<div class="doc">
+  <div class="hd"><b>Da:</b> State of New York, Division of Criminal Justice Services
+    Sex Offender Registry Unit
+<b>Oggetto:</b> Annual Address Verification</div>
+  <div class="bd">To: JEFFREY EPSTEIN
+    LITTLE ST JAMES
+    6100 RED HOOK QUARTERS, SUITE B3
+    ST THOMAS VI 00802
+
+Sex Offender Registry Annual Address Verification Form
+Offender ID: 33216
+
+The Sex Offender Registration Act (SORA) requires you to review, update, and sign this Annual Address Verification Form.</div>
+  <div class="tr"><span class="lab">in italiano</span>A: JEFFREY EPSTEIN
+   LITTLE ST JAMES
+   6100 RED HOOK QUARTERS, SUITE B3
+   ST THOMAS VI 00802
+
+Modulo annuale di verifica dell'indirizzo del registro dei sex offender
+Matricola: 33216
+
+Il Sex Offender Registration Act (SORA) impone di rivedere, aggiornare e firmare il presente modulo annuale di verifica dell'indirizzo.</div>
+  <div class="ft"><span>modulo del registro</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01736117.pdf" target="_blank" rel="noopener">EFTA01736117</a></span></div>
+</div>
+
+<p>Il modulo annuale di verifica dell'indirizzo per gli iscritti al registro dei sex offender. Indirizzo del destinatario: Little St James.</p>
+
+<p>Nel fascicolo ce n'è un altro identico, datato <strong>10 aprile 2017</strong>, stesso numero di matricola, stesso indirizzo (<span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00809187.pdf" target="_blank" rel="noopener">EFTA00809187</a></span>). E ce ne sono altri, del 2005 e del 2013.</p>
+
+<p>Al modulo va allegato l'inventario. La legge gli impone di dichiarare allo Stato le automobili, le barche, gli aerei, i numeri di telefono, gli indirizzi email e ogni account internet.</p>
+
+<div class="doc">
+  <div class="hd"><b>Documento:</b> Attachment to Sexual Offender Registration Form
+    JEFFREY EPSTEIN</div>
+  <div class="bd">Automobiles, Boats, Aircraft, Telephone Numbers, Email Addresses, and Internet Related Information
+
+AUTOMOBILES                                   Registered   Property
+1  2010 Chevrolet Suburban                    USVI         LSJ
+3  2010 Chevrolet Suburban                    Florida      Florida
+5  2006 Bentley Arnage RL                     Florida      Florida
+8  2013 Dodge Caravan                         USVI         LSJ
+11 2015 GMC Yukon Denali                      USVI         LSJ
+12 2016 Mercedes-Maybach S600X                New York     New York
+[...]
+
+WEBSITES  www.jeffreyepstein.org · www.jeffreyepsteinblog.com
+          www.jeffreyepsteinusvi.com · www.jeffreyepstein.net
+TWITTER   Jeffrey_epstein · Jeffreyepstein1
+INSTAGRAM JeeproJect</div>
+  <div class="tr"><span class="lab">in italiano</span>Allegato al modulo di registrazione come autore di reati sessuali. Automobili, barche, aeromobili, numeri di telefono, indirizzi email e informazioni relative a internet.
+
+Nell'elenco ci sono tredici automobili. La colonna «Property» indica dove si trovano: quelle marcate LSJ sono a Little St James. Seguono le barche e gli aerei, e poi ottantasette righe di numeri di telefono, decine delle quali riportano la dicitura «Staff line New York».</div>
+  <div class="ft"><span>inventario allegato al registro</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00589800.pdf" target="_blank" rel="noopener">EFTA00589800</a></span></div>
+</div>
+
+<p>Lo Stato di New York teneva il conto delle automobili che aveva sull'isola. La casella degli indirizzi email c'è, ma nella copia rilasciata è oscurata.</p>
+
+<p>E poi c'è la riga dei siti internet. Sono gli stessi che due anni prima faceva aggiornare e «spingere»: jeffreyepstein.org, jeffreyepsteinblog.com, jeffreyepsteinusvi.com, jeffreyepstein.net. Più Twitter e Instagram.</p>
+
+<p>Gli indirizzi su cui costruiva la propria immagine di filantropo della scienza sono gli stessi che la legge lo obbligava a dichiarare alla polizia in quanto sex offender registrato. Stanno scritti sullo stesso foglio.</p>
+
+<p>Per qualche riga lasciamo stare le persone e guardiamo i numeri, che in queste carte compaiono di rado. Quando compaiono, però, sono precisi al centesimo.</p>
+
+<p class="quando">tutto il 2015</p>
+<h2>I soldi</h2>
+
+<p>Nel fascicolo c'è anche un foglio di calcolo. Si intitola <em>Southern Financial Relationship, +$1mm wires YTD</em>: i bonifici sopra il milione di dollari, dall'inizio dell'anno.</p>
+
+<div class="doc">
+  <div class="hd"><b>Documento:</b> Sheet1, Southern Financial Relationship
+<b>Oggetto:</b> +$1mm wires YTD</div>
+  <div class="bd">Date          Amount              Recipient
+
+1/5/2015      $ 2,500,000.00      Jeffrey Epstein (DBTCA) 35266976
+2/10/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976
+3/13/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976
+3/27/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976
+4/16/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976
+5/18/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976
+6/1/2015      $ 1,529,290.08      DEUTSCHE BANK AG, LONDON 04-411-739
+6/12/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976
+7/9/2015      $ 3,200,000.00      Jeffrey Epstein (DBTCA) 35266976
+8/20/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976
+9/1/2015      $ 7,500,000.00      BOOTHBAY ABSOLUTE STRATEGIES FUND LP
+9/28/2015     $ 2,500,000.00      SOUTHERN FINANCIAL LLC (DBTCA) 42952771
+10/7/2015     $ 2,000,000.00      Jeffrey Epstein (DBTCA) 35266976</div>
+  <div class="tr"><span class="lab">in italiano</span>Tredici bonifici sopra il milione di dollari, da gennaio a ottobre 2015. Dieci vanno a Jeffrey Epstein in persona, sempre sullo stesso conto: 21,7 milioni di dollari, circa due milioni al mese. Gli altri tre vanno a Deutsche Bank di Londra, a un fondo d'investimento e a una società chiamata Southern Financial LLC.
+
+Totale del foglio: 33,2 milioni di dollari in dieci mesi.
+
+DBTCA sta per Deutsche Bank Trust Company Americas.</div>
+  <div class="ft"><span>foglio di calcolo</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2010/EFTA01405152.pdf" target="_blank" rel="noopener">EFTA01405152</a></span></div>
+</div>
+
+<p>Nel luglio 2020 il dipartimento dei servizi finanziari dello Stato di New York ha multato Deutsche Bank per 150 milioni di dollari, contestando alla banca le carenze nei controlli sul rapporto con Epstein.</p>
+
+<p>Il foglio copre lo stesso anno dell'agenda di Ginevra e del modulo del registro.</p>
+
+<p>E si torna alle persone, che nel frattempo hanno continuato a scriversi come se niente fosse.</p>
+
+<p class="quando">26 ottobre 2015</p>
+<h2>«Devo farlo?»</h2>
+
+<p>Il primo ministro della Mongolia, Saikhanbileg, vuole Summers a Ulan Bator per parlare di politica economica. A trasmettere l'invito è Bert Hofman, dirigente della Banca Mondiale. Summers inoltra tutto a Epstein.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Lawrence H. Summers
+<b>To:</b> Jeffrey Epstein
+<b>Subject:</b> Re: Mongolia</div>
+  <div class="bd">Do I want to be doing this?</div>
+  <div class="tr"><span class="lab">in italiano</span>Devo farlo?</div>
+  <div class="ft"><span>la domanda</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00842500.pdf" target="_blank" rel="noopener">EFTA00842500</a></span></div>
+</div>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> "jeffrey E." &lt;jeevacation@gmail.com&gt;
+<b>To:</b> Lawrence H. Summers</div>
+  <div class="bd">i wouldn't. dont know why world bank, involved. screws up any future deal</div>
+  <div class="tr"><span class="lab">in italiano</span>io non lo farei. non capisco perché ci sia dentro la banca mondiale. rovina qualunque accordo futuro</div>
+  <div class="ft"><span>il consiglio</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00842500.pdf" target="_blank" rel="noopener">EFTA00842500</a></span></div>
+</div>
+
+<p>Un capo di governo invita Summers, Summers chiede a Epstein se gli conviene, Epstein gli dice di lasciar perdere perché la presenza di un'istituzione pubblica rovina gli affari privati che verranno dopo.</p>
+
+<p>Qui la storia salta due anni e mezzo, ed è il punto in cui, leggendo, mi aspettavo che finisse. Dopo il 2015 le carte si diradano, i nomi si perdono, e uno pensa che il rapporto si sia esaurito per conto suo.</p>
+
+<p>Invece riprende. E riprende come fra due che non hanno mai smesso.</p>
+
+<p class="quando">9 e 10 febbraio 2018</p>
+<h2>«Ne sai più o meno di lui?»</h2>
+
+<p>Il 9 febbraio 2018, alle dieci e mezza di sera, Summers inoltra a Epstein uno scambio che ha appena avuto con Jason Furman, l'economista che ha presieduto il consiglio dei consulenti economici di Obama. Argomento: le norme fiscali nascoste nella legge di bilancio americana. Aggiunge una riga sola.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> Lawrence Summers
+<b>To:</b> Jeffrey Epstein &lt;jeevacation@gmail.com&gt;
+<b>Subject:</b> Fwd: Spending bill
+<b>Date:</b> Sat, 10 Feb 2018, 03:41 UTC</div>
+  <div class="bd">Do u know more or less than he does</div>
+  <div class="tr"><span class="lab">in italiano</span>ne sai più o meno di lui</div>
+  <div class="ft"><span>inoltro a Epstein</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00886794.pdf" target="_blank" rel="noopener">EFTA00886794</a></span></div>
+</div>
+
+<p>La mattina dopo Epstein risponde.</p>
+
+<div class="doc">
+  <div class="hd"><b>From:</b> "Jeffrey E." &lt;jeevacation@gmail.com&gt;
+<b>To:</b> Lawrence Summers
+<b>Subject:</b> Re: Spending bill
+<b>Date:</b> Sat, 10 Feb 2018</div>
+  <div class="bd">yes and no. ask him where 92 billion dollars go. hurricane relief. - its the next level down. 1 . tax writers are more sophistcated , to put everything on the front page.. opportunity zones.? puerto rico is the digital tax haven.
+
+can you have lisa call me re woody. I d like to speak to her</div>
+  <div class="tr"><span class="lab">in italiano</span>sì e no. chiedigli dove vanno novantadue miliardi di dollari. aiuti per gli uragani. è il livello sotto. chi scrive le norme fiscali è più raffinato, mette tutto in prima pagina.. le opportunity zones? portorico è il paradiso fiscale digitale.
+
+puoi far sì che lisa mi chiami riguardo a woody. vorrei parlarle</div>
+  <div class="ft"><span>risposta</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%209/EFTA00886920.pdf" target="_blank" rel="noopener">EFTA00886920</a></span></div>
+</div>
+
+<p>Un ex segretario al Tesoro degli Stati Uniti mette il parere di Jeffrey Epstein a confronto con quello di un ex presidente del consiglio dei consulenti economici della Casa Bianca, e chiede a Epstein chi dei due ne sappia di più.</p>
+
+<p>È l'ultimo scambio fra loro due che ho trovato nel fascicolo. Sono tre righe in tutto, e non dicono niente.</p>
+
+<p class="quando">11 novembre 2018</p>
+<h2>L'ultima telefonata</h2>
+
+<p>È una domenica. Alle 12:26 Summers scrive: «Posso chiamare nel pomeriggio». Alle 13:13 Epstein risponde: «Prova alle 3 e mezza». Due minuti dopo, alle 13:15, Summers chiude: «Ok».</p>
+
+<div class="doc">
+  <div class="hd"><b>Subject:</b> Re: I'm on plane back
+<b>Date:</b> domenica 11 novembre 2018</div>
+  <div class="bd">12:26  Lawrence Summers →  Can call this afternoon
+
+13:13  jeevacation@gmail.com →  Try 330
+
+13:15  Lawrence Summers →  Ok</div>
+  <div class="tr"><span class="lab">in italiano</span>12:26  Lawrence Summers →  Posso chiamare nel pomeriggio
+
+13:13  jeevacation@gmail.com →  Prova alle 3 e mezza
+
+13:15  Lawrence Summers →  Ok</div>
+  <div class="ft"><span>scambio di messaggi</span><span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2011/EFTA02614610.pdf" target="_blank" rel="noopener">EFTA02614610</a></span> <span class="cod"><a href="https://www.justice.gov/epstein/files/DataSet%2011/EFTA02614560.pdf" target="_blank" rel="noopener">EFTA02614560</a></span></div>
+</div>
+
+<p>Dieci anni dopo la condanna. Nove mesi prima della morte di Epstein.</p>
+
+<h2>Fin qui i documenti</h2>
+
+<p>Questa è la storia, e finisce dove finiscono le carte. Nell'agosto 2019 Epstein muore in una cella di Manhattan. Nel testamento, firmato due giorni prima, Boris Nikolic risulta indicato come esecutore di riserva: ha dichiarato di non saperne nulla e ha rifiutato l'incarico.</p>
+
+<p>Nell'ottobre 2019 il <em>New York Times</em> rivela gli incontri tra Gates ed Epstein. La fondazione li conferma. Gates dichiara di aver commesso un errore di valutazione, di aver creduto che quel canale servisse a raccogliere fondi per la salute globale, e che non ne è venuto niente.</p>
+
+<p>Le date che avete letto stanno tutte dopo la condanna. Luglio 2011, l'ufficio. Novembre 2011, la faccina. Gennaio 2012, il direttore finanziario e l'ufficio legale. Gennaio 2013, l'accordo riservato con la Banca Mondiale. Giugno 2013, i talebani. Luglio 2013, i cinque milioni e «non voglio che resti traccia». Marzo 2014, il biglietto di prima classe e quel «yes». Settembre 2014, cinque appuntamenti in un giorno. Marzo 2015, l'agenda di Ginevra con dentro l'OMS, la Banca Mondiale e la Croce Rossa. Febbraio 2018, «ne sai più o meno di lui?». Novembre 2018, «prova alle 3 e mezza».</p>
+
+<p>E in mezzo, per tutto il 2015, due milioni di dollari al mese sul conto in Deutsche Bank. E ad aprile 2015 e ad aprile 2017, lo Stato di New York che spedisce a Little St James il modulo da firmare per la matricola 33216, con allegato l'elenco delle automobili parcheggiate sull'isola.</p>
+
+<blockquote class="pull">Non era un segreto. Era scritto nella mail di presentazione, con una faccina in fondo.</blockquote>
+
+<p>Io le domande che mi restano sono tre, e ve le lascio così.</p>
+
+<p>Perché la bozza riservata di una conferenza dei vertici della sanità mondiale viene mandata a quell'indirizzo Gmail, e su richiesta di chi la riceve? Perché la direttrice di un istituto che lavora in zona di guerra chiede a lui cosa dire alla fondazione che la finanzia? E chi, in quegli anni, ha guardato quella firma sul modulo del registro e ha deciso che non cambiava niente?</p>
+
+<p>I documenti sono lì sopra, tutti cliccabili. Le conclusioni tiratele voi.</p>
+
+<div class="caveat">
+  <div class="label">Nota sul metodo</div>
+  <p>Ogni documento citato qui l'ho aperto e letto per intero, e le citazioni sono trascritte dal testo originale. Sotto ciascuno c'è il codice <code>EFTA</code> del Dipartimento di Giustizia: ci si clicca e si apre il PDF sul sito del ministero, che ci mette davanti una schermata di conferma dell'età. Le trascrizioni vengono dall'OCR dei documenti scansionati e conservano refusi ed errori di riconoscimento: dove ho tagliato ho messo <code>[...]</code>, e non ho corretto la punteggiatura di nessuno. Nel fascicolo, insieme alla corrispondenza, c'è anche parecchio materiale che corrispondenza non è (rassegne stampa, ritagli di giornale, newsletter di abbonamento finite nella stessa scatola): quella roba non è entrata qui, perché la presenza di un articolo di giornale in un faldone non dice niente su nessuno.</p>
+</div>
+
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
