@@ -1,0 +1,597 @@
+{
+  "articolo": "L'eccezione e' gia' nella regola",
+  "fonti": "fonti.csv",
+  "fonti_sha256": "a571ed840a077139124a1071451a70b84b9c0246063cffd38d2d45d2ff1056fa",
+  "generato_da": "build_data.py",
+  "grafici": {
+    "g1": {
+      "affidabilita": [
+        "A"
+      ],
+      "assi": {
+        "x": "importanza relativa attribuita all'attributo (%)"
+      },
+      "id": "g1",
+      "punti": [
+        {
+          "affidabilita": "A",
+          "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment",
+          "label": "Autonomia personale",
+          "nota": "Onda pre: 25 nov 2019 - 10 gen 2020, n=793",
+          "serie": "prima della dichiarazione OMS",
+          "unita": "importanza relativa (%)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/",
+          "x": "2019-12",
+          "y": 2.4
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment",
+          "label": "Autonomia personale",
+          "nota": "Onda post: 4 - 27 feb 2020, n=1215",
+          "serie": "quattro settimane dopo",
+          "unita": "importanza relativa (%)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/",
+          "x": "2020-02",
+          "y": 0.3
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment",
+          "label": "Privacy dei dati",
+          "nota": "Attributo di controllo: tiene",
+          "serie": "prima della dichiarazione OMS",
+          "unita": "importanza relativa (%)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/",
+          "x": "2019-12",
+          "y": 8.3
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment",
+          "label": "Privacy dei dati",
+          "nota": "Attributo di controllo: tiene",
+          "serie": "quattro settimane dopo",
+          "unita": "importanza relativa (%)",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/",
+          "x": "2020-02",
+          "y": 7.4
+        }
+      ],
+      "tipo": "dumbbell",
+      "titolo": "Il peso dell'autonomia personale prima e dopo la dichiarazione dell'OMS"
+    },
+    "g2": {
+      "affidabilita": [
+        "A"
+      ],
+      "assi": {
+        "dx": "paesi con leggi antiterrorismo nuove o riviste dal settembre 2001",
+        "sx": "quota di americani che ritiene necessario rinunciare a liberta' civili (%)"
+      },
+      "id": "g2",
+      "punti": [
+        {
+          "affidabilita": "A",
+          "fonte": "Pew Research Center, Balancing Act: National Security and Civil Liberties in Post-9/11 Era",
+          "label": "Necessario rinunciare a libertà civili",
+          "nota": "Rilevazione dopo gli attentati e prima del Patriot Act",
+          "serie": "pew",
+          "unita": "%",
+          "url": "https://www.pewresearch.org/short-reads/2013/06/07/balancing-act-national-security-and-civil-liberties-in-post-911-era/",
+          "x": "2001",
+          "y": 55.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Pew Research Center, Balancing Act: National Security and Civil Liberties in Post-9/11 Era",
+          "label": "Necessario rinunciare a libertà civili",
+          "nota": "Maggioranza ribaltata: 54% dice non necessario",
+          "serie": "pew",
+          "unita": "%",
+          "url": "https://www.pewresearch.org/short-reads/2013/06/07/balancing-act-national-security-and-civil-liberties-in-post-911-era/",
+          "x": "2011",
+          "y": 40.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Pew Research Center, Balancing Act: National Security and Civil Liberties in Post-9/11 Era",
+          "label": "Necessario rinunciare a libertà civili",
+          "nota": "Rilevazione post Snowden",
+          "serie": "pew",
+          "unita": "%",
+          "url": "https://www.pewresearch.org/short-reads/2013/06/07/balancing-act-national-security-and-civil-liberties-in-post-911-era/",
+          "x": "2013",
+          "y": 43.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Human Rights Watch, In the Name of Security (29 giugno 2012)",
+          "label": "Paesi con leggi antiterrorismo nuove o riviste",
+          "nota": "Punto di partenza per costruzione: il conteggio HRW parte dal settembre 2001",
+          "serie": "leggi",
+          "unita": "paesi",
+          "url": "https://www.hrw.org/report/2012/06/29/name-security/counterterrorism-laws-worldwide-september-11",
+          "x": "2001",
+          "y": 0.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Human Rights Watch, In the Name of Security (29 giugno 2012)",
+          "label": "Paesi con leggi antiterrorismo nuove o riviste",
+          "nota": "144 paesi; 130 leggi esaminate nel dettaglio, tutte con almeno una disposizione che apre ad abusi",
+          "serie": "leggi",
+          "unita": "paesi",
+          "url": "https://www.hrw.org/report/2012/06/29/name-security/counterterrorism-laws-worldwide-september-11",
+          "x": "2012",
+          "y": 144.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Consiglio di Sicurezza ONU, Risoluzione 1373 (28 settembre 2001)",
+          "label": "Risoluzione ONU 1373",
+          "nota": "Unico caso in cui il Consiglio impone a tutti gli Stati di modificare la legislazione nazionale",
+          "serie": "evento",
+          "url": "https://unscr.com/en/resolutions/1373/",
+          "x": "2001"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Congressional Research Service, FISA Section 702 and the 2024 RISAA",
+          "label": "Section 702 rinnovata",
+          "nota": "Primo rinnovo della clausola di scadenza",
+          "serie": "evento",
+          "url": "https://www.congress.gov/crs-product/R48592",
+          "x": "2012"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Congressional Research Service, FISA Section 702 and the 2024 RISAA",
+          "label": "Section 702 rinnovata",
+          "nota": "Secondo rinnovo",
+          "serie": "evento",
+          "url": "https://www.congress.gov/crs-product/R48592",
+          "x": "2018"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Congressional Research Service, FISA Section 702 and the 2024 RISAA",
+          "label": "Section 702 rinnovata e ampliata",
+          "nota": "RISAA 20 aprile 2024: allarga la definizione di fornitore di servizi. Nuova scadenza 20 aprile 2026",
+          "serie": "evento",
+          "url": "https://www.congress.gov/crs-product/R48592",
+          "x": "2024"
+        }
+      ],
+      "tipo": "forbice",
+      "titolo": "Le opinioni tornano indietro, le leggi no"
+    },
+    "g3": {
+      "affidabilita": [
+        "A",
+        "B"
+      ],
+      "assi": {},
+      "id": "g3",
+      "punti": [
+        {
+          "affidabilita": "A",
+          "fonte": "Commissione europea, EU Digital COVID Certificate",
+          "label": "EU Digital COVID Certificate operativo",
+          "nota": "Oltre 2,3 miliardi di certificati emessi. Regolamento in vigore dal 1 luglio 2021 al 30 giugno 2023",
+          "serie": "pandemia",
+          "url": "https://commission.europa.eu/strategy-and-policy/coronavirus-response/safe-covid-19-vaccines-europeans/eu-digital-covid-certificate_en",
+          "x": "2021-07"
+        },
+        {
+          "affidabilita": "B",
+          "fonte": "EU Digital Identity Wallet",
+          "label": "Proposta eIDAS 2.0 e portafoglio digitale europeo",
+          "nota": "Il quadro eIDAS risale al 2014: l'agenda dell'identità digitale precede il COVID",
+          "serie": "mercato unico",
+          "url": "https://en.wikipedia.org/wiki/EU_Digital_Identity_Wallet",
+          "x": "2021-06"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Regolamento (UE) 2022/2371",
+          "label": "Reg. 2022/2371: la Commissione può dichiarare l'emergenza sanitaria UE",
+          "nota": "Non è una misura d'emergenza: è la normalizzazione della capacità di dichiararla",
+          "serie": "preparazione",
+          "url": "https://eur-lex.europa.eu/eli/reg/2022/2371/oj/eng",
+          "x": "2022-11"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "EU Digital Identity Wallet",
+          "label": "eIDAS 2.0 approvato: wallet obbligatorio per ogni Stato entro fine 2026",
+          "nota": "Obbligo di offerta in capo agli Stati membri",
+          "serie": "semplificazione",
+          "url": "https://en.wikipedia.org/wiki/EU_Digital_Identity_Wallet",
+          "x": "2024-02"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Think Global Health, New amendments to the International Health Regulations",
+          "label": "Emendamenti al Regolamento Sanitario Internazionale OMS",
+          "nota": "In vigore da settembre 2025. Creano la categoria pandemic emergency",
+          "serie": "preparazione",
+          "url": "https://www.thinkglobalhealth.org/article/new-amendments-international-health-regulations",
+          "x": "2024-06"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Consiglio UE, Internal Market Emergency and Resilience Act",
+          "label": "IMERA adottato (Reg. UE 2024/2747)",
+          "nota": "Adottato l'8 novembre 2024",
+          "serie": "qualsiasi crisi",
+          "url": "https://www.consilium.europa.eu/en/policies/internal-market-emergency-and-resilience-act/",
+          "x": "2024-11"
+        },
+        {
+          "affidabilita": "B",
+          "fonte": "ForumPA, IT-Wallet",
+          "label": "IT-Wallet attivo in Italia",
+          "nota": "A febbraio 2025 oltre 7 milioni di documenti attivati da oltre 4 milioni di cittadini",
+          "serie": "digitalizzazione",
+          "url": "https://www.forumpa.it/pa-digitale/it-wallet-che-cose-e-come-funzionera-il-nuovo-portafoglio-di-identita-digitale/",
+          "x": "2024-12"
+        },
+        {
+          "affidabilita": "B",
+          "fonte": "Portolano Cavallo, AGCOM adopts new age verification mechanisms",
+          "label": "AGCOM delibera 96/25/CONS: verifica dell'età",
+          "nota": "Termine di adeguamento 12 novembre 2025, sanzioni fino a 250.000 euro",
+          "serie": "tutela dei minori",
+          "url": "https://portolano.it/en/newsletter/portolano-cavallo-inform-digital-ip/agcom-adopts-new-age-verification-mechanisms-websites-vsps-disseminating-adult-content",
+          "x": "2025-04"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Think Global Health",
+          "label": "Accordo OMS sulle pandemie",
+          "nota": "Adottato dalla 78a Assemblea Mondiale della Sanità",
+          "serie": "preparazione",
+          "url": "https://www.thinkglobalhealth.org/article/new-amendments-international-health-regulations",
+          "x": "2025-05"
+        },
+        {
+          "affidabilita": "B",
+          "fonte": "Online age verification in the United Kingdom",
+          "label": "UK Online Safety Act: verifica dell'età obbligatoria",
+          "nota": "In vigore dal 25 luglio 2025. A febbraio 2026 Ofcom ha aperto oltre 90 istruttorie e comminato 6 sanzioni",
+          "serie": "tutela dei minori",
+          "url": "https://en.wikipedia.org/wiki/Online_age_verification_in_the_United_Kingdom",
+          "x": "2025-07"
+        },
+        {
+          "affidabilita": "B",
+          "fonte": "LSE EUROPP, BritCard: the UK digital ID scheme",
+          "label": "UK: identità digitale obbligatoria annunciata",
+          "nota": "Poi annacquato: il governo ha confermato che non sara obbligatorio esibirlo per ottenere un lavoro",
+          "serie": "immigrazione",
+          "url": "https://blogs.lse.ac.uk/europpblog/2025/10/09/britcard-uk-digital-id-scheme-eu-mistakes-identity-wallet/",
+          "x": "2025-09"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Consiglio UE, Internal Market Emergency and Resilience Act",
+          "label": "IMERA entra in applicazione",
+          "nota": "Ambito: catastrofi naturali, emergenze sanitarie, shock economici, questioni di sicurezza",
+          "serie": "qualsiasi crisi",
+          "url": "https://www.consilium.europa.eu/en/policies/internal-market-emergency-and-resilience-act/",
+          "x": "2026-05"
+        }
+      ],
+      "tipo": "filiera",
+      "titolo": "Cambiano le giustificazioni, non l'architettura"
+    },
+    "g4": {
+      "affidabilita": [
+        "A"
+      ],
+      "assi": {},
+      "id": "g4",
+      "punti": [
+        {
+          "affidabilita": "A",
+          "fonte": "Regolamento (UE) 2019/818",
+          "label": "Interoperabilità (Reg. 2019/817 e 2019/818)",
+          "nota": "Common Identity Repository, European Search Portal e matching biometrico condiviso fra EES, VIS, ETIAS, Eurodac, SIS ed ECRIS-TCN",
+          "serie": "stack",
+          "url": "https://legislation.gov.uk/eur/2019/818/contents?view=plain",
+          "x": "2019-05"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Regolamento (UE) 2024/982",
+          "label": "Prüm II (Reg. UE 2024/982)",
+          "nota": "Aggiunge immagini facciali e schedari di polizia allo scambio automatico transfrontaliero. Prima: solo DNA, impronte, targhe",
+          "serie": "stack",
+          "url": "https://eur-lex.europa.eu/eli/reg/2024/982/oj/eng",
+          "x": "2024-04"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "AI Act, articolo 5",
+          "label": "AI Act: divieti in vigore (Reg. UE 2024/1689)",
+          "nota": "Il divieto di identificazione biometrica remota in tempo reale vale solo per le forze dell'ordine e ha tre eccezioni",
+          "serie": "stack",
+          "url": "https://artificialintelligenceact.eu/article/5/",
+          "x": "2025-02"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Commissione europea, lawful access to data",
+          "label": "ProtectEU: roadmap sull'accesso ai dati cifrati",
+          "nota": "Capacità di decrittazione di nuova generazione per Europol entro il 2030",
+          "serie": "stack",
+          "url": "https://home-affairs.ec.europa.eu/policies/internal-security/lawful-access-data/encryption_en",
+          "x": "2025-06"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Consiglio UE, avvio EES 12 ottobre 2025",
+          "label": "Entry Exit System operativo",
+          "nota": "Volto e impronte di ogni cittadino non europeo a ogni attraversamento della frontiera esterna, 29 paesi. A pieno regime dal 10 aprile 2026",
+          "serie": "stack",
+          "url": "https://www.consilium.europa.eu/en/press/press-releases/2025/10/11/with-start-of-operation-of-new-ees-border-control-system-the-eu-will-strengthen-border-security-and-increase-efficiency-for-travellers/",
+          "x": "2025-10"
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Parlamento europeo, Legislative Train: recast Eurodac",
+          "label": "Eurodac rifuso (Reg. UE 2024/1358)",
+          "nota": "Aggiunge immagini facciali. Abbassa l'età di raccolta biometrica da 14 a 6 anni. Accesso ampliato alle forze dell'ordine",
+          "serie": "stack",
+          "url": "https://www.europarl.europa.eu/legislative-train/spotlight-JD22/file-jd-recast-eurodac-regulation",
+          "x": "2026-06"
+        }
+      ],
+      "tipo": "stack",
+      "titolo": "Lo stack biometrico europeo: ogni strato resta"
+    },
+    "g5": {
+      "affidabilita": [
+        "C"
+      ],
+      "assi": {
+        "x": "base giuridica per la scansione delle comunicazioni private"
+      },
+      "id": "g5",
+      "punti": [
+        {
+          "affidabilita": "C",
+          "fonte": "Patrick Breyer, Chat Control",
+          "label": "Deroga volontaria approvata dal Parlamento europeo",
+          "nota": "Chat Control 1.0: i fornitori possono scansionare le comunicazioni. Misura temporanea con scadenza",
+          "serie": "stato",
+          "unita": "base giuridica attiva",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "x": "2021-07-06",
+          "y": 1.0
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Patrick Breyer, Chat Control",
+          "label": "Il regolamento interinale scade",
+          "nota": "Per la prima volta la scansione delle comunicazioni private non ha base giuridica",
+          "serie": "stato",
+          "unita": "base giuridica attiva",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "x": "2026-04-04",
+          "y": 0.0
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "The Register, MEPs fail to prevent Chat Control revival (9 luglio 2026)",
+          "label": "Il tentativo di bloccare la riproposizione fallisce",
+          "nota": "Chat Control 1.0 torna in vigore fino al 2028",
+          "serie": "stato",
+          "unita": "base giuridica attiva",
+          "url": "https://www.theregister.com/security/2026/07/09/meps_fail_to_prevent_chat_control_snoopfest_revival/",
+          "x": "2026-07-09",
+          "y": 1.0
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Patrick Breyer, Chat Control",
+          "label": "La Commissione propone la scansione obbligatoria",
+          "nota": "Chat Control 2.0: ordini di rilevamento",
+          "serie": "evento",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "x": "2022-05-11"
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Patrick Breyer, Chat Control",
+          "label": "Il Parlamento respinge la scansione obbligatoria",
+          "nota": "Mandato negoziale del Parlamento europeo",
+          "serie": "evento",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "x": "2023-11"
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Patrick Breyer, Chat Control",
+          "label": "Il Consiglio rimuove l'obbligo di rilevamento",
+          "nota": "La scansione lato client esce dal testo",
+          "serie": "evento",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "x": "2025-11"
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Patrick Breyer, Chat Control",
+          "label": "Il Consiglio ripresenta la misura come proposta nuova",
+          "nota": "Formalmente nuova: non serve rivincere l'argomento nel merito",
+          "serie": "evento",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "x": "2026-07-02"
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Patrick Breyer, Chat Control",
+          "label": "Il Parlamento la mette in procedura d'urgenza",
+          "nota": "Due giorni prima del voto",
+          "serie": "evento",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "x": "2026-07-07"
+        }
+      ],
+      "tipo": "gradino",
+      "titolo": "Chat Control: novantasei giorni senza base giuridica"
+    },
+    "g6": {
+      "affidabilita": [
+        "C"
+      ],
+      "assi": {
+        "x": "quota di segnalazioni che non regge (%)"
+      },
+      "id": "g6",
+      "punti": [
+        {
+          "affidabilita": "C",
+          "fonte": "Polizia federale svizzera, citata in Patrick Breyer, Chat Control",
+          "label": "Segnalazioni automatiche infondate (Svizzera)",
+          "nota": "Cifra da verificare su fonte primaria",
+          "serie": "falsi",
+          "unita": "%",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "y": 80.0
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Dato irlandese citato in Patrick Breyer, Chat Control",
+          "label": "Segnalazioni NCMEC non confermate nel 2020 (Irlanda)",
+          "nota": "Solo il 20% delle segnalazioni ricevute è stato confermato",
+          "serie": "falsi",
+          "unita": "%",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "y": 80.0
+        },
+        {
+          "affidabilita": "C",
+          "fonte": "Ylva Johansson, allora commissaria agli Affari interni, citata in Patrick Breyer, Chat Control",
+          "label": "Chat segnalate non azionabili (Commissione UE)",
+          "nota": "Su circa 300.000 chat segnalate all'anno in Europa",
+          "serie": "falsi",
+          "unita": "%",
+          "url": "https://www.patrick-breyer.de/en/posts/chat-control/",
+          "y": 75.0
+        }
+      ],
+      "tipo": "barre",
+      "titolo": "Quanto rumore produce la scansione automatica"
+    },
+    "g7": {
+      "affidabilita": [
+        "A"
+      ],
+      "assi": {
+        "x": "favorevoli (%)"
+      },
+      "id": "g7",
+      "punti": [
+        {
+          "affidabilita": "A",
+          "fonte": "Ipsos UK, 2 in 3 support social media ban for under-16s (rilevazione 19-22 giugno 2026, n=1082)",
+          "label": "Vietare i social agli under 16",
+          "nota": "Il principio",
+          "serie": "discesa",
+          "unita": "% favorevoli",
+          "url": "https://www.ipsos.com/en-uk/2-3-support-social-media-ban-under-16s-though-support-softens-if-it-requires-nationwide-id",
+          "x": "1",
+          "y": 69.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Ipsos UK, 2 in 3 support social media ban for under-16s (rilevazione 19-22 giugno 2026, n=1082)",
+          "label": "Se comporta caricare un documento per tutti",
+          "nota": "Il primo costo concreto",
+          "serie": "discesa",
+          "unita": "% favorevoli",
+          "url": "https://www.ipsos.com/en-uk/2-3-support-social-media-ban-under-16s-though-support-softens-if-it-requires-nationwide-id",
+          "x": "2",
+          "y": 50.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Ipsos UK, 2 in 3 support social media ban for under-16s (rilevazione 19-22 giugno 2026, n=1082)",
+          "label": "Se implica vietare le VPN",
+          "nota": "Il secondo costo concreto",
+          "serie": "discesa",
+          "unita": "% favorevoli",
+          "url": "https://www.ipsos.com/en-uk/2-3-support-social-media-ban-under-16s-though-support-softens-if-it-requires-nationwide-id",
+          "x": "3",
+          "y": 48.0
+        }
+      ],
+      "tipo": "discesa",
+      "titolo": "Il consenso si sgretola appena la misura diventa concreta"
+    },
+    "g8": {
+      "affidabilita": [
+        "A"
+      ],
+      "assi": {
+        "x": "quota di intervistati (%)"
+      },
+      "id": "g8",
+      "punti": [
+        {
+          "affidabilita": "A",
+          "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)",
+          "label": "Porterebbe sempre con sé il documento",
+          "nota": "Picco post 11 settembre",
+          "serie": "2004",
+          "unita": "%",
+          "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and",
+          "x": "2004",
+          "y": 83.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)",
+          "label": "Porterebbe sempre con sé il documento",
+          "nota": "Meno disponibilità di vent'anni fa",
+          "serie": "2025",
+          "unita": "%",
+          "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and",
+          "x": "2025",
+          "y": 58.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)",
+          "label": "Preoccupato per le libertà civili",
+          "nota": "Picco post 11 settembre",
+          "serie": "2004",
+          "unita": "%",
+          "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and",
+          "x": "2004",
+          "y": 24.0
+        },
+        {
+          "affidabilita": "A",
+          "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)",
+          "label": "Preoccupato per le libertà civili",
+          "nota": "Più diffidenza di vent'anni fa",
+          "serie": "2025",
+          "unita": "%",
+          "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and",
+          "x": "2025",
+          "y": 39.0
+        }
+      ],
+      "tipo": "confronto",
+      "titolo": "Rispetto al 2004 i britannici sono piu' diffidenti, non meno"
+    }
+  },
+  "legenda_affidabilita": {
+    "A": "fonte primaria o istituzionale verificata",
+    "B": "fonte secondaria affidabile",
+    "C": "fonte advocacy o giornalistica, da ricontrollare prima di pubblicare"
+  }
+}

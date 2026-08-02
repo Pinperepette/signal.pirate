@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'eccezione è già nella regola | Signal Pirate</title>
+  <meta name="description" content="Dall'11 settembre al green pass fino alle telecamere che ti riconoscono in piazza. Uno studio ha misurato per caso cosa succede alle preferenze delle persone quando qualcuno pronuncia la parola emergenza: bastano quattro settimane, e non serve che accada nulla. Otto grafici, ogni numero con fonte.">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="L'eccezione è già nella regola">
+  <meta property="og:description" content="Dall'11 settembre al green pass fino alle telecamere che ti riconoscono in piazza. Uno studio ha misurato per caso cosa succede alle preferenze delle persone quando qualcuno pronuncia la parola emergenza: bastano quattro settimane, e non serve che accada nulla. Otto grafici, ogni numero con fonte.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/l-eccezione-e-gia-nella-regola.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="L'eccezione è già nella regola">
+  <meta name="twitter:description" content="Uno studio ha misurato per caso cosa succede quando qualcuno pronuncia la parola emergenza: bastano quattro settimane, e non serve che accada nulla.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* ---- articolo: componenti proprie, sopra il CSS del sito ---- */
+    .ecc{
+      --bg: var(--bg-primary);
+      --fg: var(--text-primary);
+      --muted: var(--text-secondary);
+      --rule: var(--border-subtle);
+      --accent: var(--accent-reaction);
+      --accent2: var(--accent-amplification);
+      --panel: var(--bg-secondary);
+      --panel-rule: var(--border-subtle);
+    }
+    .ecc .lede{ font-size: 1.12rem; color: var(--text-primary); }
+    .ecc .lede::first-letter{
+      float: left; font-family: var(--font-mono); font-size: 3.1rem; line-height: .82;
+      padding: .08em .12em 0 0; font-weight: 700; color: var(--accent);
+    }
+    .ecc blockquote.pull{
+      margin: 2.8rem 0; padding: 0; border: 0;
+      font-family: var(--font-mono); font-size: 1.15rem; line-height: 1.4;
+      font-weight: 700; color: var(--text-primary);
+    }
+    .ecc blockquote.pull::before{
+      content: ""; display: block; width: 46px; height: 2px;
+      background: var(--accent); margin-bottom: 1.1rem;
+    }
+    .ecc .tablewrap{ overflow-x: auto; margin: 2.2rem 0; }
+    .ecc table{ border-collapse: collapse; width: 100%; min-width: 22rem; font-size: .9rem; }
+    .ecc th, .ecc td{ text-align: left; padding: .62rem .8rem .62rem 0; border-bottom: 1px solid var(--rule); color: var(--text-secondary); }
+    .ecc th{
+      font-family: var(--font-mono); font-size: .68rem; letter-spacing: .11em;
+      text-transform: uppercase; color: var(--muted); font-weight: 600;
+      border-bottom-color: var(--text-secondary);
+    }
+    .ecc td.n{ font-family: var(--font-mono); color: var(--text-primary); }
+
+    /* figure */
+    .ecc figure.fig{
+      margin: 2.8rem 0; background: var(--panel);
+      border: 1px solid var(--panel-rule); border-radius: 6px;
+      padding: 1.5rem 1.4rem 1.2rem;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .ecc figure.fig.in{ opacity: 1; transform: none; }
+    .ecc figure.wide{ width: 100%; }
+    .ecc .fig .label{
+      font-family: var(--font-mono); font-size: .66rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: .3rem;
+    }
+    .ecc .fig .titolo{
+      font-family: var(--font-mono); font-size: 1rem; font-weight: 700;
+      line-height: 1.3; margin: 0 0 1.1rem; color: var(--text-primary);
+    }
+    .ecc .fig figcaption{ font-size: .82rem; line-height: 1.55; color: var(--muted); margin-top: 1rem; }
+    .ecc .fig .src{
+      font-family: var(--font-mono); font-size: .66rem; line-height: 1.8; color: var(--muted);
+      margin-top: .9rem; padding-top: .7rem; border-top: 1px solid var(--panel-rule);
+    }
+    .ecc .fig .src a{ color: inherit; }
+    .ecc .badge{
+      display: inline-block; border: 1px solid currentColor; border-radius: 3px;
+      padding: 0 .3em; font-size: .9em; margin-right: .35em;
+    }
+    .ecc .badge.c{ color: var(--accent); }
+    /* niente overflow qui: gli SVG sono responsive via viewBox, e le etichette
+       ruotate del grafico 2 devono poter uscire dal riquadro senza essere tagliate */
+    .ecc .mount{ width: 100%; }
+    .ecc svg{ display: block; width: 100%; height: auto; overflow: visible; }
+    .ecc .c-grid{ stroke: var(--rule); stroke-width: 1; }
+    .ecc .c-axis{ stroke: var(--muted); stroke-width: 1; }
+    .ecc .c-tick, .ecc .c-tickx{ font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+    .ecc .c-lab{ font-size: 13px; fill: var(--fg); }
+    .ecc .c-sub{ font-size: 11px; fill: var(--muted); }
+    .ecc .c-val{ font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; fill: var(--fg); }
+    .ecc .c-num{ font-family: var(--font-mono); font-size: 11px; font-weight: 700; fill: var(--bg); }
+    .ecc .c-a{ fill: var(--muted); stroke: var(--muted); }
+    .ecc .c-b{ fill: var(--accent); stroke: var(--accent); }
+    .ecc .c-c{ fill: var(--accent2); stroke: var(--accent2); }
+    .ecc .c-conn{ stroke: var(--muted); stroke-width: 2; opacity: .45; fill: none; }
+    .ecc .c-line{ fill: none; stroke-width: 2.2; }
+    .ecc .c-dash{ fill: none; stroke-width: 2; stroke-dasharray: 6 4; }
+    .ecc .c-dot{ fill: none; stroke-width: 2; stroke-dasharray: 2 4; }
+    .ecc .c-band{ fill: var(--accent); opacity: .12; stroke: none; }
+    .ecc .c-band2{ fill: var(--accent2); opacity: .14; stroke: none; }
+    .ecc .c-bar{ fill: var(--accent); }
+    .ecc .c-bar.mut{ fill: var(--muted); opacity: .3; }
+    .ecc .hit{ fill: transparent; cursor: crosshair; }
+
+    /* filiera (grafico 3) */
+    .ecc .fil{ border-top: 1px solid var(--panel-rule); }
+    .ecc .fil-r{
+      display: grid; grid-template-columns: 5.2rem 1fr 9.5rem; gap: .8rem;
+      padding: .62rem 0; border-bottom: 1px solid var(--panel-rule);
+      font-size: .86rem; line-height: 1.4; color: var(--text-primary);
+    }
+    .ecc .fil-d{ font-family: var(--font-mono); font-size: .72rem; color: var(--muted); padding-top: .18em; white-space: nowrap; }
+    .ecc .fil-g{ text-align: right; }
+    .ecc .fil-g span{
+      font-family: var(--font-mono); font-size: .64rem; letter-spacing: .06em; text-transform: uppercase;
+      border: 1px solid currentColor; border-radius: 3px; padding: .1em .45em; white-space: nowrap;
+    }
+    @media (max-width: 620px){
+      .ecc .fil-r{ grid-template-columns: 1fr; gap: .2rem; }
+      .ecc .fil-g{ text-align: left; }
+    }
+    .ecc .note-eventi{ font-size: .8rem; line-height: 1.55; color: var(--muted); margin: .9rem 0 0; padding: 0; list-style: none; }
+    .ecc .note-eventi li{ margin-bottom: .2rem; }
+    .ecc .note-eventi b{ font-family: var(--font-mono); font-size: .74rem; color: var(--accent); margin-right: .4em; }
+
+    /* blocchi di servizio */
+    .ecc .caveat{
+      border: 1px solid var(--rule); border-left: 3px solid var(--muted);
+      padding: 1.3rem 1.3rem .3rem; margin: 2.8rem 0; font-size: .92rem; line-height: 1.6;
+    }
+    .ecc .caveat .label{
+      font-family: var(--font-mono); font-size: .66rem; letter-spacing: .13em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: .8rem;
+    }
+    .ecc .apparatus{
+      margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--rule);
+      font-size: .88rem; line-height: 1.6; color: var(--muted);
+    }
+    .ecc .apparatus h3{ font-family: var(--font-mono); font-size: .98rem; color: var(--text-primary); margin: 2rem 0 .8rem; }
+    .ecc .apparatus ul{ padding-left: 1.1rem; margin: 0 0 1.2rem; }
+    .ecc .apparatus li{ margin-bottom: .55rem; }
+
+    #tt{
+      position: fixed; z-index: 9999; pointer-events: none; opacity: 0;
+      transition: opacity .12s; max-width: 18rem;
+      background: var(--bg-tertiary); color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      font-size: .78rem; line-height: 1.45; padding: .55rem .7rem; border-radius: 6px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.4);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-08-02 | Pinperepette</p>
+    <h1 class="article-page-title">L'eccezione è già nella regola <span class="accent">(comoda, pronta, col fiocco sopra)</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Dall'11 settembre al green pass, fino alle telecamere che ti riconoscono in piazza: basta pronunciare la parola magica, «emergenza», e il nostro rapporto con libertà e controlli cambia al volo. A volte prima ancora che succeda davvero qualcosa.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-reaction">Sorveglianza</span>
+      <span class="tag tag-highlight">Emergenza</span>
+      <span class="tag tag-amplification">Europa</span>
+      <span class="tag tag-attention">Dati</span>
+    </div>
+  </header>
+
+  <article class="article-content ecc">
+
+<p class="lede">Alla fine del 2019 un gruppo di ricercatori australiani stava somministrando un questionario abbastanza tranquillo. Volevano sapere quanto peso le persone danno a ciascun pezzo di un sistema di sorveglianza sanitaria: la protezione della privacy, la sicurezza dei dati, l'affidabilità delle informazioni, il numero di morti evitate, il rispetto dell'autonomia personale. Roba da questionario, in tempo di pace. Niente sirene, niente panico, niente gente in fila con la mascherina.</p>
+
+<p>Poi, il 30 gennaio 2020, l'Organizzazione mondiale della sanità dichiara l'emergenza sanitaria internazionale. Il sondaggio però era ancora aperto. E così, per puro culo metodologico, i ricercatori si ritrovano in mano una cosa che nelle scienze sociali non capita quasi mai: lo stesso test, sulla stessa popolazione, prima e dopo uno shock. Settecentonovantatré risposte prima. Milleduecentoquindici dopo.</p>
+
+<p>Il risultato è uno di quei dati che ti fanno dire: ah, quindi non me lo stavo immaginando.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 1</div>
+  <div class="titolo">Il peso dell'autonomia personale prima e dopo la dichiarazione dell'OMS</div>
+  <div class="mount" data-g="g1"></div>
+  <figcaption>Discrete choice experiment su campione rappresentativo australiano, n = 2.008. Onda pre: 25 novembre 2019, 10 gennaio 2020. Onda post: 4, 27 febbraio 2020. Sono i due attributi riportati nel dossier: l'autonomia personale, che crolla, e la privacy dei dati, che tiene.</figcaption>
+  <div class="src" data-src="g1"></div>
+</figure>
+
+<p>Prima di tutto, cos'è quel numero, perché è il punto su cui poggia tutto il resto. Il questionario è un <em>discrete choice experiment</em>: mette le persone davanti a sistemi alternativi e da come scelgono ricava quanto pesa ciascuna caratteristica nella decisione. Le percentuali sono pesi relativi. Non dicono quanti australiani tengono alla libertà, dicono quanta parte della scelta è spiegata dalla libertà.</p>
+
+<p>Detto questo. L'autonomia personale, cioè il non essere costretti, pesava il 2,4 per cento. Poco, pochissimo, già prima. In quattro settimane scende allo 0,3, che è come dire che smette di entrare nel conto. La privacy dei dati invece regge, dall'8,3 al 7,4. Le persone non hanno smesso di chiedersi chi guarda le loro cose. Hanno smesso di chiedersi se sono libere di dire di no.</p>
+
+<p>E qui c'è la cosa grossa. In Australia, a febbraio 2020, non era ancora successo niente: nessun lockdown, nessun obbligo, nessuna app, nessun morto in numeri visibili. Non era arrivata la minaccia concreta. Era arrivata la parola.</p>
+
+<p>«Emergenza». E già bastava.</p>
+
+<p>Gli autori la mettono giù più educata, e vale la pena citarli per esteso: «l'accettazione pubblica della sorveglianza tecnologica delle malattie trasmissibili dipende dalla situazione. Durante un'epidemia è probabile una maggiore tolleranza verso sistemi che comportino restrizioni delle attività personali». Traduzione da bar: quando ci dicono che è un'emergenza, il cervello smette per un attimo di fare il sindacalista delle nostre libertà.</p>
+
+<h2>Il replay dopo l'11 settembre</h2>
+
+<p>Non è una cosa nuova, e la volta precedente l'abbiamo vista in diretta.</p>
+
+<p>Il 28 settembre 2001, diciassette giorni dopo le Torri, il Consiglio di Sicurezza dell'ONU approva la Risoluzione 1373, sotto il Capitolo VII della Carta. Non consigliava agli Stati di aggiornare le leggi antiterrorismo: glielo imponeva. È l'unica volta nella storia in cui il Consiglio ha ordinato a tutti gli Stati membri di riscrivere la propria legislazione nazionale. Roba che normalmente non succede.</p>
+
+<p>Nel decennio successivo, 144 paesi hanno scritto o riscritto leggi antiterrorismo. Human Rights Watch ne ha esaminate 130 nel dettaglio, e la conclusione, che è sua e non mia, è che tutte e 130 contenevano almeno una disposizione che apriva la porta ad abusi: definizioni di terrorismo larghe come un hangar, detenzioni più facili, poteri più comodi. Il rapporto documenta il loro uso contro giornalisti, manifestanti e oppositori politici. Un attentato in un paese ha riscritto il diritto penale del pianeta in dieci anni.</p>
+
+<p>La parte divertente, divertente per modo di dire, sono le scadenze. Le <em>sunset clause</em>: tranquilli, vale solo fino alla data X. Negli Stati Uniti la Section 702, quella sulla sorveglianza estera, ne aveva una. È stata rinnovata nel 2012, nel 2018 e nell'aprile 2024. E l'ultimo giro non si è limitato a tenerla in vita: ha allargato la definizione di «fornitore di servizi» fino a comprendere chi si limita a dare accesso all'infrastruttura di comunicazione.</p>
+
+<p>Quindi no, la scadenza non è sempre un freno. A volte è il tagliando, quello in cui ti montano pure un motore più grosso.</p>
+
+<h2>La gente torna indietro, le leggi se ne fregano</h2>
+
+<p>Qui c'è il pezzo interessante, ed è quello che a prima vista smonta tutto il ragionamento: gli americani, nel tempo, hanno cambiato idea.</p>
+
+<div class="tablewrap">
+<table>
+  <thead><tr><th>anno</th><th>necessario rinunciare a libertà civili</th><th>non necessario</th></tr></thead>
+  <tbody>
+    <tr><td class="n">2001</td><td class="n">55%</td><td class="n">35%</td></tr>
+    <tr><td class="n">2011</td><td class="n">40%</td><td class="n">54%</td></tr>
+    <tr><td class="n">2013</td><td class="n">43%</td><td class="n">45%</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>In dieci anni sono tornati indietro di quindici punti, e nel 2011 la maggioranza si era ribaltata. Quindi non è vero che il pubblico diventa per forza sempre più docile. Passata la botta, la gente si riprende: riguarda il conto, capisce meglio cosa ha pagato, magari si incazza pure.</p>
+
+<p>Le leggi invece restano lì, belle sedute. Il Patriot Act veniva rinnovato mentre il consenso per quello che autorizzava calava. Con una precisazione doverosa, perché è il punto in cui un lettore preparato ti ferma: il Patriot Act non è stato eterno. La Section 215, quella sulla raccolta dei tabulati, è scaduta nel 2015, è stata sostituita dallo USA Freedom Act e nel 2020 è decaduta sul serio. Il pezzo che invece non è mai caduto, e anzi si è allargato, è la Section 702. Il cricchetto non gira sempre. Gira abbastanza spesso.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 2</div>
+  <div class="titolo">Le opinioni tornano indietro, le leggi no</div>
+  <div class="mount" data-g="g2"></div>
+  <figcaption>A sinistra la quota di americani che ritiene necessario rinunciare a libertà civili (Pew, tre rilevazioni). A destra il numero di paesi che hanno adottato o revisionato leggi antiterrorismo dal settembre 2001 (Human Rights Watch). Attenzione a come è disegnata la seconda curva: i punti documentati sono soltanto due, zero nel 2001 e 144 nel 2012, e il tratto che li unisce è interpolazione, non un dato annuale. Dopo il 2012 la linea è piatta perché il conteggio si ferma lì, non perché si siano fermate le leggi.</figcaption>
+  <div class="src" data-src="g2"></div>
+</figure>
+
+<blockquote class="pull">Le opinioni sono elastiche. Le istituzioni sono plastica dura.</blockquote>
+
+<p>Il trucco è tutto qui: alle istituzioni non serve convincerti per sempre. Gli basta che tu molli la presa per il tempo necessario ad approvare una legge. Poi torni lucido, ma il cancello è già montato.</p>
+
+<p>E alla crisi successiva non si riparte da zero. La macchina c'è già. Basta cambiare il cartello appeso sopra.</p>
+
+<h2>Il green pass non ha inventato niente. Ha fatto il collaudo.</h2>
+
+<p>Il COVID non ha inventato la sorveglianza, sia chiaro: quella esisteva eccome. Ha fatto una cosa più sottile, e per questo meno visibile.</p>
+
+<p>Dopo l'11 settembre il cricchetto era scattato sull'osservazione: intercettare, raccogliere, analizzare. Il cittadino restava passivo, veniva guardato. Dopo il green pass è scattato sull'identificazione preventiva: il cittadino diventa attivo e deve esibire una credenziale digitale verificabile per fare cose ordinarie. Entrare. Lavorare. Comprare. Aprire un sito. La differenza è tutta qui: registrare vuol dire guardare dopo, controllare l'accesso vuol dire decidere adesso, davanti alla porta.</p>
+
+<p>Il certificato verde è stato il primo sistema occidentale di massa in cui una credenziale digitale ha regolato l'accesso alla vita quotidiana. In Europa ne sono usciti oltre 2,3 miliardi. Non è stato un esperimento di sorveglianza: è stato un esperimento di controllo degli accessi. Ed è riuscito.</p>
+
+<p>L'Italia poi ci ha messo del suo. Il decreto legge 127 del 2021 impose il green pass a tutti i lavoratori, pubblici e privati, dal 15 ottobre 2021: chi non era vaccinato si faceva il tampone ogni 48 ore e se lo pagava. Obblighi sul lavoro c'erano anche in Grecia e in Austria, ma nessuno spinse così a fondo il principio: una credenziale digitale come condizione per accedere al reddito.</p>
+
+<p>Poi il certificato è scaduto. Il regolamento europeo è morto il 30 giugno 2023 e non è stato rinnovato. Conviene però guardare cosa era cresciuto intorno mentre scadeva.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 3</div>
+  <div class="titolo">Cambiano le giustificazioni, non l'architettura</div>
+  <div class="mount" data-g="g3"></div>
+  <figcaption>Ogni riga è una misura, con accanto la giustificazione con cui è stata presentata. La colonna di destra cambia colore quasi a ogni riga: pandemia, mercato unico, preparazione, semplificazione, tutela dei minori, immigrazione. La colonna di sinistra è sempre la stessa cosa, una credenziale digitale che diventa condizione di accesso.</figcaption>
+  <div class="src" data-src="g3"></div>
+</figure>
+
+<p>Nessuna di quelle misure, dopo il 2023, è giustificata da un'emergenza sanitaria. Le giustificazioni sono cambiate tutte: minori, immigrazione, ordine pubblico, efficienza amministrativa. L'architettura no.</p>
+
+<p>Un'avvertenza, senza fare i fenomeni col senno di poi: il quadro eIDAS è del 2014 e il portafoglio digitale europeo è stato proposto nel giugno 2021. L'agenda dell'identità digitale precede il COVID, e scrivere che il green pass l'ha causata sarebbe una fesseria verificabile in tre click. Il punto è un altro: 2,3 miliardi di certificati hanno dimostrato su scala continentale che quell'architettura si può fare, e che la gente, quando serve, la usa.</p>
+
+<h2>L'emergenza come modalità standard</h2>
+
+<p>Di solito, per sostenere che un'emergenza legittima poteri destinati a restare, bisogna argomentare. In un caso non serve, perché è scritto.</p>
+
+<p>Regolamento UE 2024/2747, Internal Market Emergency and Resilience Act. Nome da film di fantascienza, sostanza molto concreta: un meccanismo permanente a tre stadi, contingenza, vigilanza, emergenza, per gestire le crisi del mercato interno. Il punto non è la struttura. È l'ambito di attivazione, che il regolamento elenca da sé: catastrofi naturali, emergenze sanitarie, shock economici, questioni di sicurezza. In pratica, ci sono parecchi modi per arrivare a dire «ragazzi, stavolta è eccezionale».</p>
+
+<p>L'Unione ha preso l'architettura di governo costruita sotto il COVID e l'ha resa un regime generico, permanente, attivabile per una categoria aperta di crisi. Stessa logica sul lato sanitario: il regolamento 2371 del 2022 non è una misura d'emergenza, è la normalizzazione della capacità di dichiararla.</p>
+
+<p>Il COVID ha smesso di essere l'eccezione. È diventato il tutorial.</p>
+
+<h2>Il set biometrico europeo</h2>
+
+<p>Nel frattempo l'Europa, un regolamento alla volta e senza che nessuno di questi atti venisse presentato come misura d'emergenza, ha montato un'infrastruttura biometrica continentale.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 4</div>
+  <div class="titolo">Lo stack biometrico europeo: ogni strato resta</div>
+  <div class="mount" data-g="g4"></div>
+  <figcaption>Ogni barra parte dalla data di entrata in vigore e prosegue: nessuno di questi atti ha una scadenza. È questa la differenza con le misure d'emergenza, che scadono e a volte muoiono davvero. Passa il mouse su una barra per leggere cosa aggiunge.</figcaption>
+  <div class="src" data-src="g4"></div>
+</figure>
+
+<p>Regolamenti 817 e 818 del 2019, interoperabilità: nasce il Common Identity Repository, con matching biometrico condiviso fra sei banche dati, frontiere, visti, asilo, Schengen, casellari. Prüm II, aprile 2024: immagini facciali e schedari di polizia entrano nello scambio automatico transfrontaliero, dove prima viaggiavano solo DNA, impronte e targhe. Eurodac rifuso, in applicazione da giugno 2026: aggiunge le immagini facciali e abbassa l'età per la raccolta biometrica da 14 anni a 6. Entry Exit System, ottobre 2025: volto e impronte di ogni cittadino non europeo a ogni attraversamento della frontiera esterna, 29 paesi. ProtectEU, giugno 2025: la roadmap sull'accesso legale ai dati cifrati, con capacità di decrittazione di nuova generazione per Europol entro il 2030.</p>
+
+<p>Ogni pezzo, preso da solo, ha la sua motivazione. Confini più ordinati. Indagini più rapide. Identificazione affidabile. Tutta roba che suona pure sensata. Il problema non è il singolo bullone: è quando alzi lo sguardo e vedi il motore intero.</p>
+
+<p>Dentro l'impianto c'è poi una norma che dovrebbe leggere per intero chiunque pensi che il <em>function creep</em>, cioè raccogliere per una ragione e usare per un'altra, sia un incidente. La limitazione di finalità è il principio fondativo della protezione dei dati europea: quello che raccogli per X non lo usi per Y. La dottrina giuridica, commentando i regolamenti sull'interoperabilità, parla apertamente di «cambio di paradigma per la limitazione di finalità». E l'articolo 20 del regolamento 818 consente alle autorità di polizia di interrogare il repository comune al solo scopo di identificare una persona, per esempio quando questa non può, o rifiuta, di collaborare.</p>
+
+<p>Non serve un reato. Può bastare non aver voglia di dire chi sei.</p>
+
+<p>E non è paranoia da romanzo distopico. A gennaio 2021 il governo di Singapore ammise che i dati di TraceTogether, l'app di tracciamento dei contatti, erano accessibili alla polizia per indagini penali senza alcun legame con il COVID, e che erano già stati usati in un'indagine per omicidio. L'informativa pubblicata al lancio dell'app diceva un'altra cosa. Cambiare destinazione d'uso, fino al giorno in cui qualcuno se n'è accorto, era costato zero.</p>
+
+<p>Lo scivolamento d'uso non è sempre un abuso sfuggito di mano. A volte è una funzionalità progettata, scritta bene e timbrata. L'Europa non ha subìto il function creep: lo ha codificato.</p>
+
+<h2>Il divieto con la porta laterale</h2>
+
+<p>L'AI Act vieta l'identificazione biometrica remota in tempo reale negli spazi accessibili al pubblico a fini di polizia. E uno dice: bene, finalmente.</p>
+
+<p>Poi legge le tre eccezioni. Ricerca mirata di vittime di rapimento, tratta, sfruttamento sessuale o di persone scomparse. Prevenzione di una minaccia specifica, sostanziale e imminente alla vita, terrorismo compreso. Identificazione di sospettati di reati gravi, puniti con almeno quattro anni.</p>
+
+<p>Sono, punto per punto, le tre giustificazioni d'emergenza canoniche. E sono tutte ragioni serie: il punto non è fare spallucce davanti a bambini scomparsi o al terrorismo, ci mancherebbe. Il punto è che sono esattamente le ragioni che rendono più facile spalancare l'eccezione. Il divieto, quindi, non chiude una porta blindata: disegna già le uscite di sicurezza e lascia le chiavi in bacheca. E vale soltanto per le forze dell'ordine: soggetti privati e altri enti pubblici da quella norma non sono vincolati.</p>
+
+<p>Non è più necessario invocare l'emergenza a posteriori per giustificare l'eccezione. L'eccezione è già scritta dentro la regola, in attesa che qualcuno la attivi.</p>
+
+<h2>Chat Control: novantasei giorni di respiro</h2>
+
+<p>Se vuoi vedere il meccanismo al rallentatore, senza doverlo ricostruire vent'anni dopo, guarda Chat Control.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 5</div>
+  <div class="titolo">Chat Control: novantasei giorni senza base giuridica</div>
+  <div class="mount" data-g="g5"></div>
+  <figcaption>La linea vale 1 quando esiste una base giuridica per la scansione delle comunicazioni private, 0 quando non esiste. È scesa una volta sola, per novantasei giorni. I numeri sono i passaggi elencati qui sotto. Le date di questa ricostruzione vengono in gran parte da una fonte advocacy: sono il punto più fragile dell'articolo e vanno confermate su verbali primari.</figcaption>
+  <div class="src" data-src="g5"></div>
+</figure>
+
+<p>Luglio 2021, il Parlamento europeo approva la deroga volontaria: i fornitori possono scansionare i messaggi privati. Misura temporanea, con scadenza. Maggio 2022, la Commissione propone di renderla obbligatoria. Novembre 2023, il Parlamento adotta un mandato che respinge la scansione obbligatoria. Novembre 2025, anche il Consiglio toglie l'obbligo di rilevamento dal proprio mandato e la scansione lato client esce dal testo: il cricchetto gira indietro. Marzo 2026, il Parlamento respinge la seconda proroga del regolamento interinale. 4 aprile 2026, il regolamento scade, e per la prima volta la scansione delle comunicazioni private non ha più una base giuridica.</p>
+
+<p>Poi. 2 luglio 2026, il Consiglio ripresenta la stessa misura come proposta formalmente nuova. 7 luglio, il Parlamento la mette in procedura d'urgenza. 9 luglio, il tentativo di bloccarla fallisce. In vigore fino al 2028.</p>
+
+<p>Novantasei giorni. Tanto è durata la vittoria. E nessuno ha dovuto rivincere l'argomento nel merito: è bastata la procedura.</p>
+
+<p>La parte che dovrebbe far riflettere però è un'altra. La misura è tornata nonostante l'evidenza pubblica della sua inefficacia.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 6</div>
+  <div class="titolo">Quanto rumore produce la scansione automatica</div>
+  <div class="mount" data-g="g6"></div>
+  <figcaption>Tre fonti indipendenti, tre volte lo stesso ordine di grandezza: da quattro o cinque segnalazioni ne regge una. Sono cifre riportate da una fonte advocacy che le attribuisce a fonti ufficiali: sono le meno solide dell'articolo e vanno verificate all'origine.</figcaption>
+  <div class="src" data-src="g6"></div>
+</figure>
+
+<p>La polizia federale svizzera ha riferito che circa l'80 per cento delle segnalazioni generate automaticamente si rivela infondato. In Irlanda solo il 20 per cento di quelle ricevute nel 2020 è stato confermato. L'allora commissaria europea agli Affari interni ha dichiarato che il 75 per cento delle chat segnalate, circa 300.000 all'anno in Europa, non è azionabile. Tre fonti diverse, lo stesso ordine di grandezza: da quattro o cinque segnalazioni ne regge una.</p>
+
+<p>Il criterio di valutazione, evidentemente, non è più «funziona?». È «quale emergenza la giustifica?».</p>
+
+<h2>Italia: la moratoria scade, il volto torna di moda</h2>
+
+<p>Il caso più limpido è aperto in questi giorni, e comincia con una tutela che nessuno ha abrogato.</p>
+
+<p>Nel 2021 l'Italia introdusse una moratoria sui sistemi di riconoscimento facciale nei luoghi pubblici e aperti al pubblico. Fu prorogata fino al 31 dicembre 2025. Poi è scaduta. Senza dibattito, senza sostituzione, senza che nessun parlamentare dovesse votare per toglierla di mezzo. Non è stata abolita: è semplicemente finita.</p>
+
+<p>Al suo posto è arrivato lo schema di decreto legislativo di attuazione dell'AI Act, approvato dal Consiglio dei ministri il 10 giugno 2026. L'articolo 10 disciplina il riconoscimento facciale a posteriori su materiale video e fotografico per identificare sospettati, e prevede la raccolta dei volti di chi accede a luoghi ed eventi pubblici in presenza di «esigenze di ordine pubblico». I perimetri indicati sono piazze, stazioni, stadi e percorsi dei cortei. Conservazione dei dati biometrici: sette giorni. Registri delle operazioni: cinque anni.</p>
+
+<p>La beffa è quasi elegante. Un regolamento europeo nato anche per mettere limiti alla sorveglianza biometrica può diventare, nell'attuazione nazionale, il binario giuridico per farla passare. E non serve nemmeno un'emergenza dichiarata: bastano le esigenze di ordine pubblico.</p>
+
+<p>Non è però una partita chiusa, e va detto perché la storia non è finita. Il 14 luglio il Garante per la protezione dei dati personali ha dato parere favorevole ma con rilievi pesanti, giudicando non coerente con l'AI Act la raccolta preventiva e generalizzata dei dati biometrici di chi accede a luoghi o eventi pubblici. Il 30 luglio la Commissione europea ha ricordato pubblicamente che il riconoscimento facciale negli spazi accessibili al pubblico è una pratica vietata, dichiarando di non voler consentire «un controllo pubblico e generalizzato sugli spostamenti quotidiani delle persone». Il voto in commissione alla Camera è stato rinviato, il governo ha replicato che l'Italia continuerà a rispettare le norme europee, il termine per l'adozione definitiva è il 10 ottobre. Bene: vuol dire che i freni esistono. Resta da vedere se qualcuno li usa davvero.</p>
+
+<p>Intanto in Ungheria la polizia usa il riconoscimento facciale nei cortei dal 15 aprile 2025. Non è uno scenario immaginario: è il presente di uno Stato membro.</p>
+
+<h2>Non è tutto già scritto, per fortuna</h2>
+
+<p>Raccontarla come una marcia inarrestabile verso il controllo totale sarebbe propaganda al contrario. Alcune cose sono state fermate davvero, e sono istruttive proprio perché mostrano dove il meccanismo si inceppa.</p>
+
+<p>La Corte Suprema israeliana ha dichiarato illegittimo l'uso dello Shin Bet, il servizio di sicurezza interna, per tracciare i contagiati, parlando esplicitamente di «china scivolosa» nell'impiego di «strumenti straordinari e dannosi» contro cittadini innocenti; il programma è stato chiuso nel marzo 2021. Il certificato COVID europeo è scaduto alla data prevista e non è stato rinnovato. In Germania i Länder hanno disdetto in blocco i contratti con l'app Luca. Nel Regno Unito il piano sull'identità digitale obbligatoria è stato annacquato, e il governo ha confermato che non servirà esibirla per ottenere un lavoro. Un decreto francese vieta ai sistemi di videosorveglianza di trattare dati biometrici, e la Corte costituzionale tedesca ha bocciato nel 2023 le norme sull'analisi automatizzata dei dati di polizia.</p>
+
+<p>Quindi sì: si può fermare la singola misura, soprattutto quando ha un nome chiaro, una data e una faccia riconoscibile.</p>
+
+<p>Quello che è più difficile da vedere, e quindi da smontare, è l'infrastruttura. Il certificato può morire; il modello, credenziale, verifica, accesso condizionato, può restare, cambiare nome e rientrare dalla finestra. Il portafoglio digitale che ne eredita la logica è obbligatorio per tutti gli Stati membri entro fine 2026.</p>
+
+<p>Va detta anche la cosa che sta dall'altra parte del banco, perché è vera. Molte di queste norme hanno tutele tecniche serie. La verifica dell'età italiana è costruita sulla doppia anonimizzazione: chi rilascia la prova dell'età non sa per quale sito la rilascia, e il sito non riceve dati identificativi. Il portafoglio europeo è progettato per rivelare un attributo alla volta, non tutta la tua vita. Non è giusto far finta che siano dettagli inutili.</p>
+
+<p>Però anche la migliore garanzia vive dentro una legge, e le leggi si riscrivono più facilmente di un'infrastruttura: lo stesso legislatore che le ha concesse può modificarle senza toccare un bullone di quello che sta sotto. E se per fare una cosa ordinaria devi identificarti, il cambio di abitudine è già avvenuto. Il resto sono impostazioni.</p>
+
+<h2>Il punto, alla fine</h2>
+
+<p>Non siamo necessariamente più assuefatti di vent'anni fa. I dati britannici, per esempio, dicono una cosa un po' più sottile: il consenso al sistema è cresciuto, la fiducia nel suo uso no.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 7</div>
+  <div class="titolo">Rispetto al 2004 i britannici sono più diffidenti, non meno</div>
+  <div class="mount" data-g="g8"></div>
+  <figcaption>Chi porterebbe sempre con sé il documento e chi teme per le libertà civili, nel 2004 e oggi. Oggi il 57 per cento sostiene un sistema nazionale di carte d'identità, ma citare quel numero senza questi due sarebbe cherry picking.</figcaption>
+  <div class="src" data-src="g8"></div>
+</figure>
+
+<p>E soprattutto il consenso si sgretola appena la misura diventa concreta.</p>
+
+<figure class="fig wide">
+  <div class="label">grafico 8</div>
+  <div class="titolo">Il consenso crolla appena la misura diventa concreta</div>
+  <div class="mount" data-g="g7"></div>
+  <figcaption>Stessa domanda, stesso campione, stessa rilevazione: cambia solo che alla proposta viene attaccato il suo costo. Diciannove punti se ne vanno appena si nomina il documento d'identità.</figcaption>
+  <div class="src" data-src="g7"></div>
+</figure>
+
+<p>Non è assuefazione. È qualcosa di più preciso: si approva il principio e si scopre il costo dopo. Ed è esattamente così che queste misure passano. Nessuno chiede mai «sei disposto a caricare un documento d'identità per aprire un social?». Si chiede «vuoi proteggere i bambini?». La domanda è giusta. È il pacchetto nascosto sotto che va guardato bene.</p>
+
+<p>Il meccanismo, in soldoni, è questo. Arriva l'emergenza, o anche solo la sua dichiarazione, e per un po' il diritto a non essere costretti pesa meno. In quella finestra si costruiscono regole e strumenti. Poi l'emergenza passa, le persone tornano a ragionare normalmente, ma la struttura resta lì. Alla crisi successiva non devi convincere nessuno da capo: devi solo dare alla macchina una ragione nuova per accendersi. Bambini scomparsi. Terrorismo. Immigrazione irregolare. Ordine pubblico. Sono ragioni pesanti, mica sciocchezze. È proprio per questo che funzionano così bene.</p>
+
+<p>Non serve nessun complotto perché questa cosa giri. Basta la differenza fra i tempi di una legge e i tempi di un'opinione.</p>
+
+<p>Dopo l'11 settembre lo Stato ha guadagnato più diritto di guardare. Dopo il green pass noi abbiamo imparato a mostrarci. E la cosa davvero comoda, per chi costruisce questi sistemi, è che la seconda volta non deve più convincerci: la porta è già lì.</p>
+
+<blockquote class="pull">L'emergenza non cambia le leggi. Le leggi cambiano mentre l'emergenza distrae.</blockquote>
+
+<div class="caveat">
+  <div class="label">Nota sul metodo</div>
+  <p>I numeri degli otto grafici stanno tutti in un file solo, <code>fonti.csv</code>, una riga per valore con fonte, URL e livello di affidabilità: A fonte primaria, B secondaria affidabile, C advocacy o stampa da ricontrollare. Lo script <code>build_data.py</code> valida il CSV, lo trasforma nel JSON che alimenta i grafici e lo riscrive dentro questa pagina. Non scarica niente e non ha timestamp: rilanciarlo due volte produce byte identici, quindi un diff sporco vuol dire che sono cambiati i dati e non l'orologio. Come al solito metto tutto, dati e script, così potete rifare i conti da soli: <a href="https://github.com/Pinperepette/signal.pirate/tree/main/scripts/l-eccezione-e-gia-nella-regola" target="_blank" rel="noopener">dataset e codice qui</a>.</p>
+</div>
+
+<div class="apparatus">
+
+  <h3>Note sui dati, e su quanto sono solidi</h3>
+  <ul>
+    <li><strong>Chat Control, grafici 5 e 6.</strong> Sono gli unici numeri dell'articolo che non vengono da una fonte primaria. La ricostruzione delle date del 2026 e le percentuali sulle segnalazioni infondate vengono in gran parte da Patrick Breyer, ex europarlamentare e parte in causa nella vicenda. Il quadro d'insieme coincide con quanto ha riportato la stampa specializzata, ma i singoli passaggi non sono stati confermati sui verbali di Consiglio e Parlamento: per questo nel file delle fonti sono marcati C e sotto il grafico compaiono in rosso.</li>
+    <li><strong>Il decreto italiano non è legge.</strong> Alla data di pubblicazione è uno schema: il voto in commissione è stato rinviato, la Commissione europea ha espresso critiche, il governo dichiara di voler rispettare l'AI Act. Chi legge «l'Italia ha legalizzato il riconoscimento facciale nei cortei» sta leggendo una cosa che non ho scritto, perché non è vera. Il termine per l'adozione definitiva è il 10 ottobre 2026.</li>
+    <li><strong>Lo studio australiano è uno studio solo.</strong> Un paese, un campione, nessuna replica. E i valori sono piccoli in assoluto: da 2,4 a 0,3 per cento è un rapporto fra quantità già modeste. Vuol dire che il peso dell'autonomia era basso ed è sparito, non che gli australiani abbiano perso l'87 per cento della loro libertà. Se lo studio venisse smontato, cade l'apertura dell'articolo e non il resto.</li>
+    <li><strong>Il grafico 2 ha una curva interpolata.</strong> La serie delle leggi antiterrorismo ha due soli punti documentati, zero nel 2001 e 144 nel 2012. Il tratto fra i due è una linea tirata, non un conteggio annuale, e il tratto piatto dopo il 2012 segna la fine dei dati di Human Rights Watch, non la fine delle leggi.</li>
+    <li><strong>Cosa manca.</strong> Una voce italiana raccolta di persona, Garante o giurista o un parlamentare della commissione che ha rinviato il voto: l'articolo è tutto documentale. E il testo dell'articolo 10 dello schema di decreto letto in Gazzetta invece che attraverso la stampa.</li>
+  </ul>
+
+</div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <div id="tt"></div>
+
+  <script src="../js/main.js"></script>
+  <script>
+(function(){
+/* DATI:INIZIO (generato da dati-eccezione/build_data.py, non modificare a mano) */
+const DATI = {"g1": {"id": "g1", "tipo": "dumbbell", "titolo": "Il peso dell'autonomia personale prima e dopo la dichiarazione dell'OMS", "assi": {"x": "importanza relativa attribuita all'attributo (%)"}, "affidabilita": ["A"], "punti": [{"label": "Autonomia personale", "serie": "prima della dichiarazione OMS", "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/", "affidabilita": "A", "x": "2019-12", "y": 2.4, "unita": "importanza relativa (%)", "nota": "Onda pre: 25 nov 2019 - 10 gen 2020, n=793"}, {"label": "Autonomia personale", "serie": "quattro settimane dopo", "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/", "affidabilita": "A", "x": "2020-02", "y": 0.3, "unita": "importanza relativa (%)", "nota": "Onda post: 4 - 27 feb 2020, n=1215"}, {"label": "Privacy dei dati", "serie": "prima della dichiarazione OMS", "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/", "affidabilita": "A", "x": "2019-12", "y": 8.3, "unita": "importanza relativa (%)", "nota": "Attributo di controllo: tiene"}, {"label": "Privacy dei dati", "serie": "quattro settimane dopo", "fonte": "Changes in public preferences for technologically enhanced surveillance following the COVID-19 pandemic: a discrete choice experiment", "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7677347/", "affidabilita": "A", "x": "2020-02", "y": 7.4, "unita": "importanza relativa (%)", "nota": "Attributo di controllo: tiene"}]}, "g2": {"id": "g2", "tipo": "forbice", "titolo": "Le opinioni tornano indietro, le leggi no", "assi": {"sx": "quota di americani che ritiene necessario rinunciare a liberta' civili (%)", "dx": "paesi con leggi antiterrorismo nuove o riviste dal settembre 2001"}, "affidabilita": ["A"], "punti": [{"label": "Necessario rinunciare a libertà civili", "serie": "pew", "fonte": "Pew Research Center, Balancing Act: National Security and Civil Liberties in Post-9/11 Era", "url": "https://www.pewresearch.org/short-reads/2013/06/07/balancing-act-national-security-and-civil-liberties-in-post-911-era/", "affidabilita": "A", "x": "2001", "y": 55.0, "unita": "%", "nota": "Rilevazione dopo gli attentati e prima del Patriot Act"}, {"label": "Necessario rinunciare a libertà civili", "serie": "pew", "fonte": "Pew Research Center, Balancing Act: National Security and Civil Liberties in Post-9/11 Era", "url": "https://www.pewresearch.org/short-reads/2013/06/07/balancing-act-national-security-and-civil-liberties-in-post-911-era/", "affidabilita": "A", "x": "2011", "y": 40.0, "unita": "%", "nota": "Maggioranza ribaltata: 54% dice non necessario"}, {"label": "Necessario rinunciare a libertà civili", "serie": "pew", "fonte": "Pew Research Center, Balancing Act: National Security and Civil Liberties in Post-9/11 Era", "url": "https://www.pewresearch.org/short-reads/2013/06/07/balancing-act-national-security-and-civil-liberties-in-post-911-era/", "affidabilita": "A", "x": "2013", "y": 43.0, "unita": "%", "nota": "Rilevazione post Snowden"}, {"label": "Paesi con leggi antiterrorismo nuove o riviste", "serie": "leggi", "fonte": "Human Rights Watch, In the Name of Security (29 giugno 2012)", "url": "https://www.hrw.org/report/2012/06/29/name-security/counterterrorism-laws-worldwide-september-11", "affidabilita": "A", "x": "2001", "y": 0.0, "unita": "paesi", "nota": "Punto di partenza per costruzione: il conteggio HRW parte dal settembre 2001"}, {"label": "Paesi con leggi antiterrorismo nuove o riviste", "serie": "leggi", "fonte": "Human Rights Watch, In the Name of Security (29 giugno 2012)", "url": "https://www.hrw.org/report/2012/06/29/name-security/counterterrorism-laws-worldwide-september-11", "affidabilita": "A", "x": "2012", "y": 144.0, "unita": "paesi", "nota": "144 paesi; 130 leggi esaminate nel dettaglio, tutte con almeno una disposizione che apre ad abusi"}, {"label": "Risoluzione ONU 1373", "serie": "evento", "fonte": "Consiglio di Sicurezza ONU, Risoluzione 1373 (28 settembre 2001)", "url": "https://unscr.com/en/resolutions/1373/", "affidabilita": "A", "x": "2001", "nota": "Unico caso in cui il Consiglio impone a tutti gli Stati di modificare la legislazione nazionale"}, {"label": "Section 702 rinnovata", "serie": "evento", "fonte": "Congressional Research Service, FISA Section 702 and the 2024 RISAA", "url": "https://www.congress.gov/crs-product/R48592", "affidabilita": "A", "x": "2012", "nota": "Primo rinnovo della clausola di scadenza"}, {"label": "Section 702 rinnovata", "serie": "evento", "fonte": "Congressional Research Service, FISA Section 702 and the 2024 RISAA", "url": "https://www.congress.gov/crs-product/R48592", "affidabilita": "A", "x": "2018", "nota": "Secondo rinnovo"}, {"label": "Section 702 rinnovata e ampliata", "serie": "evento", "fonte": "Congressional Research Service, FISA Section 702 and the 2024 RISAA", "url": "https://www.congress.gov/crs-product/R48592", "affidabilita": "A", "x": "2024", "nota": "RISAA 20 aprile 2024: allarga la definizione di fornitore di servizi. Nuova scadenza 20 aprile 2026"}]}, "g3": {"id": "g3", "tipo": "filiera", "titolo": "Cambiano le giustificazioni, non l'architettura", "assi": {}, "affidabilita": ["A", "B"], "punti": [{"label": "EU Digital COVID Certificate operativo", "serie": "pandemia", "fonte": "Commissione europea, EU Digital COVID Certificate", "url": "https://commission.europa.eu/strategy-and-policy/coronavirus-response/safe-covid-19-vaccines-europeans/eu-digital-covid-certificate_en", "affidabilita": "A", "x": "2021-07", "nota": "Oltre 2,3 miliardi di certificati emessi. Regolamento in vigore dal 1 luglio 2021 al 30 giugno 2023"}, {"label": "Proposta eIDAS 2.0 e portafoglio digitale europeo", "serie": "mercato unico", "fonte": "EU Digital Identity Wallet", "url": "https://en.wikipedia.org/wiki/EU_Digital_Identity_Wallet", "affidabilita": "B", "x": "2021-06", "nota": "Il quadro eIDAS risale al 2014: l'agenda dell'identità digitale precede il COVID"}, {"label": "Reg. 2022/2371: la Commissione può dichiarare l'emergenza sanitaria UE", "serie": "preparazione", "fonte": "Regolamento (UE) 2022/2371", "url": "https://eur-lex.europa.eu/eli/reg/2022/2371/oj/eng", "affidabilita": "A", "x": "2022-11", "nota": "Non è una misura d'emergenza: è la normalizzazione della capacità di dichiararla"}, {"label": "eIDAS 2.0 approvato: wallet obbligatorio per ogni Stato entro fine 2026", "serie": "semplificazione", "fonte": "EU Digital Identity Wallet", "url": "https://en.wikipedia.org/wiki/EU_Digital_Identity_Wallet", "affidabilita": "A", "x": "2024-02", "nota": "Obbligo di offerta in capo agli Stati membri"}, {"label": "Emendamenti al Regolamento Sanitario Internazionale OMS", "serie": "preparazione", "fonte": "Think Global Health, New amendments to the International Health Regulations", "url": "https://www.thinkglobalhealth.org/article/new-amendments-international-health-regulations", "affidabilita": "A", "x": "2024-06", "nota": "In vigore da settembre 2025. Creano la categoria pandemic emergency"}, {"label": "IMERA adottato (Reg. UE 2024/2747)", "serie": "qualsiasi crisi", "fonte": "Consiglio UE, Internal Market Emergency and Resilience Act", "url": "https://www.consilium.europa.eu/en/policies/internal-market-emergency-and-resilience-act/", "affidabilita": "A", "x": "2024-11", "nota": "Adottato l'8 novembre 2024"}, {"label": "IT-Wallet attivo in Italia", "serie": "digitalizzazione", "fonte": "ForumPA, IT-Wallet", "url": "https://www.forumpa.it/pa-digitale/it-wallet-che-cose-e-come-funzionera-il-nuovo-portafoglio-di-identita-digitale/", "affidabilita": "B", "x": "2024-12", "nota": "A febbraio 2025 oltre 7 milioni di documenti attivati da oltre 4 milioni di cittadini"}, {"label": "AGCOM delibera 96/25/CONS: verifica dell'età", "serie": "tutela dei minori", "fonte": "Portolano Cavallo, AGCOM adopts new age verification mechanisms", "url": "https://portolano.it/en/newsletter/portolano-cavallo-inform-digital-ip/agcom-adopts-new-age-verification-mechanisms-websites-vsps-disseminating-adult-content", "affidabilita": "B", "x": "2025-04", "nota": "Termine di adeguamento 12 novembre 2025, sanzioni fino a 250.000 euro"}, {"label": "Accordo OMS sulle pandemie", "serie": "preparazione", "fonte": "Think Global Health", "url": "https://www.thinkglobalhealth.org/article/new-amendments-international-health-regulations", "affidabilita": "A", "x": "2025-05", "nota": "Adottato dalla 78a Assemblea Mondiale della Sanità"}, {"label": "UK Online Safety Act: verifica dell'età obbligatoria", "serie": "tutela dei minori", "fonte": "Online age verification in the United Kingdom", "url": "https://en.wikipedia.org/wiki/Online_age_verification_in_the_United_Kingdom", "affidabilita": "B", "x": "2025-07", "nota": "In vigore dal 25 luglio 2025. A febbraio 2026 Ofcom ha aperto oltre 90 istruttorie e comminato 6 sanzioni"}, {"label": "UK: identità digitale obbligatoria annunciata", "serie": "immigrazione", "fonte": "LSE EUROPP, BritCard: the UK digital ID scheme", "url": "https://blogs.lse.ac.uk/europpblog/2025/10/09/britcard-uk-digital-id-scheme-eu-mistakes-identity-wallet/", "affidabilita": "B", "x": "2025-09", "nota": "Poi annacquato: il governo ha confermato che non sara obbligatorio esibirlo per ottenere un lavoro"}, {"label": "IMERA entra in applicazione", "serie": "qualsiasi crisi", "fonte": "Consiglio UE, Internal Market Emergency and Resilience Act", "url": "https://www.consilium.europa.eu/en/policies/internal-market-emergency-and-resilience-act/", "affidabilita": "A", "x": "2026-05", "nota": "Ambito: catastrofi naturali, emergenze sanitarie, shock economici, questioni di sicurezza"}]}, "g4": {"id": "g4", "tipo": "stack", "titolo": "Lo stack biometrico europeo: ogni strato resta", "assi": {}, "affidabilita": ["A"], "punti": [{"label": "Interoperabilità (Reg. 2019/817 e 2019/818)", "serie": "stack", "fonte": "Regolamento (UE) 2019/818", "url": "https://legislation.gov.uk/eur/2019/818/contents?view=plain", "affidabilita": "A", "x": "2019-05", "nota": "Common Identity Repository, European Search Portal e matching biometrico condiviso fra EES, VIS, ETIAS, Eurodac, SIS ed ECRIS-TCN"}, {"label": "Prüm II (Reg. UE 2024/982)", "serie": "stack", "fonte": "Regolamento (UE) 2024/982", "url": "https://eur-lex.europa.eu/eli/reg/2024/982/oj/eng", "affidabilita": "A", "x": "2024-04", "nota": "Aggiunge immagini facciali e schedari di polizia allo scambio automatico transfrontaliero. Prima: solo DNA, impronte, targhe"}, {"label": "AI Act: divieti in vigore (Reg. UE 2024/1689)", "serie": "stack", "fonte": "AI Act, articolo 5", "url": "https://artificialintelligenceact.eu/article/5/", "affidabilita": "A", "x": "2025-02", "nota": "Il divieto di identificazione biometrica remota in tempo reale vale solo per le forze dell'ordine e ha tre eccezioni"}, {"label": "ProtectEU: roadmap sull'accesso ai dati cifrati", "serie": "stack", "fonte": "Commissione europea, lawful access to data", "url": "https://home-affairs.ec.europa.eu/policies/internal-security/lawful-access-data/encryption_en", "affidabilita": "A", "x": "2025-06", "nota": "Capacità di decrittazione di nuova generazione per Europol entro il 2030"}, {"label": "Entry Exit System operativo", "serie": "stack", "fonte": "Consiglio UE, avvio EES 12 ottobre 2025", "url": "https://www.consilium.europa.eu/en/press/press-releases/2025/10/11/with-start-of-operation-of-new-ees-border-control-system-the-eu-will-strengthen-border-security-and-increase-efficiency-for-travellers/", "affidabilita": "A", "x": "2025-10", "nota": "Volto e impronte di ogni cittadino non europeo a ogni attraversamento della frontiera esterna, 29 paesi. A pieno regime dal 10 aprile 2026"}, {"label": "Eurodac rifuso (Reg. UE 2024/1358)", "serie": "stack", "fonte": "Parlamento europeo, Legislative Train: recast Eurodac", "url": "https://www.europarl.europa.eu/legislative-train/spotlight-JD22/file-jd-recast-eurodac-regulation", "affidabilita": "A", "x": "2026-06", "nota": "Aggiunge immagini facciali. Abbassa l'età di raccolta biometrica da 14 a 6 anni. Accesso ampliato alle forze dell'ordine"}]}, "g5": {"id": "g5", "tipo": "gradino", "titolo": "Chat Control: novantasei giorni senza base giuridica", "assi": {"x": "base giuridica per la scansione delle comunicazioni private"}, "affidabilita": ["C"], "punti": [{"label": "Deroga volontaria approvata dal Parlamento europeo", "serie": "stato", "fonte": "Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "x": "2021-07-06", "y": 1.0, "unita": "base giuridica attiva", "nota": "Chat Control 1.0: i fornitori possono scansionare le comunicazioni. Misura temporanea con scadenza"}, {"label": "Il regolamento interinale scade", "serie": "stato", "fonte": "Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "x": "2026-04-04", "y": 0.0, "unita": "base giuridica attiva", "nota": "Per la prima volta la scansione delle comunicazioni private non ha base giuridica"}, {"label": "Il tentativo di bloccare la riproposizione fallisce", "serie": "stato", "fonte": "The Register, MEPs fail to prevent Chat Control revival (9 luglio 2026)", "url": "https://www.theregister.com/security/2026/07/09/meps_fail_to_prevent_chat_control_snoopfest_revival/", "affidabilita": "C", "x": "2026-07-09", "y": 1.0, "unita": "base giuridica attiva", "nota": "Chat Control 1.0 torna in vigore fino al 2028"}, {"label": "La Commissione propone la scansione obbligatoria", "serie": "evento", "fonte": "Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "x": "2022-05-11", "nota": "Chat Control 2.0: ordini di rilevamento"}, {"label": "Il Parlamento respinge la scansione obbligatoria", "serie": "evento", "fonte": "Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "x": "2023-11", "nota": "Mandato negoziale del Parlamento europeo"}, {"label": "Il Consiglio rimuove l'obbligo di rilevamento", "serie": "evento", "fonte": "Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "x": "2025-11", "nota": "La scansione lato client esce dal testo"}, {"label": "Il Consiglio ripresenta la misura come proposta nuova", "serie": "evento", "fonte": "Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "x": "2026-07-02", "nota": "Formalmente nuova: non serve rivincere l'argomento nel merito"}, {"label": "Il Parlamento la mette in procedura d'urgenza", "serie": "evento", "fonte": "Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "x": "2026-07-07", "nota": "Due giorni prima del voto"}]}, "g6": {"id": "g6", "tipo": "barre", "titolo": "Quanto rumore produce la scansione automatica", "assi": {"x": "quota di segnalazioni che non regge (%)"}, "affidabilita": ["C"], "punti": [{"label": "Segnalazioni automatiche infondate (Svizzera)", "serie": "falsi", "fonte": "Polizia federale svizzera, citata in Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "y": 80.0, "unita": "%", "nota": "Cifra da verificare su fonte primaria"}, {"label": "Segnalazioni NCMEC non confermate nel 2020 (Irlanda)", "serie": "falsi", "fonte": "Dato irlandese citato in Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "y": 80.0, "unita": "%", "nota": "Solo il 20% delle segnalazioni ricevute è stato confermato"}, {"label": "Chat segnalate non azionabili (Commissione UE)", "serie": "falsi", "fonte": "Ylva Johansson, allora commissaria agli Affari interni, citata in Patrick Breyer, Chat Control", "url": "https://www.patrick-breyer.de/en/posts/chat-control/", "affidabilita": "C", "y": 75.0, "unita": "%", "nota": "Su circa 300.000 chat segnalate all'anno in Europa"}]}, "g7": {"id": "g7", "tipo": "discesa", "titolo": "Il consenso si sgretola appena la misura diventa concreta", "assi": {"x": "favorevoli (%)"}, "affidabilita": ["A"], "punti": [{"label": "Vietare i social agli under 16", "serie": "discesa", "fonte": "Ipsos UK, 2 in 3 support social media ban for under-16s (rilevazione 19-22 giugno 2026, n=1082)", "url": "https://www.ipsos.com/en-uk/2-3-support-social-media-ban-under-16s-though-support-softens-if-it-requires-nationwide-id", "affidabilita": "A", "x": "1", "y": 69.0, "unita": "% favorevoli", "nota": "Il principio"}, {"label": "Se comporta caricare un documento per tutti", "serie": "discesa", "fonte": "Ipsos UK, 2 in 3 support social media ban for under-16s (rilevazione 19-22 giugno 2026, n=1082)", "url": "https://www.ipsos.com/en-uk/2-3-support-social-media-ban-under-16s-though-support-softens-if-it-requires-nationwide-id", "affidabilita": "A", "x": "2", "y": 50.0, "unita": "% favorevoli", "nota": "Il primo costo concreto"}, {"label": "Se implica vietare le VPN", "serie": "discesa", "fonte": "Ipsos UK, 2 in 3 support social media ban for under-16s (rilevazione 19-22 giugno 2026, n=1082)", "url": "https://www.ipsos.com/en-uk/2-3-support-social-media-ban-under-16s-though-support-softens-if-it-requires-nationwide-id", "affidabilita": "A", "x": "3", "y": 48.0, "unita": "% favorevoli", "nota": "Il secondo costo concreto"}]}, "g8": {"id": "g8", "tipo": "confronto", "titolo": "Rispetto al 2004 i britannici sono piu' diffidenti, non meno", "assi": {"x": "quota di intervistati (%)"}, "affidabilita": ["A"], "punti": [{"label": "Porterebbe sempre con sé il documento", "serie": "2004", "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)", "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and", "affidabilita": "A", "x": "2004", "y": 83.0, "unita": "%", "nota": "Picco post 11 settembre"}, {"label": "Porterebbe sempre con sé il documento", "serie": "2025", "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)", "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and", "affidabilita": "A", "x": "2025", "y": 58.0, "unita": "%", "nota": "Meno disponibilità di vent'anni fa"}, {"label": "Preoccupato per le libertà civili", "serie": "2004", "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)", "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and", "affidabilita": "A", "x": "2004", "y": 24.0, "unita": "%", "nota": "Picco post 11 settembre"}, {"label": "Preoccupato per le libertà civili", "serie": "2025", "fonte": "Ipsos UK, 57% of Britons support national ID card scheme (rilevazione 18-21 luglio 2025, n=1116)", "url": "https://www.ipsos.com/en-uk/57-britons-support-national-id-card-scheme-have-significant-concerns-over-data-security-and", "affidabilita": "A", "x": "2025", "y": 39.0, "unita": "%", "nota": "Più diffidenza di vent'anni fa"}]}};
+/* DATI:FINE */
+
+const NS = "http://www.w3.org/2000/svg";
+const TT = document.getElementById("tt");
+const PALETTE = ["#b1452c", "#3f6b91", "#4e7a68", "#8a6d3b", "#7a5b96", "#a05a7a", "#5f7a3f", "#8a5a2b"];
+
+function el(nome, attr) {
+  const x = document.createElementNS(NS, nome);
+  for (const k in attr) x.setAttribute(k, attr[k]);
+  return x;
+}
+function testo(nodo, s) { nodo.textContent = s; return nodo; }
+function fmt(v) { return (Math.round(v * 10) / 10).toLocaleString("it-IT"); }
+
+function suggerimento(html, e) {
+  TT.innerHTML = html;
+  TT.style.opacity = 1;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + 280 > innerWidth) x = e.clientX - 280;
+  if (y + 120 > innerHeight) y = e.clientY - 120;
+  TT.style.left = x + "px";
+  TT.style.top = y + "px";
+}
+function viaSuggerimento() { TT.style.opacity = 0; }
+
+function aggancia(nodo, html) {
+  nodo.addEventListener("mousemove", e => suggerimento(html, e));
+  nodo.addEventListener("mouseleave", viaSuggerimento);
+}
+function schedaPunto(p) {
+  let s = "<b>" + p.label + "</b>";
+  if (p.y !== undefined) s += "<br>" + fmt(p.y) + (p.unita ? " " + p.unita : "");
+  if (p.nota) s += "<br>" + p.nota;
+  s += "<br><i>" + p.fonte + " [" + p.affidabilita + "]</i>";
+  return s;
+}
+
+/* una data "2026-04-04" diventa un anno frazionario, per poterla mettere su un asse */
+function anno(s) {
+  const p = String(s).split("-").map(Number);
+  const m = p.length > 1 ? p[1] : 1;
+  const g = p.length > 2 ? p[2] : 1;
+  return p[0] + ((m - 1) + (g - 1) / 30.5) / 12;
+}
+const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+              "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+function dataEstesa(s) {
+  const p = String(s).split("-");
+  if (p.length === 1) return p[0];
+  if (p.length === 2) return MESI[Number(p[1]) - 1] + " " + p[0];
+  return Number(p[2]) + " " + MESI[Number(p[1]) - 1] + " " + p[0];
+}
+function tacche(min, max, n) {
+  const passo0 = (max - min) / n;
+  const mag = Math.pow(10, Math.floor(Math.log10(passo0)));
+  const norm = passo0 / mag;
+  let passo = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+  const t = [];
+  for (let v = Math.ceil(min / passo) * passo; v <= max + 1e-9; v += passo) t.push(Math.round(v * 1e6) / 1e6);
+  return t;
+}
+
+/* ---------- grafico 1 e 8: dumbbell ---------- */
+function dumbbell(c, W) {
+  const gruppi = [];
+  c.punti.forEach(p => {
+    let g = gruppi.find(x => x.label === p.label);
+    if (!g) { g = { label: p.label, punti: [] }; gruppi.push(g); }
+    g.punti.push(p);
+  });
+  const serie = [];
+  c.punti.forEach(p => { if (!serie.includes(p.serie)) serie.push(p.serie); });
+
+  const rowh = 74, m = { t: 40, r: 58, b: 34, l: 14 };
+  const H = m.t + m.b + rowh * gruppi.length;
+  const massimo = Math.max(...c.punti.map(p => p.y)) * 1.12;
+  const pw = W - m.l - m.r;
+  const X = v => m.l + pw * (v / massimo);
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+
+  tacche(0, massimo, 5).forEach(t => {
+    svg.appendChild(el("line", { class: "c-grid", x1: X(t), y1: m.t - 12, x2: X(t), y2: H - m.b }));
+    svg.appendChild(testo(el("text", { class: "c-tickx", x: X(t), y: H - m.b + 16, "text-anchor": "middle" }), fmt(t) + "%"));
+  });
+
+  gruppi.forEach((g, i) => {
+    const cy = m.t + rowh * i + rowh * 0.62;
+    svg.appendChild(testo(el("text", { class: "c-lab", x: m.l, y: cy - 26 }), g.label));
+    const a = g.punti[0], b = g.punti[g.punti.length - 1];
+    svg.appendChild(el("line", { class: "c-conn", x1: X(a.y), y1: cy, x2: X(b.y), y2: cy }));
+    /* l'etichetta va sempre dalla parte esterna del suo pallino, altrimenti quando
+       il valore scende (2,4 -> 0,3) il numero del "prima" finisce sopra il "dopo" */
+    const piuBasso = g.punti.reduce((k, p, j, v) => (p.y < v[k].y ? j : k), 0);
+    g.punti.forEach((p, j) => {
+      const cls = j === 0 ? "c-a" : "c-b";
+      const cerchio = el("circle", { class: cls, cx: X(p.y), cy: cy, r: j === 0 ? 6 : 7.5 });
+      svg.appendChild(cerchio);
+      aggancia(cerchio, schedaPunto(p));
+      const sinistra = j === piuBasso;
+      svg.appendChild(testo(el("text", {
+        class: "c-val", x: X(p.y) + (sinistra ? -14 : 14), y: cy + 4,
+        "text-anchor": sinistra ? "end" : "start"
+      }), fmt(p.y) + "%"));
+    });
+    const delta = b.y - a.y;
+    svg.appendChild(testo(el("text", { class: "c-sub", x: m.l, y: cy + 24 }),
+      (delta < 0 ? "perde " : "guadagna ") + fmt(Math.abs(delta)) + " punti"));
+  });
+
+  serie.forEach((s, i) => {
+    svg.appendChild(el("circle", { class: i === 0 ? "c-a" : "c-b", cx: m.l + 6, cy: 6 + i * 17, r: 5.5 }));
+    svg.appendChild(testo(el("text", { class: "c-sub", x: m.l + 18, y: 10 + i * 17 }), s));
+  });
+  return svg;
+}
+
+/* ---------- grafico 2: la forbice ---------- */
+function forbice(c, W) {
+  const pew = c.punti.filter(p => p.serie === "pew").sort((a, b) => anno(a.x) - anno(b.x));
+  const leggi = c.punti.filter(p => p.serie === "leggi").sort((a, b) => anno(a.x) - anno(b.x));
+  const eventi = c.punti.filter(p => p.serie === "evento").sort((a, b) => anno(a.x) - anno(b.x));
+
+  /* il margine inferiore deve reggere le etichette ruotate degli eventi:
+     se sta stretto, finiscono sopra la didascalia */
+  const H = 400, m = { t: 46, r: 56, b: 118, l: 66 };
+  const x0 = 2000.4, x1 = 2026.4;
+  const ymaxS = 60, ymaxD = 160;
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const X = v => m.l + pw * (anno(v) - x0) / (x1 - x0);
+  const YS = v => m.t + ph * (1 - v / ymaxS);
+  const YD = v => m.t + ph * (1 - v / ymaxD);
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+
+  [0, 15, 30, 45, 60].forEach(t => {
+    svg.appendChild(el("line", { class: "c-grid", x1: m.l, y1: YS(t), x2: W - m.r, y2: YS(t) }));
+    svg.appendChild(testo(el("text", { class: "c-tick", x: m.l - 8, y: YS(t) + 4, "text-anchor": "end" }), t + "%"));
+  });
+  [0, 40, 80, 120, 160].forEach(t => {
+    svg.appendChild(testo(el("text", { class: "c-tick", x: W - m.r + 8, y: YD(t) + 4 }), t));
+  });
+  for (let a = 2001; a <= 2026; a += 5) {
+    svg.appendChild(testo(el("text", { class: "c-tickx", x: X(a), y: H - m.b + 18, "text-anchor": "middle" }), a));
+  }
+  svg.appendChild(el("line", { class: "c-axis", x1: m.l, y1: H - m.b, x2: W - m.r, y2: H - m.b }));
+
+  /* leggi: due soli punti documentati, poi piatta */
+  const a0 = leggi[0], a1 = leggi[leggi.length - 1];
+  const area = el("path", {
+    class: "c-band2",
+    d: "M" + X(a0.x) + " " + YD(0) + " L" + X(a1.x) + " " + YD(a1.y) +
+       " L" + X(a1.x) + " " + YD(0) + " Z"
+  });
+  svg.appendChild(area);
+  svg.appendChild(el("path", {
+    class: "c-dash c-c", stroke: "currentColor",
+    d: "M" + X(a0.x) + " " + YD(a0.y) + " L" + X(a1.x) + " " + YD(a1.y)
+  }));
+  svg.appendChild(el("path", {
+    class: "c-dot c-c", stroke: "currentColor",
+    d: "M" + X(a1.x) + " " + YD(a1.y) + " L" + (W - m.r) + " " + YD(a1.y)
+  }));
+  leggi.forEach(p => {
+    const cerchio = el("circle", { class: "c-c", cx: X(p.x), cy: YD(p.y), r: 5 });
+    svg.appendChild(cerchio);
+    aggancia(cerchio, schedaPunto(p));
+  });
+  svg.appendChild(testo(el("text", { class: "c-val c-c", fill: "currentColor", x: X(a1.x) + 10, y: YD(a1.y) - 10 }), "144 paesi"));
+  svg.appendChild(testo(el("text", { class: "c-sub", x: X(a1.x) + 10, y: YD(a1.y) + 20 }), "il conteggio si ferma al 2012"));
+
+  /* pew */
+  let d = "";
+  pew.forEach((p, i) => { d += (i ? "L" : "M") + X(p.x) + " " + YS(p.y) + " "; });
+  svg.appendChild(el("path", { class: "c-line c-b", stroke: "currentColor", d: d }));
+  pew.forEach(p => {
+    const cerchio = el("circle", { class: "c-b", cx: X(p.x), cy: YS(p.y), r: 5.5 });
+    svg.appendChild(cerchio);
+    aggancia(cerchio, schedaPunto(p));
+    svg.appendChild(testo(el("text", { class: "c-val", x: X(p.x), y: YS(p.y) - 12, "text-anchor": "middle" }), p.y + "%"));
+  });
+
+  /* eventi istituzionali sotto l'asse */
+  eventi.forEach((p, i) => {
+    const x = X(p.x);
+    svg.appendChild(el("line", { class: "c-grid", x1: x, y1: H - m.b, x2: x, y2: H - m.b + 8 }));
+    const t = testo(el("text", {
+      class: "c-sub", x: x, y: H - m.b + 34, "text-anchor": "end",
+      transform: "rotate(-32 " + x + " " + (H - m.b + 34) + ")"
+    }), p.label);
+    svg.appendChild(t);
+    const hit = el("rect", { class: "hit", x: x - 12, y: H - m.b, width: 24, height: 30 });
+    aggancia(hit, schedaPunto(p));
+    svg.appendChild(hit);
+  });
+
+  const lg = el("g", {});
+  lg.appendChild(el("circle", { class: "c-b", cx: m.l + 6, cy: 14, r: 5.5 }));
+  lg.appendChild(testo(el("text", { class: "c-sub", x: m.l + 18, y: 18 }), "opinione: necessario rinunciare a libertà civili (asse sinistro)"));
+  lg.appendChild(el("circle", { class: "c-c", cx: m.l + 6, cy: 32, r: 5.5 }));
+  lg.appendChild(testo(el("text", { class: "c-sub", x: m.l + 18, y: 36 }), "leggi antiterrorismo nel mondo, cumulate (asse destro)"));
+  svg.appendChild(lg);
+  return svg;
+}
+
+/* ---------- grafico 3: la filiera ---------- */
+function filiera(c, mount) {
+  const cat = [];
+  c.punti.forEach(p => { if (!cat.includes(p.serie)) cat.push(p.serie); });
+  const box = document.createElement("div");
+  box.className = "fil";
+  c.punti.slice().sort((a, b) => anno(a.x) - anno(b.x)).forEach(p => {
+    const r = document.createElement("div");
+    r.className = "fil-r";
+    const mesi = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+    const pz = p.x.split("-");
+    const d = document.createElement("div");
+    d.className = "fil-d";
+    d.textContent = (pz[1] ? mesi[Number(pz[1]) - 1] + " " : "") + pz[0];
+    const t = document.createElement("div");
+    t.textContent = p.label;
+    const g = document.createElement("div");
+    g.className = "fil-g";
+    const s = document.createElement("span");
+    s.textContent = p.serie;
+    s.style.color = PALETTE[cat.indexOf(p.serie) % PALETTE.length];
+    g.appendChild(s);
+    r.appendChild(d); r.appendChild(t); r.appendChild(g);
+    if (p.nota) aggancia(r, schedaPunto(p));
+    box.appendChild(r);
+  });
+  mount.appendChild(box);
+}
+
+/* ---------- grafico 4: lo stack che non torna indietro ---------- */
+function stack(c, W) {
+  const punti = c.punti.slice().sort((a, b) => anno(a.x) - anno(b.x));
+  const rowh = 54, m = { t: 14, r: 14, b: 34, l: 14 };
+  const H = m.t + m.b + rowh * punti.length;
+  const x0 = 2019, x1 = 2030.4;
+  const pw = W - m.l - m.r;
+  const X = v => m.l + pw * (anno(v) - x0) / (x1 - x0);
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+
+  for (let a = 2019; a <= 2030; a += 1) {
+    svg.appendChild(el("line", { class: "c-grid", x1: X(a), y1: m.t, x2: X(a), y2: H - m.b }));
+    if (a % 2 === 1) svg.appendChild(testo(el("text", { class: "c-tickx", x: X(a), y: H - m.b + 18, "text-anchor": "middle" }), a));
+  }
+  punti.forEach((p, i) => {
+    const y = m.t + rowh * i;
+    const x = X(p.x);
+    const larghezza = Math.max(W - m.r - x, 4);
+    /* l'etichetta sta sopra la barra e non esce mai dal riquadro */
+    const lx = Math.max(m.l, Math.min(x, W - m.r - Math.min(p.label.length * 6.6, pw)));
+    svg.appendChild(testo(el("text", { class: "c-lab", x: lx, y: y + 16 }), p.label));
+    svg.appendChild(el("rect", { class: "c-bar", x: x, y: y + 24, width: larghezza, height: 16, rx: 2, opacity: 0.18 + 0.07 * (i % 3) }));
+    svg.appendChild(el("rect", { class: "c-bar", x: x, y: y + 24, width: 3, height: 16 }));
+    const hit = el("rect", { class: "hit", x: x, y: y + 6, width: larghezza, height: 36 });
+    aggancia(hit, schedaPunto(p));
+    svg.appendChild(hit);
+  });
+  return svg;
+}
+
+/* ---------- grafico 5: il gradino ---------- */
+function gradino(c, W) {
+  const stati = c.punti.filter(p => p.serie === "stato").sort((a, b) => anno(a.x) - anno(b.x));
+  const eventi = c.punti.filter(p => p.serie === "evento").sort((a, b) => anno(a.x) - anno(b.x));
+  const H = 260, m = { t: 58, r: 24, b: 52, l: 42 };
+  const x0 = 2021.3, x1 = 2028.4;
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const X = v => m.l + pw * (anno(v) - x0) / (x1 - x0);
+  const Y = v => m.t + ph * (1 - v);
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+
+  [0, 1].forEach(v => {
+    svg.appendChild(el("line", { class: "c-grid", x1: m.l, y1: Y(v), x2: W - m.r, y2: Y(v) }));
+    svg.appendChild(testo(el("text", { class: "c-tick", x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }), v));
+  });
+  for (let a = 2022; a <= 2028; a += 1) {
+    svg.appendChild(testo(el("text", { class: "c-tickx", x: X(a), y: H - m.b + 18, "text-anchor": "middle" }), a));
+  }
+
+  /* finestra senza base giuridica */
+  const giu = stati.find(p => p.y === 0);
+  const ripresa = stati.filter(p => p.y === 1)[1];
+  if (giu && ripresa) {
+    svg.appendChild(el("rect", { class: "c-band", x: X(giu.x), y: m.t - 10, width: X(ripresa.x) - X(giu.x), height: ph + 10 }));
+    /* la finestra è larga pochi pixel: l'etichetta sta a sinistra, a mezza altezza,
+       dove non incrocia né la linea né i pallini degli eventi */
+    svg.appendChild(testo(el("text", {
+      class: "c-val", x: X(giu.x) - 10, y: m.t + ph / 2 + 4, "text-anchor": "end"
+    }), "96 giorni"));
+  }
+
+  let d = "", ultimo = null;
+  stati.forEach((p, i) => {
+    if (i === 0) { d += "M" + X(p.x) + " " + Y(p.y) + " "; }
+    else { d += "L" + X(p.x) + " " + Y(ultimo.y) + " L" + X(p.x) + " " + Y(p.y) + " "; }
+    ultimo = p;
+  });
+  d += "L" + (W - m.r) + " " + Y(ultimo.y);
+  svg.appendChild(el("path", { class: "c-line c-b", stroke: "currentColor", d: d }));
+
+  stati.forEach(p => {
+    const cerchio = el("circle", { class: "c-b", cx: X(p.x), cy: Y(p.y), r: 5 });
+    svg.appendChild(cerchio);
+    aggancia(cerchio, schedaPunto(p));
+  });
+
+  /* due degli eventi distano cinque giorni su un asse di sette anni: se restano
+     sulla loro ascissa esatta i pallini finiscono uno sopra l'altro. Li distanzio
+     di quanto basta e lascio che sia la linea a indicare la data vera. */
+  let ultimaX = -Infinity;
+  eventi.forEach((p, i) => {
+    const x = X(p.x);
+    const cx = Math.max(x, ultimaX + 22);
+    ultimaX = cx;
+    const y = m.t - 34 + (i % 2) * 14;
+    svg.appendChild(el("line", { class: "c-grid", x1: x, y1: Y(1), x2: cx, y2: y + 8 }));
+    const cerchio = el("circle", { class: "c-a", cx: cx, cy: y, r: 8 });
+    svg.appendChild(cerchio);
+    svg.appendChild(testo(el("text", { class: "c-num", x: cx, y: y + 4, "text-anchor": "middle" }), i + 1));
+    aggancia(cerchio, schedaPunto(p));
+  });
+  svg.appendChild(testo(el("text", { class: "c-sub", x: m.l, y: H - 8 }), "1 = la scansione delle comunicazioni private ha una base giuridica, 0 = non ce l'ha"));
+  return svg;
+}
+
+/* ---------- grafico 6: barre ---------- */
+function barre(c, W) {
+  const punti = c.punti;
+  const rowh = 62, m = { t: 12, r: 58, b: 24, l: 16 };
+  const H = m.t + m.b + rowh * punti.length;
+  const pw = W - m.l - m.r;
+  const X = v => m.l + pw * (v / 100);
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+
+  [0, 25, 50, 75, 100].forEach(t => {
+    svg.appendChild(el("line", { class: "c-grid", x1: X(t), y1: m.t, x2: X(t), y2: H - m.b }));
+    svg.appendChild(testo(el("text", { class: "c-tickx", x: X(t), y: H - m.b + 16, "text-anchor": "middle" }), t + "%"));
+  });
+  punti.forEach((p, i) => {
+    const y = m.t + rowh * i;
+    svg.appendChild(testo(el("text", { class: "c-lab", x: m.l, y: y + 16 }), p.label));
+    svg.appendChild(el("rect", { class: "c-bar mut", x: m.l, y: y + 26, width: pw, height: 14, rx: 2 }));
+    const barra = el("rect", { class: "c-bar", x: m.l, y: y + 26, width: X(p.y) - m.l, height: 14, rx: 2 });
+    svg.appendChild(barra);
+    aggancia(barra, schedaPunto(p));
+    svg.appendChild(testo(el("text", { class: "c-val", x: X(p.y) + 10, y: y + 38 }), fmt(p.y) + "%"));
+  });
+  return svg;
+}
+
+/* ---------- grafico 7: la discesa ---------- */
+function discesa(c, W) {
+  const punti = c.punti.slice().sort((a, b) => Number(a.x) - Number(b.x));
+  const H = 300, m = { t: 40, r: 20, b: 92, l: 44 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const passo = pw / punti.length;
+  const larghezza = Math.min(passo * 0.5, 120);
+  const Y = v => m.t + ph * (1 - v / 80);
+  const svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img" });
+
+  [0, 20, 40, 60, 80].forEach(t => {
+    svg.appendChild(el("line", { class: "c-grid", x1: m.l, y1: Y(t), x2: W - m.r, y2: Y(t) }));
+    svg.appendChild(testo(el("text", { class: "c-tick", x: m.l - 8, y: Y(t) + 4, "text-anchor": "end" }), t + "%"));
+  });
+
+  punti.forEach((p, i) => {
+    const cx = m.l + passo * i + passo / 2;
+    const y = Y(p.y);
+    const barra = el("rect", { class: "c-bar", x: cx - larghezza / 2, y: y, width: larghezza, height: (H - m.b) - y, rx: 2 });
+    svg.appendChild(barra);
+    aggancia(barra, schedaPunto(p));
+    svg.appendChild(testo(el("text", { class: "c-val", x: cx, y: y - 10, "text-anchor": "middle" }), p.y + "%"));
+
+    /* etichetta su due righe */
+    const parole = p.label.split(" ");
+    let riga = "", righe = [];
+    parole.forEach(w => {
+      if ((riga + " " + w).trim().length > 22) { righe.push(riga.trim()); riga = w; }
+      else riga += " " + w;
+    });
+    righe.push(riga.trim());
+    righe.forEach((r, j) => {
+      svg.appendChild(testo(el("text", { class: "c-sub", x: cx, y: H - m.b + 20 + j * 14, "text-anchor": "middle" }), r));
+    });
+
+    if (i > 0) {
+      const prec = punti[i - 1];
+      const cxp = m.l + passo * (i - 1) + passo / 2;
+      svg.appendChild(el("path", {
+        class: "c-conn", "stroke-dasharray": "4 4",
+        d: "M" + (cxp + larghezza / 2) + " " + Y(prec.y) + " L" + (cx - larghezza / 2) + " " + Y(p.y)
+      }));
+      const delta = p.y - prec.y;
+      svg.appendChild(testo(el("text", {
+        class: "c-sub", x: (cxp + cx) / 2, y: (Y(prec.y) + Y(p.y)) / 2 - 8, "text-anchor": "middle"
+      }), Math.abs(delta) + (delta < 0 ? " punti in meno" : " punti in più")));
+    }
+  });
+  return svg;
+}
+
+/* ---------- fonti sotto ogni grafico ---------- */
+function fonti(c) {
+  const viste = [];
+  c.punti.forEach(p => {
+    if (!viste.some(v => v.url === p.url)) viste.push({ fonte: p.fonte, url: p.url, aff: p.affidabilita });
+  });
+  return viste.map(v =>
+    '<span class="badge' + (v.aff === "C" ? " c" : "") + '">' + v.aff + "</span>" +
+    '<a href="' + v.url + '" target="_blank" rel="noopener">' + v.fonte + "</a>"
+  ).join("<br>");
+}
+
+/* ---------- disegno ---------- */
+const RENDER = {
+  dumbbell: dumbbell, forbice: forbice, stack: stack,
+  gradino: gradino, barre: barre, discesa: discesa, confronto: dumbbell
+};
+
+function disegna() {
+  document.querySelectorAll(".mount").forEach(mount => {
+    const c = DATI[mount.dataset.g];
+    if (!c) return;
+    mount.innerHTML = "";
+    const W = Math.max(mount.clientWidth || 640, 320);
+    if (c.tipo === "filiera") filiera(c, mount);
+    else {
+      const f = RENDER[c.tipo];
+      if (f) mount.appendChild(f(c, W));
+    }
+    if (c.tipo === "gradino") {
+      const lista = document.createElement("ol");
+      lista.className = "note-eventi";
+      c.punti.filter(p => p.serie === "evento")
+        .sort((a, b) => anno(a.x) - anno(b.x))
+        .forEach((p, i) => {
+          const li = document.createElement("li");
+          li.innerHTML = "<b>" + (i + 1) + "</b>" + dataEstesa(p.x) + " · " + p.label;
+          lista.appendChild(li);
+        });
+      mount.appendChild(lista);
+    }
+  });
+  document.querySelectorAll(".src").forEach(box => {
+    const c = DATI[box.dataset.src];
+    if (c) box.innerHTML = fonti(c);
+  });
+}
+
+let attesa;
+addEventListener("resize", () => { clearTimeout(attesa); attesa = setTimeout(disegna, 180); });
+disegna();
+
+const osservatore = new IntersectionObserver(voci => {
+  voci.forEach(v => { if (v.isIntersecting) { v.target.classList.add("in"); osservatore.unobserve(v.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll("figure.fig").forEach(f => osservatore.observe(f));
+})();
+  </script>
+</body>
+</html>
