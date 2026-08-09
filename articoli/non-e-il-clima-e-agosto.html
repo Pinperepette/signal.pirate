@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Non è il clima, è agosto | Signal Pirate</title>
+  <meta name="description" content="Mi sono scaricato le serie del Met Office e della NASA e ho guardato cosa reggeva davvero di quello che ci raccontano ogni estate. Il riscaldamento c'è. L'anticiclone di questi giorni no, quello è meteo. E il «mai così veloce» è una frase che gli archivi non hanno la risoluzione per sostenere.">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Non È Il Clima, È Agosto">
+  <meta property="og:description" content="Serie HadCRUT5 e GISTEMP scaricate e ricalcolate. Il riscaldamento c'e' ed e' misurato. Ma l'anticiclone di questi giorni e' meteo, il «mai cosi' veloce» non e' verificabile con i proxy, e le proiezioni al 2100 sono ventagli da 1 a 9 gradi.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/non-e-il-clima-e-agosto.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Non È Il Clima, È Agosto">
+  <meta name="twitter:description" content="Il riscaldamento c'e' ed e' misurato. Quasi tutto quello che ci viene costruito sopra, no. Tre grafici con i dati scaricati alla fonte.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <style>
+    .cl-math{
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 8px;
+      padding: 1.3rem 1.4rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+    .cl-math .cl-ml{
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: .8rem;
+    }
+    .cl-math .katex-display{ margin: .4rem 0; }
+    .cl-math .cl-mn{
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-top: .9rem;
+    }
+    .cl-sec{
+      font-family: var(--font-mono);
+      font-size: .82rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent-attention);
+      margin: 3.5rem 0 1.2rem;
+      opacity: .85;
+    }
+    .cl-fig{
+      margin: 2.5rem 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.4rem 1.3rem 1.1rem;
+    }
+    .cl-fig .cl-t{
+      font-family: var(--font-mono);
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: .3rem;
+    }
+    .cl-fig .cl-s{
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+    .cl-fig .cl-c{ width: 100%; overflow-x: auto; }
+    .cl-fig svg{ display:block; max-width:100%; height:auto; }
+    .cl-fig .cl-n{
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-top: 1rem;
+      padding-top: .9rem;
+      border-top: 1px solid var(--border-subtle);
+      opacity: .85;
+    }
+    .cl-num{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1px;
+      background: var(--border-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 2.2rem 0;
+    }
+    .cl-num > div{ background: var(--bg-secondary); padding: 1.1rem 1rem; }
+    .cl-num b{
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--accent-attention);
+      margin-bottom: .5rem;
+    }
+    .cl-num span{
+      font-family: var(--font-mono);
+      font-size: .74rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      display: block;
+    }
+    .cl-warn{
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-rejection);
+      border-radius: 8px;
+      padding: 1.2rem 1.3rem;
+      margin: 2.2rem 0;
+    }
+    .cl-warn .cl-wt{
+      font-family: var(--font-mono);
+      font-size: .74rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent-rejection);
+      margin-bottom: .6rem;
+      font-weight: 700;
+    }
+    .cl-warn p:last-child{ margin-bottom: 0; }
+    .cl-rel{
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 1.1rem 1.3rem;
+      margin: 2.2rem 0;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      line-height: 1.6;
+    }
+    .cl-rel b{
+      display: block;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: .5rem;
+    }
+    .cl-src{
+      font-family: var(--font-mono);
+      font-size: .78rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1.4rem;
+      margin-top: 3.5rem;
+    }
+    .cl-src b.cl-h{
+      display: block;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: .7rem;
+    }
+    .cl-src li{ margin-bottom: .45rem; }
+    .cl-ix{ font-family: var(--font-mono); color: var(--accent-highlight); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-08-09 | Pinperepette</p>
+    <h1 class="article-page-title">Non è il clima, <span class="accent">è agosto</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Un grado e mezzo in centosettantasei anni. Questo dicono le serie del Met Office e della NASA, che mi sono scaricato per andare a vedere cosa regge davvero di quello che ci raccontano ogni estate. Il riscaldamento c'è, quello lo misurano i termometri. Sul resto bisogna stare parecchio più attenti.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Clima</span>
+      <span class="tag tag-highlight">Dati</span>
+      <span class="tag tag-reaction">Meteo</span>
+      <span class="tag tag-amplification">Modelli</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <p>Agosto. Apri il telefono e c'è la mappa dell'Italia colorata di viola, l'anticiclone ha un nome da demone babilonese, e c'è qualcuno in televisione che spiega con la faccia seria che questa è la prova definitiva che il pianeta sta morendo. Poi arriva settembre, non muore nessuno, e l'anno dopo si rifà tutto identico con un demone diverso.</p>
+
+    <p>Se provi a dire che trentotto gradi ad agosto in Val Padana sono, molto banalmente, agosto in Val Padana, ti arriva addosso l'etichetta di negazionista. È un'etichetta comoda: chiude il discorso prima ancora di discutere il dato.</p>
+
+    <p>Allora ho fatto la cosa che faccio sempre. Mi sono scaricato i dati.</p>
+
+    <p>Non le slide di qualcuno, non l'infografica del giornale, non il grafico dello screenshot dello screenshot. I file veri, dal server di chi li produce: la serie <strong>HadCRUT5</strong> del Met Office britannico, centosettantasei anni di temperature globali, e <strong>GISTEMP</strong> della NASA per i mesi più recenti. I numeri sotto vengono da quei file. Se vuoi, i conti sono abbastanza semplici da rifare.</p>
+
+    <p class="cl-sec">// Prima cosa, il termometro</p>
+
+    <p>Partiamo dalla cosa più semplice: il pianeta si è scaldato. Non «forse», non «secondo alcuni modelli»: c'è scritto nei termometri.</p>
+
+    <p>E si è scaldato esattamente di questo: <strong>un grado e mezzo in centosettantaquattro anni</strong>. Per la precisione 1,54 gradi fra il 1850 e il 2024, che è l'anno più caldo che abbiamo misurato. Lo stesso dato visto in tre modi diversi: fanno <strong>0,88 gradi per secolo</strong>, cioè meno di un centesimo di grado all'anno, cioè un grado tondo ogni centotredici anni.</p>
+
+    <p>Questo numero ci serve tra poco.</p>
+
+    <div class="cl-fig">
+      <div class="cl-t">Temperatura media globale, dal 1850 a oggi</div>
+      <div class="cl-s">Scostamento in gradi rispetto alla media del periodo 1850/1900, quello che chiamiamo pre industriale. Ogni barra è un anno, la linea spessa è la media mobile a dieci anni. Le due barre vuote in fondo sono provvisorie: il 2026 arriva solo a giugno.</div>
+      <div class="cl-c" id="c1"></div>
+      <div class="cl-n">Met Office Hadley Centre e CRU, HadCRUT5.0.2.0, anni completi dal 1850 al 2024, ribasata sulla media 1850/1900 (offset di 0,357 gradi rispetto alla baseline originale 1961/1990). NASA GISTEMP v4 per 2025 e 2026, riportata sulla stessa scala con l'offset medio fra le due serie sui quarantacinque anni in comune, cioè 0,283 gradi.</div>
+    </div>
+
+    <div class="cl-num">
+      <div><b>+1,54</b><span>gradi nel 2024, l'anno più caldo mai misurato</span></div>
+      <div><b>+0,87</b><span>gradi per secolo, media su tutta la serie</span></div>
+      <div><b>+0,21</b><span>gradi per decennio, tendenza dal 1975</span></div>
+      <div><b>+1,05</b><span>gradi, media degli ultimi trent'anni</span></div>
+    </div>
+
+    <p>Qui non c'è molto da discutere sui numeri. Il 2024 è stato l'anno più caldo della serie strumentale, e da metà anni Settanta saliamo di circa due decimi di grado ogni dieci anni. Sul fatto che il pianeta si stia scaldando, qui il dato è abbastanza difficile da girare.</p>
+
+    <p>E qui ti servono tutti e due i numeri, non uno solo, perché quel grado e mezzo non è arrivato a rate costanti. Sulla serie intera fai 0,87 gradi per secolo, ma sugli ultimi cinquant'anni la pendenza è di due decimi ogni dieci anni, cioè <strong>2,1 gradi per secolo</strong>: più del doppio. Chi ti dice soltanto «un grado e mezzo in due secoli» ti sta nascondendo la pendenza recente. Chi ti dice soltanto «due decimi per decennio» ti sta nascondendo quanto è piccolo il totale accumulato. Vanno guardati insieme.</p>
+
+    <p>Perché poi il totale conta, eccome. Un grado e mezzo spalmato su centosettantasei anni è una quantità che nessun essere umano percepisce mentre accade: la differenza fra le sette e le otto di mattina, in una giornata qualunque, è dieci volte tanto. Su scala planetaria e su scala secolare quel grado e mezzo pesa parecchio, e non sto dicendo il contrario. Sto dicendo che è una cosa molto diversa da quella che ti raccontano a luglio quando il caldo di un pomeriggio diventa l'apocalisse.</p>
+
+    <p>Però c'è una cosa che nell'agosto 2024 non ha titolato nessuno, e adesso che abbiamo due anni in più di dati si vede meglio. Il picco del 2023 e 2024 è arrivato insieme a un El Niño bello grosso, che è l'oscillazione del Pacifico che ogni tanto scarica in atmosfera il calore che l'oceano aveva accumulato. Finito El Niño, il 2025 si è chiuso a <strong>+1,47</strong> e il 2026, sui primi sei mesi, sta un pelo sotto.</p>
+
+    <p>Su questo voglio essere pignolo, perché mettere sei mesi contro dodici non si può fare e non ho voglia che me lo contestino giustamente. Il confronto pulito è gennaio giugno contro gennaio giugno, stessi mesi, stessa stagionalità. Su quella base il 2024 sta a <strong>+1,58</strong>, il 2025 a <strong>+1,52</strong> e il 2026 a <strong>+1,47</strong>. Il 2026 è terzo, e sta sotto anche al 2025. Non è l'anno più caldo di sempre, checché ne dica il titolo che leggerai fra tre settimane.</p>
+
+    <p>Prima di scriverlo ho fatto anche questo controllo, perché sei mesi contro un anno sarebbero un confronto abbastanza stupido. Uno potrebbe dire: e se il secondo semestre ribaltasse tutto? Sugli ultimi trent'anni lo scarto medio fra la media gennaio giugno e quella dell'anno intero è di tre millesimi di grado. Praticamente zero. Perché il 2026 diventasse primo servirebbe un secondo semestre due decimi sopra il primo, e lo scarto massimo mai osservato in trent'anni è 0,157, che capitò nel 2023 quando El Niño si accese esattamente a metà anno. Adesso non c'è niente del genere in corso.</p>
+
+    <div class="cl-warn">
+      <div class="cl-wt">Come non usare questo dato</div>
+      <p>Due anni sotto un massimo non sono un'inversione di tendenza, e se domani leggi «il riscaldamento si è fermato» sappi che chi lo scrive sta facendo l'errore identico e speculare a quello di chi scriveva «il pianeta bolle» nell'agosto 2024. Prendere due punti e chiamarli tendenza è la stessa cazzata in tutte e due le direzioni.</p>
+      <p>La linea di tendenza continua a salire. Il problema è cosa scegli di mostrare: se l'anno record finisce su tutte le prime pagine e i due anni successivi, più freschi, non finiscono da nessuna parte, quello che stai ricevendo non è informazione. È una selezione.</p>
+    </div>
+
+    <p class="cl-sec">// Adesso parliamo di questa estate</p>
+
+    <p>Quello che sta succedendo in Europa in queste settimane ha un nome tecnico ed è vecchio come la meteorologia: <strong>anticiclone</strong>.</p>
+
+    <p>Il meccanismo è abbastanza semplice. Una vasta area di alta pressione si piazza sul continente e tappa la circolazione atlantica, quella che di solito ci porta le perturbazioni. Dentro l'anticiclone l'aria scende, e scendendo si comprime. Comprimendosi si scalda, per termodinamica pura, circa un grado ogni cento metri di discesa. Il cielo resta sereno, quindi il sole picchia dalla mattina alla sera senza una nuvola che faccia ombra, il terreno si asciuga e smette di dissiparlo, quel calore, in evaporazione. Risultato: una settimana di caldo bestiale. Se la struttura resta bloccata, due o tre.</p>
+
+    <p>Questo è <strong>meteo</strong>. È la stessa identica figura barica che ha prodotto le canicole del 1947, del 2003, e quelle che si raccontavano i nostri nonni. Chiamarla con un nome da divinità infernale e colorarla di viola sulla mappa non la trasforma in un evento climatico, la trasforma in contenuto.</p>
+
+    <p>E la differenza fra meteo e clima non è una pignoleria da secchione, è proprio la definizione delle due cose. Il clima è una statistica: com'è distribuita la temperatura su trent'anni. Il meteo è una singola estrazione da quella distribuzione. Un'estate rovente non dimostra il riscaldamento globale, esattamente come una nevicata a maggio non lo smentisce. Sono due pescate dalla stessa urna.</p>
+
+    <p>Che l'urna si sia spostata di circa un grado è vero, e sta nel primo grafico. Uno spostamento di un grado rende le pescate calde <em>statisticamente più probabili</em>, e questo è un effetto reale. Non rende ogni giornata calda una conseguenza del riscaldamento globale, e soprattutto non rende automaticamente inedito quello che ti raccontano come inedito.</p>
+
+    <p>E sui record vale la pena aprire una parentesi, perché è il terreno più scivoloso di tutti. Il primato europeo sono i 48,8 gradi di Floridia, in provincia di Siracusa, l'11 agosto 2021. L'Organizzazione meteorologica mondiale lo ha convalidato soltanto nel gennaio 2024, cioè dopo due anni e mezzo di verifiche sul sensore e sul sito, con tanto di gruppo dell'INRiM mandato a controllare la strumentazione. Il primato che si rivendicava prima in Italia, 48,5 gradi a Catenanuova il 10 agosto 1999, non è mai stato convalidato del tutto per dubbi sugli strumenti.</p>
+
+    <p>Tienitelo a mente la prossima volta che leggi «nuovo record» il giorno stesso in cui è successo. Un decimo di grado dipende da dov'è piazzata la centralina, da cosa ci hanno costruito intorno negli ultimi vent'anni, da come è tarato il sensore. Per stabilire se un numero è vero ci vogliono anni di lavoro, e nel frattempo il numero ha già fatto il giro dei telegiornali.</p>
+
+    <p>Il problema nasce quando questi due piani vengono messi insieme: una giornata calda diventa una notizia e la notizia diventa una conferma.</p>
+
+    <p class="cl-sec">// La frase che non si può dire</p>
+
+    <p>«Non era mai successo così in fretta.» La senti ovunque. Potrebbe anche essere vera. Il punto è che <strong>non abbiamo l'archivio per verificarla</strong>.</p>
+
+    <p>Prima del 1850 i termometri non ci sono. Ci sono i proxy, cioè misure indirette: isotopi nel ghiaccio, anelli degli alberi, pollini, gusci di foraminiferi nei sedimenti. Ognuno di questi archivi ha un limite fisico su quanto finemente riesce a registrare il tempo, e questo limita parecchio quello che possiamo ricostruire. È un filtro passa basso, e cancella tutto quello che è più veloce della sua risoluzione.</p>
+
+    <p>Nel ghiaccio l'aria resta in comunicazione con l'atmosfera finché la neve non si compatta abbastanza da sigillarla, e nel frattempo i gas si mescolano su decenni. Nei sedimenti, lacustri o marini, c'è la bioturbazione: le bestioline che vivono sul fondale rimescolano di continuo gli strati, e ti spalmano su secoli quello che è successo in vent'anni. Il risultato netto è che ogni archivio applica al passato una media mobile, e la media mobile ammazza i picchi.</p>
+
+    <p>Quanto li ammazza? Si calcola. Ho preso un'escursione ipotetica, un grado e mezzo che sale in centocinquant'anni e poi rientra, cioè grosso modo l'ordine di grandezza di quello che abbiamo misurato noi dal 1850. Poi ho guardato come apparirebbe quell'evento se fosse capitato tremila anni fa e dovessimo leggerlo dai proxy.</p>
+
+    <div class="cl-fig">
+      <div class="cl-t">Quanto un filtro temporale schiaccia un picco</div>
+      <div class="cl-s">Dimostrazione del meccanismo, non misura di archivi reali. Un'escursione di 1,5 gradi lunga centocinquant'anni, fatta passare attraverso filtri gaussiani con finestre di 25, 100 e 250 anni.</div>
+      <div class="cl-c" id="c2"></div>
+      <div class="cl-n">Simulazione mia, non dati. Il segnale in ingresso è un'escursione di 1,5 gradi lunga centocinquant'anni, e i filtri sono gaussiane con le finestre indicate, che è il modo standard di rappresentare l'effetto combinato di diffusione dei gas, compattazione e bioturbazione. Le finestre sono scelte da me come valori plausibili, non ricavate dalla calibrazione di un record specifico: gli archivi reali hanno risposte diverse fra loro, e anche fra siti dello stesso tipo. Il grafico mostra come si comporta un filtro, non quanta informazione perdano davvero una carota o un sedimento.</div>
+    </div>
+
+    <p>Il risultato cambia parecchio. Un picco che in ingresso vale <strong>un grado e mezzo</strong> esce a 1,31 dopo un filtro da venticinque anni, a <strong>0,54</strong> dopo uno da cento e a <strong>0,23</strong> dopo uno da duecentocinquanta. Il quindici per cento dell'originale. Su un grafico paleoclimatico di quelli che girano, una traccia così è indistinguibile dal rumore di fondo.</p>
+
+    <p>Su questi numeri devo però essere preciso, perché è il punto dove sarebbe comodo barare. Non sto misurando quanta informazione perdono davvero una carota groenlandese o un sedimento marino: sto facendo passare un segnale finto dentro filtri che ho scelto io. Le finestre sono valori plausibili, non calibrazioni. Gli archivi veri hanno risposte diverse fra loro e persino fra siti dello stesso tipo, perché dipendono da quanta neve cade ogni anno, da quanto rimescolano le bestie sul fondale, da com'è fatto quel posto lì.</p>
+
+    <p>Quindi il grafico dimostra <strong>come si comporta un filtro passa basso</strong>, non quanto vale l'attenuazione reale in Groenlandia. Per quel numero servirebbe la funzione di risposta di quello specifico record, ricavata dalla sua calibrazione. Il che, guarda caso, è esattamente la cosa che andrebbe chiesta a chiunque tiri fuori un grafico paleo per dimostrare qualcosa: qual è la risoluzione di questo archivio, e che cosa può ancora vedere a quella risoluzione.</p>
+
+    <div class="cl-warn">
+      <p><strong>Non</strong> segue che in passato ci siano state accelerazioni come questa. Non lo so, e dai proxy non possiamo saperlo.</p>
+      <p>Possiamo però dire una cosa più limitata: <strong>non lo possiamo escludere</strong>, perché l'archivio che dovrebbe smentirlo non ha la risoluzione per farlo. L'assenza di picchi rapidi nelle ricostruzioni è esattamente quello che ci aspetteremmo di vedere <em>anche se</em> quei picchi ci fossero stati. Il fatto che il proxy non mostri un picco non basta quindi a dimostrare che quel picco non ci sia mai stato.</p>
+      <p>Quindi «mai così veloce nella storia della Terra» è una frase che va oltre quello che i dati permettono di dire. Una formulazione che i dati permettono davvero è più semplice: mai così veloce da quando misuriamo con i termometri.</p>
+    </div>
+
+    <p>Ma lo stesso limite vale anche dall'altra parte. Chi tira fuori i grafici paleo per dire «il periodo medievale era più caldo di adesso» sta usando archivi con lo stesso identico problema di risoluzione, e spesso ricavati per giunta da un solo punto. Il caso più diffuso è la carota GISP2, che sta a Summit in Groenlandia: misura la temperatura sopra la calotta groenlandese, non quella del pianeta, e la sua serie classica si ferma al 1855. Cioè prima del riscaldamento industriale. Confrontarla con «oggi» vuol dire confrontare il passato con un presente che in quel grafico non c'è proprio.</p>
+
+    <p>Detto questo, c'è una cosa che va nella direzione opposta e che sarebbe disonesto non scrivere, visto che il limite l'ho tirato fuori io. Che in passato abbia fatto molto più caldo è vero, e non è nemmeno in discussione.</p>
+
+    <div class="cl-fig">
+      <div class="cl-t">Dove siamo, dentro la scala del Fanerozoico</div>
+      <div class="cl-s">Temperatura media globale ricostruita sugli ultimi 485 milioni di anni.</div>
+      <div class="cl-c" id="c5"></div>
+      <div class="cl-n">Valori da Judd et al., «A 485-million-year history of Earth's surface temperature», <em>Science</em>, settembre 2024 (ricostruzione PhanDA, oltre 150.000 dati da cinque proxy più 850 simulazioni). Minimo 11 gradi nel tardo Pleistocene, massimo 36 nel Turoniano. Il valore attuale è la media globale di riferimento, circa 15.</div>
+    </div>
+
+    <p>Il minimo di tutta la serie sta nel tardo Pleistocene, cioè ieri in termini geologici, e il massimo nel Turoniano, in pieno Cretaceo. Noi stiamo a quindici, quindi vicini all'estremo freddo. Nell'Eocene ai poli non c'era ghiaccio permanente e alle Isole Ellesmere, dentro il Circolo Polare Artico, si trovano fossili di coccodrilli e di palme. Oggi, rispetto alla storia del pianeta, fa freddo.</p>
+
+    <p>E il limite di risoluzione con questo non c'entra niente, il che è il motivo per cui lo scrivo qui invece di nasconderlo. Uno stato caldo che dura dieci milioni di anni è puro segnale a bassa frequenza, cioè esattamente quello che il filtro lascia passare intatto: lì il guadagno vale circa uno. Il passa basso ammazza gli eventi rapidi, non le ere. E per leggere il Cretaceo non servono nemmeno proxy fini, bastano indicatori grossolani tipo che ai poli non c'era ghiaccio.</p>
+
+    <p>Una precisazione però ci va, perché è il punto in cui questo dato viene usato per dire una cosa che non dice. In tutto il tempo profondo la CO2 si è mossa da sola, senza uomini in giro, per vulcanismo e tettonica. Vero. Ma lungo tutti quei 485 milioni di anni temperature alte e CO2 alta viaggiano insieme, e lo stesso studio indica la CO2 come il controllo dominante del clima nel Fanerozoico. Quel grafico dimostra che il pianeta è stato molto più caldo e che la CO2 varia anche da sola. Non dimostra che la CO2 non scaldi, dimostra il contrario.</p>
+
+    <p>Che poi è il motivo per cui la domanda «da dove arriva quella di adesso» è una domanda separata, con una risposta separata, e ci arrivo fra due sezioni.</p>
+
+    <p>Il limite quindi vale per tutti e due i racconti. Prima dei termometri, quella precisione non ce l'abbiamo.</p>
+
+    <p class="cl-sec">// Il problema è matematico</p>
+
+    <p>Quello che ho appena descritto a parole ha una forma precisa, e secondo me è la parte più interessante di tutta la faccenda. Il clima ricostruito dal passato è un <strong>problema inverso</strong>, e i problemi inversi hanno guai loro, ben studiati, che non dipendono da quanti soldi metti nella ricerca.</p>
+
+    <p>Mettiamola giù. Esiste una temperatura vera nel passato, chiamiamola <span class="cl-ix">T(t)</span>. Tu non la osservi. Osservi un proxy, che registra quella temperatura dopo che l'archivio ci ha messo del suo.</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Il modello diretto</div>
+      $$Y(t)=\int_{-\infty}^{+\infty} K(t-\tau)\,T(\tau)\,d\tau+\epsilon(t)$$
+      <div class="cl-mn">K è la funzione di risposta dell'archivio, cioè quanto e come spalma nel tempo. Epsilon è il rumore di misura.</div>
+    </div>
+
+    <p>Il proxy non vede la temperatura. Vede la temperatura <em>convoluta</em> con la risposta dell'archivio. E adesso la mossa che rende tutto leggibile: si passa in Fourier, dove la convoluzione diventa un prodotto.</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">In frequenza</div>
+      $$\hat{Y}(\omega)=\hat{K}(\omega)\,\hat{T}(\omega)+\hat{\epsilon}(\omega)$$
+      <div class="cl-mn">Ogni frequenza del segnale viene moltiplicata per il guadagno dell'archivio a quella frequenza.</div>
+    </div>
+
+    <p>Se l'archivio è un passa basso, e lo è, allora alle alte frequenze il guadagno crolla verso zero. Un evento rapido è fatto di alte frequenze. Quindi:</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Quello che succede ai picchi</div>
+      $$|\hat{K}(\omega)|\to 0 \quad\Longrightarrow\quad |\hat{Y}(\omega)|\ll|\hat{T}(\omega)|$$
+      <div class="cl-mn">Più l'evento è veloce, meno il proxy lo registra. È la stessa cosa del grafico di sopra, scritta in un modo che si può controllare.</div>
+    </div>
+
+    <p>Questa è la base della frase che ho buttato lì prima, cioè che la media mobile ammazza i picchi. Non è un modo di dire, è il comportamento di un filtro, e lo puoi calcolare.</p>
+
+    <p>Ora però viene il pezzo grosso, perché noi il problema lo vogliamo girare al contrario. Osserviamo <span class="cl-ix">Y</span> e vogliamo <span class="cl-ix">T</span>. Cioè dobbiamo deconvolvere, e in frequenza la deconvoluzione è una divisione.</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Il problema inverso</div>
+      $$\hat{T}(\omega)=\frac{\hat{Y}(\omega)}{\hat{K}(\omega)}-\frac{\hat{\epsilon}(\omega)}{\hat{K}(\omega)}$$
+      <div class="cl-mn">Guarda il secondo termine. Dove il guadagno tende a zero, il rumore viene diviso per un numero piccolissimo.</div>
+    </div>
+
+    <p>Ecco il punto, ed è il motivo per cui questa sezione esiste. Alle frequenze che ci interessano, cioè quelle degli eventi rapidi, il denominatore va a zero e il rumore <strong>esplode</strong>. La ricostruzione diventa instabile: perturbazioni minuscole nel dato osservato producono oscillazioni enormi nella temperatura ricostruita. È un problema mal posto nel senso di Hadamard, la stessa roba che trovi nel deblurring di un'immagine mossa.</p>
+
+    <p>Quindi la questione non è che abbiamo pochi dati e che con più carotaggi si sistema. È che <strong>l'operazione di osservazione ha distrutto informazione</strong>, e quell'informazione non è recuperabile per via algebrica. Puoi stabilizzare la deconvoluzione con una regolarizzazione, Tikhonov o un prior bayesiano, e infatti è quello che si fa. Ma a quel punto la ricostruzione che vedi dipende anche da come hai regolarizzato, non solo dai dati. Il che va benissimo, purché sia dichiarato.</p>
+
+    <p class="cl-sec">// Due spiegazioni, gli stessi dati</p>
+
+    <p>C'è un secondo pezzo di matematica che riguarda la sezione precedente, quella su aerosol e attribuzione, e secondo me è ancora più centrale. Scriviamo il riscaldamento osservato come somma di contributi:</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Il bilancio</div>
+      $$\Delta T=\beta_{1}F_{\text{CO}_2}+\beta_{2}F_{\text{aer}}+\beta_{3}F_{\text{sol}}+\eta$$
+      <div class="cl-mn">Le F sono le forzanti, i beta i coefficienti da stimare, eta la variabilità interna.</div>
+    </div>
+
+    <p>Noi osserviamo il totale a sinistra e vogliamo i singoli beta a destra. Il guaio è che le forzanti non sono ben separate: il CO2 e gli aerosol crescono più o meno insieme, perché escono dagli stessi camini. E quando i regressori sono correlati succede questo:</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Non identificabilità</div>
+      $$\theta_{1}\neq\theta_{2}\qquad\text{ma}\qquad f(\theta_{1})\approx f(\theta_{2})$$
+      <div class="cl-mn">Due combinazioni diverse di parametri producono praticamente gli stessi dati osservati.</div>
+    </div>
+
+    <p>Detta in una riga sola: <strong>se due modelli diversi producono gli stessi dati osservati entro il rumore della misura, i dati non contengono abbastanza informazione per scegliere fra i due.</strong> Non è una questione di onestà di chi calcola, né di potenza di calcolo. È una proprietà del problema.</p>
+
+    <p>E qui la degenerazione ha pure un nome in letteratura: aerosol forti più sensibilità climatica alta danno lo stesso riscaldamento osservato di aerosol deboli più sensibilità bassa. Le due combinazioni raccontano futuri molto diversi e passati quasi identici. È esattamente il buco di cui parlavo prima, scritto in modo che non si possa liquidare come opinione.</p>
+
+    <p>E siccome a parole si può dire tutto, questa cosa l'ho calcolata. Prendo il modello più semplice che regge, quello a due box usato nelle stime osservative della sensibilità:</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Il giocattolo</div>
+      $$\Delta T=\frac{F_{\text{ghg}}+F_{\text{aer}}}{\dfrac{F_{2\times}}{\text{ECS}}+\kappa}$$
+      <div class="cl-mn">Con i valori AR6: forcing da raddoppio 3,93 W/m², gas serra e altre forzanti non aerosol 3,42 W/m², assorbimento di calore dell'oceano 0,55 W/m² per grado.</div>
+    </div>
+
+    <p>Poi faccio scorrere due manopole. La sensibilità climatica da 2 a 5 gradi, che è il suo intervallo ufficiale, e il forcing degli aerosol da meno 2,0 a meno 0,4 watt per metro quadro, che è il suo. Per ogni coppia guardo se quel modello riproduce il grado e mezzo che abbiamo effettivamente misurato. Le coppie che ci riescono le coloro in base a quello che prevedono per il 2100, le altre le lascio grigie.</p>
+
+    <div class="cl-fig">
+      <div class="cl-t">Tutti i modelli che spiegano lo stesso passato</div>
+      <div class="cl-s">Ogni punto è una coppia sensibilità climatica più forcing degli aerosol. Colorati: quelli che riproducono il riscaldamento osservato. Il colore dice cosa prevedono per il 2100.</div>
+      <div class="cl-c" id="c6"></div>
+      <div class="cl-n">Modello a due box deliberatamente semplice, scritto per mostrare la struttura del problema. Non riproduce FaIR né un modello di circolazione: i numeri del 2100 servono a far vedere quanto si allargano lungo la cresta, non come previsione. Intervalli dei parametri e valori delle forzanti da AR6.</div>
+    </div>
+
+    <p>Guarda la forma. Le soluzioni non sono un punto, sono una <strong>cresta</strong> che attraversa tutto il grafico in diagonale. Sensibilità 2,4 con aerosol deboli spiega il passato esattamente come sensibilità 5,0 con aerosol forti. Il dato osservato non sceglie fra le due, perché entrambe ci passano dentro.</p>
+
+    <p>E adesso il colore, che è il motivo per cui questo grafico esiste. Lungo quella cresta il passato è identico e il 2100 va da <strong>2,06 a 3,37 gradi</strong>. Un grado e mezzo di differenza fra modelli che sui dati che abbiamo sono indistinguibili. Non è che uno sia giusto e l'altro sbagliato: sono tutti compatibili con quello che abbiamo misurato.</p>
+
+    <p>Questo è il senso pratico della non identificabilità, e secondo me è la cosa più utile di tutto il pezzo. Quando qualcuno ti dà un numero singolo per il 2100, quel numero è un punto scelto sulla cresta. La scelta può essere ragionevolissima, ma resta una scelta, e non gliela impone il dato osservato.</p>
+
+    <p>Il modo formale per misurare quanto sei messo male è la matrice di informazione di Fisher, che dice quanta informazione i dati portano su ogni parametro.</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Quanta informazione c'è davvero</div>
+      $$\mathcal{I}(\theta)=\mathbb{E}\!\left[\left(\frac{\partial\log p(Y\mid\theta)}{\partial\theta}\right)\left(\frac{\partial\log p(Y\mid\theta)}{\partial\theta}\right)^{\!T}\right]$$
+      <div class="cl-mn">Quando la matrice si avvicina alla singolarità, det I(θ) ≈ 0, esistono direzioni nello spazio dei parametri lungo le quali puoi muoverti senza cambiare quasi niente di ciò che osservi.</div>
+    </div>
+
+    <p>Quelle direzioni si chiamano direzioni sloppy, e i modelli che ne hanno tante si comportano tutti allo stesso modo: il risultato è ben vincolato lungo poche combinazioni di parametri e praticamente libero lungo tutte le altre. Riconosci il quadro? È il ventaglio da uno a nove gradi che salta fuori nella sezione dopo, visto dall'altra parte.</p>
+
+    <p>Un pezzo di onestà però ci va, perché se lo salto me lo tirano dietro giustamente. La non identificabilità vale <em>rispetto ai dati che usi</em>. Se ti limiti alla serie della temperatura media globale, la degenerazione è pesante. Se aggiungi vincoli indipendenti, il contenuto di calore degli oceani, i pattern spaziali, la differenza fra emisferi, alcune direzioni si chiudono. È precisamente per questo che gli studi di attribuzione usano più impronte invece di una sola, ed è il motivo per cui l'attribuzione qualitativa regge molto meglio della ripartizione quantitativa. La direzione si vincola con relativamente poca informazione. Le quote esatte richiedono molta più informazione di quella che abbiamo.</p>
+
+    <p>Ultimo pezzo, e collega tutto al Monte Carlo. Se il modello fosse quasi lineare, l'incertezza si propagherebbe con una formula sola:</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Propagazione linearizzata</div>
+      $$Y=f(X)\qquad\Longrightarrow\qquad \Sigma_{Y}\approx J_{f}\,\Sigma_{X}\,J_{f}^{T}$$
+      <div class="cl-mn">J è lo jacobiano del modello. Vale finché le perturbazioni sono piccole e la risposta è quasi lineare.</div>
+    </div>
+
+    <p>Ma il clima non è quasi lineare e gli intervalli dei parametri non sono piccoli. Con retroazioni e soglie quella approssimazione salta, e la distribuzione di uscita non è più una gaussiana attorno al valore centrale: diventa asimmetrica, con una coda destra lunga. Quando l'approssimazione salta, l'unica strada onesta è campionare.</p>
+
+    <div class="cl-math">
+      <div class="cl-ml">Monte Carlo</div>
+      $$X_{i}\sim p(X)\qquad Y_{i}=f(X_{i})\qquad\Longrightarrow\qquad p(Y)$$
+      <div class="cl-mn">Peschi dai parametri, fai girare il modello, guardi la distribuzione che esce.</div>
+    </div>
+
+    <p>Ed è esattamente quello che ho fatto con FaIR nell'altro pezzo. Quel risultato che va da poco più di un grado a nove, con mediana 2,42, smette di essere «ho fatto diecimila simulazioni e guarda che numeri buffi». È la distribuzione di uscita di un sistema non lineare quando ci propaghi dentro l'incertezza che sui parametri hai davvero. La coda destra lunga non è un errore del metodo. È la forma della risposta.</p>
+
+    <p class="cl-sec">// Quanto ci mettiamo del nostro</p>
+
+    <p>Ma tutto questo non dice ancora chi abbia causato il riscaldamento.</p>
+
+    <p>Quello che hai letto sopra dimostra una cosa sola: che non sappiamo se in passato ci siano state accelerazioni come questa. Non dice niente su <em>chi</em> l'ha causata. Le due domande però sono diverse e richiedono dati diversi. L'attribuzione non passa dai proxy. Passa da misure fatte adesso, con gli strumenti, e sono roba di un altro tipo.</p>
+
+    <p>Il primo indizio è la firma isotopica. Il carbonio che si sta accumulando in atmosfera è povero di carbonio 13 e completamente privo di carbonio 14. Il radiocarbonio decade con un tempo di dimezzamento di cinquemilasettecento anni, quindi un carbonio che non ne ha più nemmeno una traccia è per forza vecchio di milioni di anni. Cioè fossile. Nel frattempo l'ossigeno atmosferico cala nella proporzione esatta che ti aspetteresti da una combustione. Questo non ti dice quanto scalda: ti dice da dove viene quella roba, e la risposta è dai nostri tubi di scappamento e dalle nostre ciminiere. Non serve sapere niente del clima medievale per stabilirlo.</p>
+
+    <p>Poi c'è la stratosfera, che si sta raffreddando mentre la troposfera si scalda. Questo dato è particolarmente utile, perché se a scaldarci fosse il Sole si scalderebbero tutte e due. Il raffreddamento in quota insieme al riscaldamento in basso è la firma specifica dell'effetto serra, ed è misurata da satellite. Aggiungici che l'irradianza solare dal 1980 è piatta o in leggero calo mentre la temperatura sale, e che le notti si scaldano più dei giorni e gli inverni più delle estati, che sono altre due impronte serra e non solari. Il Sole è il candidato più ovvio, ma i dati non tornano.</p>
+
+    <p>Qui però serve una precisazione, perché è il punto dove si scivola facilmente. Il Sole non spiega bene il riscaldamento che misuriamo, e questo è quello che le osservazioni permettono di dire. Non permettono di trasformare la nostra conoscenza del sistema in una certezza assoluta su ogni meccanismo e su ogni previsione futura. Aver escluso un candidato non vuol dire aver capito tutto il resto.</p>
+
+    <p>E il resto è enorme. Nuvole, correnti oceaniche, vegetazione, ghiacci, aerosol, retroazioni che si tirano a vicenda su scale temporali che vanno dai mesi ai secoli. Le nuvole da sole restano il pezzo peggio vincolato dell'intero quadro, e non è un dettaglio marginale visto quanta radiazione gestiscono. Quando si dice che una causa è stata isolata, bisognerebbe dire nella stessa frase su quali misure poggia l'affermazione e quanto è largo il margine che resta.</p>
+
+    <p>Nel caso dell'attribuzione le misure sono quelle di sopra, e sono solide: isotopi, stratosfera, irradianza, il ciclo giorno notte. Quando dalla stessa frase si passa a «e quindi sappiamo cosa succede nel 2080», il margine si allarga parecchio, e quel passaggio quasi nessuno te lo segnala.</p>
+
+    <p>Su questo punto, invece, i dati sono piuttosto solidi. Che il CO2 scaldi e che quello in più sia nostro non è la parte fragile della storia. È la parte solida dell'argomento. Contestare questo punto non mette in discussione il resto del ragionamento.</p>
+
+    <p>La questione più difficile è invece quantificare quanto pesa ciascun fattore.</p>
+
+    <p>Il buco più grosso si chiama aerosol. Le particelle che emettiamo insieme al CO2, solfati e polveri, raffreddano: riflettono luce e cambiano le nuvole. Di quanto raffreddino non lo sappiamo con precisione, l'intervallo è largo, e questo intervallo si mangia direttamente la contabilità. Se gli aerosol raffreddano poco, allora il CO2 scalda poco e il riscaldamento osservato ha dentro parecchia variabilità naturale. Se raffreddano tanto, il CO2 scalda molto e senza di loro saremmo già molto più su. Lo stesso grado e mezzo osservato è compatibile con contabilità diverse, e la differenza fra quelle contabilità è un parametro che stimiamo, non che misuriamo.</p>
+
+    <p>A questo si aggiunge la variabilità interna, cioè oceani che spostano calore su decenni senza che nessuno abbia toccato niente. Il riscaldamento osservato è quindi un dato solido, mentre attribuire una quota precisa a ogni componente lo è molto meno. È qui che spesso il racconto pubblico diventa più sicuro dei dati.</p>
+
+    <p>Messa in fila, sta così. Sappiamo che l'uomo ha un ruolo nel cambiamento climatico. Non sappiamo quantificarlo con la precisione con cui vengono presentate le conseguenze. E finché non sappiamo quanto pesa ogni componente, converrebbe andarci piano prima di trasformare una proiezione in una sentenza, e una sentenza in una politica.</p>
+
+    <p>Il problema sta nella catena completa dell'inferenza.</p>
+
+    <div class="cl-fig">
+      <div class="cl-t">La catena, e quanto si sfilaccia</div>
+      <div class="cl-s">Ogni anello poggia sul precedente e ci aggiunge la sua incertezza. La freccia sotto è la sicurezza con cui la roba viene raccontata in pubblico.</div>
+      <div class="cl-c" id="c4"></div>
+      <div class="cl-n">Schema qualitativo, non una misura. Serve a mostrare la struttura dell'inferenza: le barre indicano quanto è vincolato ogni passaggio dalle osservazioni dirette, non una barra d'errore numerica.</div>
+    </div>
+
+    <p>Il primo anello è fisica da laboratorio, misurata riga spettrale per riga spettrale: il CO2 assorbe infrarossi. Non si discute. Il secondo è quanto scalda il pianeta se raddoppi il CO2, e qui l'intervallo ufficiale è talmente largo che il risultato al 2100 raddoppia a seconda di dove peschi. Il terzo è quante emissioni faremo davvero, che non è scienza, è previsione socioeconomica a ottant'anni, e chiunque abbia provato a prevedere l'economia a ottant'anni sa come finisce. Il quarto è cosa fa tutto questo alla siccità in Puglia o agli uragani nei Caraibi, e lì siamo già molto oltre quello che il modello sa fare. Il quinto è quali politiche ne seguono, che non è scienza per niente: è una scelta politica travestita da conseguenza tecnica.</p>
+
+    <p><strong>La sicurezza con cui questa roba viene comunicata cresce mano a mano che ci si allontana dalla fisica.</strong> Il primo anello, quello davvero solido, nessuno lo racconta perché è noioso. L'ultimo, quello che di scientifico non ha più niente, ti arriva addosso con la certezza di un teorema. Più ci si allontana dalla misura diretta, più servirebbe cautela.</p>
+
+    <p>Basta leggere i rapporti dell'IPCC invece dei titoli che li riassumono. L'IPCC assegna un livello di confidenza a ogni singola affermazione, e alcune tesi che nel dibattito pubblico girano come fatti acquisiti stanno lì dentro con confidenza <em>bassa</em>. L'esempio più netto sono i cicloni tropicali: l'AR6 dichiara confidenza bassa sui trend di lungo periodo nella frequenza dei cicloni di tutte le categorie, e confidenza bassa nel rilevare e attribuire un'influenza umana sull'intensità storica, in qualunque bacino e a livello globale. Roba che se la dici a cena ti guardano male, e sta scritta nel documento che tutti citano e nessuno apre.</p>
+
+    <p>Qui però tiro il freno anche a me stesso, perché questo giochino si può fare in tutte e due le direzioni e non ho voglia di farlo. Sulla siccità l'AR6 <strong>non</strong> dice «non si sa niente»: attribuisce al cambiamento climatico un aumento della siccità agricola ed ecologica in alcune regioni specifiche, Mediterraneo compreso, con confidenza <em>media</em>. Se ti capita qualcuno che ti spiega che l'IPCC nega la siccità, ti sta raccontando una balla speculare a quella dei titoli. Il punto non è che nel rapporto ci sia scritto che va tutto bene. È che ci sono scritte le gradazioni, e le gradazioni sono esattamente la cosa che si perde per strada.</p>
+
+    <p>Il passaggio dai rapporti scientifici ai titoli cambia parecchio il livello di cautela. Le cautele stanno scritte, dentro i rapporti, in inglese e in caratteri piccoli, e vengono sistematicamente perse nel passaggio verso il titolo. Nessuno ha bisogno di mentire. Basta lasciar cadere le barre d'errore, e le barre d'errore cadono sempre dallo stesso lato, quello che fa notizia.</p>
+
+    <p class="cl-sec">// I modelli, ovvero il ventaglio</p>
+
+    <p>È qui che arrivano molti dei numeri più citati sul futuro. I modelli non producono un unico numero, producono un <strong>intervallo</strong> di risultati. E un intervallo in un titolo ci sta male.</p>
+
+    <p>Un modello climatico dipende da parametri che non sono misurati con precisione, sono calibrati: la sensibilità climatica, il forcing degli aerosol, la capacità termica dell'oceano, quanto calore scende verso il fondo. Ogni parametro ha un intervallo plausibile. Quando li combini, anche il risultato finale diventa una distribuzione, non un numero singolo.</p>
+
+    <p>Quanto larga l'ho misurato smontando FaIR, l'emulatore che sta nella catena di modelli usata dall'IPCC: 2001 righe di Python, 2064 parametri calibrati. Facendo girare diecimila combinazioni di parametri, tutte pescate dentro gli intervalli ufficialmente accettati e tenendo fermo <strong>lo stesso scenario di emissioni</strong>, cioè SSP2 4.5, la temperatura al 2100 si spalma così.</p>
+
+    <div class="cl-num">
+      <div><b>+2,42</b><span>gradi, mediana delle diecimila simulazioni</span></div>
+      <div><b>+4,54</b><span>gradi, novantacinquesimo percentile</span></div>
+      <div><b>+9,01</b><span>gradi, massimo estratto</span></div>
+    </div>
+
+    <p>Da uno a nove gradi, con lo stesso scenario di emissioni. Il valore di default dell'IPCC, +2,78, non è «la previsione»: è un punto dentro una distribuzione enorme. E se muovi solo la sensibilità climatica dentro il suo intervallo ufficiale, da 2,0 a 5,0 gradi, la temperatura al 2100 passa da 2,38 a 4,76. Il doppio, cambiando una manopola sola.</p>
+
+    <div class="cl-rel">
+      <b>Se vuoi il dettaglio</b>
+      L'analisi completa del codice, dei parametri e del Monte Carlo sta in <a href="il-clima-ha-un-bug.html">Il clima ha un bug</a>, dove FaIR 2.2.4 è smontato pezzo per pezzo e tutto è riproducibile.
+    </div>
+
+    <p>C'è poi un problema ancora più difficile. L'incertezza che riesci a esplorare è quella <strong>parametrica</strong>: giri le manopole che il modello ha. Ma le manopole che il modello non ha, cioè i processi che non sono proprio rappresentati, non le puoi quantificare. Non ci metti una barra d'errore sopra una cosa che non hai modellato. È il problema del lampione: cerchi le chiavi dove c'è la luce, non dove ti sono cadute.</p>
+
+    <p>Poi c'è il caso <strong>RCP8.5</strong>, che è il mio preferito. Per anni sui giornali è stato presentato come lo scenario «business as usual», cioè cosa succede se andiamo avanti così. Non lo è mai stato: è stato costruito come limite superiore estremo e richiede, fra le altre cose, di quintuplicare l'uso globale del carbone entro il 2100. In un mondo che sta facendo l'esatto contrario. Nel 2020 Zeke Hausfather e Glen Peters, che negazionisti non sono per niente, l'hanno scritto su <em>Nature</em> in un commento col titolo che dice già tutto: la storia del «business as usual» è fuorviante.</p>
+
+    <p>I modelli quindi non vanno buttati. Ma un intervallo da uno a nove gradi che ti viene comunicato come «il pianeta si scalderà di tot entro il 2100» non è divulgazione. È una distribuzione trasformata in un singolo numero, spesso scegliendo quello che fa più notizia.</p>
+
+    <p class="cl-sec">// Il dato che non titola nessuno</p>
+
+    <p>Se vogliamo capire quanto sia diventato pericoloso il clima, un dato utile sono anche i morti. Quindi sono andato a prendere anche quelli. Il database EM DAT dell'Università di Lovanio li raccoglie dal 1900.</p>
+
+    <div class="cl-fig">
+      <div class="cl-t">Morti per disastri naturali nel mondo</div>
+      <div class="cl-s">Media annua per decennio. Dentro ci sono siccità, alluvioni, tempeste, temperature estreme, frane, incendi.</div>
+      <div class="cl-c" id="c3"></div>
+      <div class="cl-n">EM DAT, CRED, Université catholique de Louvain, via Our World in Data (serie decadal deaths disasters type, entità World). Il decennio 2020 è ancora incompleto. Fuori terremoti ed eruzioni, che col clima non c'entrano.</div>
+    </div>
+
+    <p>Negli anni Venti del Novecento morivano in media <strong>524 mila persone all'anno</strong> per disastri legati al clima. Negli anni Dieci di questo secolo: <strong>45 mila</strong>. Meno novantuno per cento in valore assoluto.</p>
+
+    <p>E il dato assoluto è già quello più prudente, perché nel frattempo la popolazione mondiale è passata da circa un miliardo e nove a circa sette miliardi e tre. Se lo correggi per la popolazione, <strong>la probabilità individuale di morire per un evento climatico estremo è crollata di circa il novantotto per cento</strong>.</p>
+
+    <div class="cl-num">
+      <div><b>&minus;91%</b><span>morti annue da disastri climatici, dagli anni Venti agli anni Dieci</span></div>
+      <div><b>&times;4</b><span>popolazione mondiale nello stesso periodo</span></div>
+      <div><b>&minus;98%</b><span>rischio individuale, corretto per popolazione</span></div>
+    </div>
+
+    <p>Il calo è avvenuto mentre la temperatura globale aumentava. La spiegazione sta soprattutto nell'adattamento. Previsioni meteo che funzionano, sistemi di allerta, case in muratura, argini, condizionatori, ospedali, strade, e i soldi per averli. L'umanità non ha smesso di essere presa a schiaffi dal clima. Ha smesso di morirci.</p>
+
+    <div class="cl-warn">
+      <div class="cl-wt">Il dato contrario</div>
+      <p>C'è una voce che va nella direzione opposta ed è giusto mettercela io, invece di aspettare che me la tirino dietro nei commenti: i morti per <em>temperature estreme</em> in senso stretto sono saliti parecchio. Da qualche centinaio all'anno negli anni Ottanta a circa <strong>26.500 all'anno</strong> nel decennio in corso, con dentro le ondate di calore europee del 2003 e del 2022. E non è una voce marginale che posso liquidare in una riga: dentro il totale di questo decennio pesa per <strong>più della metà</strong>.</p>
+      <p>Due cose, però, e non ne nascondo nessuna delle due. La prima è che quel totale è dieci volte più piccolo di quello di un secolo fa: 26.500 morti per caldo stanno al cinque per cento dei 524 mila che facevano i disastri climatici in un anno medio degli anni Venti del Novecento. La seconda è che una parte dell'aumento è un cambio di contabilità più che di realtà. Le morti da ondata di calore oggi si stimano con l'eccesso di mortalità, che è un metodo epidemiologico che negli anni Ottanta a queste cose non veniva applicato. Stiamo anche contando meglio una roba che prima finiva in altre caselle.</p>
+      <p>Detto questo, resta la voce che cresce, ed è l'unica del grafico che vada in quella direzione. Senza il denominatore, però, quel dato racconta solo una parte della storia. E chi lo nasconde del tutto sbaglia in modo speculare. Aggiungo l'ultimo pezzo per completezza: nelle statistiche di mortalità il freddo continua a uccidere molto più del caldo. Lo studio di Gasparrini sul <em>Lancet</em>, settantaquattro milioni di decessi analizzati in tredici paesi, trova un rapporto di circa venti a uno.</p>
+    </div>
+
+    <p class="cl-sec">// Che ne facciamo</p>
+
+    <p>La temperatura globale è salita di circa un grado e mezzo dal 1850 e continua a salire di due decimi ogni decennio. È misurato, e sappiamo che l'uomo ci ha un ruolo. Quanto grande, con la precisione con cui ce lo raccontano, no. L'estate calda resta un episodio meteorologico. Il «mai così veloce» va oltre quello che i proxy permettono di verificare. Le proiezioni al 2100 hanno intervalli molto larghi. E i morti per disastri naturali sono crollati mentre il pianeta si scaldava.</p>
+
+    <p>Il riscaldamento c'è. Ma un grado e mezzo, un'estate calda, una proiezione al 2100 o un numero sui morti non bastano da soli a raccontare tutto il resto. Il problema arriva quando l'urgenza diventa panico: le politiche si fanno di fretta, i ragazzi crescono con l'idea che ogni estate sia un'emergenza e poi, quando servirà chiedere loro qualcosa di serio, la credibilità sarà già consumata. E alla fine questa perdita di credibilità danneggia anche chi vuole occuparsi seriamente di clima.</p>
+
+    <p>Il clima della Terra cambia, come ha sempre fatto, e stavolta ci mettiamo del nostro. Lo affronti studiandolo, misurandolo e soprattutto dicendo chiaramente dove finiscono i dati e dove cominciano le ipotesi. Anche perché gli ultimi cent'anni mostrano che adattarsi funziona. Non lo affronti titolando in viola.</p>
+
+    <div class="cl-src">
+      <b class="cl-h">Fonti e dati</b>
+      <ul>
+        <li>Met Office Hadley Centre e CRU, <strong>HadCRUT5.0.2.0</strong>, serie globale annuale, anni completi dal 1850 al 2024, ribasata sul periodo 1850/1900.</li>
+        <li><strong>NASA GISTEMP v4</strong> (GLB.Ts+dSST), serie mensile, usata per 2025 e 2026 perché HadCRUT è aggiornata solo a febbraio 2025. Riportata sulla scala HadCRUT con l'offset medio 1980/2024. Il 2026 copre gennaio giugno.</li>
+        <li><strong>EM DAT</strong>, Centre for Research on the Epidemiology of Disasters, UCLouvain, decessi da disastri naturali per decennio, via Our World in Data.</li>
+        <li><strong>FaIR 2.2.4</strong>, analisi del codice, dei 2064 parametri e del Monte Carlo a diecimila estrazioni: <a href="il-clima-ha-un-bug.html">Il clima ha un bug</a>.</li>
+        <li>Hausfather Z. e Peters G., «Emissions, the business as usual story is misleading», <em>Nature</em> 577, 2020.</li>
+      </ul>
+      <p style="margin-top:1rem">Il primo e il terzo grafico usano dati scaricati alla fonte e ricalcolati. Il secondo è una simulazione dichiarata, serve a mostrare l'effetto della risoluzione dei proxy e i valori sono ordini di grandezza, non la calibrazione di un record specifico.</p>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+
+  <script src="../js/main.js"></script>
+  <script>
+const DTEMP = [[1850, -0.061], [1851, 0.123], [1852, 0.127], [1853, 0.086], [1854, 0.065], [1855, 0.06], [1856, 0.036], [1857, -0.111], [1858, -0.032], [1859, 0.075], [1860, -0.034], [1861, -0.073], [1862, -0.18], [1863, 0.012], [1864, -0.109], [1865, 0.024], [1866, 0.015], [1867, -0.0], [1868, 0.005], [1869, 0.04], [1870, 0.029], [1871, -0.012], [1872, 0.028], [1873, 0.015], [1874, -0.017], [1875, -0.019], [1876, -0.068], [1877, 0.255], [1878, 0.345], [1879, 0.053], [1880, 0.041], [1881, 0.124], [1882, 0.061], [1883, 0.01], [1884, -0.136], [1885, -0.115], [1886, -0.064], [1887, -0.142], [1888, -0.023], [1889, 0.107], [1890, -0.15], [1891, -0.045], [1892, -0.151], [1893, -0.138], [1894, -0.127], [1895, -0.092], [1896, 0.072], [1897, 0.097], [1898, -0.129], [1899, 0.001], [1900, 0.122], [1901, 0.063], [1902, -0.082], [1903, -0.177], [1904, -0.241], [1905, -0.051], [1906, 0.037], [1907, -0.148], [1908, -0.157], [1909, -0.179], [1910, -0.174], [1911, -0.183], [1912, -0.119], [1913, -0.111], [1914, 0.094], [1915, 0.165], [1916, -0.064], [1917, -0.186], [1918, -0.068], [1919, 0.031], [1920, 0.058], [1921, 0.116], [1922, 0.017], [1923, 0.039], [1924, 0.045], [1925, 0.074], [1926, 0.234], [1927, 0.127], [1928, 0.15], [1929, -0.036], [1930, 0.18], [1931, 0.253], [1932, 0.211], [1933, 0.034], [1934, 0.182], [1935, 0.15], [1936, 0.187], [1937, 0.337], [1938, 0.344], [1939, 0.316], [1940, 0.432], [1941, 0.395], [1942, 0.358], [1943, 0.363], [1944, 0.501], [1945, 0.4], [1946, 0.238], [1947, 0.265], [1948, 0.232], [1949, 0.213], [1950, 0.13], [1951, 0.295], [1952, 0.372], [1953, 0.434], [1954, 0.24], [1955, 0.159], [1956, 0.093], [1957, 0.321], [1958, 0.339], [1959, 0.308], [1960, 0.241], [1961, 0.336], [1962, 0.292], [1963, 0.32], [1964, 0.051], [1965, 0.152], [1966, 0.208], [1967, 0.239], [1968, 0.188], [1969, 0.325], [1970, 0.271], [1971, 0.151], [1972, 0.263], [1973, 0.406], [1974, 0.184], [1975, 0.246], [1976, 0.141], [1977, 0.46], [1978, 0.362], [1979, 0.447], [1980, 0.553], [1981, 0.607], [1982, 0.391], [1983, 0.58], [1984, 0.404], [1985, 0.406], [1986, 0.452], [1987, 0.6], [1988, 0.639], [1989, 0.536], [1990, 0.717], [1991, 0.695], [1992, 0.481], [1993, 0.522], [1994, 0.59], [1995, 0.733], [1996, 0.633], [1997, 0.779], [1998, 0.934], [1999, 0.681], [2000, 0.688], [2001, 0.846], [2002, 0.9], [2003, 0.901], [2004, 0.824], [2005, 0.963], [2006, 0.929], [2007, 0.948], [2008, 0.822], [2009, 0.953], [2010, 1.037], [2011, 0.894], [2012, 0.934], [2013, 0.98], [2014, 1.029], [2015, 1.182], [2016, 1.289], [2017, 1.202], [2018, 1.119], [2019, 1.248], [2020, 1.279], [2021, 1.118], [2022, 1.158], [2023, 1.457], [2024, 1.537]];
+const DPROV = [[2025, 1.475], [2026, 1.472]];
+const DRES  = [[0, 0.0, 0.0, 0.0, 0.0001], [5, 0.0, 0.0, 0.0, 0.0001], [10, 0.0, 0.0, 0.0, 0.0001], [15, 0.0, 0.0, 0.0, 0.0001], [20, 0.0, 0.0, 0.0, 0.0001], [25, 0.0, 0.0, 0.0, 0.0001], [30, 0.0, 0.0, 0.0, 0.0001], [35, 0.0, 0.0, 0.0, 0.0001], [40, 0.0, 0.0, 0.0, 0.0002], [45, 0.0, 0.0, 0.0, 0.0002], [50, 0.0, 0.0, 0.0, 0.0002], [55, 0.0, 0.0, 0.0, 0.0002], [60, 0.0, 0.0, 0.0, 0.0002], [65, 0.0, 0.0, 0.0, 0.0002], [70, 0.0, 0.0, 0.0, 0.0003], [75, 0.0, 0.0, 0.0, 0.0003], [80, 0.0, 0.0, 0.0, 0.0003], [85, 0.0, 0.0, 0.0, 0.0003], [90, 0.0, 0.0, 0.0, 0.0003], [95, 0.0, 0.0, 0.0, 0.0004], [100, 0.0, 0.0, 0.0, 0.0004], [105, 0.0, 0.0, 0.0, 0.0004], [110, 0.0, 0.0, 0.0, 0.0004], [115, 0.0, 0.0, 0.0, 0.0005], [120, 0.0, 0.0, 0.0, 0.0005], [125, 0.0, 0.0, 0.0, 0.0005], [130, 0.0, 0.0, 0.0, 0.0006], [135, 0.0, 0.0, 0.0, 0.0006], [140, 0.0, 0.0, 0.0, 0.0007], [145, 0.0, 0.0, 0.0, 0.0007], [150, 0.0, 0.0, 0.0, 0.0008], [155, 0.0, 0.0, 0.0, 0.0008], [160, 0.0, 0.0, 0.0, 0.0009], [165, 0.0, 0.0, 0.0, 0.0009], [170, 0.0, 0.0, 0.0, 0.001], [175, 0.0, 0.0, 0.0, 0.0011], [180, 0.0, 0.0, 0.0, 0.0011], [185, 0.0, 0.0, 0.0, 0.0012], [190, 0.0, 0.0, 0.0, 0.0013], [195, 0.0, 0.0, 0.0, 0.0014], [200, 0.0, 0.0, 0.0, 0.0015], [205, 0.0, 0.0, 0.0, 0.0016], [210, 0.0, 0.0, 0.0, 0.0017], [215, 0.0, 0.0, 0.0, 0.0018], [220, 0.0, 0.0, 0.0, 0.0019], [225, 0.0, 0.0, 0.0, 0.002], [230, 0.0, 0.0, 0.0, 0.0021], [235, 0.0, 0.0, 0.0, 0.0023], [240, 0.0, 0.0, 0.0, 0.0024], [245, 0.0, 0.0, 0.0, 0.0026], [250, 0.0, 0.0, 0.0, 0.0027], [255, 0.0, 0.0, 0.0, 0.0029], [260, 0.0, 0.0, 0.0, 0.0031], [265, 0.0, 0.0, 0.0, 0.0032], [270, 0.0, 0.0, 0.0, 0.0034], [275, 0.0, 0.0, 0.0, 0.0036], [280, 0.0, 0.0, 0.0, 0.0038], [285, 0.0, 0.0, 0.0, 0.0041], [290, 0.0, 0.0, 0.0, 0.0043], [295, 0.0, 0.0, 0.0, 0.0045], [300, 0.0, 0.0, 0.0, 0.0048], [305, 0.0, 0.0, 0.0, 0.0051], [310, 0.0, 0.0, 0.0, 0.0054], [315, 0.0, 0.0, 0.0, 0.0057], [320, 0.0, 0.0, 0.0, 0.006], [325, 0.0, 0.0, 0.0, 0.0063], [330, 0.0, 0.0, 0.0, 0.0066], [335, 0.0, 0.0, 0.0, 0.007], [340, 0.0, 0.0, 0.0, 0.0074], [345, 0.0, 0.0, 0.0, 0.0078], [350, 0.0, 0.0, 0.0, 0.0082], [355, 0.0, 0.0, 0.0, 0.0086], [360, 0.0, 0.0, 0.0, 0.009], [365, 0.0, 0.0, 0.0, 0.0095], [370, 0.0, 0.0, 0.0, 0.01], [375, 0.0, 0.0, 0.0, 0.0105], [380, 0.0, 0.0, 0.0, 0.011], [385, 0.0, 0.0, 0.0, 0.0116], [390, 0.0, 0.0, 0.0, 0.0121], [395, 0.0, 0.0, 0.0, 0.0127], [400, 0.0, 0.0, 0.0, 0.0134], [405, 0.0, 0.0, 0.0, 0.014], [410, 0.0, 0.0, 0.0, 0.0147], [415, 0.0, 0.0, 0.0, 0.0154], [420, 0.0, 0.0, 0.0, 0.0161], [425, 0.0, 0.0, 0.0, 0.0168], [430, 0.0, 0.0, 0.0, 0.0176], [435, 0.0, 0.0, 0.0, 0.0184], [440, 0.0, 0.0, 0.0, 0.0192], [445, 0.0, 0.0, 0.0, 0.0201], [450, 0.0, 0.0, 0.0, 0.021], [455, 0.0, 0.0, 0.0, 0.0219], [460, 0.0, 0.0, 0.0, 0.0229], [465, 0.0, 0.0, 0.0, 0.0239], [470, 0.0, 0.0, 0.0, 0.0249], [475, 0.0, 0.0, 0.0, 0.0259], [480, 0.0, 0.0, 0.0, 0.027], [485, 0.0, 0.0, 0.0, 0.0281], [490, 0.0, 0.0, 0.0, 0.0293], [495, 0.0, 0.0, 0.0, 0.0305], [500, 0.0, 0.0, 0.0, 0.0317], [505, 0.0, 0.0, 0.0, 0.033], [510, 0.0, 0.0, 0.0, 0.0343], [515, 0.0, 0.0, 0.0, 0.0356], [520, 0.0, 0.0, 0.0, 0.037], [525, 0.0, 0.0, 0.0, 0.0384], [530, 0.0, 0.0, 0.0, 0.0399], [535, 0.0, 0.0, 0.0, 0.0414], [540, 0.0, 0.0, 0.0, 0.0429], [545, 0.0, 0.0, 0.0, 0.0445], [550, 0.0, 0.0, 0.0, 0.0461], [555, 0.0, 0.0, 0.0, 0.0477], [560, 0.0, 0.0, 0.0, 0.0494], [565, 0.0, 0.0, 0.0001, 0.0512], [570, 0.0, 0.0, 0.0001, 0.0529], [575, 0.0, 0.0, 0.0001, 0.0547], [580, 0.0, 0.0, 0.0001, 0.0566], [585, 0.0, 0.0, 0.0002, 0.0585], [590, 0.0, 0.0, 0.0002, 0.0604], [595, 0.0, 0.0, 0.0003, 0.0624], [600, 0.0, 0.0, 0.0003, 0.0644], [605, 0.0, 0.0, 0.0004, 0.0664], [610, 0.0, 0.0, 0.0005, 0.0685], [615, 0.0, 0.0, 0.0006, 0.0706], [620, 0.0, 0.0, 0.0007, 0.0728], [625, 0.0, 0.0, 0.0009, 0.075], [630, 0.0, 0.0, 0.0011, 0.0772], [635, 0.0, 0.0, 0.0013, 0.0795], [640, 0.0, 0.0, 0.0015, 0.0818], [645, 0.0, 0.0, 0.0018, 0.0841], [650, 0.0, 0.0, 0.0021, 0.0865], [655, 0.0, 0.0, 0.0025, 0.0889], [660, 0.0, 0.0, 0.0029, 0.0913], [665, 0.0, 0.0, 0.0034, 0.0938], [670, 0.0, 0.0, 0.0039, 0.0962], [675, 0.0, 0.0, 0.0045, 0.0988], [680, 0.0, 0.0, 0.0053, 0.1013], [685, 0.0, 0.0, 0.0061, 0.1039], [690, 0.0, 0.0, 0.007, 0.1064], [695, 0.0, 0.0, 0.0081, 0.109], [700, 0.0, 0.0, 0.0092, 0.1117], [705, 0.0, 0.0, 0.0106, 0.1143], [710, 0.0, 0.0, 0.0121, 0.117], [715, 0.0, 0.0, 0.0138, 0.1196], [720, 0.0, 0.0, 0.0157, 0.1223], [725, 0.0, 0.0, 0.0178, 0.125], [730, 0.0, 0.0, 0.0201, 0.1277], [735, 0.0, 0.0, 0.0227, 0.1305], [740, 0.0, 0.0, 0.0256, 0.1332], [745, 0.0, 0.0, 0.0287, 0.1359], [750, 0.0, 0.0, 0.0322, 0.1386], [755, 0.0, 0.0, 0.0361, 0.1414], [760, 0.0, 0.0, 0.0402, 0.1441], [765, 0.0, 0.0, 0.0448, 0.1468], [770, 0.0, 0.0, 0.0498, 0.1495], [775, 0.0, 0.0, 0.0552, 0.1522], [780, 0.0, 0.0, 0.0611, 0.1549], [785, 0.0, 0.0, 0.0674, 0.1576], [790, 0.0, 0.0, 0.0742, 0.1602], [795, 0.0, 0.0, 0.0815, 0.1629], [800, 0.0, 0.0, 0.0893, 0.1655], [805, 0.0, 0.0, 0.0976, 0.1681], [810, 0.0, 0.0, 0.1065, 0.1706], [815, 0.0, 0.0, 0.1159, 0.1732], [820, 0.0, 0.0, 0.1259, 0.1757], [825, 0.0, 0.0, 0.1364, 0.1781], [830, 0.0, 0.0, 0.1475, 0.1806], [835, 0.0, 0.0, 0.1591, 0.183], [840, 0.0, 0.0, 0.1712, 0.1853], [845, 0.0, 0.0001, 0.1838, 0.1876], [850, 0.0, 0.0003, 0.1969, 0.1899], [855, 0.0, 0.0006, 0.2104, 0.1921], [860, 0.0, 0.0011, 0.2244, 0.1943], [865, 0.0, 0.002, 0.2388, 0.1964], [870, 0.0, 0.0037, 0.2535, 0.1984], [875, 0.0, 0.0064, 0.2685, 0.2004], [880, 0.0, 0.0108, 0.2837, 0.2024], [885, 0.0, 0.0176, 0.2991, 0.2043], [890, 0.0, 0.0276, 0.3147, 0.2061], [895, 0.0, 0.0421, 0.3303, 0.2078], [900, 0.0, 0.0622, 0.3459, 0.2095], [905, 0.0, 0.0892, 0.3615, 0.2111], [910, 0.0, 0.1244, 0.3769, 0.2127], [915, 0.0, 0.1686, 0.392, 0.2141], [920, 0.0, 0.2225, 0.4069, 0.2155], [925, 0.0, 0.2861, 0.4213, 0.2168], [930, 0.1568, 0.3592, 0.4353, 0.2181], [935, 0.3119, 0.4405, 0.4487, 0.2192], [940, 0.4635, 0.5286, 0.4615, 0.2203], [945, 0.6101, 0.6212, 0.4736, 0.2213], [950, 0.75, 0.7162, 0.485, 0.2222], [955, 0.8817, 0.8109, 0.4954, 0.2231], [960, 1.0037, 0.9028, 0.505, 0.2238], [965, 1.1147, 0.9896, 0.5136, 0.2245], [970, 1.2135, 1.069, 0.5212, 0.2251], [975, 1.299, 1.1392, 0.5277, 0.2255], [980, 1.3703, 1.1986, 0.533, 0.2259], [985, 1.4266, 1.246, 0.5372, 0.2263], [990, 1.4672, 1.2805, 0.5403, 0.2265], [995, 1.4918, 1.3015, 0.5421, 0.2266], [1000, 1.5, 1.3085, 0.5427, 0.2267], [1005, 1.4918, 1.3015, 0.5421, 0.2266], [1010, 1.4672, 1.2805, 0.5403, 0.2265], [1015, 1.4266, 1.246, 0.5372, 0.2263], [1020, 1.3703, 1.1986, 0.533, 0.2259], [1025, 1.299, 1.1392, 0.5277, 0.2255], [1030, 1.2135, 1.069, 0.5212, 0.2251], [1035, 1.1147, 0.9896, 0.5136, 0.2245], [1040, 1.0037, 0.9028, 0.505, 0.2238], [1045, 0.8817, 0.8109, 0.4954, 0.2231], [1050, 0.75, 0.7162, 0.485, 0.2222], [1055, 0.6101, 0.6212, 0.4736, 0.2213], [1060, 0.4635, 0.5286, 0.4615, 0.2203], [1065, 0.3119, 0.4405, 0.4487, 0.2192], [1070, 0.1568, 0.3592, 0.4353, 0.2181], [1075, 0.0, 0.2861, 0.4213, 0.2168], [1080, 0.0, 0.2225, 0.4069, 0.2155], [1085, 0.0, 0.1686, 0.392, 0.2141], [1090, 0.0, 0.1244, 0.3769, 0.2127], [1095, 0.0, 0.0892, 0.3615, 0.2111], [1100, 0.0, 0.0622, 0.3459, 0.2095], [1105, 0.0, 0.0421, 0.3303, 0.2078], [1110, 0.0, 0.0276, 0.3147, 0.2061], [1115, 0.0, 0.0176, 0.2991, 0.2043], [1120, 0.0, 0.0108, 0.2837, 0.2024], [1125, 0.0, 0.0064, 0.2685, 0.2004], [1130, 0.0, 0.0037, 0.2535, 0.1984], [1135, 0.0, 0.002, 0.2388, 0.1964], [1140, 0.0, 0.0011, 0.2244, 0.1943], [1145, 0.0, 0.0006, 0.2104, 0.1921], [1150, 0.0, 0.0003, 0.1969, 0.1899], [1155, 0.0, 0.0001, 0.1838, 0.1876], [1160, 0.0, 0.0, 0.1712, 0.1853], [1165, 0.0, 0.0, 0.1591, 0.183], [1170, 0.0, 0.0, 0.1475, 0.1806], [1175, 0.0, 0.0, 0.1364, 0.1781], [1180, 0.0, 0.0, 0.1259, 0.1757], [1185, 0.0, 0.0, 0.1159, 0.1732], [1190, 0.0, 0.0, 0.1065, 0.1706], [1195, 0.0, 0.0, 0.0976, 0.1681], [1200, 0.0, 0.0, 0.0893, 0.1655], [1205, 0.0, 0.0, 0.0815, 0.1629], [1210, 0.0, 0.0, 0.0742, 0.1602], [1215, 0.0, 0.0, 0.0674, 0.1576], [1220, 0.0, 0.0, 0.0611, 0.1549], [1225, 0.0, 0.0, 0.0552, 0.1522], [1230, 0.0, 0.0, 0.0498, 0.1495], [1235, 0.0, 0.0, 0.0448, 0.1468], [1240, 0.0, 0.0, 0.0402, 0.1441], [1245, 0.0, 0.0, 0.0361, 0.1414], [1250, 0.0, 0.0, 0.0322, 0.1386], [1255, 0.0, 0.0, 0.0287, 0.1359], [1260, 0.0, 0.0, 0.0256, 0.1332], [1265, 0.0, 0.0, 0.0227, 0.1305], [1270, 0.0, 0.0, 0.0201, 0.1277], [1275, 0.0, 0.0, 0.0178, 0.125], [1280, 0.0, 0.0, 0.0157, 0.1223], [1285, 0.0, 0.0, 0.0138, 0.1196], [1290, 0.0, 0.0, 0.0121, 0.117], [1295, 0.0, 0.0, 0.0106, 0.1143], [1300, 0.0, 0.0, 0.0092, 0.1117], [1305, 0.0, 0.0, 0.0081, 0.109], [1310, 0.0, 0.0, 0.007, 0.1064], [1315, 0.0, 0.0, 0.0061, 0.1039], [1320, 0.0, 0.0, 0.0053, 0.1013], [1325, 0.0, 0.0, 0.0045, 0.0988], [1330, 0.0, 0.0, 0.0039, 0.0962], [1335, 0.0, 0.0, 0.0034, 0.0938], [1340, 0.0, 0.0, 0.0029, 0.0913], [1345, 0.0, 0.0, 0.0025, 0.0889], [1350, 0.0, 0.0, 0.0021, 0.0865], [1355, 0.0, 0.0, 0.0018, 0.0841], [1360, 0.0, 0.0, 0.0015, 0.0818], [1365, 0.0, 0.0, 0.0013, 0.0795], [1370, 0.0, 0.0, 0.0011, 0.0772], [1375, 0.0, 0.0, 0.0009, 0.075], [1380, 0.0, 0.0, 0.0007, 0.0728], [1385, 0.0, 0.0, 0.0006, 0.0706], [1390, 0.0, 0.0, 0.0005, 0.0685], [1395, 0.0, 0.0, 0.0004, 0.0664], [1400, 0.0, 0.0, 0.0003, 0.0644], [1405, 0.0, 0.0, 0.0003, 0.0624], [1410, 0.0, 0.0, 0.0002, 0.0604], [1415, 0.0, 0.0, 0.0002, 0.0585], [1420, 0.0, 0.0, 0.0001, 0.0566], [1425, 0.0, 0.0, 0.0001, 0.0547], [1430, 0.0, 0.0, 0.0001, 0.0529], [1435, 0.0, 0.0, 0.0001, 0.0512], [1440, 0.0, 0.0, 0.0, 0.0494], [1445, 0.0, 0.0, 0.0, 0.0477], [1450, 0.0, 0.0, 0.0, 0.0461], [1455, 0.0, 0.0, 0.0, 0.0445], [1460, 0.0, 0.0, 0.0, 0.0429], [1465, 0.0, 0.0, 0.0, 0.0414], [1470, 0.0, 0.0, 0.0, 0.0399], [1475, 0.0, 0.0, 0.0, 0.0384], [1480, 0.0, 0.0, 0.0, 0.037], [1485, 0.0, 0.0, 0.0, 0.0356], [1490, 0.0, 0.0, 0.0, 0.0343], [1495, 0.0, 0.0, 0.0, 0.033], [1500, 0.0, 0.0, 0.0, 0.0317], [1505, 0.0, 0.0, 0.0, 0.0305], [1510, 0.0, 0.0, 0.0, 0.0293], [1515, 0.0, 0.0, 0.0, 0.0281], [1520, 0.0, 0.0, 0.0, 0.027], [1525, 0.0, 0.0, 0.0, 0.0259], [1530, 0.0, 0.0, 0.0, 0.0249], [1535, 0.0, 0.0, 0.0, 0.0239], [1540, 0.0, 0.0, 0.0, 0.0229], [1545, 0.0, 0.0, 0.0, 0.0219], [1550, 0.0, 0.0, 0.0, 0.021], [1555, 0.0, 0.0, 0.0, 0.0201], [1560, 0.0, 0.0, 0.0, 0.0192], [1565, 0.0, 0.0, 0.0, 0.0184], [1570, 0.0, 0.0, 0.0, 0.0176], [1575, 0.0, 0.0, 0.0, 0.0168], [1580, 0.0, 0.0, 0.0, 0.0161], [1585, 0.0, 0.0, 0.0, 0.0154], [1590, 0.0, 0.0, 0.0, 0.0147], [1595, 0.0, 0.0, 0.0, 0.014], [1600, 0.0, 0.0, 0.0, 0.0134], [1605, 0.0, 0.0, 0.0, 0.0127], [1610, 0.0, 0.0, 0.0, 0.0121], [1615, 0.0, 0.0, 0.0, 0.0116], [1620, 0.0, 0.0, 0.0, 0.011], [1625, 0.0, 0.0, 0.0, 0.0105], [1630, 0.0, 0.0, 0.0, 0.01], [1635, 0.0, 0.0, 0.0, 0.0095], [1640, 0.0, 0.0, 0.0, 0.009], [1645, 0.0, 0.0, 0.0, 0.0086], [1650, 0.0, 0.0, 0.0, 0.0082], [1655, 0.0, 0.0, 0.0, 0.0078], [1660, 0.0, 0.0, 0.0, 0.0074], [1665, 0.0, 0.0, 0.0, 0.007], [1670, 0.0, 0.0, 0.0, 0.0066], [1675, 0.0, 0.0, 0.0, 0.0063], [1680, 0.0, 0.0, 0.0, 0.006], [1685, 0.0, 0.0, 0.0, 0.0057], [1690, 0.0, 0.0, 0.0, 0.0054], [1695, 0.0, 0.0, 0.0, 0.0051], [1700, 0.0, 0.0, 0.0, 0.0048], [1705, 0.0, 0.0, 0.0, 0.0045], [1710, 0.0, 0.0, 0.0, 0.0043], [1715, 0.0, 0.0, 0.0, 0.0041], [1720, 0.0, 0.0, 0.0, 0.0038], [1725, 0.0, 0.0, 0.0, 0.0036], [1730, 0.0, 0.0, 0.0, 0.0034], [1735, 0.0, 0.0, 0.0, 0.0032], [1740, 0.0, 0.0, 0.0, 0.0031], [1745, 0.0, 0.0, 0.0, 0.0029], [1750, 0.0, 0.0, 0.0, 0.0027], [1755, 0.0, 0.0, 0.0, 0.0026], [1760, 0.0, 0.0, 0.0, 0.0024], [1765, 0.0, 0.0, 0.0, 0.0023], [1770, 0.0, 0.0, 0.0, 0.0021], [1775, 0.0, 0.0, 0.0, 0.002], [1780, 0.0, 0.0, 0.0, 0.0019], [1785, 0.0, 0.0, 0.0, 0.0018], [1790, 0.0, 0.0, 0.0, 0.0017], [1795, 0.0, 0.0, 0.0, 0.0016], [1800, 0.0, 0.0, 0.0, 0.0015], [1805, 0.0, 0.0, 0.0, 0.0014], [1810, 0.0, 0.0, 0.0, 0.0013], [1815, 0.0, 0.0, 0.0, 0.0012], [1820, 0.0, 0.0, 0.0, 0.0011], [1825, 0.0, 0.0, 0.0, 0.0011], [1830, 0.0, 0.0, 0.0, 0.001], [1835, 0.0, 0.0, 0.0, 0.0009], [1840, 0.0, 0.0, 0.0, 0.0009], [1845, 0.0, 0.0, 0.0, 0.0008], [1850, 0.0, 0.0, 0.0, 0.0008], [1855, 0.0, 0.0, 0.0, 0.0007], [1860, 0.0, 0.0, 0.0, 0.0007], [1865, 0.0, 0.0, 0.0, 0.0006], [1870, 0.0, 0.0, 0.0, 0.0006], [1875, 0.0, 0.0, 0.0, 0.0005], [1880, 0.0, 0.0, 0.0, 0.0005], [1885, 0.0, 0.0, 0.0, 0.0005], [1890, 0.0, 0.0, 0.0, 0.0004], [1895, 0.0, 0.0, 0.0, 0.0004], [1900, 0.0, 0.0, 0.0, 0.0004], [1905, 0.0, 0.0, 0.0, 0.0004], [1910, 0.0, 0.0, 0.0, 0.0003], [1915, 0.0, 0.0, 0.0, 0.0003], [1920, 0.0, 0.0, 0.0, 0.0003], [1925, 0.0, 0.0, 0.0, 0.0003], [1930, 0.0, 0.0, 0.0, 0.0003], [1935, 0.0, 0.0, 0.0, 0.0002], [1940, 0.0, 0.0, 0.0, 0.0002], [1945, 0.0, 0.0, 0.0, 0.0002], [1950, 0.0, 0.0, 0.0, 0.0002], [1955, 0.0, 0.0, 0.0, 0.0002], [1960, 0.0, 0.0, 0.0, 0.0002], [1965, 0.0, 0.0, 0.0, 0.0001], [1970, 0.0, 0.0, 0.0, 0.0001], [1975, 0.0, 0.0, 0.0, 0.0001], [1980, 0.0, 0.0, 0.0, 0.0001], [1985, 0.0, 0.0, 0.0, 0.0001], [1990, 0.0, 0.0, 0.0, 0.0001], [1995, 0.0, 0.0, 0.0, 0.0001]];
+const DDIS  = [[1900, 147261], [1910, 32409], [1920, 523942], [1930, 464277], [1940, 386725], [1950, 61464], [1960, 325904], [1970, 98906], [1980, 75210], [1990, 43341], [2000, 78095], [2010, 45432], [2020, 48067]];
+const DDEG  = [[2.0, -2.0, 0.565, 1.789, 0], [2.0, -1.95, 0.584, 1.789, 0], [2.0, -1.9, 0.604, 1.789, 0], [2.0, -1.85, 0.624, 1.789, 0], [2.0, -1.8, 0.644, 1.789, 0], [2.0, -1.75, 0.664, 1.789, 0], [2.0, -1.7, 0.684, 1.789, 0], [2.0, -1.65, 0.704, 1.789, 0], [2.0, -1.6, 0.724, 1.789, 0], [2.0, -1.55, 0.744, 1.789, 0], [2.0, -1.5, 0.763, 1.789, 0], [2.0, -1.45, 0.783, 1.789, 0], [2.0, -1.4, 0.803, 1.789, 0], [2.0, -1.35, 0.823, 1.789, 0], [2.0, -1.3, 0.843, 1.789, 0], [2.0, -1.25, 0.863, 1.789, 0], [2.0, -1.2, 0.883, 1.789, 0], [2.0, -1.15, 0.903, 1.789, 0], [2.0, -1.1, 0.922, 1.789, 0], [2.0, -1.05, 0.942, 1.789, 0], [2.0, -1.0, 0.962, 1.789, 0], [2.0, -0.95, 0.982, 1.789, 0], [2.0, -0.9, 1.002, 1.789, 0], [2.0, -0.85, 1.022, 1.789, 0], [2.0, -0.8, 1.042, 1.789, 0], [2.0, -0.75, 1.062, 1.789, 0], [2.0, -0.7, 1.082, 1.789, 0], [2.0, -0.65, 1.101, 1.789, 0], [2.0, -0.6, 1.121, 1.789, 0], [2.0, -0.55, 1.141, 1.789, 0], [2.0, -0.5, 1.161, 1.789, 0], [2.0, -0.45, 1.181, 1.789, 0], [2.0, -0.4, 1.201, 1.789, 0], [2.1, -2.0, 0.586, 1.858, 0], [2.1, -1.95, 0.607, 1.858, 0], [2.1, -1.9, 0.628, 1.858, 0], [2.1, -1.85, 0.648, 1.858, 0], [2.1, -1.8, 0.669, 1.858, 0], [2.1, -1.75, 0.69, 1.858, 0], [2.1, -1.7, 0.71, 1.858, 0], [2.1, -1.65, 0.731, 1.858, 0], [2.1, -1.6, 0.752, 1.858, 0], [2.1, -1.55, 0.772, 1.858, 0], [2.1, -1.5, 0.793, 1.858, 0], [2.1, -1.45, 0.814, 1.858, 0], [2.1, -1.4, 0.834, 1.858, 0], [2.1, -1.35, 0.855, 1.858, 0], [2.1, -1.3, 0.876, 1.858, 0], [2.1, -1.25, 0.896, 1.858, 0], [2.1, -1.2, 0.917, 1.858, 0], [2.1, -1.15, 0.937, 1.858, 0], [2.1, -1.1, 0.958, 1.858, 0], [2.1, -1.05, 0.979, 1.858, 0], [2.1, -1.0, 0.999, 1.858, 0], [2.1, -0.95, 1.02, 1.858, 0], [2.1, -0.9, 1.041, 1.858, 0], [2.1, -0.85, 1.061, 1.858, 0], [2.1, -0.8, 1.082, 1.858, 0], [2.1, -0.75, 1.103, 1.858, 0], [2.1, -0.7, 1.123, 1.858, 0], [2.1, -0.65, 1.144, 1.858, 0], [2.1, -0.6, 1.165, 1.858, 0], [2.1, -0.55, 1.185, 1.858, 0], [2.1, -0.5, 1.206, 1.858, 0], [2.1, -0.45, 1.227, 1.858, 0], [2.1, -0.4, 1.247, 1.858, 0], [2.2, -2.0, 0.608, 1.926, 0], [2.2, -1.95, 0.629, 1.926, 0], [2.2, -1.9, 0.651, 1.926, 0], [2.2, -1.85, 0.672, 1.926, 0], [2.2, -1.8, 0.693, 1.926, 0], [2.2, -1.75, 0.715, 1.926, 0], [2.2, -1.7, 0.736, 1.926, 0], [2.2, -1.65, 0.758, 1.926, 0], [2.2, -1.6, 0.779, 1.926, 0], [2.2, -1.55, 0.8, 1.926, 0], [2.2, -1.5, 0.822, 1.926, 0], [2.2, -1.45, 0.843, 1.926, 0], [2.2, -1.4, 0.865, 1.926, 0], [2.2, -1.35, 0.886, 1.926, 0], [2.2, -1.3, 0.907, 1.926, 0], [2.2, -1.25, 0.929, 1.926, 0], [2.2, -1.2, 0.95, 1.926, 0], [2.2, -1.15, 0.972, 1.926, 0], [2.2, -1.1, 0.993, 1.926, 0], [2.2, -1.05, 1.014, 1.926, 0], [2.2, -1.0, 1.036, 1.926, 0], [2.2, -0.95, 1.057, 1.926, 0], [2.2, -0.9, 1.079, 1.926, 0], [2.2, -0.85, 1.1, 1.926, 0], [2.2, -0.8, 1.121, 1.926, 0], [2.2, -0.75, 1.143, 1.926, 0], [2.2, -0.7, 1.164, 1.926, 0], [2.2, -0.65, 1.186, 1.926, 0], [2.2, -0.6, 1.207, 1.926, 0], [2.2, -0.55, 1.228, 1.926, 0], [2.2, -0.5, 1.25, 1.926, 0], [2.2, -0.45, 1.271, 1.926, 0], [2.2, -0.4, 1.293, 1.926, 0], [2.3, -2.0, 0.629, 1.992, 0], [2.3, -1.95, 0.651, 1.992, 0], [2.3, -1.9, 0.673, 1.992, 0], [2.3, -1.85, 0.695, 1.992, 0], [2.3, -1.8, 0.717, 1.992, 0], [2.3, -1.75, 0.739, 1.992, 0], [2.3, -1.7, 0.762, 1.992, 0], [2.3, -1.65, 0.784, 1.992, 0], [2.3, -1.6, 0.806, 1.992, 0], [2.3, -1.55, 0.828, 1.992, 0], [2.3, -1.5, 0.85, 1.992, 0], [2.3, -1.45, 0.872, 1.992, 0], [2.3, -1.4, 0.894, 1.992, 0], [2.3, -1.35, 0.916, 1.992, 0], [2.3, -1.3, 0.939, 1.992, 0], [2.3, -1.25, 0.961, 1.992, 0], [2.3, -1.2, 0.983, 1.992, 0], [2.3, -1.15, 1.005, 1.992, 0], [2.3, -1.1, 1.027, 1.992, 0], [2.3, -1.05, 1.049, 1.992, 0], [2.3, -1.0, 1.071, 1.992, 0], [2.3, -0.95, 1.094, 1.992, 0], [2.3, -0.9, 1.116, 1.992, 0], [2.3, -0.85, 1.138, 1.992, 0], [2.3, -0.8, 1.16, 1.992, 0], [2.3, -0.75, 1.182, 1.992, 0], [2.3, -0.7, 1.204, 1.992, 0], [2.3, -0.65, 1.226, 1.992, 0], [2.3, -0.6, 1.249, 1.992, 0], [2.3, -0.55, 1.271, 1.992, 0], [2.3, -0.5, 1.293, 1.992, 0], [2.3, -0.45, 1.315, 1.992, 0], [2.3, -0.4, 1.337, 1.992, 0], [2.4, -2.0, 0.649, 2.057, 0], [2.4, -1.95, 0.672, 2.057, 0], [2.4, -1.9, 0.695, 2.057, 0], [2.4, -1.85, 0.718, 2.057, 0], [2.4, -1.8, 0.741, 2.057, 0], [2.4, -1.75, 0.763, 2.057, 0], [2.4, -1.7, 0.786, 2.057, 0], [2.4, -1.65, 0.809, 2.057, 0], [2.4, -1.6, 0.832, 2.057, 0], [2.4, -1.55, 0.855, 2.057, 0], [2.4, -1.5, 0.878, 2.057, 0], [2.4, -1.45, 0.901, 2.057, 0], [2.4, -1.4, 0.923, 2.057, 0], [2.4, -1.35, 0.946, 2.057, 0], [2.4, -1.3, 0.969, 2.057, 0], [2.4, -1.25, 0.992, 2.057, 0], [2.4, -1.2, 1.015, 2.057, 0], [2.4, -1.15, 1.038, 2.057, 0], [2.4, -1.1, 1.061, 2.057, 0], [2.4, -1.05, 1.083, 2.057, 0], [2.4, -1.0, 1.106, 2.057, 0], [2.4, -0.95, 1.129, 2.057, 0], [2.4, -0.9, 1.152, 2.057, 0], [2.4, -0.85, 1.175, 2.057, 0], [2.4, -0.8, 1.198, 2.057, 0], [2.4, -0.75, 1.221, 2.057, 0], [2.4, -0.7, 1.243, 2.057, 0], [2.4, -0.65, 1.266, 2.057, 0], [2.4, -0.6, 1.289, 2.057, 0], [2.4, -0.55, 1.312, 2.057, 0], [2.4, -0.5, 1.335, 2.057, 0], [2.4, -0.45, 1.358, 2.057, 1], [2.4, -0.4, 1.381, 2.057, 1], [2.5, -2.0, 0.669, 2.121, 0], [2.5, -1.95, 0.693, 2.121, 0], [2.5, -1.9, 0.716, 2.121, 0], [2.5, -1.85, 0.74, 2.121, 0], [2.5, -1.8, 0.763, 2.121, 0], [2.5, -1.75, 0.787, 2.121, 0], [2.5, -1.7, 0.811, 2.121, 0], [2.5, -1.65, 0.834, 2.121, 0], [2.5, -1.6, 0.858, 2.121, 0], [2.5, -1.55, 0.881, 2.121, 0], [2.5, -1.5, 0.905, 2.121, 0], [2.5, -1.45, 0.928, 2.121, 0], [2.5, -1.4, 0.952, 2.121, 0], [2.5, -1.35, 0.975, 2.121, 0], [2.5, -1.3, 0.999, 2.121, 0], [2.5, -1.25, 1.023, 2.121, 0], [2.5, -1.2, 1.046, 2.121, 0], [2.5, -1.15, 1.07, 2.121, 0], [2.5, -1.1, 1.093, 2.121, 0], [2.5, -1.05, 1.117, 2.121, 0], [2.5, -1.0, 1.14, 2.121, 0], [2.5, -0.95, 1.164, 2.121, 0], [2.5, -0.9, 1.188, 2.121, 0], [2.5, -0.85, 1.211, 2.121, 0], [2.5, -0.8, 1.235, 2.121, 0], [2.5, -0.75, 1.258, 2.121, 0], [2.5, -0.7, 1.282, 2.121, 0], [2.5, -0.65, 1.305, 2.121, 0], [2.5, -0.6, 1.329, 2.121, 0], [2.5, -0.55, 1.352, 2.121, 1], [2.5, -0.5, 1.376, 2.121, 1], [2.5, -0.45, 1.4, 2.121, 1], [2.5, -0.4, 1.423, 2.121, 1], [2.6, -2.0, 0.689, 2.183, 0], [2.6, -1.95, 0.713, 2.183, 0], [2.6, -1.9, 0.737, 2.183, 0], [2.6, -1.85, 0.762, 2.183, 0], [2.6, -1.8, 0.786, 2.183, 0], [2.6, -1.75, 0.81, 2.183, 0], [2.6, -1.7, 0.834, 2.183, 0], [2.6, -1.65, 0.859, 2.183, 0], [2.6, -1.6, 0.883, 2.183, 0], [2.6, -1.55, 0.907, 2.183, 0], [2.6, -1.5, 0.931, 2.183, 0], [2.6, -1.45, 0.956, 2.183, 0], [2.6, -1.4, 0.98, 2.183, 0], [2.6, -1.35, 1.004, 2.183, 0], [2.6, -1.3, 1.028, 2.183, 0], [2.6, -1.25, 1.053, 2.183, 0], [2.6, -1.2, 1.077, 2.183, 0], [2.6, -1.15, 1.101, 2.183, 0], [2.6, -1.1, 1.125, 2.183, 0], [2.6, -1.05, 1.15, 2.183, 0], [2.6, -1.0, 1.174, 2.183, 0], [2.6, -0.95, 1.198, 2.183, 0], [2.6, -0.9, 1.222, 2.183, 0], [2.6, -0.85, 1.247, 2.183, 0], [2.6, -0.8, 1.271, 2.183, 0], [2.6, -0.75, 1.295, 2.183, 0], [2.6, -0.7, 1.319, 2.183, 0], [2.6, -0.65, 1.344, 2.183, 0], [2.6, -0.6, 1.368, 2.183, 1], [2.6, -0.55, 1.392, 2.183, 1], [2.6, -0.5, 1.416, 2.183, 1], [2.6, -0.45, 1.441, 2.183, 1], [2.6, -0.4, 1.465, 2.183, 1], [2.7, -2.0, 0.708, 2.244, 0], [2.7, -1.95, 0.733, 2.244, 0], [2.7, -1.9, 0.758, 2.244, 0], [2.7, -1.85, 0.783, 2.244, 0], [2.7, -1.8, 0.808, 2.244, 0], [2.7, -1.75, 0.833, 2.244, 0], [2.7, -1.7, 0.858, 2.244, 0], [2.7, -1.65, 0.883, 2.244, 0], [2.7, -1.6, 0.907, 2.244, 0], [2.7, -1.55, 0.932, 2.244, 0], [2.7, -1.5, 0.957, 2.244, 0], [2.7, -1.45, 0.982, 2.244, 0], [2.7, -1.4, 1.007, 2.244, 0], [2.7, -1.35, 1.032, 2.244, 0], [2.7, -1.3, 1.057, 2.244, 0], [2.7, -1.25, 1.082, 2.244, 0], [2.7, -1.2, 1.107, 2.244, 0], [2.7, -1.15, 1.132, 2.244, 0], [2.7, -1.1, 1.157, 2.244, 0], [2.7, -1.05, 1.182, 2.244, 0], [2.7, -1.0, 1.207, 2.244, 0], [2.7, -0.95, 1.232, 2.244, 0], [2.7, -0.9, 1.257, 2.244, 0], [2.7, -0.85, 1.281, 2.244, 0], [2.7, -0.8, 1.306, 2.244, 0], [2.7, -0.75, 1.331, 2.244, 0], [2.7, -0.7, 1.356, 2.244, 1], [2.7, -0.65, 1.381, 2.244, 1], [2.7, -0.6, 1.406, 2.244, 1], [2.7, -0.55, 1.431, 2.244, 1], [2.7, -0.5, 1.456, 2.244, 1], [2.7, -0.45, 1.481, 2.244, 1], [2.7, -0.4, 1.506, 2.244, 1], [2.8, -2.0, 0.727, 2.303, 0], [2.8, -1.95, 0.752, 2.303, 0], [2.8, -1.9, 0.778, 2.303, 0], [2.8, -1.85, 0.804, 2.303, 0], [2.8, -1.8, 0.829, 2.303, 0], [2.8, -1.75, 0.855, 2.303, 0], [2.8, -1.7, 0.88, 2.303, 0], [2.8, -1.65, 0.906, 2.303, 0], [2.8, -1.6, 0.932, 2.303, 0], [2.8, -1.55, 0.957, 2.303, 0], [2.8, -1.5, 0.983, 2.303, 0], [2.8, -1.45, 1.008, 2.303, 0], [2.8, -1.4, 1.034, 2.303, 0], [2.8, -1.35, 1.06, 2.303, 0], [2.8, -1.3, 1.085, 2.303, 0], [2.8, -1.25, 1.111, 2.303, 0], [2.8, -1.2, 1.136, 2.303, 0], [2.8, -1.15, 1.162, 2.303, 0], [2.8, -1.1, 1.188, 2.303, 0], [2.8, -1.05, 1.213, 2.303, 0], [2.8, -1.0, 1.239, 2.303, 0], [2.8, -0.95, 1.264, 2.303, 0], [2.8, -0.9, 1.29, 2.303, 0], [2.8, -0.85, 1.316, 2.303, 0], [2.8, -0.8, 1.341, 2.303, 0], [2.8, -0.75, 1.367, 2.303, 1], [2.8, -0.7, 1.392, 2.303, 1], [2.8, -0.65, 1.418, 2.303, 1], [2.8, -0.6, 1.444, 2.303, 1], [2.8, -0.55, 1.469, 2.303, 1], [2.8, -0.5, 1.495, 2.303, 1], [2.8, -0.45, 1.52, 2.303, 1], [2.8, -0.4, 1.546, 2.303, 1], [2.9, -2.0, 0.745, 2.362, 0], [2.9, -1.95, 0.772, 2.362, 0], [2.9, -1.9, 0.798, 2.362, 0], [2.9, -1.85, 0.824, 2.362, 0], [2.9, -1.8, 0.85, 2.362, 0], [2.9, -1.75, 0.877, 2.362, 0], [2.9, -1.7, 0.903, 2.362, 0], [2.9, -1.65, 0.929, 2.362, 0], [2.9, -1.6, 0.955, 2.362, 0], [2.9, -1.55, 0.982, 2.362, 0], [2.9, -1.5, 1.008, 2.362, 0], [2.9, -1.45, 1.034, 2.362, 0], [2.9, -1.4, 1.06, 2.362, 0], [2.9, -1.35, 1.087, 2.362, 0], [2.9, -1.3, 1.113, 2.362, 0], [2.9, -1.25, 1.139, 2.362, 0], [2.9, -1.2, 1.165, 2.362, 0], [2.9, -1.15, 1.191, 2.362, 0], [2.9, -1.1, 1.218, 2.362, 0], [2.9, -1.05, 1.244, 2.362, 0], [2.9, -1.0, 1.27, 2.362, 0], [2.9, -0.95, 1.296, 2.362, 0], [2.9, -0.9, 1.323, 2.362, 0], [2.9, -0.85, 1.349, 2.362, 0], [2.9, -0.8, 1.375, 2.362, 1], [2.9, -0.75, 1.401, 2.362, 1], [2.9, -0.7, 1.428, 2.362, 1], [2.9, -0.65, 1.454, 2.362, 1], [2.9, -0.6, 1.48, 2.362, 1], [2.9, -0.55, 1.506, 2.362, 1], [2.9, -0.5, 1.533, 2.362, 1], [2.9, -0.45, 1.559, 2.362, 1], [2.9, -0.4, 1.585, 2.362, 1], [3.0, -2.0, 0.763, 2.419, 0], [3.0, -1.95, 0.79, 2.419, 0], [3.0, -1.9, 0.817, 2.419, 0], [3.0, -1.85, 0.844, 2.419, 0], [3.0, -1.8, 0.871, 2.419, 0], [3.0, -1.75, 0.898, 2.419, 0], [3.0, -1.7, 0.925, 2.419, 0], [3.0, -1.65, 0.952, 2.419, 0], [3.0, -1.6, 0.978, 2.419, 0], [3.0, -1.55, 1.005, 2.419, 0], [3.0, -1.5, 1.032, 2.419, 0], [3.0, -1.45, 1.059, 2.419, 0], [3.0, -1.4, 1.086, 2.419, 0], [3.0, -1.35, 1.113, 2.419, 0], [3.0, -1.3, 1.14, 2.419, 0], [3.0, -1.25, 1.167, 2.419, 0], [3.0, -1.2, 1.194, 2.419, 0], [3.0, -1.15, 1.22, 2.419, 0], [3.0, -1.1, 1.247, 2.419, 0], [3.0, -1.05, 1.274, 2.419, 0], [3.0, -1.0, 1.301, 2.419, 0], [3.0, -0.95, 1.328, 2.419, 0], [3.0, -0.9, 1.355, 2.419, 1], [3.0, -0.85, 1.382, 2.419, 1], [3.0, -0.8, 1.409, 2.419, 1], [3.0, -0.75, 1.435, 2.419, 1], [3.0, -0.7, 1.462, 2.419, 1], [3.0, -0.65, 1.489, 2.419, 1], [3.0, -0.6, 1.516, 2.419, 1], [3.0, -0.55, 1.543, 2.419, 1], [3.0, -0.5, 1.57, 2.419, 1], [3.0, -0.45, 1.597, 2.419, 1], [3.0, -0.4, 1.624, 2.419, 1], [3.1, -2.0, 0.781, 2.476, 0], [3.1, -1.95, 0.809, 2.476, 0], [3.1, -1.9, 0.836, 2.476, 0], [3.1, -1.85, 0.864, 2.476, 0], [3.1, -1.8, 0.891, 2.476, 0], [3.1, -1.75, 0.919, 2.476, 0], [3.1, -1.7, 0.946, 2.476, 0], [3.1, -1.65, 0.974, 2.476, 0], [3.1, -1.6, 1.001, 2.476, 0], [3.1, -1.55, 1.029, 2.476, 0], [3.1, -1.5, 1.056, 2.476, 0], [3.1, -1.45, 1.084, 2.476, 0], [3.1, -1.4, 1.111, 2.476, 0], [3.1, -1.35, 1.139, 2.476, 0], [3.1, -1.3, 1.166, 2.476, 0], [3.1, -1.25, 1.194, 2.476, 0], [3.1, -1.2, 1.221, 2.476, 0], [3.1, -1.15, 1.249, 2.476, 0], [3.1, -1.1, 1.276, 2.476, 0], [3.1, -1.05, 1.304, 2.476, 0], [3.1, -1.0, 1.331, 2.476, 0], [3.1, -0.95, 1.359, 2.476, 1], [3.1, -0.9, 1.386, 2.476, 1], [3.1, -0.85, 1.414, 2.476, 1], [3.1, -0.8, 1.441, 2.476, 1], [3.1, -0.75, 1.469, 2.476, 1], [3.1, -0.7, 1.496, 2.476, 1], [3.1, -0.65, 1.524, 2.476, 1], [3.1, -0.6, 1.551, 2.476, 1], [3.1, -0.55, 1.579, 2.476, 1], [3.1, -0.5, 1.606, 2.476, 1], [3.1, -0.45, 1.634, 2.476, 1], [3.1, -0.4, 1.661, 2.476, 0], [3.2, -2.0, 0.799, 2.531, 0], [3.2, -1.95, 0.827, 2.531, 0], [3.2, -1.9, 0.855, 2.531, 0], [3.2, -1.85, 0.883, 2.531, 0], [3.2, -1.8, 0.911, 2.531, 0], [3.2, -1.75, 0.939, 2.531, 0], [3.2, -1.7, 0.967, 2.531, 0], [3.2, -1.65, 0.995, 2.531, 0], [3.2, -1.6, 1.024, 2.531, 0], [3.2, -1.55, 1.052, 2.531, 0], [3.2, -1.5, 1.08, 2.531, 0], [3.2, -1.45, 1.108, 2.531, 0], [3.2, -1.4, 1.136, 2.531, 0], [3.2, -1.35, 1.164, 2.531, 0], [3.2, -1.3, 1.192, 2.531, 0], [3.2, -1.25, 1.22, 2.531, 0], [3.2, -1.2, 1.249, 2.531, 0], [3.2, -1.15, 1.277, 2.531, 0], [3.2, -1.1, 1.305, 2.531, 0], [3.2, -1.05, 1.333, 2.531, 0], [3.2, -1.0, 1.361, 2.531, 1], [3.2, -0.95, 1.389, 2.531, 1], [3.2, -0.9, 1.417, 2.531, 1], [3.2, -0.85, 1.445, 2.531, 1], [3.2, -0.8, 1.473, 2.531, 1], [3.2, -0.75, 1.502, 2.531, 1], [3.2, -0.7, 1.53, 2.531, 1], [3.2, -0.65, 1.558, 2.531, 1], [3.2, -0.6, 1.586, 2.531, 1], [3.2, -0.55, 1.614, 2.531, 1], [3.2, -0.5, 1.642, 2.531, 1], [3.2, -0.45, 1.67, 2.531, 0], [3.2, -0.4, 1.698, 2.531, 0], [3.3, -2.0, 0.816, 2.585, 0], [3.3, -1.95, 0.844, 2.585, 0], [3.3, -1.9, 0.873, 2.585, 0], [3.3, -1.85, 0.902, 2.585, 0], [3.3, -1.8, 0.931, 2.585, 0], [3.3, -1.75, 0.959, 2.585, 0], [3.3, -1.7, 0.988, 2.585, 0], [3.3, -1.65, 1.017, 2.585, 0], [3.3, -1.6, 1.045, 2.585, 0], [3.3, -1.55, 1.074, 2.585, 0], [3.3, -1.5, 1.103, 2.585, 0], [3.3, -1.45, 1.132, 2.585, 0], [3.3, -1.4, 1.16, 2.585, 0], [3.3, -1.35, 1.189, 2.585, 0], [3.3, -1.3, 1.218, 2.585, 0], [3.3, -1.25, 1.246, 2.585, 0], [3.3, -1.2, 1.275, 2.585, 0], [3.3, -1.15, 1.304, 2.585, 0], [3.3, -1.1, 1.333, 2.585, 0], [3.3, -1.05, 1.361, 2.585, 1], [3.3, -1.0, 1.39, 2.585, 1], [3.3, -0.95, 1.419, 2.585, 1], [3.3, -0.9, 1.448, 2.585, 1], [3.3, -0.85, 1.476, 2.585, 1], [3.3, -0.8, 1.505, 2.585, 1], [3.3, -0.75, 1.534, 2.585, 1], [3.3, -0.7, 1.562, 2.585, 1], [3.3, -0.65, 1.591, 2.585, 1], [3.3, -0.6, 1.62, 2.585, 1], [3.3, -0.55, 1.649, 2.585, 1], [3.3, -0.5, 1.677, 2.585, 0], [3.3, -0.45, 1.706, 2.585, 0], [3.3, -0.4, 1.735, 2.585, 0], [3.4, -2.0, 0.832, 2.638, 0], [3.4, -1.95, 0.862, 2.638, 0], [3.4, -1.9, 0.891, 2.638, 0], [3.4, -1.85, 0.92, 2.638, 0], [3.4, -1.8, 0.95, 2.638, 0], [3.4, -1.75, 0.979, 2.638, 0], [3.4, -1.7, 1.008, 2.638, 0], [3.4, -1.65, 1.038, 2.638, 0], [3.4, -1.6, 1.067, 2.638, 0], [3.4, -1.55, 1.096, 2.638, 0], [3.4, -1.5, 1.126, 2.638, 0], [3.4, -1.45, 1.155, 2.638, 0], [3.4, -1.4, 1.184, 2.638, 0], [3.4, -1.35, 1.213, 2.638, 0], [3.4, -1.3, 1.243, 2.638, 0], [3.4, -1.25, 1.272, 2.638, 0], [3.4, -1.2, 1.301, 2.638, 0], [3.4, -1.15, 1.331, 2.638, 0], [3.4, -1.1, 1.36, 2.638, 1], [3.4, -1.05, 1.389, 2.638, 1], [3.4, -1.0, 1.419, 2.638, 1], [3.4, -0.95, 1.448, 2.638, 1], [3.4, -0.9, 1.477, 2.638, 1], [3.4, -0.85, 1.507, 2.638, 1], [3.4, -0.8, 1.536, 2.638, 1], [3.4, -0.75, 1.565, 2.638, 1], [3.4, -0.7, 1.594, 2.638, 1], [3.4, -0.65, 1.624, 2.638, 1], [3.4, -0.6, 1.653, 2.638, 0], [3.4, -0.55, 1.682, 2.638, 0], [3.4, -0.5, 1.712, 2.638, 0], [3.4, -0.45, 1.741, 2.638, 0], [3.4, -0.4, 1.77, 2.638, 0], [3.5, -2.0, 0.849, 2.69, 0], [3.5, -1.95, 0.879, 2.69, 0], [3.5, -1.9, 0.909, 2.69, 0], [3.5, -1.85, 0.939, 2.69, 0], [3.5, -1.8, 0.968, 2.69, 0], [3.5, -1.75, 0.998, 2.69, 0], [3.5, -1.7, 1.028, 2.69, 0], [3.5, -1.65, 1.058, 2.69, 0], [3.5, -1.6, 1.088, 2.69, 0], [3.5, -1.55, 1.118, 2.69, 0], [3.5, -1.5, 1.148, 2.69, 0], [3.5, -1.45, 1.178, 2.69, 0], [3.5, -1.4, 1.208, 2.69, 0], [3.5, -1.35, 1.237, 2.69, 0], [3.5, -1.3, 1.267, 2.69, 0], [3.5, -1.25, 1.297, 2.69, 0], [3.5, -1.2, 1.327, 2.69, 0], [3.5, -1.15, 1.357, 2.69, 1], [3.5, -1.1, 1.387, 2.69, 1], [3.5, -1.05, 1.417, 2.69, 1], [3.5, -1.0, 1.447, 2.69, 1], [3.5, -0.95, 1.477, 2.69, 1], [3.5, -0.9, 1.506, 2.69, 1], [3.5, -0.85, 1.536, 2.69, 1], [3.5, -0.8, 1.566, 2.69, 1], [3.5, -0.75, 1.596, 2.69, 1], [3.5, -0.7, 1.626, 2.69, 1], [3.5, -0.65, 1.656, 2.69, 0], [3.5, -0.6, 1.686, 2.69, 0], [3.5, -0.55, 1.716, 2.69, 0], [3.5, -0.5, 1.746, 2.69, 0], [3.5, -0.45, 1.775, 2.69, 0], [3.5, -0.4, 1.805, 2.69, 0], [3.6, -2.0, 0.865, 2.741, 0], [3.6, -1.95, 0.895, 2.741, 0], [3.6, -1.9, 0.926, 2.741, 0], [3.6, -1.85, 0.956, 2.741, 0], [3.6, -1.8, 0.987, 2.741, 0], [3.6, -1.75, 1.017, 2.741, 0], [3.6, -1.7, 1.048, 2.741, 0], [3.6, -1.65, 1.078, 2.741, 0], [3.6, -1.6, 1.109, 2.741, 0], [3.6, -1.55, 1.139, 2.741, 0], [3.6, -1.5, 1.17, 2.741, 0], [3.6, -1.45, 1.2, 2.741, 0], [3.6, -1.4, 1.23, 2.741, 0], [3.6, -1.35, 1.261, 2.741, 0], [3.6, -1.3, 1.291, 2.741, 0], [3.6, -1.25, 1.322, 2.741, 0], [3.6, -1.2, 1.352, 2.741, 1], [3.6, -1.15, 1.383, 2.741, 1], [3.6, -1.1, 1.413, 2.741, 1], [3.6, -1.05, 1.444, 2.741, 1], [3.6, -1.0, 1.474, 2.741, 1], [3.6, -0.95, 1.505, 2.741, 1], [3.6, -0.9, 1.535, 2.741, 1], [3.6, -0.85, 1.565, 2.741, 1], [3.6, -0.8, 1.596, 2.741, 1], [3.6, -0.75, 1.626, 2.741, 1], [3.6, -0.7, 1.657, 2.741, 0], [3.6, -0.65, 1.687, 2.741, 0], [3.6, -0.6, 1.718, 2.741, 0], [3.6, -0.55, 1.748, 2.741, 0], [3.6, -0.5, 1.779, 2.741, 0], [3.6, -0.45, 1.809, 2.741, 0], [3.6, -0.4, 1.84, 2.741, 0], [3.7, -2.0, 0.881, 2.791, 0], [3.7, -1.95, 0.912, 2.791, 0], [3.7, -1.9, 0.943, 2.791, 0], [3.7, -1.85, 0.974, 2.791, 0], [3.7, -1.8, 1.005, 2.791, 0], [3.7, -1.75, 1.036, 2.791, 0], [3.7, -1.7, 1.067, 2.791, 0], [3.7, -1.65, 1.098, 2.791, 0], [3.7, -1.6, 1.129, 2.791, 0], [3.7, -1.55, 1.16, 2.791, 0], [3.7, -1.5, 1.191, 2.791, 0], [3.7, -1.45, 1.222, 2.791, 0], [3.7, -1.4, 1.253, 2.791, 0], [3.7, -1.35, 1.284, 2.791, 0], [3.7, -1.3, 1.315, 2.791, 0], [3.7, -1.25, 1.346, 2.791, 0], [3.7, -1.2, 1.377, 2.791, 1], [3.7, -1.15, 1.408, 2.791, 1], [3.7, -1.1, 1.439, 2.791, 1], [3.7, -1.05, 1.47, 2.791, 1], [3.7, -1.0, 1.501, 2.791, 1], [3.7, -0.95, 1.532, 2.791, 1], [3.7, -0.9, 1.563, 2.791, 1], [3.7, -0.85, 1.594, 2.791, 1], [3.7, -0.8, 1.625, 2.791, 1], [3.7, -0.75, 1.656, 2.791, 0], [3.7, -0.7, 1.687, 2.791, 0], [3.7, -0.65, 1.718, 2.791, 0], [3.7, -0.6, 1.749, 2.791, 0], [3.7, -0.55, 1.78, 2.791, 0], [3.7, -0.5, 1.811, 2.791, 0], [3.7, -0.45, 1.842, 2.791, 0], [3.7, -0.4, 1.873, 2.791, 0], [3.8, -2.0, 0.896, 2.841, 0], [3.8, -1.95, 0.928, 2.841, 0], [3.8, -1.9, 0.959, 2.841, 0], [3.8, -1.85, 0.991, 2.841, 0], [3.8, -1.8, 1.023, 2.841, 0], [3.8, -1.75, 1.054, 2.841, 0], [3.8, -1.7, 1.086, 2.841, 0], [3.8, -1.65, 1.117, 2.841, 0], [3.8, -1.6, 1.149, 2.841, 0], [3.8, -1.55, 1.18, 2.841, 0], [3.8, -1.5, 1.212, 2.841, 0], [3.8, -1.45, 1.244, 2.841, 0], [3.8, -1.4, 1.275, 2.841, 0], [3.8, -1.35, 1.307, 2.841, 0], [3.8, -1.3, 1.338, 2.841, 0], [3.8, -1.25, 1.37, 2.841, 1], [3.8, -1.2, 1.401, 2.841, 1], [3.8, -1.15, 1.433, 2.841, 1], [3.8, -1.1, 1.464, 2.841, 1], [3.8, -1.05, 1.496, 2.841, 1], [3.8, -1.0, 1.528, 2.841, 1], [3.8, -0.95, 1.559, 2.841, 1], [3.8, -0.9, 1.591, 2.841, 1], [3.8, -0.85, 1.622, 2.841, 1], [3.8, -0.8, 1.654, 2.841, 0], [3.8, -0.75, 1.685, 2.841, 0], [3.8, -0.7, 1.717, 2.841, 0], [3.8, -0.65, 1.749, 2.841, 0], [3.8, -0.6, 1.78, 2.841, 0], [3.8, -0.55, 1.812, 2.841, 0], [3.8, -0.5, 1.843, 2.841, 0], [3.8, -0.45, 1.875, 2.841, 0], [3.8, -0.4, 1.906, 2.841, 0], [3.9, -2.0, 0.912, 2.889, 0], [3.9, -1.95, 0.944, 2.889, 0], [3.9, -1.9, 0.976, 2.889, 0], [3.9, -1.85, 1.008, 2.889, 0], [3.9, -1.8, 1.04, 2.889, 0], [3.9, -1.75, 1.072, 2.889, 0], [3.9, -1.7, 1.104, 2.889, 0], [3.9, -1.65, 1.136, 2.889, 0], [3.9, -1.6, 1.168, 2.889, 0], [3.9, -1.55, 1.2, 2.889, 0], [3.9, -1.5, 1.233, 2.889, 0], [3.9, -1.45, 1.265, 2.889, 0], [3.9, -1.4, 1.297, 2.889, 0], [3.9, -1.35, 1.329, 2.889, 0], [3.9, -1.3, 1.361, 2.889, 1], [3.9, -1.25, 1.393, 2.889, 1], [3.9, -1.2, 1.425, 2.889, 1], [3.9, -1.15, 1.457, 2.889, 1], [3.9, -1.1, 1.489, 2.889, 1], [3.9, -1.05, 1.521, 2.889, 1], [3.9, -1.0, 1.554, 2.889, 1], [3.9, -0.95, 1.586, 2.889, 1], [3.9, -0.9, 1.618, 2.889, 1], [3.9, -0.85, 1.65, 2.889, 1], [3.9, -0.8, 1.682, 2.889, 0], [3.9, -0.75, 1.714, 2.889, 0], [3.9, -0.7, 1.746, 2.889, 0], [3.9, -0.65, 1.778, 2.889, 0], [3.9, -0.6, 1.81, 2.889, 0], [3.9, -0.55, 1.842, 2.889, 0], [3.9, -0.5, 1.875, 2.889, 0], [3.9, -0.45, 1.907, 2.889, 0], [3.9, -0.4, 1.939, 2.889, 0], [4.0, -2.0, 0.927, 2.936, 0], [4.0, -1.95, 0.959, 2.936, 0], [4.0, -1.9, 0.992, 2.936, 0], [4.0, -1.85, 1.024, 2.936, 0], [4.0, -1.8, 1.057, 2.936, 0], [4.0, -1.75, 1.09, 2.936, 0], [4.0, -1.7, 1.122, 2.936, 0], [4.0, -1.65, 1.155, 2.936, 0], [4.0, -1.6, 1.188, 2.936, 0], [4.0, -1.55, 1.22, 2.936, 0], [4.0, -1.5, 1.253, 2.936, 0], [4.0, -1.45, 1.285, 2.936, 0], [4.0, -1.4, 1.318, 2.936, 0], [4.0, -1.35, 1.351, 2.936, 1], [4.0, -1.3, 1.383, 2.936, 1], [4.0, -1.25, 1.416, 2.936, 1], [4.0, -1.2, 1.449, 2.936, 1], [4.0, -1.15, 1.481, 2.936, 1], [4.0, -1.1, 1.514, 2.936, 1], [4.0, -1.05, 1.546, 2.936, 1], [4.0, -1.0, 1.579, 2.936, 1], [4.0, -0.95, 1.612, 2.936, 1], [4.0, -0.9, 1.644, 2.936, 1], [4.0, -0.85, 1.677, 2.936, 0], [4.0, -0.8, 1.71, 2.936, 0], [4.0, -0.75, 1.742, 2.936, 0], [4.0, -0.7, 1.775, 2.936, 0], [4.0, -0.65, 1.808, 2.936, 0], [4.0, -0.6, 1.84, 2.936, 0], [4.0, -0.55, 1.873, 2.936, 0], [4.0, -0.5, 1.905, 2.936, 0], [4.0, -0.45, 1.938, 2.936, 0], [4.0, -0.4, 1.971, 2.936, 0], [4.1, -2.0, 0.941, 2.983, 0], [4.1, -1.95, 0.974, 2.983, 0], [4.1, -1.9, 1.008, 2.983, 0], [4.1, -1.85, 1.041, 2.983, 0], [4.1, -1.8, 1.074, 2.983, 0], [4.1, -1.75, 1.107, 2.983, 0], [4.1, -1.7, 1.14, 2.983, 0], [4.1, -1.65, 1.173, 2.983, 0], [4.1, -1.6, 1.206, 2.983, 0], [4.1, -1.55, 1.24, 2.983, 0], [4.1, -1.5, 1.273, 2.983, 0], [4.1, -1.45, 1.306, 2.983, 0], [4.1, -1.4, 1.339, 2.983, 0], [4.1, -1.35, 1.372, 2.983, 1], [4.1, -1.3, 1.405, 2.983, 1], [4.1, -1.25, 1.438, 2.983, 1], [4.1, -1.2, 1.472, 2.983, 1], [4.1, -1.15, 1.505, 2.983, 1], [4.1, -1.1, 1.538, 2.983, 1], [4.1, -1.05, 1.571, 2.983, 1], [4.1, -1.0, 1.604, 2.983, 1], [4.1, -0.95, 1.637, 2.983, 1], [4.1, -0.9, 1.67, 2.983, 0], [4.1, -0.85, 1.704, 2.983, 0], [4.1, -0.8, 1.737, 2.983, 0], [4.1, -0.75, 1.77, 2.983, 0], [4.1, -0.7, 1.803, 2.983, 0], [4.1, -0.65, 1.836, 2.983, 0], [4.1, -0.6, 1.869, 2.983, 0], [4.1, -0.55, 1.903, 2.983, 0], [4.1, -0.5, 1.936, 2.983, 0], [4.1, -0.45, 1.969, 2.983, 0], [4.1, -0.4, 2.002, 2.983, 0], [4.2, -2.0, 0.956, 3.029, 0], [4.2, -1.95, 0.989, 3.029, 0], [4.2, -1.9, 1.023, 3.029, 0], [4.2, -1.85, 1.057, 3.029, 0], [4.2, -1.8, 1.09, 3.029, 0], [4.2, -1.75, 1.124, 3.029, 0], [4.2, -1.7, 1.158, 3.029, 0], [4.2, -1.65, 1.191, 3.029, 0], [4.2, -1.6, 1.225, 3.029, 0], [4.2, -1.55, 1.259, 3.029, 0], [4.2, -1.5, 1.292, 3.029, 0], [4.2, -1.45, 1.326, 3.029, 0], [4.2, -1.4, 1.36, 3.029, 1], [4.2, -1.35, 1.393, 3.029, 1], [4.2, -1.3, 1.427, 3.029, 1], [4.2, -1.25, 1.461, 3.029, 1], [4.2, -1.2, 1.494, 3.029, 1], [4.2, -1.15, 1.528, 3.029, 1], [4.2, -1.1, 1.562, 3.029, 1], [4.2, -1.05, 1.595, 3.029, 1], [4.2, -1.0, 1.629, 3.029, 1], [4.2, -0.95, 1.663, 3.029, 0], [4.2, -0.9, 1.696, 3.029, 0], [4.2, -0.85, 1.73, 3.029, 0], [4.2, -0.8, 1.763, 3.029, 0], [4.2, -0.75, 1.797, 3.029, 0], [4.2, -0.7, 1.831, 3.029, 0], [4.2, -0.65, 1.864, 3.029, 0], [4.2, -0.6, 1.898, 3.029, 0], [4.2, -0.55, 1.932, 3.029, 0], [4.2, -0.5, 1.965, 3.029, 0], [4.2, -0.45, 1.999, 3.029, 0], [4.2, -0.4, 2.033, 3.029, 0], [4.3, -2.0, 0.97, 3.074, 0], [4.3, -1.95, 1.004, 3.074, 0], [4.3, -1.9, 1.038, 3.074, 0], [4.3, -1.85, 1.072, 3.074, 0], [4.3, -1.8, 1.107, 3.074, 0], [4.3, -1.75, 1.141, 3.074, 0], [4.3, -1.7, 1.175, 3.074, 0], [4.3, -1.65, 1.209, 3.074, 0], [4.3, -1.6, 1.243, 3.074, 0], [4.3, -1.55, 1.277, 3.074, 0], [4.3, -1.5, 1.312, 3.074, 0], [4.3, -1.45, 1.346, 3.074, 0], [4.3, -1.4, 1.38, 3.074, 1], [4.3, -1.35, 1.414, 3.074, 1], [4.3, -1.3, 1.448, 3.074, 1], [4.3, -1.25, 1.482, 3.074, 1], [4.3, -1.2, 1.516, 3.074, 1], [4.3, -1.15, 1.551, 3.074, 1], [4.3, -1.1, 1.585, 3.074, 1], [4.3, -1.05, 1.619, 3.074, 1], [4.3, -1.0, 1.653, 3.074, 0], [4.3, -0.95, 1.687, 3.074, 0], [4.3, -0.9, 1.721, 3.074, 0], [4.3, -0.85, 1.756, 3.074, 0], [4.3, -0.8, 1.79, 3.074, 0], [4.3, -0.75, 1.824, 3.074, 0], [4.3, -0.7, 1.858, 3.074, 0], [4.3, -0.65, 1.892, 3.074, 0], [4.3, -0.6, 1.926, 3.074, 0], [4.3, -0.55, 1.96, 3.074, 0], [4.3, -0.5, 1.995, 3.074, 0], [4.3, -0.45, 2.029, 3.074, 0], [4.3, -0.4, 2.063, 3.074, 0], [4.4, -2.0, 0.984, 3.118, 0], [4.4, -1.95, 1.019, 3.118, 0], [4.4, -1.9, 1.053, 3.118, 0], [4.4, -1.85, 1.088, 3.118, 0], [4.4, -1.8, 1.123, 3.118, 0], [4.4, -1.75, 1.157, 3.118, 0], [4.4, -1.7, 1.192, 3.118, 0], [4.4, -1.65, 1.226, 3.118, 0], [4.4, -1.6, 1.261, 3.118, 0], [4.4, -1.55, 1.296, 3.118, 0], [4.4, -1.5, 1.33, 3.118, 0], [4.4, -1.45, 1.365, 3.118, 1], [4.4, -1.4, 1.4, 3.118, 1], [4.4, -1.35, 1.434, 3.118, 1], [4.4, -1.3, 1.469, 3.118, 1], [4.4, -1.25, 1.504, 3.118, 1], [4.4, -1.2, 1.538, 3.118, 1], [4.4, -1.15, 1.573, 3.118, 1], [4.4, -1.1, 1.608, 3.118, 1], [4.4, -1.05, 1.642, 3.118, 1], [4.4, -1.0, 1.677, 3.118, 0], [4.4, -0.95, 1.711, 3.118, 0], [4.4, -0.9, 1.746, 3.118, 0], [4.4, -0.85, 1.781, 3.118, 0], [4.4, -0.8, 1.815, 3.118, 0], [4.4, -0.75, 1.85, 3.118, 0], [4.4, -0.7, 1.885, 3.118, 0], [4.4, -0.65, 1.919, 3.118, 0], [4.4, -0.6, 1.954, 3.118, 0], [4.4, -0.55, 1.989, 3.118, 0], [4.4, -0.5, 2.023, 3.118, 0], [4.4, -0.45, 2.058, 3.118, 0], [4.4, -0.4, 2.093, 3.118, 0], [4.5, -2.0, 0.998, 3.162, 0], [4.5, -1.95, 1.033, 3.162, 0], [4.5, -1.9, 1.068, 3.162, 0], [4.5, -1.85, 1.103, 3.162, 0], [4.5, -1.8, 1.138, 3.162, 0], [4.5, -1.75, 1.173, 3.162, 0], [4.5, -1.7, 1.208, 3.162, 0], [4.5, -1.65, 1.244, 3.162, 0], [4.5, -1.6, 1.279, 3.162, 0], [4.5, -1.55, 1.314, 3.162, 0], [4.5, -1.5, 1.349, 3.162, 0], [4.5, -1.45, 1.384, 3.162, 1], [4.5, -1.4, 1.419, 3.162, 1], [4.5, -1.35, 1.454, 3.162, 1], [4.5, -1.3, 1.489, 3.162, 1], [4.5, -1.25, 1.525, 3.162, 1], [4.5, -1.2, 1.56, 3.162, 1], [4.5, -1.15, 1.595, 3.162, 1], [4.5, -1.1, 1.63, 3.162, 1], [4.5, -1.05, 1.665, 3.162, 0], [4.5, -1.0, 1.7, 3.162, 0], [4.5, -0.95, 1.735, 3.162, 0], [4.5, -0.9, 1.77, 3.162, 0], [4.5, -0.85, 1.806, 3.162, 0], [4.5, -0.8, 1.841, 3.162, 0], [4.5, -0.75, 1.876, 3.162, 0], [4.5, -0.7, 1.911, 3.162, 0], [4.5, -0.65, 1.946, 3.162, 0], [4.5, -0.6, 1.981, 3.162, 0], [4.5, -0.55, 2.016, 3.162, 0], [4.5, -0.5, 2.052, 3.162, 0], [4.5, -0.45, 2.087, 3.162, 0], [4.5, -0.4, 2.122, 3.162, 0], [4.6, -2.0, 1.011, 3.204, 0], [4.6, -1.95, 1.047, 3.204, 0], [4.6, -1.9, 1.082, 3.204, 0], [4.6, -1.85, 1.118, 3.204, 0], [4.6, -1.8, 1.154, 3.204, 0], [4.6, -1.75, 1.189, 3.204, 0], [4.6, -1.7, 1.225, 3.204, 0], [4.6, -1.65, 1.26, 3.204, 0], [4.6, -1.6, 1.296, 3.204, 0], [4.6, -1.55, 1.332, 3.204, 0], [4.6, -1.5, 1.367, 3.204, 1], [4.6, -1.45, 1.403, 3.204, 1], [4.6, -1.4, 1.438, 3.204, 1], [4.6, -1.35, 1.474, 3.204, 1], [4.6, -1.3, 1.51, 3.204, 1], [4.6, -1.25, 1.545, 3.204, 1], [4.6, -1.2, 1.581, 3.204, 1], [4.6, -1.15, 1.616, 3.204, 1], [4.6, -1.1, 1.652, 3.204, 0], [4.6, -1.05, 1.688, 3.204, 0], [4.6, -1.0, 1.723, 3.204, 0], [4.6, -0.95, 1.759, 3.204, 0], [4.6, -0.9, 1.794, 3.204, 0], [4.6, -0.85, 1.83, 3.204, 0], [4.6, -0.8, 1.866, 3.204, 0], [4.6, -0.75, 1.901, 3.204, 0], [4.6, -0.7, 1.937, 3.204, 0], [4.6, -0.65, 1.972, 3.204, 0], [4.6, -0.6, 2.008, 3.204, 0], [4.6, -0.55, 2.044, 3.204, 0], [4.6, -0.5, 2.079, 3.204, 0], [4.6, -0.45, 2.115, 3.204, 0], [4.6, -0.4, 2.15, 3.204, 0], [4.7, -2.0, 1.024, 3.246, 0], [4.7, -1.95, 1.06, 3.246, 0], [4.7, -1.9, 1.097, 3.246, 0], [4.7, -1.85, 1.133, 3.246, 0], [4.7, -1.8, 1.169, 3.246, 0], [4.7, -1.75, 1.205, 3.246, 0], [4.7, -1.7, 1.241, 3.246, 0], [4.7, -1.65, 1.277, 3.246, 0], [4.7, -1.6, 1.313, 3.246, 0], [4.7, -1.55, 1.349, 3.246, 0], [4.7, -1.5, 1.385, 3.246, 1], [4.7, -1.45, 1.421, 3.246, 1], [4.7, -1.4, 1.457, 3.246, 1], [4.7, -1.35, 1.493, 3.246, 1], [4.7, -1.3, 1.529, 3.246, 1], [4.7, -1.25, 1.565, 3.246, 1], [4.7, -1.2, 1.602, 3.246, 1], [4.7, -1.15, 1.638, 3.246, 1], [4.7, -1.1, 1.674, 3.246, 0], [4.7, -1.05, 1.71, 3.246, 0], [4.7, -1.0, 1.746, 3.246, 0], [4.7, -0.95, 1.782, 3.246, 0], [4.7, -0.9, 1.818, 3.246, 0], [4.7, -0.85, 1.854, 3.246, 0], [4.7, -0.8, 1.89, 3.246, 0], [4.7, -0.75, 1.926, 3.246, 0], [4.7, -0.7, 1.962, 3.246, 0], [4.7, -0.65, 1.998, 3.246, 0], [4.7, -0.6, 2.034, 3.246, 0], [4.7, -0.55, 2.07, 3.246, 0], [4.7, -0.5, 2.107, 3.246, 0], [4.7, -0.45, 2.143, 3.246, 0], [4.7, -0.4, 2.179, 3.246, 0], [4.8, -2.0, 1.037, 3.288, 0], [4.8, -1.95, 1.074, 3.288, 0], [4.8, -1.9, 1.111, 3.288, 0], [4.8, -1.85, 1.147, 3.288, 0], [4.8, -1.8, 1.184, 3.288, 0], [4.8, -1.75, 1.22, 3.288, 0], [4.8, -1.7, 1.257, 3.288, 0], [4.8, -1.65, 1.293, 3.288, 0], [4.8, -1.6, 1.33, 3.288, 0], [4.8, -1.55, 1.366, 3.288, 1], [4.8, -1.5, 1.403, 3.288, 1], [4.8, -1.45, 1.439, 3.288, 1], [4.8, -1.4, 1.476, 3.288, 1], [4.8, -1.35, 1.512, 3.288, 1], [4.8, -1.3, 1.549, 3.288, 1], [4.8, -1.25, 1.585, 3.288, 1], [4.8, -1.2, 1.622, 3.288, 1], [4.8, -1.15, 1.658, 3.288, 0], [4.8, -1.1, 1.695, 3.288, 0], [4.8, -1.05, 1.732, 3.288, 0], [4.8, -1.0, 1.768, 3.288, 0], [4.8, -0.95, 1.805, 3.288, 0], [4.8, -0.9, 1.841, 3.288, 0], [4.8, -0.85, 1.878, 3.288, 0], [4.8, -0.8, 1.914, 3.288, 0], [4.8, -0.75, 1.951, 3.288, 0], [4.8, -0.7, 1.987, 3.288, 0], [4.8, -0.65, 2.024, 3.288, 0], [4.8, -0.6, 2.06, 3.288, 0], [4.8, -0.55, 2.097, 3.288, 0], [4.8, -0.5, 2.133, 3.288, 0], [4.8, -0.45, 2.17, 3.288, 0], [4.8, -0.4, 2.206, 3.288, 0], [4.9, -2.0, 1.05, 3.328, 0], [4.9, -1.95, 1.087, 3.328, 0], [4.9, -1.9, 1.124, 3.328, 0], [4.9, -1.85, 1.161, 3.328, 0], [4.9, -1.8, 1.198, 3.328, 0], [4.9, -1.75, 1.235, 3.328, 0], [4.9, -1.7, 1.272, 3.328, 0], [4.9, -1.65, 1.309, 3.328, 0], [4.9, -1.6, 1.346, 3.328, 0], [4.9, -1.55, 1.383, 3.328, 1], [4.9, -1.5, 1.42, 3.328, 1], [4.9, -1.45, 1.457, 3.328, 1], [4.9, -1.4, 1.494, 3.328, 1], [4.9, -1.35, 1.531, 3.328, 1], [4.9, -1.3, 1.568, 3.328, 1], [4.9, -1.25, 1.605, 3.328, 1], [4.9, -1.2, 1.642, 3.328, 1], [4.9, -1.15, 1.679, 3.328, 0], [4.9, -1.1, 1.716, 3.328, 0], [4.9, -1.05, 1.753, 3.328, 0], [4.9, -1.0, 1.79, 3.328, 0], [4.9, -0.95, 1.827, 3.328, 0], [4.9, -0.9, 1.864, 3.328, 0], [4.9, -0.85, 1.901, 3.328, 0], [4.9, -0.8, 1.938, 3.328, 0], [4.9, -0.75, 1.975, 3.328, 0], [4.9, -0.7, 2.012, 3.328, 0], [4.9, -0.65, 2.049, 3.328, 0], [4.9, -0.6, 2.086, 3.328, 0], [4.9, -0.55, 2.123, 3.328, 0], [4.9, -0.5, 2.16, 3.328, 0], [4.9, -0.45, 2.197, 3.328, 0], [4.9, -0.4, 2.234, 3.328, 0], [5.0, -2.0, 1.063, 3.368, 0], [5.0, -1.95, 1.1, 3.368, 0], [5.0, -1.9, 1.138, 3.368, 0], [5.0, -1.85, 1.175, 3.368, 0], [5.0, -1.8, 1.213, 3.368, 0], [5.0, -1.75, 1.25, 3.368, 0], [5.0, -1.7, 1.287, 3.368, 0], [5.0, -1.65, 1.325, 3.368, 0], [5.0, -1.6, 1.362, 3.368, 1], [5.0, -1.55, 1.4, 3.368, 1], [5.0, -1.5, 1.437, 3.368, 1], [5.0, -1.45, 1.475, 3.368, 1], [5.0, -1.4, 1.512, 3.368, 1], [5.0, -1.35, 1.549, 3.368, 1], [5.0, -1.3, 1.587, 3.368, 1], [5.0, -1.25, 1.624, 3.368, 1], [5.0, -1.2, 1.662, 3.368, 0], [5.0, -1.15, 1.699, 3.368, 0], [5.0, -1.1, 1.737, 3.368, 0], [5.0, -1.05, 1.774, 3.368, 0], [5.0, -1.0, 1.811, 3.368, 0], [5.0, -0.95, 1.849, 3.368, 0], [5.0, -0.9, 1.886, 3.368, 0], [5.0, -0.85, 1.924, 3.368, 0], [5.0, -0.8, 1.961, 3.368, 0], [5.0, -0.75, 1.999, 3.368, 0], [5.0, -0.7, 2.036, 3.368, 0], [5.0, -0.65, 2.073, 3.368, 0], [5.0, -0.6, 2.111, 3.368, 0], [5.0, -0.55, 2.148, 3.368, 0], [5.0, -0.5, 2.186, 3.368, 0], [5.0, -0.45, 2.223, 3.368, 0], [5.0, -0.4, 2.26, 3.368, 0]];
+
+const NS='http://www.w3.org/2000/svg';
+const CS=getComputedStyle(document.documentElement);
+function v(n,f){const x=CS.getPropertyValue(n).trim();return x||f}
+const COL={
+    hot:  v('--accent-reaction','#ff6b6b'),
+    cold: v('--accent-amplification','#4ecdc4'),
+    line: v('--text-primary','#e0e0e0'),
+    grid: v('--chart-grid','rgba(255,255,255,.06)'),
+    txt:  v('--text-secondary','#8888aa'),
+    good: v('--accent-attention','#00ff88'),
+    warn: v('--accent-rejection','#ff8800')
+};
+function el(n,a){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e}
+function tx(x,y,s,o){o=o||{};const t=el('text',{x:x,y:y,'font-family':"'JetBrains Mono',monospace",
+    'font-size':o.fs||10.5,fill:o.fill||COL.txt,'text-anchor':o.ta||'start','font-weight':o.fw||400});
+    t.textContent=s;return t}
+
+(function(){
+    const W=760,H=360,L=48,R=16,T=18,B=36;
+    const iw=W-L-R, ih=H-T-B, y0=1850, y1=2026, vmin=-0.6, vmax=1.8;
+    const X=y=>L+(y-y0)/(y1-y0)*iw, Y=q=>T+(vmax-q)/(vmax-vmin)*ih;
+    const s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img'});
+    for(let q=-0.5;q<=1.75;q+=0.5){
+        s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(q),y2:Y(q),stroke:COL.grid}));
+        s.appendChild(tx(L-8,Y(q)+4,(q>0?'+':'')+q.toFixed(1),{ta:'end'}));
+    }
+    s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(0),y2:Y(0),stroke:COL.txt,'stroke-width':1.2,opacity:.6}));
+    s.appendChild(tx(W-R,Y(0)-7,'media 1850/1900',{ta:'end',fs:9.5}));
+    const bw=Math.max(1.5,iw/(y1-y0)-0.7);
+    DTEMP.forEach(function(d){
+        const q=d[1], top=q>=0?Y(q):Y(0), h=Math.max(.8,Math.abs(Y(q)-Y(0)));
+        s.appendChild(el('rect',{x:X(d[0])-bw/2,y:top,width:bw,height:h,
+            fill:q>=0?COL.hot:COL.cold,opacity:.7}));
+    });
+    let p='',n=0;
+    DTEMP.forEach(function(d,i){
+        if(i<9)return;
+        let m=0;for(let k=i-9;k<=i;k++)m+=DTEMP[k][1];m/=10;
+        p+=(n++?'L':'M')+X(d[0]).toFixed(1)+','+Y(m).toFixed(1);
+    });
+    s.appendChild(el('path',{d:p,fill:'none',stroke:COL.line,'stroke-width':2.2,'stroke-linejoin':'round'}));
+    DPROV.forEach(function(d){
+        s.appendChild(el('rect',{x:X(d[0])-bw/2,y:Y(d[1]),width:bw,height:Math.abs(Y(d[1])-Y(0)),
+            fill:'none',stroke:COL.hot,'stroke-width':1}));
+    });
+    [1850,1900,1950,2000,2026].forEach(function(y){
+        s.appendChild(tx(X(y),H-12,y,{ta:y===1850?'start':y===2026?'end':'middle'}));
+    });
+    const pk=DTEMP[DTEMP.length-1];
+    s.appendChild(el('circle',{cx:X(pk[0]),cy:Y(pk[1]),r:3.2,fill:COL.hot}));
+    s.appendChild(tx(X(pk[0])-7,Y(pk[1])-10,'2024  +'+pk[1].toFixed(2),{ta:'end',fs:11,fw:700,fill:COL.hot}));
+    s.appendChild(tx(L,T+8,'barre vuote = 2025 e 2026 provvisori (2026 arriva a giugno)',{fs:9.5}));
+    document.getElementById('c1').appendChild(s);
+})();
+
+(function(){
+    const W=760,H=330,L=46,R=176,T=20,B=42;
+    const iw=W-L-R, ih=H-T-B;
+    const x0=DRES[0][0], x1=DRES[DRES.length-1][0];
+    const X=x=>L+(x-x0)/(x1-x0)*iw, Y=q=>T+ih-(q/1.7)*ih;
+    const s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img'});
+    const S=[{i:1,n:'Segnale in ingresso',c:COL.hot,w:2.5,pk:1.50},
+             {i:2,n:'Filtro 25 anni',c:COL.good,w:1.8,pk:1.31},
+             {i:3,n:'Filtro 100 anni',c:COL.cold,w:1.8,pk:0.54},
+             {i:4,n:'Filtro 250 anni',c:COL.warn,w:1.8,pk:0.23}];
+    [0,0.5,1.0,1.5].forEach(function(q){
+        s.appendChild(el('line',{x1:L,x2:L+iw,y1:Y(q),y2:Y(q),stroke:COL.grid}));
+        s.appendChild(tx(L-8,Y(q)+4,q.toFixed(1),{ta:'end'}));
+    });
+    S.forEach(function(sr){
+        let p='';
+        DRES.forEach(function(r,k){p+=(k?'L':'M')+X(r[0]).toFixed(1)+','+Y(r[sr.i]).toFixed(1)});
+        s.appendChild(el('path',{d:p,fill:'none',stroke:sr.c,'stroke-width':sr.w,'stroke-linejoin':'round'}));
+    });
+    S.forEach(function(sr,k){
+        const y=T+18+k*30;
+        s.appendChild(el('line',{x1:L+iw+18,x2:L+iw+42,y1:y-4,y2:y-4,stroke:sr.c,'stroke-width':sr.w+.7}));
+        s.appendChild(tx(L+iw+50,y,sr.n,{fs:10.5,fill:COL.line}));
+        s.appendChild(tx(L+iw+50,y+13,'picco '+sr.pk.toFixed(2),{fs:10,fill:sr.c,fw:700}));
+    });
+    s.appendChild(tx(L+iw/2,H-10,'tempo (2000 anni di archivio)',{ta:'middle'}));
+    s.appendChild(tx(L-36,T-5,'gradi',{fs:9.5}));
+    s.appendChild(tx(L,T-5,'simulazione: segnale finto, filtri scelti. Non sono archivi misurati',
+        {fs:9.5,fill:COL.warn}));
+    document.getElementById('c2').appendChild(s);
+})();
+
+(function(){
+    const W=760,H=420,L=62,R=150,T=24,B=56;
+    const iw=W-L-R, ih=H-T-B;
+    const ex0=1.95,ex1=5.05, ay0=-2.05, ay1=-0.35;
+    const X=v=>L+(v-ex0)/(ex1-ex0)*iw, Y=v=>T+ih-(v-ay0)/(ay1-ay0)*ih;
+    const s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img'});
+    /* mescola due colori esadecimali */
+    function mix(a,b,t){
+        const p=c=>[1,3,5].map(i=>parseInt(c.substr(i,2),16));
+        if(a[0]!=='#'||b[0]!=='#') return a;
+        const A=p(a),B2=p(b);
+        return 'rgb('+A.map((v,i)=>Math.round(v+(B2[i]-v)*t)).join(',')+')';
+    }
+    const LO=2.0, HI=3.4;
+    for(let v=2;v<=5;v+=0.5){
+        s.appendChild(el('line',{x1:X(v),x2:X(v),y1:T,y2:T+ih,stroke:COL.grid}));
+        s.appendChild(tx(X(v),H-34,v.toFixed(1),{ta:'middle'}));
+    }
+    for(let v=-2;v<=-0.4;v+=0.4){
+        s.appendChild(el('line',{x1:L,x2:L+iw,y1:Y(v),y2:Y(v),stroke:COL.grid}));
+        s.appendChild(tx(L-8,Y(v)+4,v.toFixed(1),{ta:'end'}));
+    }
+    DDEG.forEach(function(d){
+        if(d[4]) return;
+        s.appendChild(el('circle',{cx:X(d[0]),cy:Y(d[1]),r:2.6,fill:COL.txt,opacity:.16}));
+    });
+    DDEG.forEach(function(d){
+        if(!d[4]) return;
+        const t=Math.max(0,Math.min(1,(d[3]-LO)/(HI-LO)));
+        s.appendChild(el('circle',{cx:X(d[0]),cy:Y(d[1]),r:4.1,
+            fill:mix('#4ecdc4','#ff6b6b',t),opacity:.92}));
+    });
+    s.appendChild(tx(L+iw/2,H-14,'sensibilità climatica, gradi per raddoppio di CO2',{ta:'middle',fs:11}));
+    const yl=el('text',{x:-(T+ih/2),y:16,transform:'rotate(-90)','text-anchor':'middle',
+        'font-family':"'JetBrains Mono',monospace",'font-size':11,fill:COL.txt});
+    yl.textContent='forcing aerosol, W/m²'; s.appendChild(yl);
+    /* legenda */
+    const lx=L+iw+22;
+    s.appendChild(tx(lx,T+14,'Riproducono',{fs:11,fw:700,fill:COL.line}));
+    s.appendChild(tx(lx,T+28,'il +1,5 osservato',{fs:11,fw:700,fill:COL.line}));
+    const gid='degg', gr=el('linearGradient',{id:gid,x1:'0',y1:'1',x2:'0',y2:'0'});
+    [[0,'#4ecdc4'],[1,'#ff6b6b']].forEach(function(st){
+        gr.appendChild(el('stop',{offset:st[0],'stop-color':st[1]}));});
+    s.appendChild(el('defs',{})).appendChild(gr);
+    const by=T+44, bh=150;
+    s.appendChild(el('rect',{x:lx,y:by,width:15,height:bh,rx:3,fill:'url(#'+gid+')'}));
+    s.appendChild(tx(lx+22,by+9,'3,37 nel 2100',{fs:10.5,fill:'#ff6b6b',fw:700}));
+    s.appendChild(tx(lx+22,by+bh,'2,06 nel 2100',{fs:10.5,fill:'#4ecdc4',fw:700}));
+    s.appendChild(tx(lx,by+bh+26,'Stesso passato,',{fs:11,fill:COL.line,fw:700}));
+    s.appendChild(tx(lx,by+bh+40,'futuri diversi',{fs:11,fill:COL.line,fw:700}));
+    s.appendChild(el('circle',{cx:lx+7,cy:by+bh+62,r:3.4,fill:COL.txt,opacity:.3}));
+    s.appendChild(tx(lx+18,by+bh+66,'incompatibili',{fs:10}));
+    document.getElementById('c6').appendChild(s);
+})();
+
+(function(){
+    const W=760,H=200,L=54,R=54,T=44,B=54;
+    const iw=W-L-R, lo=10, hi=38;
+    const X=v=>L+(v-lo)/(hi-lo)*iw;
+    const s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img'});
+    const g=el('linearGradient',{id:'phg',x1:'0',x2:'1'});
+    [[0,COL.cold],[.5,COL.warn],[1,COL.hot]].forEach(function(st){
+        g.appendChild(el('stop',{offset:st[0],'stop-color':st[1]}));});
+    s.appendChild(el('defs',{})).appendChild(g);
+    const by=T+26, bh=26;
+    s.appendChild(el('rect',{x:X(11),y:by,width:X(36)-X(11),height:bh,rx:4,
+        fill:'url(#phg)',opacity:.55}));
+    s.appendChild(tx(L+iw/2,T-16,'intervallo percorso dalla temperatura terrestre in 485 milioni di anni',
+        {ta:'middle',fs:10.5}));
+    [[11,'11°','minimo\ntardo Pleistocene',COL.cold],
+     [15,'15°','OGGI',COL.line],
+     [36,'36°','massimo\nTuroniano, Cretaceo',COL.hot]].forEach(function(m){
+        const x=X(m[0]), oggi=m[0]===15;
+        s.appendChild(el('line',{x1:x,x2:x,y1:by-(oggi?12:5),y2:by+bh+(oggi?10:5),
+            stroke:m[3],'stroke-width':oggi?2.4:1.6}));
+        s.appendChild(tx(x,by-(oggi?18:10),m[1],{ta:'middle',fs:oggi?13:11.5,fw:700,fill:m[3]}));
+        m[2].split('\n').forEach(function(ln,k){
+            s.appendChild(tx(x,by+bh+24+k*12,ln,{ta:'middle',fs:oggi?11:9.5,
+                fw:oggi?700:400,fill:oggi?COL.line:COL.txt}));});
+    });
+    s.appendChild(el('path',{d:'M'+X(15)+','+(by+bh+12)+' l-4,-6 l8,0 z',fill:COL.line}));
+    s.appendChild(tx(L,H-8,'gradi centigradi, media globale',{fs:9.5}));
+    s.appendChild(tx(W-R,H-8,'siamo vicini all\'estremo freddo',{ta:'end',fs:10,fill:COL.cold,fw:700}));
+    document.getElementById('c5').appendChild(s);
+})();
+
+(function(){
+    const W=760,H=360,L=250,R=30,T=26,B=64;
+    const iw=W-L-R;
+    const rows=[
+        ['CO2 assorbe infrarossi',        .05,'fisica di laboratorio'],
+        ['Quanto scalda se raddoppia',    .42,'sensibilita climatica'],
+        ['Quante emissioni faremo',       .66,'previsione socioeconomica'],
+        ['Cosa fa al meteo di casa tua',  .84,'impatti regionali'],
+        ['Quali politiche ne seguono',   1.00,'scelta politica']
+    ];
+    const s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img'});
+    rows.forEach(function(r,i){
+        const y=T+16+i*46, w=Math.max(14,r[1]*iw);
+        s.appendChild(el('rect',{x:L,y:y-11,width:iw,height:22,rx:3,
+            fill:COL.grid,opacity:.5}));
+        s.appendChild(el('rect',{x:L,y:y-11,width:w,height:22,rx:3,
+            fill:i===0?COL.good:i===4?COL.hot:COL.warn,opacity:.28+i*0.12}));
+        s.appendChild(tx(L-14,y-1,r[0],{ta:'end',fs:11.5,fill:COL.line,fw:600}));
+        s.appendChild(tx(L-14,y+11,r[2],{ta:'end',fs:9.5}));
+        if(i<rows.length-1)
+            s.appendChild(el('line',{x1:L-6,x2:L-6,y1:y+11,y2:y+35,stroke:COL.txt,
+                opacity:.35,'stroke-width':1}));
+    });
+    s.appendChild(tx(L,T-8,'incertezza che si accumula, anello dopo anello',{fs:9.5}));
+    const ay=T+16+rows.length*46+2;
+    s.appendChild(el('defs',{})).appendChild(
+        (function(){const m=el('marker',{id:'ah',viewBox:'0 0 10 10',refX:9,refY:5,
+            markerWidth:6,markerHeight:6,orient:'auto'});
+            m.appendChild(el('path',{d:'M0,0 L10,5 L0,10 z',fill:COL.hot}));return m})());
+    s.appendChild(el('line',{x1:L,x2:L+iw,y1:ay,y2:ay,stroke:COL.hot,'stroke-width':1.6,
+        'marker-end':'url(#ah)',opacity:.8}));
+    s.appendChild(tx(L,ay+18,'e la sicurezza con cui te lo raccontano cresce in questa direzione',
+        {fs:10.5,fill:COL.hot,fw:700}));
+    document.getElementById('c4').appendChild(s);
+})();
+
+(function(){
+    const W=760,H=330,L=56,R=16,T=18,B=52;
+    const iw=W-L-R, ih=H-T-B, vmax=560000;
+    const s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img'});
+    const step=iw/DDIS.length, bw=step*0.66;
+    const Y=q=>T+ih-q/vmax*ih;
+    [0,100000,200000,300000,400000,500000].forEach(function(q){
+        s.appendChild(el('line',{x1:L,x2:W-R,y1:Y(q),y2:Y(q),stroke:COL.grid}));
+        s.appendChild(tx(L-8,Y(q)+4,q?(q/1000)+'k':'0',{ta:'end'}));
+    });
+    DDIS.forEach(function(d,i){
+        const x=L+i*step+(step-bw)/2, h=Math.max(1.5,ih-(Y(d[1])-T)), late=d[0]>=1980;
+        s.appendChild(el('rect',{x:x,y:Y(d[1]),width:bw,height:h,rx:2,
+            fill:late?COL.good:COL.hot,opacity:late?.9:.62}));
+        s.appendChild(tx(x+bw/2,H-32,"'"+String(d[0]).slice(2),{ta:'middle'}));
+        if(d[0]===1920||d[0]===2010)
+            s.appendChild(tx(x+bw/2,Y(d[1])-8,Math.round(d[1]/1000)+'k',
+                {ta:'middle',fs:11.5,fw:700,fill:d[0]===1920?COL.hot:COL.good}));
+    });
+    s.appendChild(tx(L,H-10,'media annua di decessi, per decennio'));
+    s.appendChild(tx(W-R,H-10,'rosso 1900/1970    verde 1980 a oggi',{ta:'end'}));
+    document.getElementById('c3').appendChild(s);
+})();
+  </script>
+</body>
+</html>
