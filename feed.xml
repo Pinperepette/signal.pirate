@@ -8,6 +8,14 @@
   <atom:link href="https://pinperepette.github.io/signal.pirate/feed.xml" rel="self" type="application/rss+xml"/>
 
   <item>
+    <title>Vi ho chiesto una serie e mi avete costruito un dataset</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/mi-avete-costruito-un-dataset.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/mi-avete-costruito-un-dataset.html</guid>
+    <pubDate>Wed, 12 Aug 2026 00:00:00 +0200</pubDate>
+    <description>Lunedì sera ho chiesto su X che serie guardare e sono arrivati più di trecento commenti, il giorno dopo ho rifatto il giro con i libri e ne sono arrivati altri cento. Ho ricontato tutto da zero, questa volta con gli script scritti bene invece che in una cartella temporanea, e le classifiche aggiornate sono qui: 323 risposte sulle serie per 210 titoli e 486 consigli, 114 risposte sui libri per 195 titoli. Breaking Bad vince con 17 voti, Person of Interest arriva undicesima a 11 con almeno tre persone convinte ognuna di essere l'unica ad averla nominata, e il decennio 2010 da solo vale il 52 per cento di tutti i consigli. Poi ho guardato quali titoli finiscono nella stessa risposta e ne è uscito un grafo: 44 corde su 100 saltano da un genere all'altro, il nodo con più legami dopo Breaking Bad non è il suo spin off ma Mr. Robot. La cosa che non cercavo sta alla fine: a parità di campione i vostri libri producono il 48 per cento di titoli diversi in più delle vostre serie. Sulle serie 43 menzioni su 100 portano un titolo inedito, sui libri 87 su 100. Guardare è un fatto collettivo, leggere no, e si misura con una formula che viene dall'ecologia. Dentro ci sono tutti gli script, il dataset riga per riga e i limiti dichiarati, a partire dalle cinquanta risposte che l'API non mi ha voluto dare.Alla fine ho smesso di contare i titoli, che è la misura più fragile che esista, e ho misurato quanti ne contano davvero: 81 per le serie contro 160 per i libri. E la coppia di libri consigliata insieme da due persone diverse, in 74 partecipanti, non esiste: zero, a qualsiasi soglia. E per chiudere la rete delle persone: la somiglianza fra due partecipanti a caso, dove stavo per prendere una cantonata perche' 76 delle 77 coppie con gusti "identici" erano gente che aveva nominato un titolo solo, lo stesso. Tolto l'artefatto il divario raddoppia invece di sgonfiarsi.</description>
+  </item>
+
+  <item>
     <title>Non è il clima, è agosto</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/non-e-il-clima-e-agosto.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/non-e-il-clima-e-agosto.html</guid>

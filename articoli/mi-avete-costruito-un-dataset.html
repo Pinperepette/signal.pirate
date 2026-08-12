@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vi ho chiesto una serie e mi avete costruito un dataset | Signal Pirate</title>
+  <meta name="description" content="Ho chiesto su X che serie guardare e sono arrivati 373 commenti. Poi ho chiesto libri. Ho ricontato tutto da zero, riscritto gli script e messo giù le classifiche aggiornate. Sulle serie andiamo d'accordo, sui libri quasi per niente: 81 titoli che contano contro 160, e zero coppie di libri consigliate insieme da due persone.">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Vi ho chiesto una serie e mi avete costruito un dataset">
+  <meta property="og:description" content="323 risposte sulle serie, 114 sui libri, 210 titoli, 195 libri, tutte le classifiche aggiornate e gli script per rifarle. Con una cosa che non mi aspettavo: sulle serie converge tutto, sui libri niente.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/mi-avete-costruito-un-dataset.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/immagini/serie-e-libri/serie-3-classifica.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="2860">
+  <meta property="og:image:height" content="1936">
+  <meta property="og:image:alt" content="La classifica delle serie TV consigliate, con Breaking Bad in testa a 17 voti">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vi ho chiesto una serie e mi avete costruito un dataset">
+  <meta name="twitter:description" content="Classifiche aggiornate di serie e libri, il grafo di come si tengono insieme i vostri gusti, e tutti gli script.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/immagini/serie-e-libri/serie-3-classifica.png">
+
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .sl-fig{ margin: 2.4rem 0; text-align: center; }
+    .sl-fig img{
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      display: block;
+    }
+    .sl-fig figcaption{
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.85rem;
+      line-height: 1.6;
+      text-align: left;
+    }
+    .sl-fig a.zoom{
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      text-decoration: none;
+      border-bottom: 1px dotted var(--border-subtle);
+    }
+    .sl-fig a.zoom:hover{ color: var(--text-primary); }
+
+    .code-block{
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.6rem 0;
+      padding: 1.5rem 0 1.1rem;
+      overflow-x: auto;
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      line-height: 1.7;
+    }
+    .code-block::before{
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.45rem;
+      right: 0.8rem;
+      font-size: 0.62rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.55;
+    }
+    .code-block pre{
+      margin: 0;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      background: none;
+      white-space: pre;
+      tab-size: 4;
+    }
+    .code-block .ln{
+      padding: 0 0.9rem 0 1.1rem;
+      color: #4a5058;
+      text-align: right;
+      user-select: none;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .code-block .src{
+      padding: 0 1.2rem;
+      color: #d6dae0;
+      overflow-x: auto;
+    }
+    .code-block .src .c { color: #959077 } /* Comment */
+    .code-block .src .err { color: #ed007e; background-color: #1e0010 } /* Error */
+    .code-block .src .esc { color: #f8f8f2 } /* Escape */
+    .code-block .src .g { color: #f8f8f2 } /* Generic */
+    .code-block .src .k { color: #66d9ef } /* Keyword */
+    .code-block .src .l { color: #ae81ff } /* Literal */
+    .code-block .src .n { color: #f8f8f2 } /* Name */
+    .code-block .src .o { color: #ff4689 } /* Operator */
+    .code-block .src .x { color: #f8f8f2 } /* Other */
+    .code-block .src .p { color: #f8f8f2 } /* Punctuation */
+    .code-block .src .ch { color: #959077 } /* Comment.Hashbang */
+    .code-block .src .cm { color: #959077 } /* Comment.Multiline */
+    .code-block .src .cp { color: #959077 } /* Comment.Preproc */
+    .code-block .src .cpf { color: #959077 } /* Comment.PreprocFile */
+    .code-block .src .c1 { color: #959077 } /* Comment.Single */
+    .code-block .src .cs { color: #959077 } /* Comment.Special */
+    .code-block .src .gd { color: #ff4689 } /* Generic.Deleted */
+    .code-block .src .ge { color: #f8f8f2; font-style: italic } /* Generic.Emph */
+    .code-block .src .ges { color: #f8f8f2; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+    .code-block .src .gr { color: #f8f8f2 } /* Generic.Error */
+    .code-block .src .gh { color: #f8f8f2 } /* Generic.Heading */
+    .code-block .src .gi { color: #a6e22e } /* Generic.Inserted */
+    .code-block .src .go { color: #66d9ef } /* Generic.Output */
+    .code-block .src .gp { color: #ff4689; font-weight: bold } /* Generic.Prompt */
+    .code-block .src .gs { color: #f8f8f2; font-weight: bold } /* Generic.Strong */
+    .code-block .src .gu { color: #959077 } /* Generic.Subheading */
+    .code-block .src .gt { color: #f8f8f2 } /* Generic.Traceback */
+    .code-block .src .kc { color: #66d9ef } /* Keyword.Constant */
+    .code-block .src .kd { color: #66d9ef } /* Keyword.Declaration */
+    .code-block .src .kn { color: #ff4689 } /* Keyword.Namespace */
+    .code-block .src .kp { color: #66d9ef } /* Keyword.Pseudo */
+    .code-block .src .kr { color: #66d9ef } /* Keyword.Reserved */
+    .code-block .src .kt { color: #66d9ef } /* Keyword.Type */
+    .code-block .src .ld { color: #e6db74 } /* Literal.Date */
+    .code-block .src .m { color: #ae81ff } /* Literal.Number */
+    .code-block .src .s { color: #e6db74 } /* Literal.String */
+    .code-block .src .na { color: #a6e22e } /* Name.Attribute */
+    .code-block .src .nb { color: #f8f8f2 } /* Name.Builtin */
+    .code-block .src .nc { color: #a6e22e } /* Name.Class */
+    .code-block .src .no { color: #66d9ef } /* Name.Constant */
+    .code-block .src .nd { color: #a6e22e } /* Name.Decorator */
+    .code-block .src .ni { color: #f8f8f2 } /* Name.Entity */
+    .code-block .src .ne { color: #a6e22e } /* Name.Exception */
+    .code-block .src .nf { color: #a6e22e } /* Name.Function */
+    .code-block .src .nl { color: #f8f8f2 } /* Name.Label */
+    .code-block .src .nn { color: #f8f8f2 } /* Name.Namespace */
+    .code-block .src .nx { color: #a6e22e } /* Name.Other */
+    .code-block .src .py { color: #f8f8f2 } /* Name.Property */
+    .code-block .src .nt { color: #ff4689 } /* Name.Tag */
+    .code-block .src .nv { color: #f8f8f2 } /* Name.Variable */
+    .code-block .src .ow { color: #ff4689 } /* Operator.Word */
+    .code-block .src .pm { color: #f8f8f2 } /* Punctuation.Marker */
+    .code-block .src .w { color: #f8f8f2 } /* Text.Whitespace */
+    .code-block .src .mb { color: #ae81ff } /* Literal.Number.Bin */
+    .code-block .src .mf { color: #ae81ff } /* Literal.Number.Float */
+    .code-block .src .mh { color: #ae81ff } /* Literal.Number.Hex */
+    .code-block .src .mi { color: #ae81ff } /* Literal.Number.Integer */
+    .code-block .src .mo { color: #ae81ff } /* Literal.Number.Oct */
+    .code-block .src .sa { color: #e6db74 } /* Literal.String.Affix */
+    .code-block .src .sb { color: #e6db74 } /* Literal.String.Backtick */
+    .code-block .src .sc { color: #e6db74 } /* Literal.String.Char */
+    .code-block .src .dl { color: #e6db74 } /* Literal.String.Delimiter */
+    .code-block .src .sd { color: #e6db74 } /* Literal.String.Doc */
+    .code-block .src .s2 { color: #e6db74 } /* Literal.String.Double */
+    .code-block .src .se { color: #ae81ff } /* Literal.String.Escape */
+    .code-block .src .sh { color: #e6db74 } /* Literal.String.Heredoc */
+    .code-block .src .si { color: #e6db74 } /* Literal.String.Interpol */
+    .code-block .src .sx { color: #e6db74 } /* Literal.String.Other */
+    .code-block .src .sr { color: #e6db74 } /* Literal.String.Regex */
+    .code-block .src .s1 { color: #e6db74 } /* Literal.String.Single */
+    .code-block .src .ss { color: #e6db74 } /* Literal.String.Symbol */
+    .code-block .src .bp { color: #f8f8f2 } /* Name.Builtin.Pseudo */
+    .code-block .src .fm { color: #a6e22e } /* Name.Function.Magic */
+    .code-block .src .vc { color: #f8f8f2 } /* Name.Variable.Class */
+    .code-block .src .vg { color: #f8f8f2 } /* Name.Variable.Global */
+    .code-block .src .vi { color: #f8f8f2 } /* Name.Variable.Instance */
+    .code-block .src .vm { color: #f8f8f2 } /* Name.Variable.Magic */
+    .code-block .src .il { color: #ae81ff } /* Literal.Number.Integer.Long */
+    .sl-note{
+      border-left: 2px solid var(--border-subtle);
+      padding: 0.2rem 0 0.2rem 1.1rem;
+      margin: 1.8rem 0;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
+    .sl-cifre{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.2rem;
+      margin: 2.2rem 0;
+      padding: 1.4rem 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .sl-cifre div{ text-align: left; }
+    .sl-cifre b{
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+    .sl-cifre span{
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.5;
+      display: block;
+      margin-top: 0.35rem;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <header class="article-header">
+    <p class="article-meta">2026-08-12 | Pinperepette</p>
+    <h1 class="article-page-title">Vi ho chiesto una serie <span class="accent">e mi avete costruito un dataset</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+      Lunedì sera ho chiesto che serie guardare. Sono arrivati più di trecento commenti. Il giorno dopo ho chiesto libri e ne sono arrivati altri cento. Ho ricontato tutto da zero, riscritto gli script e messo giù le classifiche aggiornate. Poi ho scoperto una cosa che non c'entrava niente con la domanda di partenza.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Dati</span>
+      <span class="tag tag-highlight">Serie TV</span>
+      <span class="tag tag-reaction">Libri</span>
+      <span class="tag tag-amplification">Script</span>
+    </div>
+  </header>
+
+  <article class="article-content">
+
+    <p>Non guardo praticamente mai la TV. Ogni tanto però mollo tutto e mi immergo in una serie, e lunedì sera avevo voglia di farlo senza sapere da dove partire. Quindi ho fatto la cosa più semplice del mondo: <a href="https://x.com/Pinperepette/status/2086859435490656571" target="_blank" rel="noopener">ho chiesto su X</a>.</p>
+
+    <p>Nel giro di poche ore erano più di trecento commenti. Non riuscivo nemmeno a leggerli tutti, figuriamoci a rispondere. A un certo punto ho scritto sotto al post che era diventato un DDoS, e non era del tutto una battuta: la coda di notifiche non scendeva mai.</p>
+
+    <p>Allora ho fatto quello che faccio sempre quando i dati mi arrivano addosso invece di andarmeli a cercare. Li ho contati. Sono usciti <a href="https://x.com/Pinperepette/status/2087066304926589032" target="_blank" rel="noopener">quattro grafici</a>, e sono piaciuti abbastanza che il giorno dopo ho rifatto il giro <a href="https://x.com/Pinperepette/status/2087117060631375995" target="_blank" rel="noopener">con i libri</a>, e poi <a href="https://x.com/Pinperepette/status/2087265726918725728" target="_blank" rel="noopener">altri quattro grafici</a>.</p>
+
+    <p>Poi mi avete chiesto le classifiche aggiornate, perché nel frattempo altra gente aveva risposto. Ed è successa una cosa che mi ha dato fastidio: mi sono accorto che gli script del primo giro erano rimasti solo nella mia testa e in una cartella temporanea. Quindi ho rifatto tutto da capo, questa volta scritto bene, e sta tutto qui dentro. Dataset, script e risposte grezze stanno in <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/mi-avete-costruito-un-dataset" target="_blank" rel="noopener"><code>scripts/mi-avete-costruito-un-dataset</code></a>, quindi se una riga vi sembra sbagliata la vedete e la correggete.</p>
+
+    <div class="sl-cifre">
+      <div><b>323</b><span>risposte sulle serie<br>raccolte il 12 agosto</span></div>
+      <div><b>210</b><span>titoli diversi<br>per 486 consigli</span></div>
+      <div><b>114</b><span>risposte sui libri<br>per 195 titoli</span></div>
+      <div><b>1</b><span>voto solo, per più<br>della metà dei titoli</span></div>
+    </div>
+
+    <h2>Primo problema: l'API non ti dà i tuoi stessi commenti</h2>
+
+    <p>Sembra banale. Non lo è. X dice che sotto al post ci sono 373 risposte, e quando le chiedi te ne dà duecento. Alla fine, incrociando quattro interrogazioni diverse, sono arrivato a <strong>323 risposte uniche su 373 dichiarate</strong>, l'87 per cento. Le altre cinquanta non c'è verso. Lo scrivo subito e in grande perché è esattamente il tipo di cosa che nessuno mette mai sotto ai grafici.</p>
+
+    <p>Il motivo è che l'endpoint è paginato e la paginazione si ferma: dieci pagine, venti risposte a pagina, duecento e buonanotte. E non sono nemmeno le prime duecento, sono quelle che decide l'ordinamento: nel mio caso partivano dalle 20:18 di lunedì, quindi le prime tre ore e mezza di conversazione, cioè il pezzo grosso, non c'erano proprio. La soluzione è brutta ma funziona: interroghi la stessa conversazione da più angolazioni (per data, per popolarità, per finestra temporale chiusa, per <code>conversation_id</code> invece che per thread) e fai l'unione degli id, perché ogni query pesca un sottoinsieme un po' diverso.</p>
+
+    <div class="code-block" data-lang="python"><pre class="ln" aria-hidden="true"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre><pre class="src"><span class="kn">import</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">glob</span>
+
+<span class="c1"># ogni chiamata (x_replies_to, ricerche con sort/finestre diverse) finisce</span>
+<span class="c1"># in un file dentro raw/. Qui si fa solo l&#39;unione, deduplicata per id.</span>
+<span class="k">def</span> <span class="nf">unisci</span><span class="p">(</span><span class="n">cartella</span><span class="p">,</span> <span class="n">conversazione</span><span class="p">):</span>
+    <span class="n">visti</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">cartella</span> <span class="o">+</span> <span class="s2">&quot;/*.json&quot;</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;conversation_id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">conversazione</span> <span class="ow">and</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">conversazione</span><span class="p">:</span>
+                <span class="n">visti</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span>          <span class="c1"># stesso id = stessa risposta</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">visti</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">])</span>
+
+<span class="n">risposte</span> <span class="o">=</span> <span class="n">unisci</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;2086859435490656571&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">risposte</span><span class="p">),</span> <span class="s2">&quot;risposte,&quot;</span><span class="p">,</span>
+      <span class="nb">len</span><span class="p">({</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">risposte</span><span class="p">}),</span> <span class="s2">&quot;profili distinti&quot;</span><span class="p">)</span></pre></div>
+
+    <div class="sl-note">
+      Piccola nota di onestà: i numeri di questo articolo non coincidono con quelli che avevo pubblicato su X lunedì. Là avevo Breaking Bad a 27 voti, qui a 17. Non ho cambiato idea sui conti: ho cambiato dataset. Quello di lunedì l'avevo tirato su a mano leggendo la conversazione dal browser, dove i commenti li vedo tutti. Questo è ricostruito via API dove non li vedo tutti, ma è riproducibile da chiunque abbia lo script. Ho preferito il secondo. Le posizioni in classifica cambiano pochissimo, i totali sì.
+    </div>
+
+    <h2>Secondo problema: questa parte non la automatizzi</h2>
+
+    <p>Uno legge "Fringe prima di tutte" e capisce Fringe. Un regex no. Nelle 323 risposte c'era gente che scriveva <em>Le Boureau</em> per Le Bureau, <em>Batlestar</em> per Battlestar, <em>Cernobyl</em> con la C, <em>Breaking Bed</em> (due volte, da persone diverse). C'era chi rispondeva a un altro commento con "vero, quella è bellissima" senza ripetere il titolo, e quel voto è valido eccome. C'era chi consigliava una cosa e ne stroncava altre quattro nella stessa riga, e quelle quattro non sono voti.</p>
+
+    <p>E poi c'era il commento con un GIF e la scritta "una specie di Bud Spencer on steroids", che è Reacher. L'ho capito solo perché tre risposte più sotto qualcuno scriveva "vediamo la quarta stagione che esce domani".</p>
+
+    <p>Quindi il dataset è curato a mano, riga per riga, e ha una forma volutamente stupida: un dizionario di titoli con i metadati, e una lista piatta di coppie <code>(persona, titolo)</code>. Una riga per ogni volta che una persona consiglia una cosa.</p>
+
+    <div class="code-block" data-lang="python"><pre class="ln" aria-hidden="true"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre><pre class="src"><span class="c1"># dati.py — chiave: (titolo, anno, paese, categoria)</span>
+<span class="n">SERIE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;breakingbad&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Breaking Bad&quot;</span><span class="p">,</span> <span class="mi">2008</span><span class="p">,</span> <span class="s2">&quot;USA&quot;</span><span class="p">,</span> <span class="s2">&quot;crime&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;mrrobot&quot;</span><span class="p">:</span>     <span class="p">(</span><span class="s2">&quot;Mr. Robot&quot;</span><span class="p">,</span> <span class="mi">2015</span><span class="p">,</span> <span class="s2">&quot;USA&quot;</span><span class="p">,</span> <span class="s2">&quot;scifi&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;fauda&quot;</span><span class="p">:</span>       <span class="p">(</span><span class="s2">&quot;Fauda&quot;</span><span class="p">,</span> <span class="mi">2015</span><span class="p">,</span> <span class="s2">&quot;Israele&quot;</span><span class="p">,</span> <span class="s2">&quot;spionaggio&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;rocco&quot;</span><span class="p">:</span>       <span class="p">(</span><span class="s2">&quot;Rocco Schiavone&quot;</span><span class="p">,</span> <span class="mi">2016</span><span class="p">,</span> <span class="s2">&quot;Italia&quot;</span><span class="p">,</span> <span class="s2">&quot;italiana&quot;</span><span class="p">),</span>
+    <span class="c1"># ... 210 in tutto</span>
+<span class="p">}</span>
+
+<span class="c1"># (utente, chiave) — un voto per persona per titolo</span>
+<span class="n">RECS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;laserpez&quot;</span><span class="p">,</span> <span class="s2">&quot;blackmirror&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;laserpez&quot;</span><span class="p">,</span> <span class="s2">&quot;mindhunter&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;TheBuffaloBit&quot;</span><span class="p">,</span> <span class="s2">&quot;breakingbad&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;TheBuffaloBit&quot;</span><span class="p">,</span> <span class="s2">&quot;mrrobot&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;nippur6502&quot;</span><span class="p">,</span> <span class="s2">&quot;fauda&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;SoniaVigoson&quot;</span><span class="p">,</span> <span class="s2">&quot;fauda&quot;</span><span class="p">),</span>      <span class="c1"># risposta di conferma sotto a nippur6502</span>
+    <span class="c1"># ... 486 in tutto</span>
+<span class="p">]</span></pre></div>
+
+    <p>La regola che conta è una sola e la ripeto in fondo a ogni grafico: <strong>un voto per persona per titolo</strong>. Se uno scrive Breaking Bad tre volte in tre commenti diversi, resta un voto. Se una persona ha risposto con venticinque titoli (ed è successo), quei venticinque valgono uno a testa esattamente come il tizio che ne ha scritto uno solo. Altrimenti la classifica la scrivono i più logorroici e non i più d'accordo.</p>
+
+    <p>Fatto questo, contare è banale. Il cuore di tutte le classifiche che seguono sono queste tre righe:</p>
+
+    <div class="code-block" data-lang="python"><pre class="ln" aria-hidden="true"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8</pre><pre class="src"><span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="n">voti</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dati</span><span class="o">.</span><span class="n">RECS</span><span class="p">)</span>
+<span class="n">chi</span>   <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">persona</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dati</span><span class="o">.</span><span class="n">RECS</span><span class="p">:</span>
+    <span class="n">chi</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">persona</span><span class="p">)</span>
+
+<span class="n">classifica</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">voti</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">voti</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">dati</span><span class="o">.</span><span class="n">SERIE</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span></pre></div>
+
+    <p>Il resto sono seicento righe di matplotlib per farlo sembrare una cosa seria.</p>
+
+    <h2>Tutto quello che mi avete consigliato</h2>
+
+    <p>Partiamo dalla mappa completa. Duecentodieci titoli, in nove scaffali per genere, ordinati per voti dentro ogni scaffale. Il pallino a sinistra cresce con i voti, il numero compare solo da due in su.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/serie-1-videoteca.png" alt="La videoteca: tutti i 210 titoli di serie TV consigliati, divisi in nove scaffali per genere, con voti, paese e anno">
+      <figcaption>Tutti i titoli usciti dalle 323 risposte. Colonna di sinistra il crime, che da solo fa 53 titoli. A destra di ogni riga il paese di produzione e l'anno della prima messa in onda della serie originale. Cinque titoli non hanno un anno accertato e restano senza. Fonte: la conversazione, ricontata il 12 agosto.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/serie-1-videoteca.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p>Le due cose che saltano fuori subito. La prima: <strong>140 titoli su 210 sono americani</strong>, il 67 per cento. Quindici sono italiani, e non è male, ma il resto del mondo esiste appena. La seconda: <strong>114 titoli su 210 li ha detti una persona sola</strong>. Più della metà di questa lista è il gusto di un singolo, non un consiglio condiviso.</p>
+
+    <h2>La classifica aggiornata</h2>
+
+    <p>Ecco la parte che mi avete chiesto. Sopra ci sono solo i titoli da cinque voti in su, con i nomi di chi li ha scelti, perché quello è l'unico posto della conversazione dove ci siamo trovati d'accordo davvero e mi sembrava giusto firmarlo.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/serie-3-classifica.png" alt="Classifica delle serie TV: Breaking Bad 17 voti, Black Mirror e Fringe 13, Person of Interest 11">
+      <figcaption>A sinistra i diciotto titoli con almeno cinque voti, con il nome di ogni persona che li ha nominati. In alto a destra dove finiscono i voti per genere, sotto i trentasei titoli a quattro e tre voti, in fondo le liste più lunghe. Un quadrato per titolo, colorato per genere.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/serie-3-classifica.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p><strong>Breaking Bad vince con 17</strong> e non è nemmeno una gara: prende il 30 per cento in più del secondo. Poi Black Mirror e Fringe appaiati a 13, Person of Interest a 11, e un plotone a dieci con Better Call Saul, Mr. Robot e The Expanse.</p>
+
+    <p>Person of Interest a 11 è la vera sorpresa. Non è una serie di cui si parla ancora molto in giro, e almeno tre di voi hanno scritto qualche variante di "possibile che nessuno gli abbia detto Person of Interest", ognuno convinto di essere il primo. Eravate in undici.</p>
+
+    <p>Il dato che però conta di più sta nel sottotitolo di quel grafico: <strong>96 titoli su 210 hanno preso almeno due voti</strong>. Gli altri 114 sono roba detta una volta sola. La classifica esiste solo nei primi venti posti, sotto è un elenco di gusti personali che non si incontrano mai.</p>
+
+    <h2>"Anche roba vecchia va benissimo"</h2>
+
+    <p>Nel post avevo scritto che andava bene anche roba vecchia. Ho voluto vedere se era vero, cioè se la roba vecchia mi arrivava davvero o se era solo una cortesia che vi avevo fatto.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/serie-2-annate.png" alt="Le annate: le serie consigliate disposte sull'anno di prima messa in onda, una corsia per genere, con istogramma per decennio">
+      <figcaption>Ogni pallino è una serie sull'anno della prima messa in onda. Più grande, più persone l'hanno consigliata. L'asse è spezzato: il pezzo 1955-1995 sta in un quinto della larghezza, altrimenti sarebbe stato quasi tutto vuoto. Sotto, quanti consigli arrivano da ogni decennio di uscita.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/serie-2-annate.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p>Prima però una nota da lettore pignolo: dei 486 consigli, 481 hanno una data utilizzabile, perché cinque titoli hanno un anno che non sono riuscito a verificare. I conti di questo paragrafo stanno su quei 481.</p>
+
+    <p>Detto questo: la roba vecchia esiste ma è una minoranza netta. Il decennio 2010 da solo vale <strong>il 52 per cento di tutti i consigli</strong>. Tutto quello che è uscito prima del 1990, che sono trentuno anni di televisione, vale 11 consigli su 481. Il primo pallino a sinistra è del 1959 e sono Ai confini della realtà, l'ultimo è Pluribus dell'anno scorso.</p>
+
+    <p>E dentro quel poco che sopravvive c'è un pattern preciso: prima del 1990 restano quasi solo la fantascienza e i polizieschi. Star Trek, Spazio 1999, Il prigioniero, Ai confini della realtà, X-Files, Miami Vice, Magnum. La commedia degli anni Settanta ha lasciato Happy Days e Hazzard e basta. Il resto è evaporato.</p>
+
+    <h2>La parte che non mi aspettavo: come state insieme</h2>
+
+    <p>Fin qui erano classifiche, cioè conteggi. Ma nei dati c'era una cosa più interessante che non avevo guardato: quando una persona risponde con quattro titoli in una riga, quei quattro li sta <em>associando</em>. Nella sua testa stanno sullo stesso scaffale.</p>
+
+    <p>Se conto quante persone diverse hanno nominato la stessa coppia, mi esce un grafo. E il grafo non lo disegno io: viene fuori da solo.</p>
+
+    <div class="code-block" data-lang="python"><pre class="ln" aria-hidden="true"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre><pre class="src"><span class="kn">import</span> <span class="nn">collections</span><span class="o">,</span> <span class="nn">itertools</span>
+
+<span class="n">per_persona</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">persona</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dati</span><span class="o">.</span><span class="n">RECS</span><span class="p">:</span>
+    <span class="n">per_persona</span><span class="p">[</span><span class="n">persona</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+<span class="n">coppie</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">titoli</span> <span class="ow">in</span> <span class="n">per_persona</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">titoli</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">coppie</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>        <span class="c1"># +1 per ogni persona che li nomina entrambi</span>
+
+<span class="c1"># soglia: titoli con almeno 4 voti, coppie viste da almeno 2 persone</span>
+<span class="n">archi</span> <span class="o">=</span> <span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">coppie</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+         <span class="ow">and</span> <span class="n">voti</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">voti</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">]</span></pre></div>
+
+    <p>Ottocentoquarantasette coppie osservate in tutto, e trentasei sopra la soglia che ho scelto per disegnare: titoli con almeno quattro voti, coppie viste da almeno due persone. La soglia sui voti serve solo a non riempire il cerchio di puntini, e più avanti rifaccio il conto senza. Ho provato prima con un layout a molle, quello che si usa di solito per i grafi, e faceva schifo: le componenti scollegate scappavano agli angoli e il centro collassava in una palla illeggibile. Allora l'ho buttato e ho messo i titoli su un cerchio, raggruppati per genere, con le corde dentro.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/serie-4-grafo.png" alt="Grafo circolare: 23 serie con almeno 4 voti disposte per genere, collegate dalle corde delle coppie consigliate insieme">
+      <figcaption>Ventitré titoli con almeno quattro voti, collegati quando almeno due persone li hanno nominati tutti e due. I settori del cerchio sono i generi, cioè una classificazione mia. Le corde no, quelle le avete tirate voi. Spessore della corda proporzionale a quante persone la sostengono.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/serie-4-grafo.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p>Guardate quante corde tagliano il cerchio invece di restare dentro il proprio settore: 44 su 100. Solo che quel numero, da solo, non vale granché: dipende da come ho disegnato io i settori. Se accorpassi crime e spionaggio, che è una scelta difendibile, crollerebbe.</p>
+
+    <p>La misura che non dipende dai miei settori è l'<strong>assortatività</strong>, che è roba da analisi di reti: quanto un nodo tende a collegarsi con nodi che hanno la stessa etichetta. Vale 1 se i generi sono mondi separati, 0 se il genere non conta niente, e può anche andare sotto zero se i generi si attraggono. Qui vale <strong>0,29</strong>. Per sapere se 0,29 è tanto o poco ho rimescolato le etichette di genere sui nodi tremila volte e rifatto il conto: viene &minus;0,08 in media, e il valore vero non lo raggiunge quasi mai (p = 0,001).</p>
+
+    <p>Quindi il genere conta, non è rumore. Ma conta poco, e siamo molto più vicini allo zero che all'uno. Il crime e la fantascienza, che nella mia tabella sono due categorie separate, nelle vostre risposte sono ampiamente lo stesso pubblico. Breaking Bad si lega a Black Mirror, a Mr. Robot, a Dark, a Chernobyl. Il genere è un'etichetta comoda per chi fa i grafici, non è il modo in cui vi ricordate le serie.</p>
+
+    <p>E poi c'è la cosa che mi ha divertito di più. Il nodo con più legami è Breaking Bad, con dieci. Il secondo non è Better Call Saul, che è il suo spin off: è <strong>Mr. Robot, con sette</strong>. Mr. Robot fa da ponte tra le due metà del cerchio. Se dovessi indovinare da una sola risposta cos'altro guarda una persona, guarderei lì.</p>
+
+    <p>Restano fuori dodici titoli che hanno quattro voti o più e non hanno mai viaggiato in coppia con nessuno: Dr. House, Yellowstone, The Shield, Sons of Anarchy, Dexter, Lie to Me. Piacciono, ma a gente che non si somiglia fra sé.</p>
+
+    <h2>I libri, e qui cambia tutto</h2>
+
+    <p>Il giorno dopo ho rifatto la stessa domanda con i libri, perché il thread sulle serie era stato bello per un motivo che non c'entrava con le serie: ci si era avvicinati un po' attraverso i gusti di ciascuno.</p>
+
+    <p>Stesso metodo, stesso script, un dizionario e una lista piatta. Solo che i metadati sono diversi: titolo, autore, anno di prima edizione originale (non della traduzione italiana, che è un'altra cosa), tema, e se è narrativa o saggistica.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/libri-3-classifica.png" alt="Classifica dei libri: Gödel Escher Bach 5 voti, poi tre libri a quattro voti">
+      <figcaption>I diciotto libri con più di un voto, su 195 titoli totali. A destra gli autori più nominati, contati per numero di persone diverse (e contando anche chi è stato citato senza un titolo preciso, tipo "leggi tutto Lovecraft"), e le librerie più lunghe.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/libri-3-classifica.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p>Guardate i numeri della prima riga e teneteli a mente: <strong>il libro più votato prende cinque voti</strong>. Cinque. È Gödel, Escher, Bach, che è esattamente il libro che ti aspetti da questo pubblico, e uno di voi mi ha scritto che l'ha appena cominciato e che ottocento pagine sono dure da maneggiare. Sotto ci sono tre libri a quattro voti (Armi acciaio e malattie, I pilastri della terra, Il Maestro e Margherita) e poi si scende subito a due.</p>
+
+    <p>Su 195 titoli, <strong>177 li ha nominati una persona sola</strong>. Il 91 per cento.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/libri-1-biblioteca.png" alt="La biblioteca: tutti i 195 libri consigliati, divisi in nove scaffali tematici, con autore e anno di prima edizione">
+      <figcaption>Tutti i 195 titoli, in nove scaffali. Nella seconda colonna, sotto la fantascienza, i sette libri da cui ero partito io, tenuti fuori classifica. Nella biblioteca c'è dentro roba che va dalla Divina Commedia a Stochastic Calculus for Finance, e non è una battuta.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/libri-1-biblioteca.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/libri-2-secoli.png" alt="Timeline dei libri consigliati per anno di prima edizione, dal 1321 al 2026">
+      <figcaption>Sette secoli su uno scaffale. L'asse è compresso fino al 1900, altrimenti il grafico sarebbe stato tutto schiacciato a destra. Sei titoli non hanno un anno accertato e sono fuori da questa vista.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/libri-2-secoli.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <h2>La cosa che mi ha colpito: sulle serie ci troviamo, sui libri no</h2>
+
+    <p>Due domande quasi identiche, allo stesso pubblico, a un giorno di distanza. Prima di andare avanti conviene avere in testa quattro numeri, che fin qui sono sparsi tra il testo e le figure.</p>
+
+    <div class="sl-cifre">
+      <div><b>486 &rarr; 210</b><span>serie: menzioni raccolte<br>e titoli diversi che ne escono</span></div>
+      <div><b>17</b><span>voti al primo<br>in classifica: Breaking Bad</span></div>
+      <div><b>223 &rarr; 195</b><span>libri: menzioni raccolte<br>e titoli diversi che ne escono</span></div>
+      <div><b>5</b><span>voti al primo<br>in classifica: Gödel, Escher, Bach</span></div>
+    </div>
+
+    <p>Da un lato una classifica con una testa netta, dall'altro una lista in cui quasi ogni menzione è un titolo nuovo e il primo prende cinque voti. Sono proprio due cose di forma diversa.</p>
+
+    <p>Il problema è che i due campioni sono di dimensioni diverse: 486 menzioni per le serie, 223 per i libri. Confrontarli così sarebbe scorretto, perché più menzioni raccogli più titoli diversi trovi, per forza. Serve una misura che tenga conto della taglia.</p>
+
+    <p>Questa misura esiste da sessant'anni e viene dall'ecologia. Si chiama curva di rarefazione: se dal mio campione estraessi a caso solo k menzioni, quante specie diverse mi aspetterei di trovare? La formula di Hurlbert la calcola in chiuso, senza simulazioni.</p>
+
+    <div class="code-block" data-lang="python"><pre class="ln" aria-hidden="true"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre><pre class="src"><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">def</span> <span class="nf">rarefazione</span><span class="p">(</span><span class="n">conteggi</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Titoli diversi attesi dopo k menzioni estratte a caso, senza rimpiazzo.</span>
+<span class="sd">       conteggi = lista dei voti per titolo. Hurlbert 1971.&quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">conteggi</span><span class="p">)</span>
+    <span class="n">lg</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">lgamma</span>
+    <span class="k">def</span> <span class="nf">logC</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>                       <span class="c1"># log del binomiale, per non esplodere</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">lg</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">lg</span><span class="p">(</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">lg</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">logC</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+    <span class="c1"># 1 meno la probabilità che un titolo NON esca in nessuna delle k estrazioni</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">logC</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">-</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">conteggi</span><span class="p">)</span></pre></div>
+
+    <p>Applicata ai due dataset alla stessa quota, 223 menzioni per entrambi, dice questo.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/serie-5-serie-vs-libri.png" alt="Confronto serie TV contro libri: curva di rarefazione e coda della classifica, con quattro indicatori a confronto">
+      <figcaption>A sinistra la curva di rarefazione: titoli diversi attesi al crescere delle menzioni raccolte. A destra la coda della classifica in scala logaritmica, voti del titolo in n-esima posizione. Questa volta la coda delle serie non è stimata dai totali pubblicati, come nella prima versione di lunedì: è il dataset completo, titolo per titolo.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/serie-5-serie-vs-libri.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p>A parità di campione i vostri libri producono <strong>il 48 per cento di titoli diversi in più</strong> delle vostre serie. Detta in un altro modo: sulle serie 43 menzioni su 100 portano un titolo che non aveva ancora detto nessuno, le altre 57 ripetono. Sui libri quella quota sale a 87 su 100.</p>
+
+    <p>Il grafico di destra è ancora più chiaro. La curva blu delle serie parte da 17 e scende come una scala; quella arancione dei libri parte da 5 ed è quasi piatta da subito. Sono due oggetti di forma diversa, non due misure diverse della stessa cosa.</p>
+
+    <p>Perché succede, secondo me. Le serie TV le guardiamo tutti insieme nello stesso momento, perché ce le mette davanti la stessa piattaforma nella stessa stagione: c'è un catalogo condiviso, quindi c'è una memoria condivisa. I libri no. Un libro lo trovi per conto tuo, in un momento a caso della tua vita, e quel momento non lo condivide nessun altro. La lista dei libri di una persona è molto più informativa su chi è quella persona di quanto lo sia la sua lista di serie, per il semplice motivo che è molto meno probabile che coincida con la mia.</p>
+
+    <p>Che poi è esattamente quello che speravo succedesse quando ho fatto la seconda domanda, solo che non pensavo si potesse misurare.</p>
+
+    <h2>Duecentodieci titoli, ma quanti contano davvero?</h2>
+
+    <p>C'è una cosa che ho ripetuto in tutto l'articolo senza dirvi che è la misura più fragile che esista: <em>quanti titoli diversi sono usciti</em>. Duecentodieci, centonovantacinque. Il problema è che quel numero non è una proprietà dei vostri gusti, è una proprietà della quantità di dati che ho raccolto. Se dalle serie ne sorteggio 223 come per i libri, i 210 titoli diventano <strong>131</strong>. Non è cambiato niente nei gusti, ho solo guardato di meno.</p>
+
+    <p>Meglio girare la domanda: <em>quanti titoli equiprobabili darebbero la stessa diversità che vedo?</em> Se dieci titoli si dividessero i voti in parti uguali, la risposta sarebbe dieci. Se uno prendesse quasi tutto e gli altri nove le briciole, la risposta sarebbe poco più di uno. Questi si chiamano numeri di Hill e hanno un parametro <code>q</code> che decide quanto pesano i titoli rari: a <code>q=0</code> contano tutti uguale (ed è il conteggio crudo), a <code>q=1</code> ognuno pesa quanto la sua frequenza, a <code>q=2</code> i titoli rari smettono quasi di contare.</p>
+
+    <div class="code-block" data-lang="python"><pre class="ln" aria-hidden="true"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre><pre class="src"><span class="k">def</span> <span class="nf">hill</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;c = voti per titolo. Restituisce quanti titoli equiprobabili</span>
+<span class="sd">       darebbero la stessa diversita&#39; di c.&quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">c</span> <span class="o">/</span> <span class="n">c</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>                       <span class="c1"># exp dell&#39;entropia di Shannon</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">p</span> <span class="o">**</span> <span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">q</span><span class="p">))</span>
+
+<span class="c1"># q=0 -&gt; quanti titoli esistono          (il conteggio crudo)</span>
+<span class="c1"># q=1 -&gt; exp(H), la &quot;perplexity&quot;</span>
+<span class="c1"># q=2 -&gt; 1/somma(p^2), cioe&#39; l&#39;inverso dell&#39;indice di Herfindahl</span></pre></div>
+
+    <p>Qui mi si è accesa una lampadina. La perplexity la conosco dai modelli linguistici, l'indice di Herfindahl dall'antitrust, e non avevo mai notato che sono <strong>la stessa formula</strong>: <code>q=1</code> e <code>q=2</code>. Cambia solo quanto sei disposto a dare retta alla coda.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/serie-6-diversita.png" alt="Profilo di diversità di Hill per serie e libri, e tabella di somiglianza fra le persone">
+      <figcaption>A sinistra il profilo di diversità: sull'asse orizzontale il parametro q, in verticale quanti titoli equiprobabili darebbero la stessa diversità. Tutto a parità di campione, 223 menzioni per entrambi, sorteggiate 500 volte con seed fisso (per i libri sono tutte, quindi la banda è nulla). A destra quanto si somigliano fra loro le persone che hanno risposto.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/serie-6-diversita.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p>A <code>q=2</code>, cioè guardando solo i titoli che raccolgono massa vera, le serie valgono <strong>81 titoli</strong> e i libri <strong>160</strong>. Il doppio. E notate cosa succede alle due curve: quella dei libri parte da 195 e scende pigramente, perché non c'è quasi niente da smontare, tutti i titoli pesano uguale. Quella delle serie parte da 131 e crolla, perché sotto ai primi venti c'è aria.</p>
+
+    <p>Il Gini della classifica dice la stessa cosa in un altro modo: <strong>0,32</strong> per le serie contro <strong>0,12</strong> per i libri, sempre a parità di campione. La massa dei consigli sulle serie è concentrata, quella sui libri è spalmata.</p>
+
+    <h3 style="font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-secondary); margin-top: 2.4rem;">E le persone?</h3>
+
+    <p>Fin qui ho contato titoli. Ma la domanda vera è sulle persone: due di voi presi a caso hanno qualcosa in comune? Basta prendere ogni coppia di partecipanti e guardare se le loro liste si toccano.</p>
+
+    <p>Si chiama indice di Jaccard ed è la cosa meno sofisticata di tutto l'articolo: titoli in comune diviso titoli totali dei due. Sulle serie viene sopra zero nel <strong>3,26 per cento</strong> delle coppie, sui libri nell'<strong>1,63</strong>. Sui libri è la metà, nonostante le liste siano più lunghe: 3,01 titoli a testa contro 2,11, cioè più occasioni di incontrarsi.</p>
+
+    <p>Solo che qui stavo per prendere una cantonata. Guardando la distribuzione mi sono trovato 77 coppie di persone con somiglianza <strong>1</strong>, cioè liste identiche, e la tentazione era raccontarle come "una piccola comunità di gente con gusti sovrapponibili". Sono andato a vedere chi erano: <strong>76 su 77 sono coppie di persone che hanno nominato un titolo solo, lo stesso</strong>. Due che passano di lì e scrivono "Breaking Bad" e basta. Non è affinità elettiva, è una lista di lunghezza uno.</p>
+
+    <p>E qui il numeratore e il denominatore giocano contro di me, perché il 61 per cento delle liste sulle serie ha un titolo solo, contro il 34 per cento sui libri. Le liste corte gonfiano Jaccard <em>proprio dalla parte che mi conviene</em>. Quindi ho rifatto il conto tenendo solo chi si è sbilanciato con almeno due titoli.</p>
+
+    <figure class="sl-fig">
+      <img src="../immagini/serie-e-libri/serie-7-persone.png" alt="Distribuzione della somiglianza di Jaccard fra coppie di persone, e come cambia alzando la soglia di lunghezza minima della lista">
+      <figcaption>A sinistra la distribuzione della somiglianza fra coppie di persone, calcolata solo su chi ha nominato almeno due titoli. Le coppie a somiglianza zero sono la stragrande maggioranza e resterebbero fuori scala, quindi non sono disegnate. A destra come cambia la quota di coppie che si incontrano al salire dell'asticella: sotto ogni punto quante persone restano da quel lato.</figcaption>
+      <a class="zoom" href="../immagini/serie-e-libri/serie-7-persone.png" target="_blank" rel="noopener">apri a piena risoluzione</a>
+    </figure>
+
+    <p>Tolto l'artefatto, il divario non si sgonfia: <strong>raddoppia</strong>. Fra chi ha detto almeno due titoli si incontra il <strong>10,6 per cento</strong> delle coppie sulle serie contro il <strong>2,4</strong> sui libri. Fra chi ne ha detti almeno tre, il <strong>19,7</strong> contro il <strong>4,8</strong>: una coppia di spettatori su cinque, una coppia di lettori su venti. Più alzo l'asticella e più le due curve divergono, che è l'opposto di quello che farebbero se il divario fosse un effetto delle liste corte.</p>
+
+    <p>Sul pannello di destra i punti più a destra vanno presi per quello che sono: a sei titoli restano quattordici persone da un lato e tredici dall'altro, quindi quella parte di curva balla parecchio. È la ragione per cui la soglia che uso nel testo è due, non sei.</p>
+
+    <p>E poi c'è il numero che ha chiuso la questione. Sulle serie, le coppie di titoli nominate insieme da almeno due persone diverse sono <strong>46</strong>, contando qualsiasi titolo. Nel grafo di prima ne vedete 36 perché lì tenevo solo i titoli da quattro voti in su: le altre dieci hanno dentro roba come Goliath o Altered Carbon, che di voti ne hanno due, e le avevo lasciate fuori per non riempire il cerchio di puntini.</p>
+
+    <p>Sui libri sono <strong>zero</strong>. Non poche: zero. E non è la soglia dei quattro voti a farmi lo scherzo, perché ho provato ad abbassarla fino a prendere qualsiasi libro, anche quelli nominati una volta sola, e resta zero. In 74 persone e 223 consigli non esiste <em>una singola coppia di libri</em> che due persone diverse abbiano nominato entrambi.</p>
+
+    <p>Il grafo dei gusti, sui libri, non è debole. Non esiste proprio.</p>
+
+    <p>Che è il punto dove il cerchio si chiude, e infatti smetto qui: sono partito contando titoli, poi ho guardato come si distribuivano, poi come si legavano fra loro, e alla fine come si legano le persone. Alla fine sono quattro modi diversi di arrivare alla stessa cosa. Da una domanda su X delle nove di sera.</p>
+
+    <h2>Quello che il conto non dice</h2>
+
+    <p>Metto in fila i limiti, perché sono tanti e sono reali.</p>
+
+    <p>Il campione non è rappresentativo di niente. Sono le persone che seguono me e che avevano voglia di rispondere quella sera: pesante di nerd, di gente che legge saggistica scientifica e che ha delle opinioni. Se una serie non è in classifica non vuol dire che sia brutta, vuol dire che non l'ha vista questo gruppo qui.</p>
+
+    <p>La categorizzazione in generi è mia e in diversi punti è arbitraria. Ho messo Chernobyl in "storia" e Silo in "fantascienza", ma potevo metterle tutte e due in "distopia" e sarebbe cambiato il grafico dei generi. Il grafo delle corde, guarda caso, è proprio il modo per accorgersene.</p>
+
+    <p>Le date sono la prima messa in onda della serie originale, non del reboot e non della versione italiana. Battlestar Galactica è al 2004 e non al 1978 perché quasi tutti parlavano del reboot, ma uno di voi intendeva l'originale e quel voto è finito nel posto sbagliato. Cinque titoli non hanno un anno che sono riuscito a verificare e restano fuori dalla timeline.</p>
+
+    <p>Sull'assortatività: 0,29 è calcolata su una rete di 23 nodi e 36 archi, che è piccola. Il test di permutazione dice che non è rumore, ma l'intervallo attorno a quel numero è largo e non lo prenderei alla seconda cifra.</p>
+
+    <p>Poi ci sono due analisi che ho fatto e ho buttato, e visto che le ho fatte tanto vale dire perché. La prima è il fit di una legge di potenza sulla coda, alla Zipf: viene un esponente di 2,04 per le serie e 3,72 per i libri, con un test di Kolmogorov-Smirnov che non rifiuta né l'uno né l'altro. Sembra un risultato, non lo è: sui libri il titolo più votato ne prende cinque, quindi sto stimando una legge di potenza su valori interi che vanno da 1 a 5. Con quel margine di manovra ci si adatta qualsiasi cosa, e i due esponenti non sono confrontabili in modo onesto.</p>
+
+    <p>La seconda è l'informazione mutua fra genere e titolo. Quella non l'ho buttata perché veniva male, l'ho buttata perché <em>non misura niente</em>: il titolo determina il genere, quindi l'incertezza sul genere una volta noto il titolo è zero per costruzione, e quella quantità è sempre e comunque uguale all'entropia del genere. L'ho riformulata come informazione fra persona e genere, che ha senso, ma con due titoli a testa in media ogni persona predice il proprio genere quasi perfettamente per puro caso: rimescolando i dati, l'85 per cento del valore resta lì. Il segnale c'è ma è piccolo e sepolto sotto il bias di un campione corto. Non ci costruisco sopra una frase.</p>
+
+    <p>E il pezzo più fragile resta la lettura a mano. Ho deciso io che "vero, quella è bellissima" sotto al commento di un altro vale come voto, e che "Fringe, Trono di Spade, Mr Robot, Lie to me cazzate" non vale come quattro voti ma come zero. Un altro avrebbe deciso diversamente e avrebbe ottenuto numeri leggermente diversi. Gli script li ho messi tutti, e il dataset è leggibile riga per riga: <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mi-avete-costruito-un-dataset/serie/dati.py" target="_blank" rel="noopener">le 210 serie</a> e <a href="https://github.com/pinperepette/signal.pirate/blob/main/scripts/mi-avete-costruito-un-dataset/libri/dati.py" target="_blank" rel="noopener">i 195 libri</a> stanno lì, con accanto chi li ha nominati. Se una riga vi sembra sbagliata, si vede e si corregge.</p>
+
+    <h2>E quindi, cosa guardo?</h2>
+
+    <p>Me lo avete chiesto in parecchi sotto al post dei grafici, e la risposta onesta è che ha deciso mia moglie. In casa comando io, naturalmente, tranne quando ci sono lei, mia figlia o il cane. Ha scelto Absentia, che in questa classifica non compare nemmeno, e dopo un quarto d'ora dormiva sul divano.</p>
+
+    <p>Comunque ho segnato Mr. Robot, perché a questo punto è diventata una questione di metodo: se è il nodo che tiene insieme il grafo, tanto vale partire da lì. E Person of Interest, perché undici persone che si convincono ognuna per conto suo di essere l'unica ad averla nominata sono un segnale statistico difficile da ignorare.</p>
+
+    <p>Tutto quello che ho usato per scrivere questo pezzo sta in <a href="https://github.com/pinperepette/signal.pirate/tree/main/scripts/mi-avete-costruito-un-dataset" target="_blank" rel="noopener"><code>scripts/mi-avete-costruito-un-dataset</code></a>: i sette script dei grafici, i due elenchi completi di serie e libri con i voti, e anche le risposte grezze in JSON, così se non vi fidate di come ho contato potete ricontare voi.</p>
+
+    <p>Grazie davvero a tutti quelli che hanno risposto. Volevo una serie e mi avete dato 486 consigli di serie, altri 223 di libri, un grafo, e una cosa da misurare che non sapevo di voler misurare. Nel dubbio, continuate a rispondere alle domande stupide che faccio la sera.</p>
+
+  </article>
+
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
