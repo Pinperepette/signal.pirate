@@ -83,6 +83,26 @@
 
     <div class="articles-grid">
 
+      <!-- Article Card: XSS2Shell -->
+      <a href="articoli/xss2shell-wordpress-core-rce.html" class="article-card" style="text-decoration:none">
+        <div class="article-card-date">2026-08-14</div>
+        <h3 class="article-card-title">XSS2Shell: Da un XSS su WordPress al Controllo del Server</h3>
+        <p class="article-card-abstract">
+          Una nuova falla nel core di WordPress, CVE-2026-64638 con CVSS 8.9, parte da un XSS sulla
+          pagina di login e arriva all'esecuzione di codice sul server. Non è zero-click: serve un
+          amministratore già autenticato. Ho preparato un lab con Docker e Playwright per provare la
+          catena in locale: XSS, DOM clobbering, Application Password e caricamento di un plugin
+          malevolo. Dentro ci sono la spiegazione passo passo, il codice e i controlli da fare se
+          amministri un sito WordPress.
+        </p>
+        <div class="article-card-tags">
+          <span class="tag tag-attention">WordPress</span>
+          <span class="tag tag-reaction">XSS</span>
+          <span class="tag tag-highlight">RCE</span>
+          <span class="tag tag-amplification">Lab</span>
+        </div>
+      </a>
+
       <!-- Article Card: Vi ho chiesto una serie e mi avete costruito un dataset -->
       <a href="articoli/mi-avete-costruito-un-dataset.html" class="article-card" style="text-decoration:none">
         <div class="article-card-date">2026-08-12</div>

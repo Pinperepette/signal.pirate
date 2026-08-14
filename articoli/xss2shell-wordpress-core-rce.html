@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XSS2Shell: Da un XSS su WordPress al Controllo del Server | Signal Pirate</title>
+  <meta name="description" content="WordPress ha una falla nel core. Un XSS su wp-login.php può diventare esecuzione di codice. Qui spiego come funziona e ti do un lab per provarlo.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,136,0,0.05));
+      border-left: 3px solid var(--accent-reaction);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+    .section-number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      color: #c8c8d8;
+      position: relative;
+    }
+    .code-block::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      font-size: 0.65rem;
+      color: rgba(0,255,136,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      z-index: 1;
+    }
+    .code-block table { border-collapse: collapse; width: 100%; }
+    .code-block td { padding: 0; vertical-align: top; border: none; }
+    .code-block td:hover { background: none; }
+    .code-block .ln {
+      width: 3.2em;
+      padding: 0.2em 0.8em 0.2em 0.6em;
+      text-align: right;
+      color: #3a3a5a;
+      user-select: none;
+      border-right: 1px solid #1a1a2e;
+      background: #090d14;
+      font-size: 0.72rem;
+    }
+    .code-block .code { padding: 0.2em 0 0.2em 1em; white-space: pre; }
+    .code-block .code-wrap { padding: 0.8rem 0; }
+    .ck { color: #7c4dff; }
+    .cs { color: #00ff88; }
+    .cn { color: #b5cea8; }
+    .cc { color: #6a6a8a; }
+    .cf { color: #4ecdc4; }
+    .cv { color: #9cdcfe; }
+    .ct { color: #4ec9b0; }
+    .co { color: #d4d4d4; }
+    .cw { color: #ff6b6b; }
+    .terminal-output {
+      background: #0d1117;
+      border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      color: #c8c8d8;
+    }
+    .terminal-output .t-prompt { color: #00ff88; }
+    .terminal-output .t-cmd { color: #fff; }
+    .terminal-output .t-out { color: #8b949e; display: block; }
+    .terminal-output .t-ok { color: #00ff88; }
+    .terminal-output .t-warn { color: #ff6b6b; }
+    .terminal-output .t-highlight { color: #ff8800; }
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pipeline-step {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .pipeline-step:hover { transform: translateY(-2px); }
+    .step-num {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--accent-attention);
+    }
+    .step-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .step-detail {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+    .strategy-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+    }
+    .strategy-table th {
+      background: var(--bg-tertiary);
+      padding: 0.9rem 1rem;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-attention);
+      border-bottom: 2px solid var(--accent-attention);
+    }
+    .strategy-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.5;
+    }
+    .strategy-table tr:hover td { background: rgba(0,255,136,0.03); }
+    .conclusion-box {
+      background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(124,77,255,0.08));
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .conclusion-box .quote {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-attention);
+      line-height: 1.4;
+    }
+    .accent { color: var(--accent-attention); }
+    .article-content strong { color: var(--accent-yellow); }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: rgba(0,255,136,0.08);
+      padding: 0.15em 0.4em;
+      border-radius: 4px;
+      color: var(--accent-attention);
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/xss2shell-wordpress-core-rce.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="XSS2Shell: Da un XSS su WordPress al Controllo del Server">
+  <meta property="og:description" content="WordPress ha una falla nel core. Un XSS su wp-login.php può diventare esecuzione di codice. Qui spiego come funziona e ti do un lab per provarlo.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/xss2shell-wordpress-core-rce.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-08-14">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="XSS2Shell: Da un XSS su WordPress al Controllo del Server">
+  <meta name="twitter:description" content="WordPress ha una falla nel core. Un XSS su wp-login.php può diventare esecuzione di codice. Qui spiego come funziona e ti do un lab per provarlo.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"XSS2Shell: Da un XSS su WordPress al Controllo del Server","description":"WordPress ha una falla nel core. Un XSS su wp-login.php può diventare esecuzione di codice. Qui spiego come funziona e ti do un lab per provarlo.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-08-14","dateModified":"2026-08-14","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/xss2shell-wordpress-core-rce.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-08-14 | Pinperepette</p>
+    <h1 class="article-page-title">XSS2Shell: <span class="accent">Da un XSS al Server</span></h1>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 700px; margin-left: auto; margin-right: auto;">
+      Una nuova falla nel core di WordPress permette di passare da un semplice XSS alla esecuzione di codice sul server. Qui ti spiego passo passo come funziona e ti do il codice per provarla in un lab sicuro.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">WordPress</span>
+      <span class="tag tag-reaction">XSS</span>
+      <span class="tag tag-highlight">RCE</span>
+      <span class="tag tag-amplification">Lab</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <h2><span class="accent">//</span> Il Bug</h2>
+
+    <p>Il 6 agosto 2026 WordPress rilascia la versione 7.0.3. Tra le correzioni c'è <strong>CVE-2026-64638</strong>, una falla con punteggio CVSS 8.9. Non è su un plugin o su un tema. È nel cuore di WordPress, nella pagina che usi per fare login.</p>
+
+    <p>Il problema è questo: se provi a entrare con un nome utente che contiene codice JavaScript, WordPress lo mostra di nuovo nella pagina di errore senza controllarlo bene. Il browser esegue quel codice. Questo si chiama XSS, cross-site scripting.</p>
+
+    <p>Da solo l'XSS non prende il server. Serve anche che un amministratore sia già loggato e interagisca con una pagina preparata dall'attaccante. Quindi non è un attacco zero-click. Ma se questa seconda condizione si verifica, la catena che parte dall'XSS arriva fino a eseguire codice PHP sul server.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>Cosa sappiamo.</strong> CVE-2026-64638 è reale. La patch 7.0.3 è uscita il 6 agosto 2026 e WordPress l'ha distribuita anche alle versioni precedenti ancora supportate. Non ci sono attacchi confermati su larga scala, ma i dettagli tecnici e il PoC sono pubblici. Il rischio è alto.</p>
+    </div>
+
+    <div class="warning-box fade-in">
+      <p><strong>Non farlo su siti altrui.</strong> Questo articolo serve a capire la falla e a difendersi. Il codice è pensato per un lab locale, non per attaccare qualcuno.</p>
+    </div>
+
+    <h2><span class="accent">//</span> La Catena</h2>
+
+    <p>L'attacco non è un colpo solo. È una serie di passaggi. Se ne manca anche uno, tutto si ferma. Questo è il motivo per cui difendersi è possibile: ci sono più punti dove intervenire.</p>
+
+    <div class="pipeline-steps fade-in">
+      <div class="pipeline-step">
+        <div class="step-num">01</div>
+        <div class="step-name">XSS</div>
+        <div class="step-detail">Il nome utente inserito in wp-login.php viene ristampato senza controlli</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">02</div>
+        <div class="step-name">DOM Clobbering</div>
+        <div class="step-detail">Il codice malevolo sovrascrive una variabile del browser</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">03</div>
+        <div class="step-name">REST API</div>
+        <div class="step-detail">Viene creata una Application Password per l'admin</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">04</div>
+        <div class="step-name">Exfil</div>
+        <div class="step-detail">La password viene rubata dal server dell'attaccante</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="step-num">05</div>
+        <div class="step-name">RCE</div>
+        <div class="step-detail">Con la password si crea un admin, si carica un plugin e si esegue codice</div>
+      </div>
+    </div>
+
+    <h2><span class="accent">//</span> Il Lab</h2>
+
+    <p>Per capire la catena ho preparato un lab con Docker. Parte da WordPress 6.7.0, cioè una versione che precede la 7.0.3 con la patch. Dentro ci sono due piccoli plugin di aiuto: uno abilita le Application Password anche senza HTTPS, l'altro espone un nonce REST via JSONP per replicare ciò che un XSS pre-auth reale potrebbe ottenere.</p>
+
+    <p>Tutto il codice è nella cartella <a href="https://github.com/pinperepette/signal.pirate/tree/main/xss2shell-lab" target="_blank" rel="noopener">xss2shell-lab</a> del repository. Ti servono Docker, Python 3.9+ e Playwright.</p>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">cd xss2shell-lab</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">docker compose up -d</span>
+      <span class="t-out">[+] Container WordPress su 127.0.0.1:8080</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">source .venv/bin/activate</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">python run-poc.py</span>
+    </div>
+
+    <p>Se funziona vedi <code>marker_ok: true</code> e <code>status: "pwned"</code>.</p>
+
+    <h2><span class="accent">//</span> Il Primo Passo: XSS</h2>
+
+    <p>Quando sbagli password, WordPress ti mostra di nuovo il form di login e ti scrive il nome utente che avevi inserito. Questo è comodo, ma pericoloso se il nome utente contiene codice.</p>
+
+    <p>Nel PoC il nome utente non è un nome. È una stringa che contiene tag HTML con uno spazio iniziale:</p>
+
+    <div class="code-block" data-lang="html">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code">&lt; area id=ajaxurl href="http://127.0.0.1:8080/?rest_route=/..."&gt;</td></tr>
+        <tr><td class="ln">2</td><td class="code">&lt; div id=color-picker class=reset-pass-submit&gt;</td></tr>
+        <tr><td class="ln">3</td><td class="code">&lt; button class="wp-generate-pw color-option"&gt;X&lt;/button&gt;</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <p>Lo spazio prima del nome del tag serve a ingannare i filtri. <code>&lt;area&gt;</code> senza spazio viene riconosciuto e forse bloccato. <code>&lt; area&gt;</code> con lo spazio passa inosservato a certi controlli, ma il browser lo interpreta comunque come tag.</p>
+
+    <p>È una di quelle cose che, quando la vedi nel PoC, ti fai venire il dubbio: aspetta un attimo, davvero basta uno spazio?</p>
+
+    <h2><span class="accent">//</span> Il Secondo Passo: DOM Clobbering</h2>
+
+    <p>WordPress usa una variabile JavaScript chiamata <code>ajaxurl</code> per mandare richieste al server. Gli script la leggono come una stringa.</p>
+
+    <p>Il browser però ha una stranezza: se nella pagina c'è un elemento HTML con <code>id="ajaxurl"</code>, quell'elemento diventa accessibile come <code>window.ajaxurl</code>. Se uno script poi usa questa variabile come stringa, il browser prende il valore dell'attributo <code>href</code> dell'elemento.</p>
+
+    <p>Il payload crea quindi un elemento <code>&lt;area id=ajaxurl href="URL-attaccante"&gt;</code>. Quando uno script interno usa <code>ajaxurl</code>, finisce per chiamare l'URL scelto dall'attaccante.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Cos'è il DOM clobbering.</strong> Il browser trasforma automaticamente gli elementi con un id in variabili globali. Non è un bug di WordPress in sé. Diventa pericoloso quando un'applicazione si fida di queste variabili senza controllarle.</p>
+    </div>
+
+    <h2><span class="accent">//</span> Il Terzo Passo: Application Password</h2>
+
+    <p>WordPress ha una funzione chiamata Application Passwords. Serve per dare a un'app esterna una password diversa dalla tua, in modo che possa usare le REST API al posto tuo. Se sei admin, quella password ha i privilegi di admin.</p>
+
+    <p>Per crearla serve un nonce REST, cioè un codice temporaneo che dimostra che la richiesta arriva da una pagina fidata. Nel lab questo nonce viene esposto via JSONP per replicare come un XSS reale potrebbe leggerlo: da un endpoint pubblico, da uno script già presente nella pagina, o da una scheda admin aperta.</p>
+
+    <p>A questo punto il codice malevolo chiede a WordPress di creare una nuova Application Password. Il browser dell'admin, che ha una sessione attiva, completa l'operazione e restituisce la password generata.</p>
+
+    <div class="code-block" data-lang="javascript">
+      <div class="code-wrap"><table><tbody>
+        <tr><td class="ln">1</td><td class="code"><span class="ck">const</span> <span class="cv">appUrl</span> <span class="co">=</span> <span class="cv">WP</span> <span class="co">+</span> <span class="cs">'/?rest_route=/wp/v2/users/me/application-passwords'</span> <span class="co">+</span></td></tr>
+        <tr><td class="ln">2</td><td class="code">  <span class="cs">'&_method=POST&_wpnonce='</span> <span class="co">+</span> <span class="cf">encodeURIComponent</span>(<span class="cv">nonce</span>) <span class="co">+</span></td></tr>
+        <tr><td class="ln">3</td><td class="code">  <span class="cs">'&name=XSS2Shell&_jsonp=opener.pwn'</span>;</td></tr>
+      </tbody></table></div>
+    </div>
+
+    <h2><span class="accent">//</span> Gli Ultimi Passi: dalla Password al Server</h2>
+
+    <p>La Application Password arriva al server dell'attaccante. Ora l'attaccante può autenticarsi come admin sulle REST API.</p>
+
+    <p>Lo script Python fa tre cose:</p>
+
+    <ol>
+      <li><strong>Crea un nuovo utente admin</strong> chiamando <code>/wp/v2/users</code>.</li>
+      <li><strong>Fa login</strong> con questo utente per ottenere i cookie di sessione.</li>
+      <li><strong>Carica un plugin ZIP malevolo</strong> dalla pagina di installazione plugin.</li>
+    </ol>
+
+    <p>Il plugin contiene un file <code>pwnplugin.php</code> che, appena attivato, scrive un marker nella root del sito e offre un endpoint con <code>shell_exec('whoami')</code>. Nel lab questo dimostra l'esecuzione di codice. Nella realtà il plugin potrebbe nascondere una web shell, modificare file, creare altri account o rubare dati.</p>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">python run-poc.py</span>
+      <span class="t-out">[*] Login admin su WordPress...</span>
+      <span class="t-out">[*] Admin loggato.</span>
+      <span class="t-out">[*] Exploit avviato, attendo il popup...</span>
+      <span class="t-out">Application Password creata: Xyd8 gD2b 640c t8Cr jMXc L6VO</span>
+      <span class="t-out">Risposta server: { "status": "pwned", "marker_ok": true }</span>
+      <span class="t-out">[*] Marker RCE: 200 PWNED at ...</span>
+    </div>
+
+    <h2><span class="accent">//</span> Automazione</h2>
+
+    <p>La catena usa più finestre del browser: la pagina principale, un popup per il nonce, un altro popup per la password, e infine le richieste REST. Farlo a mano è scomodo.</p>
+
+    <p>Per questo ho scritto <code>run-poc.py</code> con Playwright. Avvia il server attaccante, fa login come admin, clicca il pulsante dell'exploit e aspetta il risultato. Alla fine verifica che il marker RCE sia presente.</p>
+
+    <h2><span class="accent">//</span> Cosa Controllare</h2>
+
+    <p>Se hai un sito WordPress e vuoi capire se è stato compromesso con una catena di questo tipo, ecco i controlli principali.</p>
+
+    <div class="terminal-output fade-in">
+      <span class="t-prompt">$</span> <span class="t-cmd">wp core verify-checksums</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">wp plugin verify-checksums --all</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">wp user list --role=administrator</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">find wp-content -name "*.php" -newermt "14 days ago"</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">find wp-content/uploads -name "*.php"</span>
+      <span class="t-prompt">$</span> <span class="t-cmd">grep -rEl "eval\(|base64_decode|gzinflate|str_rot13|assert\(|move_uploaded_file" wp-content</span>
+    </div>
+
+    <p>Controlla anche le Application Password nella pagina del tuo profilo utente. Se trovi una voce che non hai creato tu, revocala.</p>
+
+    <table class="strategy-table fade-in">
+      <thead>
+        <tr>
+          <th>Controllo</th>
+          <th>Cosa trovi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>wp user list --role=administrator</code></td>
+          <td>Account admin creati dall'attaccante</td>
+        </tr>
+        <tr>
+          <td><code>find wp-content/uploads -name "*.php"</code></td>
+          <td>File PHP dove non dovrebbero esserci</td>
+        </tr>
+        <tr>
+          <td><code>find wp-content -name "*.php" -newermt "14 days ago"</code></td>
+          <td>File aggiunti o modificati di recente</td>
+        </tr>
+        <tr>
+          <td><code>grep -rE "eval\(|base64_decode|gzinflate" wp-content</code></td>
+          <td>Pattern tipici di web shell</td>
+        </tr>
+        <tr>
+          <td>Verifica Application Passwords</td>
+          <td>Password API create di nascosto</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Per prevenire: aggiorna WordPress, riduci gli account admin, disabilita la modifica di plugin e temi da wp-admin, monitora i log delle REST API e usa un WAF con regole per XSS.</p>
+
+    <h2><span class="accent">//</span> Conclusione</h2>
+
+    <p>Il messaggio di XSS2Shell è che una falla apparentemente piccola, un XSS sulla pagina di login, può diventare il primo passo per prendere il controllo di un server. Non serve un bug enorme. Basta una catena di passaggi ben costruita.</p>
+
+    <p>Il lab lo dimostra: dal nome utente reflectato, al DOM clobbering, alla Application Password, fino al plugin malevolo. Ogni passaggio è visibile e modificabile.</p>
+
+    <p>Il codice completo è su <a href="https://github.com/pinperepette/signal.pirate/tree/main/xss2shell-lab" target="_blank" rel="noopener">GitHub</a>, nella cartella <code>xss2shell-lab</code>. Provalo in locale, smontalo, cambia il payload e guarda dove la catena si ferma.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

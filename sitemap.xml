@@ -2,9 +2,33 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pinperepette.github.io/signal.pirate/</loc>
-    <lastmod>2026-08-02</lastmod>
+    <lastmod>2026-08-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/xss2shell-wordpress-core-rce.html</loc>
+    <lastmod>2026-08-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/mi-avete-costruito-un-dataset.html</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/non-e-il-clima-e-agosto.html</loc>
+    <lastmod>2026-08-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/l-italia-che-non-c-e-stata.html</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://pinperepette.github.io/signal.pirate/articoli/famoso-per-un-po-di-brutta-stampa.html</loc>
@@ -15,6 +39,30 @@
   <url>
     <loc>https://pinperepette.github.io/signal.pirate/articoli/l-eccezione-e-gia-nella-regola.html</loc>
     <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/fallo-scrivere-a-quattro-agenti.html</loc>
+    <lastmod>2026-07-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/i-numeri-sono-giusti.html</loc>
+    <lastmod>2026-07-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/non-e-un-esodo.html</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pinperepette.github.io/signal.pirate/articoli/tre-ingressi-una-sola-uscita.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -10,3 +10,4 @@ __pycache__/
 sentinel_log.jsonl
 .env
 .env.*
+xss2shell-lab/.venv/
