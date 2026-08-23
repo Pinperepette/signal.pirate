@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <script>(function(){var t;if(location.search.indexOf('t=l')>-1)t='light';else if(location.search.indexOf('t=d')>-1)t='dark';if(!t)try{t=localStorage.getItem('theme')}catch(e){}document.documentElement.dataset.theme=t||'dark'})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tanti Problemi, Una Sola Macchina | Signal Pirate</title>
+  <meta name="description" content="Nel pezzo sulla congettura di Jacobi tutto si giocava su una griglia di numeri e un determinante. Ma quella griglia sta ovunque: i numeri complessi sono matrici 2x2 travestite, i sistemi di equazioni sono Ax=b, le rotazioni sono quattro caselle, le derivate in piu' variabili sono lo Jacobiano, le reti neurali sono moltiplicazioni di griglie. Un sacco di matematica sembra difficile solo perche' la stiamo guardando nella rappresentazione sbagliata.">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="alternate" type="application/rss+xml" title="Signal Pirate" href="../feed.xml">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    /* === Insight Box === */
+    .insight-box {
+      background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .insight-box p { margin: 0; line-height: 1.6; }
+
+    /* === Warning Box === */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(255,77,77,0.08), rgba(255,170,0,0.04));
+      border-left: 3px solid var(--accent-rejection);
+      border-radius: 0 10px 10px 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .warning-box p { margin: 0; line-height: 1.6; }
+
+    /* === Abstract === */
+    .abstract {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-attention);
+      border-radius: 0 10px 10px 0;
+      padding: 1.3rem 1.5rem;
+      margin: 0 0 2.5rem;
+    }
+    .abstract-h {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-secondary);
+      margin: 0 0 0.8rem;
+    }
+    .abstract p { margin: 0.55rem 0; line-height: 1.55; font-size: 0.95rem; }
+
+    /* === Kicker === */
+    .article-kicker {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      max-width: 640px;
+      margin: 1rem auto 0;
+      line-height: 1.45;
+    }
+
+    /* === Code snippet === */
+    .code-snippet {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-highlight);
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .code-snippet pre {
+      margin: 0;
+      white-space: pre;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .code-snippet .cmt { color: var(--text-secondary); }
+
+    /* === Diagram box === */
+    .diagram-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.4rem 1rem 1.1rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+    .diagram-box pre {
+      display: inline-block;
+      text-align: left;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+    .diagram-box .hit { color: var(--accent-rejection); font-weight: 700; }
+    .diagram-box .ok { color: var(--accent-attention); font-weight: 700; }
+    .diagram-box .dim { color: var(--text-secondary); }
+    .diagram-box .cap {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin: 1rem 0 0;
+    }
+  </style>
+  <!-- seo:auto -->
+  <link rel="canonical" href="https://pinperepette.github.io/signal.pirate/articoli/tanti-problemi-una-sola-macchina.html">
+  <meta name="author" content="Andrea Amani">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Signal Pirate">
+  <meta property="og:locale" content="it_IT">
+  <meta property="og:title" content="Tanti Problemi, Una Sola Macchina">
+  <meta property="og:description" content="Nel pezzo sulla congettura di Jacobi tutto si giocava su una griglia di numeri e un determinante. Ma quella griglia sta ovunque: i numeri complessi sono matrici 2x2 travestite, i sistemi di equazioni sono Ax=b, le rotazioni sono quattro caselle, le derivate in piu&#x27; variabili sono lo Jacobiano, le reti neurali sono moltiplicazioni di griglie. Un sacco di matematica sembra difficile solo perche&#x27; la stiamo guardando nella rappresentazione sbagliata.">
+  <meta property="og:url" content="https://pinperepette.github.io/signal.pirate/articoli/tanti-problemi-una-sola-macchina.html">
+  <meta property="og:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="800">
+  <meta property="og:image:alt" content="Signal Pirate - logo">
+  <meta property="article:published_time" content="2026-08-23">
+  <meta property="article:author" content="Andrea Amani">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tanti Problemi, Una Sola Macchina">
+  <meta name="twitter:description" content="Nel pezzo sulla congettura di Jacobi tutto si giocava su una griglia di numeri e un determinante. Ma quella griglia sta ovunque: numeri complessi, sistemi di equazioni, rotazioni, derivate, reti neurali. Spesso la matematica sembra difficile solo perche&#x27; la guardiamo nella rappresentazione sbagliata.">
+  <meta name="twitter:image" content="https://pinperepette.github.io/signal.pirate/assets/og-image.jpg">
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BlogPosting","headline":"Tanti Problemi, Una Sola Macchina","description":"Nel pezzo sulla congettura di Jacobi tutto si giocava su una griglia di numeri e un determinante. Ma quella griglia sta ovunque: i numeri complessi sono matrici 2x2 travestite, i sistemi di equazioni sono Ax=b, le rotazioni sono quattro caselle, le derivate in piu' variabili sono lo Jacobiano, le reti neurali sono moltiplicazioni di griglie. Un sacco di matematica sembra difficile solo perche' la stiamo guardando nella rappresentazione sbagliata.","image":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg","datePublished":"2026-08-23","dateModified":"2026-08-23","author":{"@type":"Person","name":"Andrea Amani","url":"https://github.com/pinperepette"},"publisher":{"@type":"Organization","name":"Signal Pirate","logo":{"@type":"ImageObject","url":"https://pinperepette.github.io/signal.pirate/assets/og-image.jpg"}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://pinperepette.github.io/signal.pirate/articoli/tanti-problemi-una-sola-macchina.html"},"inLanguage":"it-IT"}
+  </script>
+  <!-- /seo:auto -->
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a href="../" class="nav-logo">SIGNAL<span>PIRATE</span></a>
+    <ul class="nav-links">
+      <li><a href="../">Home</a></li>
+      <li><a href="../index.html#articoli">Articoli</a></li>
+      <li><a href="https://github.com/pinperepette" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <button id="theme-toggle" aria-label="Cambia tema">
+      <svg id="theme-icon-dark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-light" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <p class="article-meta">2026-08-23 | Pinperepette</p>
+    <h1 class="article-page-title">Tanti Problemi, <span class="accent">Una Sola Macchina</span></h1>
+    <p class="article-kicker">A luglio ho raccontato di una congettura di ottantasette anni caduta per colpa di una griglia di numeri. Quella griglia sta molto piu' in giro di quanto sembri.</p>
+    <p style="font-family: var(--font-mono); font-size: 1rem; color: var(--text-secondary); margin-top: 1rem; max-width: 720px; margin-left: auto; margin-right: auto;">
+      Un sacco di matematica, almeno quella che poi finisce in un computer, sembra difficile per un motivo banale: la stiamo guardando nella rappresentazione sbagliata. Cambiala, e lo stesso problema diventa una serie di conti meccanici che chiunque puo' controllare.
+    </p>
+    <div class="article-card-tags" style="justify-content: center; margin-top: 1.5rem;">
+      <span class="tag tag-attention">Matematica</span>
+      <span class="tag tag-highlight">Algebra Lineare</span>
+      <span class="tag tag-reaction">AI</span>
+      <span class="tag tag-amplification">Rappresentazioni</span>
+    </div>
+  </header>
+
+  <!-- Article Content -->
+  <article class="article-content">
+
+    <div class="abstract fade-in">
+      <p class="abstract-h">In breve, senza formule</p>
+      <p>A luglio ho raccontato come e' caduta la congettura di Jacobi: una formula, tre punti che finiscono nello stesso posto, e un controllo che chiunque rifa' in dieci righe di codice. Solo che, se riguardi quel controllo, al momento decisivo non c'era nessuna genialata. C'era una <strong>griglia di numeri</strong> e un conto meccanico fatto su quella griglia.</p>
+      <p>Questo pezzo parte da li'. Perche' quella griglia non e' un attrezzo da specialisti della congettura di Jacobi: e' lo stesso identico oggetto che c'e' sotto i numeri immaginari, sotto i sistemi di equazioni, sotto le rotazioni di un videogioco, sotto le derivate in piu' variabili e sotto ogni singolo livello di una rete neurale. Sono problemi che a scuola ti hanno raccontato in cinque momenti diversi come se fossero cinque materie. Non lo sono.</p>
+      <p>La cosa che mi interessa e' un'altra: <em>tantissima matematica sembra difficile solo perche' e' scritta male</em>. Cambia rappresentazione e la stessa cosa diventa meccanica. E "meccanica" e' esattamente la parola che serve nel momento in cui vuoi che a fare i conti sia una macchina, e che a controllarli possa essere chiunque.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 00 - LA GRIGLIA CHE NON ABBIAMO GUARDATO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Quella Griglia Che Abbiamo Dato Per Scontata</h2>
+    <span class="section-number">Sezione 00. Torniamo un attimo indietro</span>
+
+    <p>Un mese fa, nel <a href="tre-ingressi-una-sola-uscita.html">pezzo su Alpoge e la congettura di Jacobi</a>, ho buttato li' parole grosse come se niente fosse. Jacobiano. Determinante. "Viene <span class="katex-inline">\( -2 \)</span>, costante, mai zero". E siamo andati avanti tranquilli, perche' il punto della storia era un altro.</p>
+
+    <p>Adesso pero' fermati un secondo su cosa abbiamo <em>fatto</em>, materialmente, per far cadere una congettura in piedi dal 1939. Abbiamo preso una formula in tre variabili, abbiamo costruito una tabella tre per tre di derivate, e da quella tabella abbiamo tirato fuori un singolo numero. Fine. Il pezzo piu' delicato di tutta la faccenda, quello su cui si regge la parola "controesempio", e' <strong>una griglia di nove caselle e un conto sopra</strong>.</p>
+
+    <p>E allora mi e' rimasta una domanda: <em>perche' salta fuori sempre una griglia di numeri?</em> Perche' 'sta roba compare nei sistemi di equazioni, nelle rotazioni, nella grafica 3D, nella statistica, nelle reti neurali e in una congettura di geometria algebrica del 1939? O e' una coincidenza sospetta, o dietro c'e' qualcosa.</p>
+
+    <p>Dietro c'e' qualcosa. E non e' complicato.</p>
+
+    <!-- ============================================================
+         SEZIONE 01 - IL TRUCCO DEL VESTITO
+         ============================================================ -->
+    <h2><span class="accent">//</span> MCMXLVIII per XXIII</h2>
+    <span class="section-number">Sezione 01. Il problema non e' sempre il problema</span>
+
+    <p>Prima di parlare di matrici ti chiedo un favore: moltiplica questi due numeri.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\text{MCMXLVIII} \times \text{XXIII}$$</div>
+      <p class="formula-label">Prenditi tutto il tempo che ti serve. Anzi, non prendertelo.</p>
+    </div>
+
+    <p>Non ci provare nemmeno, e' orribile. Non c'e' una procedura, non c'e' un incolonnamento, non c'e' niente da mandare a memoria: devi ragionare da capo ogni volta, e a meta' strada ti sei perso. Adesso rifallo cosi':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$1948 \times 23 = 44804$$</div>
+      <p class="formula-label">Stessi identici numeri. Stesso identico problema.</p>
+    </div>
+
+    <p>Questo lo sai fare. Lo sai fare da quando avevi otto anni, e soprattutto lo sai fare <strong>senza pensare</strong>: incolonni, moltiplichi cifra per cifra, tieni i riporti, sommi. E' una procedura stupida, ripetibile, che funziona uguale con numeri di tre cifre o di trenta. La puoi insegnare a un bambino. La puoi insegnare a una macchina.</p>
+
+    <p>Ora, la cosa da mettere a fuoco: <strong>i due problemi sono lo stesso problema</strong>. Stessi numeri, stesso risultato. L'unica cosa cambiata e' come li abbiamo scritti. I Romani non erano piu' stupidi di noi. Avevano solo una notazione che rendeva la moltiplicazione una rogna. La notazione posizionale, quella con lo zero, arrivata in Europa via mondo arabo intorno al 1200, non ha reso i numeri piu' semplici. Ha reso semplice <em>lavorarci</em>.</p>
+
+    <p>Ecco, le matrici fanno una cosa molto simile con un mucchio di altra matematica. Vediamo il caso piu' bello, che secondo me e' anche quello che a scuola ci hanno raccontato peggio.</p>
+
+    <!-- ============================================================
+         SEZIONE 02 - NUMERI COMPLESSI
+         ============================================================ -->
+    <h2><span class="accent">//</span> I Numeri Immaginari Erano Rotazioni</h2>
+    <span class="section-number">Sezione 02. Quattro caselle e il mistero finisce</span>
+
+    <p>Al liceo qualcuno ti ha detto: esiste un numero <span class="katex-inline">\( i \)</span> tale che <span class="katex-inline">\( i^2 = -1 \)</span>. E tu, giustamente, hai pensato: <em>e certo, e io mi invento un numero che fa quello che mi pare</em>. Poi te l'hanno chiamato "immaginario", che come nome e' un disastro, e per il resto della vita ti e' rimasta l'idea che i numeri complessi siano una furbata inventata dai matematici per non ammettere che certe equazioni non hanno soluzione.</p>
+
+    <p>Adesso guardali cosi'. Prendi due griglie due per due, una per il numero <span class="katex-inline">\( 1 \)</span> e una per <span class="katex-inline">\( i \)</span>:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$1 \ \longleftrightarrow \ \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \qquad\qquad i \ \longleftrightarrow \ \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$$</div>
+      <p class="formula-label">Due tabelle di quattro numeri. Nessun numero inventato.</p>
+    </div>
+
+    <p>La prima e' la griglia che non fa niente: la moltiplichi per qualcosa e ti restituisce quel qualcosa. E' l'uno, in versione tabella. La seconda invece fa una cosa precisa: presa una freccia sul piano, la <strong>ruota di novanta gradi</strong> in senso antiorario. Provala a mano sulla freccia che punta a destra, quella verso il punto <span class="katex-inline">\( (1,0) \)</span>: esce la freccia che punta in su, verso <span class="katex-inline">\( (0,1) \)</span>. Ruotata di novanta gradi. Nient'altro.</p>
+
+    <p>Bene. Adesso moltiplica quella seconda griglia per se stessa, cioe' ruota due volte di novanta gradi:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix} = \begin{pmatrix} 0\cdot 0 + (-1)\cdot 1 & \ \ 0\cdot(-1) + (-1)\cdot 0 \\[4pt] 1\cdot 0 + 0\cdot 1 & \ \ 1\cdot(-1) + 0\cdot 0 \end{pmatrix} = \begin{pmatrix} -1 & 0 \\ 0 & -1 \end{pmatrix}$$</div>
+      <p class="formula-label">Riga per colonna: due moltiplicazioni e una somma per casella, otto prodotti in tutto. E' scritto tutto.</p>
+    </div>
+
+    <p>E il risultato e' la griglia di <span class="katex-inline">\( -1 \)</span>:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\begin{pmatrix} -1 & 0 \\ 0 & -1 \end{pmatrix} = -\begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \qquad\Longrightarrow\qquad i^2 = -1$$</div>
+      <p class="formula-label">Ruota di 90 gradi, poi ancora di 90. Sei a 180: punti esattamente all'indietro.</p>
+    </div>
+
+    <p>Guarda cosa e' appena successo. La griglia di <span class="katex-inline">\( i \)</span>, moltiplicata per se stessa, ti da' meno la griglia di <span class="katex-inline">\( 1 \)</span>. E non e' piu' una regola calata dall'alto da mandare a memoria: e' un conto di quattro caselle e un fatto geometrico. Ecco cosa vuol dire <span class="katex-inline">\( i^2 = -1 \)</span>.</p>
+
+    <p>E non funziona solo per <span class="katex-inline">\( i \)</span>. Funziona per tutti. Un numero complesso qualsiasi <span class="katex-inline">\( a + bi \)</span> diventa questa griglia:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$a + bi \ \longleftrightarrow \ \begin{pmatrix} a & -b \\ b & a \end{pmatrix}$$</div>
+      <p class="formula-label">Il dizionario completo. Da qui in poi puoi buttare via la lettera i.</p>
+    </div>
+
+    <p>E la corrispondenza non e' un'analogia carina, e' esatta: se sommi due di quelle griglie ottieni la griglia della somma, se le moltiplichi ottieni la griglia del prodotto. Tutto torna, casella per casella. In gergo si dice che le due strutture sono <em>isomorfe</em>, che tradotto vuol dire: sono la stessa cosa scritta in due alfabeti diversi, e puoi passare da uno all'altro senza perdere niente. Non "si assomigliano". <strong>Sono.</strong></p>
+
+    <p>E qui arriva il regalo. Ti ricordi il modulo al quadrato di un numero complesso, quella cosa <span class="katex-inline">\( |a+bi|^2 = a^2 + b^2 \)</span> che sembrava una definizione a caso? Calcola il determinante di quella griglia:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\det \begin{pmatrix} a & -b \\ b & a \end{pmatrix} = a\cdot a - (-b)\cdot b = a^2 + b^2$$</div>
+      <p class="formula-label">Il modulo al quadrato e il determinante sono lo stesso numero. Sempre.</p>
+    </div>
+
+    <p>A scuola te le hanno insegnate come due cose diverse. Qui scopri che sono <strong>lo stesso conto</strong>.</p>
+
+    <!-- ============================================================
+         SEZIONE 03 - Ax = b
+         ============================================================ -->
+    <h2><span class="accent">//</span> Tre Equazioni Diventano Un Oggetto Solo</h2>
+    <span class="section-number">Sezione 03. Ax = b, e la domanda si accorcia</span>
+
+    <p>Passiamo alla roba che tutti abbiamo odiato: i sistemi di equazioni. Due incognite, due equazioni, e quel casino di sostituzioni con cui ricavi <span class="katex-inline">\( y \)</span> dalla prima, lo infili nella seconda, sbagli un segno e ricominci.</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\begin{cases} 2x + y = 5 \\ x - y = 1 \end{cases} \qquad\longleftrightarrow\qquad \begin{pmatrix} 2 & 1 \\ 1 & -1 \end{pmatrix}\begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} 5 \\ 1 \end{pmatrix}$$</div>
+      <p class="formula-label">A sinistra due equazioni. A destra tre oggetti e un uguale.</p>
+    </div>
+
+    <p>A destra abbiamo scritto <span class="katex-inline">\( Ax = b \)</span>: la griglia dei coefficienti moltiplicata per la colonna delle incognite fa la colonna dei risultati. Sembra solo un modo diverso di impaginare la stessa roba, e in un certo senso lo e'. Ma guarda cosa ti compra.</p>
+
+    <p><strong>Primo:</strong> la scrittura non cambia mai piu'. Due equazioni: <span class="katex-inline">\( Ax = b \)</span>. Tre equazioni in tre incognite: <span class="katex-inline">\( Ax = b \)</span>. Diecimila equazioni in diecimila incognite, tipo quelle che risolve un simulatore di fluidi o un modello meteo: <span class="katex-inline">\( Ax = b \)</span>. Cambia solo quanto e' grande la griglia. Il problema, <em>come problema</em>, e' sempre lo stesso, e questo vuol dire che ti basta un pezzo di codice solo per tutti i casi.</p>
+
+    <p><strong>Secondo, e qui viene il bello:</strong> hai una domanda vecchia che diventa nuova. "Questo sistema ha una sola soluzione, oppure ne ha infinite, oppure nessuna?" Nel formato a equazioni e' una rogna: devi metterti li' e provare. Nel formato a griglia e' una domanda sola, con una risposta sola:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\det A \neq 0 \quad \Longleftrightarrow \quad \text{una e una sola soluzione}$$</div>
+      <p class="formula-label">Nel nostro caso det A = -3. Diverso da zero. Soluzione unica: x = 2, y = 1.</p>
+    </div>
+
+    <p><strong>Hai gia' visto questo determinante.</strong> E' lo stesso identico attrezzo del pezzo sulla congettura di Jacobi, dove <span class="katex-inline">\( \det J_F = -2 \)</span>, mai zero, voleva dire "la macchina non schiaccia mai niente". Qui, in un contesto che sembra completamente diverso, <span class="katex-inline">\( \det A \neq 0 \)</span> vuol dire "il sistema non e' degenere, la soluzione c'e' ed e' unica".</p>
+
+    <p>E' la stessa domanda: <em>questa trasformazione butta via informazione?</em> Se il determinante e' zero, si': due ingressi diversi possono finire nello stesso posto, e indietro non torni. Se non e' zero, no. Che tu stia risolvendo i compiti di terza liceo o abbattendo una congettura del 1939, stai chiedendo la stessa cosa alla stessa macchina.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Cosa e' davvero il determinante.</strong> La formuletta con le diagonali e' solo il modo di calcolarlo. Il determinante, preso in valore assoluto, e' <em>di quanto la trasformazione gonfia o sgonfia i volumi</em>. Prendi un cubetto di lato 1, dagli in pasto alla trasformazione, guarda il volume che esce: quello e' il determinante, a meno del segno. Se viene <span class="katex-inline">\( 3 \)</span>, i volumi triplicano. Se viene <span class="katex-inline">\( 0 \)</span> il cubetto e' stato <strong>appiattito</strong>: schiacciato su un piano, o su una retta. Ha perso una dimensione, e da li' indietro non ci torni. Il segno dice se la trasformazione ha anche <strong>ribaltato l'orientamento</strong>, cioe' se ha fatto l'effetto specchio. Ecco perche' in quel pezzo il numero era <span class="katex-inline">\( -2 \)</span> e non <span class="katex-inline">\( 2 \)</span>: quella mappa raddoppia i volumi <em>e</em> li specchia. Il meno non era decorativo.</p>
+    </div>
+
+    <p>Una precisazione onesta, che poi e' il tipo di cosa che separa la matematica dalla divulgazione allegra: dal punto di vista teorico, se <span class="katex-inline">\( \det A \neq 0 \)</span> la soluzione e' <span class="katex-inline">\( x = A^{-1}b \)</span>, con <span class="katex-inline">\( A^{-1} \)</span> la matrice inversa. E' vero ed e' elegante. Nella pratica pero' <strong>nessuno risolve i sistemi cosi'</strong>: calcolare l'inversa costa piu' fatica che risolvere direttamente, e con i numeri a virgola mobile del computer accumula errori peggio. Si usa l'eliminazione di Gauss o una fattorizzazione. La forma <span class="katex-inline">\( A^{-1}b \)</span> serve a capire, non a calcolare. Sono due mestieri diversi e vale la pena non confonderli.</p>
+
+    <!-- ============================================================
+         SEZIONE 04 - ROTAZIONI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Formule Di Trigonometria Che Non Devi Ricordare</h2>
+    <span class="section-number">Sezione 04. Ruotare e' moltiplicare</span>
+
+    <p>Torniamo alle rotazioni, che nella sezione 02 avevamo lasciato a meta'. Ruotare il piano di un angolo <span class="katex-inline">\( \theta \)</span> qualsiasi si scrive cosi':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$R(\theta) = \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix}$$</div>
+      <p class="formula-label">Con theta = 90 gradi (cos 0, sin 1) ritrovi esattamente la griglia di i. Non e' una coincidenza.</p>
+    </div>
+
+    <p>Guardala bene e confrontala col dizionario di prima, quello dei numeri complessi: <span class="katex-inline">\( a+bi \leftrightarrow \left(\begin{smallmatrix} a & -b \\ b & a\end{smallmatrix}\right) \)</span>. E' <em>identica</em>, con <span class="katex-inline">\( a = \cos\theta \)</span> e <span class="katex-inline">\( b = \sin\theta \)</span>. Quindi "una rotazione" e "un numero complesso di modulo 1" non sono due cose imparentate: sono due nomi per la stessa griglia. E infatti il determinante lo conferma da solo, senza che nessuno debba metterci del suo:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\det R(\theta) = \cos^2\theta + \sin^2\theta = 1$$</div>
+      <p class="formula-label">Uno. Cioe': ruotare non cambia le aree. Grazie al cazzo, verrebbe da dire.</p>
+    </div>
+
+    <p>E' quasi comico: la formula piu' famosa della trigonometria, quella che ti hanno fatto imparare come un dogma, qui esce fuori come effetto collaterale del fatto ovvio che se giri un oggetto l'oggetto non diventa piu' grande. Ma il regalo vero e' un altro, ed e' questo. Ruotare di <span class="katex-inline">\( \alpha \)</span> e poi ruotare di <span class="katex-inline">\( \beta \)</span> e' come ruotare di <span class="katex-inline">\( \alpha + \beta \)</span>, no? Ovvio. Allora moltiplica le due griglie e guarda cosa ti esce nelle caselle:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$R(\alpha)R(\beta) = \begin{pmatrix} \cos\alpha\cos\beta - \sin\alpha\sin\beta & -(\sin\alpha\cos\beta + \cos\alpha\sin\beta) \\ \sin\alpha\cos\beta + \cos\alpha\sin\beta & \cos\alpha\cos\beta - \sin\alpha\sin\beta \end{pmatrix} = R(\alpha+\beta)$$</div>
+      <p class="formula-label">Il prodotto di due rotazioni. Guarda cosa c'e' scritto nelle caselle.</p>
+    </div>
+
+    <p>Le formule di addizione. Quelle. <span class="katex-inline">\( \cos(\alpha+\beta) = \cos\alpha\cos\beta - \sin\alpha\sin\beta \)</span> e <span class="katex-inline">\( \sin(\alpha+\beta) = \sin\alpha\cos\beta + \cos\alpha\sin\beta \)</span>, i due mostri che tutti abbiamo mandato a memoria maledicendo, e che tutti abbiamo dimenticato entro l'estate successiva. Non devi per forza ricordarle come formule isolate. Sono <strong>quello che c'e' scritto nelle caselle quando moltiplichi due rotazioni</strong>, e la moltiplicazione fra griglie e' una procedura stupida che puoi rifare in trenta secondi su un foglio.</p>
+
+    <p>Non hai memorizzato una formula: hai memorizzato il risultato di un conto che potevi rifare quando volevi. E' esattamente il tipo di fatica che una buona rappresentazione ti risparmia.</p>
+
+    <p>Da qui, tra l'altro, viene tutta la grafica al computer. Ruotare, ridimensionare, specchiare, spostare: ognuna e' una griglia. E siccome comporre trasformazioni e' moltiplicare griglie, venti trasformazioni di fila le schiacci in <strong>una griglia sola</strong>, calcolata una volta, e poi la applichi a duecentomila vertici. Non e' un'ottimizzazione furba trovata da qualche programmatore: e' che la rappresentazione ti da' la scorciatoia gratis.</p>
+
+    <!-- ============================================================
+         SEZIONE 05 - JACOBIANO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Adesso Lo Jacobiano Ha Senso</h2>
+    <span class="section-number">Sezione 05. La derivata, quando i numeri sono tanti</span>
+
+    <p>Torniamo a quel pezzo di luglio, adesso che abbiamo gli attrezzi.</p>
+
+    <p>Quando hai una funzione di una variabile sola, la derivata in un punto e' un numero: la pendenza. Il senso e' semplice, e' <em>la retta che assomiglia di piu' alla curva li' intorno</em>. Zoomi abbastanza su una curva liscia e vedi una retta: la derivata e' quella retta.</p>
+
+    <p>E se la funzione prende tre numeri e ne restituisce tre? Un numero solo non basta piu', perche' ci sono tre ingressi che possono muoversi e tre uscite che possono reagire. Ti servono tutte le combinazioni: quanto si muove la prima uscita se muovo il primo ingresso, quanto se muovo il secondo, e cosi' via. Nove numeri. E nove numeri con due indici, uno per l'uscita e uno per l'ingresso, si scrivono in una griglia:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$J_F = \begin{pmatrix} \dfrac{\partial F_1}{\partial x} & \dfrac{\partial F_1}{\partial y} & \dfrac{\partial F_1}{\partial z} \\[8pt] \dfrac{\partial F_2}{\partial x} & \dfrac{\partial F_2}{\partial y} & \dfrac{\partial F_2}{\partial z} \\[8pt] \dfrac{\partial F_3}{\partial x} & \dfrac{\partial F_3}{\partial y} & \dfrac{\partial F_3}{\partial z} \end{pmatrix}$$</div>
+      <p class="formula-label">Riga i, colonna j: quanto reagisce l'uscita i se sposti di un pelo l'ingresso j.</p>
+    </div>
+
+    <p>Quel simbolo storto vuol dire solo "derivo rispetto a questa variabile e tratto le altre come numeri fermi". Niente di piu'. E la griglia intera, tutta insieme, e' <strong>la trasformazione lineare che assomiglia di piu' alla funzione, in quel punto</strong>. E' esattamente la stessa idea della retta tangente, solo che in piu' dimensioni la cosa che assomiglia alla funzione non e' una retta: e' una matrice. Scritta per esteso, l'approssimazione e' questa:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$F(x + h) \ \approx \ F(x) + J_F(x)\,h$$</div>
+      <p class="formula-label">Sposto l'ingresso di un pelo h: l'uscita si sposta di quel pelo passato dentro la griglia.</p>
+    </div>
+
+    <p>Guarda che roba familiare. <span class="katex-inline">\( J_F(x) \)</span> qui sta esattamente dove nella retta tangente ci sarebbe la pendenza, e fa esattamente il suo mestiere: moltiplica lo spostamento. Solo che non e' un numero, e' una matrice, e moltiplicare vuol dire trasformare un vettore. Ecco perche' lo Jacobiano sta nella stessa famiglia delle rotazioni e delle altre griglie viste finora: <strong>e' la trasformazione lineare che la funzione somiglia di piu' a fare, li'.</strong></p>
+
+
+    <p>E adesso ricomponi il puzzle di quel pezzo, che a questo punto si monta da solo. Il determinante dice di quanto la trasformazione gonfia i volumi. Lo Jacobiano e' la trasformazione che approssima la funzione in un punto. Quindi <span class="katex-inline">\( \det J_F \)</span> in un punto dice <strong>di quanto quella funzione gonfia i volumi li' intorno</strong>. Se viene zero, li' la funzione appiattisce: schiaccia una dimensione, incolla insieme direzioni diverse, butta via informazione. Se viene <span class="katex-inline">\( -2 \)</span> ovunque, come nella mappa di Alpoge, allora ovunque raddoppia i volumi e li specchia, e non schiaccia mai niente da nessuna parte.</p>
+
+    <p>Quel "foglio di gomma che non fa mai una grinza" di cui parlavo li', e che allora era un'analogia per farti capire, adesso non e' piu' un'analogia. E' una griglia di nove derivate e un conto sopra, che ti restituisce un numero, e quel numero o e' zero o non lo e'.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Riguarda lo script SymPy di quel pezzo</strong>, quello che chiunque poteva incollare in un terminale per verificare la caduta della congettura. Costruisce la griglia delle derivate parziali. Chiama <code>.det()</code>. Stampa. La ragione per cui un problema aperto dal 1939 si verifica in dieci righe non e' che il problema fosse facile: e' che qualcuno, molto prima, aveva trovato la rappresentazione in cui la domanda "questa macchina schiaccia?" diventa "questo numero e' zero?". Il lavoro duro era gia' stato fatto, ed era stato fatto sulla notazione.</p>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 06 - AUTOVALORI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Le Direzioni Che Non Girano</h2>
+    <span class="section-number">Sezione 06. Autovalori, senza paura</span>
+
+    <p>C'e' un problema con le matrici, ed e' che mescolano tutto. Guardi una griglia di numeri e non hai la minima idea di cosa faccia: prende ogni ingresso, lo spalma su tutte le uscite, e da fuori sembra solo un frullatore.</p>
+
+    <p>Pero' quasi sempre c'e' un modo per capirla. Cerchi le <strong>direzioni speciali</strong>: quelle in cui la matrice non gira niente, si limita ad allungare o accorciare. Una freccia che punta li', dopo la trasformazione punta ancora esattamente li', solo piu' lunga o piu' corta. La freccia si chiama <strong>autovettore</strong>, il numero che la allunga <strong>autovalore</strong>, i nomi fanno paura e il concetto no. Si scrive cosi':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$A v = \lambda v$$</div>
+      <p class="formula-label">"La matrice A applicata alla freccia v fa la stessa freccia v, moltiplicata per un numero."</p>
+    </div>
+
+        <p>Un esempio con numeri veri. Prendi questa griglia, che a occhio non dice niente a nessuno:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$A = \begin{pmatrix} 2 & 1 \\ 1 & 2 \end{pmatrix}$$</div>
+      <p class="formula-label">Quattro numeri. Cosa fa questa cosa? Boh.</p>
+    </div>
+
+    <p>Adesso prova a darle in pasto due frecce scelte bene, la diagonale <span class="katex-inline">\( (1,1) \)</span> e l'antidiagonale <span class="katex-inline">\( (1,-1) \)</span>. Sono due conti da dieci secondi ciascuno, falli:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$A\begin{pmatrix} 1 \\ 1 \end{pmatrix} = \begin{pmatrix} 3 \\ 3 \end{pmatrix} = \mathbf{3}\begin{pmatrix} 1 \\ 1 \end{pmatrix} \qquad\qquad A\begin{pmatrix} 1 \\ -1 \end{pmatrix} = \begin{pmatrix} 1 \\ -1 \end{pmatrix} = \mathbf{1}\begin{pmatrix} 1 \\ -1 \end{pmatrix}$$</div>
+      <p class="formula-label">Nessuna delle due frecce ha cambiato direzione. Una si e' allungata per 3, l'altra e' rimasta com'era.</p>
+    </div>
+
+    <p>Ecco cosa fa quella matrice, detto in italiano: <strong>allunga per tre lungo la diagonale, e lascia stare tutto il resto lungo l'antidiagonale.</strong> Tutto qui. Non e' un frullatore, e' uno stiramento in due direzioni fisse. Sembrava un mescolone perche' lo stavamo guardando negli assi sbagliati: nel sistema di riferimento fatto da quelle due frecce, quella matrice e' solo "moltiplica per 3" e "moltiplica per 1", due numeri indipendenti.</p>
+
+        <p>E' di nuovo il trucco del vestito, ma stavolta applicato <em>dentro</em> l'algebra lineare: cambio il sistema di coordinate e l'operazione che mescolava tutto diventa un paio di moltiplicazioni separate. E' il motivo per cui gli autovalori sono ovunque: in statistica sono dietro la PCA, dove gli autovettori danno le direzioni in cui i dati variano di piu', e in Google erano il PageRank.</p>
+
+    <div class="insight-box fade-in">
+            <p><strong>E qui si chiude il cerchio col determinante.</strong> Per questa matrice il determinante, <span class="katex-inline">\( 2\cdot2 - 1\cdot1 = 3 \)</span>, e' il prodotto dei due fattori di stiramento, <span class="katex-inline">\( 3 \times 1 \)</span>. Non e' un caso, ma non e' nemmeno la spiegazione generale: quella non passa dagli autovalori. Per qualunque matrice quadrata, il determinante fa zero esattamente quando esiste un vettore non nullo che viene mandato a zero. Ecco perche' determinante zero vuol dire schiacciare: basta una direzione annientata e il conto se ne accorge.</p>
+    </div>
+
+    <p>Una precisazione, perche' ho scritto "quasi sempre" e non era per prudenza retorica. Non tutte le matrici hanno un set completo di direzioni fisse. Le rotazioni, per dirne una, non ne hanno <em>nessuna</em>: e' ovvio, se giri il piano nessuna freccia resta dove stava. E infatti se ti ostini a cercare gli autovalori di una rotazione ti escono numeri complessi. Che, se hai letto la sezione 02, e' esattamente il posto da cui eravamo partiti.</p>
+
+    <!-- ============================================================
+         SEZIONE 07 - RETI NEURALI
+         ============================================================ -->
+    <h2><span class="accent">//</span> Un Livello Di Rete Neurale, Smontato</h2>
+    <span class="section-number">Sezione 07. Sorpresa: e' la stessa macchina</span>
+
+    <p>Adesso il salto che sembra grosso e non lo e'. Una forma tipica di un livello di rete neurale, quella cosa di cui si parla tutti i giorni come se fosse magia nera, si scrive cosi':</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$y = \sigma(Wx + b)$$</div>
+      <p class="formula-label">Un livello, nella sua forma piu' comune. Tutto qui.</p>
+    </div>
+
+    <p>Ok, questa sembra una roba infernale. Guardiamola un secondo, pezzo per pezzo. <span class="katex-inline">\( x \)</span> e' la colonna dei numeri che entrano. <span class="katex-inline">\( W \)</span> e' una griglia di numeri, i famosi "pesi", quelli che il modello impara. <span class="katex-inline">\( b \)</span> e' un'altra colonna, uno spostamento fisso. E <span class="katex-inline">\( \sigma \)</span> e' una funzioncina che si applica a ogni numero uno per volta, tipo "se e' negativo mettilo a zero" (questa si chiama ReLU ed e' proprio cosi' stupida come sembra).</p>
+
+    <p>Quindi <span class="katex-inline">\( Wx + b \)</span> e'... esattamente la roba della sezione 03. Griglia per colonna, piu' uno spostamento. Il pezzo affine di un livello di rete neurale <strong>e' <span class="katex-inline">\( Wx + b \)</span></strong>: la stessa moltiplicazione matrice-vettore che abbiamo visto nei sistemi, con uno spostamento aggiunto. Aprilo per un caso minuscolo con due ingressi e vedi che non c'e' niente di nuovo sotto il sole:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$\begin{pmatrix} y_1 \\ y_2 \end{pmatrix} = \sigma\!\left( \begin{pmatrix} w_{11} & w_{12} \\ w_{21} & w_{22} \end{pmatrix}\!\begin{pmatrix} x_1 \\ x_2 \end{pmatrix} + \begin{pmatrix} b_1 \\ b_2 \end{pmatrix} \right)$$</div>
+      <p class="formula-label">Moltiplica, sposta, schiaccia. In un modello vero la griglia ha migliaia di righe, non due. Il conto e' quello.</p>
+    </div>
+
+    <p>Adesso la domanda giusta: se di ogni livello tieni solo la parte affine, quella senza <span class="katex-inline">\( \sigma \)</span>, e ne impili cento, cosa ottieni? Sembra che ottieni una cosa molto potente. E invece ottieni <strong>niente</strong>. Guarda, senza la funzioncina <span class="katex-inline">\( \sigma \)</span> in mezzo:</p>
+
+    <div class="formula-box fade-in">
+      <div class="formula-text">$$W_2(W_1 x) = (W_2 W_1)\,x = W x$$</div>
+      <p class="formula-label">Due livelli senza non-linearita' collassano in uno. E cosi' cento, e cosi' mille.</p>
+    </div>
+
+    <p>Il prodotto di due matrici e' una matrice. Il prodotto di cento matrici e' <em>ancora</em> una matrice. Una composizione di mille trasformazioni lineari, senza quella funzioncina stupida in mezzo, sarebbe equivalente a una sola trasformazione lineare: un'unica griglia, che sa fare solo cose lineari, e che non imparerebbe mai niente di interessante.</p>
+
+    <div class="insight-box fade-in">
+      <p><strong>Il trucco che permette al deep learning di essere <em>profondo</em> e' quella <span class="katex-inline">\( \sigma \)</span>.</strong> Senza una non linearita' in mezzo, impilare trasformazioni non aggiunge niente a quello che la rete sa esprimere: e' la ragione per cui impilare i livelli serve a qualcosa. Il pezzo affine, cioe' le matrici piu' lo spostamento, e' quello che fa il lavoro pesante e che le GPU sanno macinare a velocita' oscena. Il pezzo non lineare e' quello che impedisce a cento livelli di diventare uno.</p>
+    </div>
+
+    <p>E l'addestramento? Addestrare vuol dire capire come cambiare quei pesi per sbagliare un po' meno. Cioe' calcolare come reagisce l'errore quando muovi ciascun peso, che e' la derivata di una funzione con milioni di ingressi. Cioe', l'hai letto tre sezioni fa, <strong>uno Jacobiano</strong>. La backpropagation e' la regola della catena applicata a una pila di livelli, e la regola della catena, in piu' variabili e in forma matriciale, si esprime come <strong>prodotto di Jacobiani</strong>, uno per livello, dall'ultimo al primo.</p>
+
+    <p>Con una furbizia che vale la pena dire, perche' e' il motivo per cui la cosa e' praticabile: quei Jacobiani, per intero, non li scrive mai nessuno. Quello che serve davvero non e' la matrice, e' il suo effetto su un vettore: un <em>prodotto vettore-Jacobiano</em>. E quello si calcola direttamente, livello per livello, senza mai materializzare la griglia completa. E' esattamente il lavoro che fanno i framework di differenziazione automatica, PyTorch e soci: la struttura e' un prodotto di Jacobiani, quello che gira in memoria e' una sequenza di prodotti con un vettore.</p>
+
+    <p>Le GPU sono nate per fare grafica in parallelo, e nella grafica le trasformazioni matriciali sono dappertutto. Le reti neurali hanno bisogno di fare moltiplicazioni matriciali a raffica. Quindi <strong>la stessa architettura hardware che era perfetta per far girare i mostri di Quake si e' rivelata perfetta anche per questo.</strong></p>
+
+    <div class="diagram-box fade-in">
+<pre><span class="dim">IL PROBLEMA                     LA RAPPRESENTAZIONE      LA DOMANDA DIVENTA
+─────────────────────────────────────────────────────────────────────────────</span>
+"i al quadrato fa -1"?      ──▶  <span class="ok">[  0  -1 ]</span>            ruota di 90, poi ancora
+                                 <span class="ok">[  1   0 ]</span>            di 90: guardi indietro
+
+n equazioni, n incognite    ──▶  <span class="ok">A x = b</span>              <span class="hit">soluzione unica?</span>
+                                                       <span class="dim">(A e' invertibile?)</span>
+
+ruotare di un angolo        ──▶  <span class="ok">[ cos  -sin ]</span>         moltiplicare due griglie
+                                 <span class="ok">[ sin   cos ]</span>         (e le formule escono da sole)
+
+derivare in piu' variabili  ──▶  <span class="ok">J</span>  (griglia di        <span class="hit">det J = 0 ?</span>
+                                    derivate parziali)
+
+"ma cosa fa 'sta matrice?"  ──▶  <span class="ok">A v = &#955; v</span>            quali direzioni restano
+                                                       ferme, e di quanto
+
+un livello di rete neurale  ──▶  <span class="ok">&#963;(W x + b)</span>           moltiplica, sposta,
+                                                       schiaccia. E ripeti.</pre>
+      <p class="cap">sei problemi che sembrano di sei materie diverse. una colonna in mezzo.</p>
+    </div>
+
+    <div class="stats-row fade-in">
+      <div class="stat-card">
+        <div class="stat-number">2&times;2</div>
+        <div class="stat-label">la matrice che rappresenta<br>un numero complesso</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">1</div>
+        <div class="stat-label">il numero che decide<br>se si torna indietro</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">47</div>
+        <div class="stat-label">prodotti di AlphaTensor per un<br>4&times;4 mod 2, contro i 49 di Strassen</div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SEZIONE 08 - DOVE IL TRUCCO SI ROMPE
+         ============================================================ -->
+    <h2><span class="accent">//</span> Dove Il Trucco Si Rompe</h2>
+    <span class="section-number">Sezione 08. Onesta', che non guasta mai</span>
+
+    <p>Qui pero' c'e' un limite. Se ti stai formando l'idea che basti scrivere tutto con le matrici e la matematica diventa facile, no. Il trucco ha un tetto, e vale la pena sapere dov'e'.</p>
+
+    <p><strong>Una matrice rappresenta una trasformazione lineare.</strong> Puoi sommare vettori, moltiplicarli per numeri, combinarli. Ma se ti serve una curva, una soglia, una saturazione, da sola non basta. E attenzione che gia' <span class="katex-inline">\( Wx + b \)</span>, quello dei livelli di rete neurale, a rigore non e' lineare ma <em>affine</em>: c'e' quello spostamento in fondo che rompe la linearita' stretta. La mossa che si fa allora e' sempre la stessa: prendi la roba non lineare e la <em>linearizzi in un punto</em>, e la matrice con cui la linearizzi e' lo Jacobiano. Funziona benissimo, finche' resti vicino a quel punto.</p>
+
+    <div class="warning-box fade-in">
+      <p><strong>E indovina qual e' l'esempio piu' fresco del limite.</strong> La congettura di Jacobi diceva: se lo Jacobiano non e' mai zero in nessun punto, allora la mappa si inverte globalmente. Cioe' diceva: <em>la matrice locale, in tutti i punti, basta a dirti cosa fa la funzione presa tutta intera</em>. Era falso. Il controesempio di Alpoge e' letteralmente una funzione il cui Jacobiano e' invertibile in ogni punto e che, ciononostante, da lontano incolla tre punti nello stesso posto. Quel pezzo, visto da qui, e' proprio la storia di una linearizzazione che non basta. Le matrici sono uno strumento formidabile per rendere meccanico cio' che e' locale; convincersi che il locale determini il globale e' costato ottantasette anni a un mucchio di gente molto piu' brava di me.</p>
+    </div>
+
+    <p>E poi cambiare rappresentazione non e' gratis. Trovare gli autovalori di una matrice grossa e' un conto serio, non un'occhiata. Con i numeri a virgola mobile ci sono matrici in cui un errore microscopico nei dati diventa un errore enorme nel risultato, e c'e' un intero mestiere, l'analisi numerica, che esiste per gestire questa roba. La forma pulita ti dice cosa vuoi calcolare, non ti regala il calcolo.</p>
+
+    <p>La versione corretta della tesi, quindi, non e' "le matrici risolvono i problemi". E': <strong>quando riesci a portare un problema in forma di matrice, una grossa fetta del lavoro diventa meccanica. E quello che resta difficile lo vedi meglio.</strong> E' un guadagno enorme, ma e' un guadagno, non una vittoria.</p>
+
+    <!-- ============================================================
+         SEZIONE 09 - PERCHE' ADESSO
+         ============================================================ -->
+    <h2><span class="accent">//</span> Perche' Adesso Conta Il Doppio</h2>
+    <span class="section-number">Sezione 09. Genera, traduci, verifica</span>
+
+    <p>Nel pezzo di luglio il punto vero non era il controesempio, era l'<strong>asimmetria</strong>: trovare una formula che rompe la congettura e' un oceano, verificarla sono dieci righe. E dicevo che quella asimmetria e' il terreno perfetto per un modello che sforna candidati appoggiato a un verificatore che non perdona.</p>
+
+    <p>Bene: adesso possiamo dire una cosa in piu' su <em>chi paga</em> quell'asimmetria. La verifica costa poco perche' qualcuno, prima, ha portato la domanda in una forma in cui verificare e' meccanico. Se la condizione "questa macchina non schiaccia mai niente" non avesse una traduzione in griglie e determinanti, non sarebbe una verifica: sarebbe una discussione. Con opinioni, sfumature, gente che non e' d'accordo. Invece e' <code>J.det()</code>, e stampa <span class="katex-inline">\( -2 \)</span>, e non c'e' altro da aggiungere.</p>
+
+    <p>Quindi la pipeline di cui si parla in continuazione in questi mesi, quando la guardi da vicino, ha tre pezzi e non due. C'e' il modello che propone candidati, ed e' la parte che costa: quello e' l'oceano. C'e' la verifica in fondo, che esegue il conto, e costa quasi niente. E in mezzo c'e' il passaggio che porta la domanda in una forma calcolabile, quello che si fa una volta sola e spesso decenni prima.</p>
+
+    <p>Ed e' proprio il pezzo in mezzo che spesso manca: tradurre la domanda in qualcosa che una macchina possa controllare. AlphaTensor, che li' avevo citato di sfuggita, e' l'esempio piu' pulito che conosca: cercava algoritmi piu' veloci per moltiplicare matrici, e la mossa vincente e' stata riscrivere "un algoritmo di moltiplicazione" come <strong>un oggetto matematico da scomporre</strong> (un tensore, che e' grosso modo una griglia con un indice in piu'). Riscritto cosi', "trova un algoritmo migliore" diventa "trova una scomposizione piu' corta", che e' una cosa in cui puoi mandare una macchina a cercare. Il risultato l'hanno pubblicato su Nature nel 2022 (<a href="https://www.nature.com/articles/s41586-022-05172-4" target="_blank" rel="noopener">Fawzi et al., <em>Nature</em> 610, 47&ndash;53</a>): per moltiplicare due matrici <span class="katex-inline">\( 4\times4 \)</span> <strong>in aritmetica modulo 2</strong> bastano 47 moltiplicazioni invece di 49. E qui serve dire cosa si sta contando, perche' "moltiplicazioni" e' una parola scivolosa: si contano solo i <em>prodotti fra elementi</em>, le somme no, e le 49 sono quelle dell'algoritmo di Strassen del 1969 applicato due volte di fila (sette moltiplicazioni per un <span class="katex-inline">\( 2\times2 \)</span>, e <span class="katex-inline">\( 7\times7=49 \)</span> per un <span class="katex-inline">\( 4\times4 \)</span> spezzato in blocchi). Due prodotti in meno, in un caso particolare, con una regola di conteggio precisa. Fa sorridere detto cosi', ma il punto e' che una macchina ha battuto sessant'anni di ingegno umano su un problema su cui l'ingegno umano si era accanito, e ci e' riuscita perche' qualcuno le aveva dato lo spazio giusto in cui cercare.</p>
+
+    <p>Ed e' esattamente lo stesso movimento degli assistenti di dimostrazione tipo Lean, di cui si parla sempre di piu': tradurre un teorema in una forma che una macchina puo' controllare passo per passo. Non "capire" la dimostrazione. <em>Renderla verificabile senza opinioni.</em> Cambia la rappresentazione finche' la verifica smette di essere un giudizio e diventa un'esecuzione.</p>
+
+    <p>Se vuoi vedere con i tuoi occhi la parte di questo pezzo che si puo' controllare, sono poche righe. Aritmetica esatta, niente approssimazioni, gira offline.</p>
+
+    <div class="code-snippet fade-in">
+<pre>import sympy as sp
+a, b, c, d = sp.symbols('a b c d')
+M = lambda p, q: sp.Matrix([[p, -q], [q, p]])              <span class="cmt"># il "numero" p + qi</span>
+
+print(M(0, 1)**2)                                          <span class="cmt"># [[-1,0],[0,-1]]  ->  i^2 = -1</span>
+print(sp.simplify(M(a,b)*M(c,d) - M(a*c-b*d, a*d+b*c)))    <span class="cmt"># matrice nulla: il prodotto torna</span>
+print(sp.factor(M(a, b).det()))                            <span class="cmt"># a**2 + b**2  ->  il modulo al quadrato</span>
+
+A = sp.Matrix([[2, 1], [1, 2]])
+print(A.eigenvects())                                      <span class="cmt"># 1 lungo (-1,1),  3 lungo (1,1)</span>
+print(A.det())                                             <span class="cmt"># 3 = 1*3, il prodotto degli autovalori</span></pre>
+    </div>
+
+    <p>La seconda riga stampata e' quella che mi diverte di piu': una matrice di zeri. Vuol dire che moltiplicare due numeri complessi e moltiplicare le due griglie corrispondenti danno lo stesso risultato, per <em>qualsiasi</em> valore di <span class="katex-inline">\( a, b, c, d \)</span>, perche' SymPy sta facendo il conto con le lettere e non con dei numeri di prova. Non e' un test su qualche caso: e' la verifica dell'identita'. E anche qui, come allora, non devi fidarti di me. Incolla, esegui, guarda.</p>
+
+    <div class="conclusion-box">
+      <p class="quote">Una matrice non risolve niente.<br>Mette il problema in una forma dove la soluzione si puo' controllare.</p>
+    </div>
+
+    <p>Quindi, tirando le somme. I numeri complessi sono griglie <span class="katex-inline">\( 2\times2 \)</span> di una certa forma. I sistemi di equazioni sono <span class="katex-inline">\( Ax=b \)</span>. Le rotazioni sono griglie <span class="katex-inline">\( 2\times2 \)</span> di una certa forma, che poi sono le stesse di prima. Le formule di trigonometria sono cosa esce quando ne moltiplichi due. Le derivate in piu' variabili sono griglie. Il "questa macchina torna indietro?" e' un numero calcolato da una griglia. Il "cosa fa questa trasformazione" sono le direzioni ferme di una griglia. Un livello di rete neurale e' una griglia, uno spostamento e una funzioncina. L'addestramento e' una moltiplicazione di griglie di derivate.</p>
+
+    <p>Non e' che la matematica sia poca cosa. E' che una quantita' impressionante di roba che ci hanno raccontato come materie separate, in capitoli separati, con nomi che sembravano apposta per intimidire, e' <strong>la stessa macchina guardata da angolazioni diverse</strong>. Il giorno in cui te ne accorgi non impari una cosa nuova: smetti di ricordarne otto.</p>
+
+    <p>E la prossima volta che un pezzo di matematica ti sembra impossibile, prima di darti del cretino vale la pena farsi la domanda che si sarebbe fatta un romano davanti a MCMXLVIII per XXIII: <em>e se fosse solo scritto male?</em></p>
+
+    <p style="font-size: 0.9rem; color: var(--text-secondary);"><strong>Fonti e verifiche.</strong> Questo pezzo riprende <a href="tre-ingressi-una-sola-uscita.html">Tre Ingressi, Una Sola Uscita</a>, pubblicato qui il 20 luglio 2026, sul controesempio di <a href="https://x.com/__alpoge__" target="_blank" rel="noopener">Levent Alpoge</a> alla congettura di Jacobi, che, al momento della stesura di questo pezzo, non risultava ancora sottoposto a revisione tra pari formale. Tutti i conti di questo pezzo li ho rifatti in aritmetica esatta con SymPy prima di scrivere, compreso il <span class="katex-inline">\( \det J_F = -2 \)</span> di quel pezzo. Su AlphaTensor: <a href="https://www.nature.com/articles/s41586-022-05172-4" target="_blank" rel="noopener">Fawzi et al., <em>Nature</em> 610, 47&ndash;53 (2022)</a> e la <a href="https://www.quantamagazine.org/ai-reveals-new-possibilities-in-matrix-multiplication-20221123/" target="_blank" rel="noopener">copertura di Quanta</a>; le 47 moltiplicazioni valgono per matrici <span class="katex-inline">\( 4\times4 \)</span> in aritmetica modulo 2, non nel caso generale. Panna, come al solito, non ha letto una riga e sta benissimo.</p>
+
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Signal Pirate | <a href="https://github.com/pinperepette" target="_blank" rel="noopener">Andrea Amani</a> aka The Pirate</p>
+    <p style="margin-top: 0.5rem; opacity: 0.5;">Reverse engineering dell'attenzione digitale</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    });
+  </script>
+</body>
+</html>
