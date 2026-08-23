@@ -79,11 +79,27 @@
   </item>
 
   <item>
+    <title>Non è un Esodo (e Non è il Lavoro)</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/non-e-un-esodo.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/non-e-un-esodo.html</guid>
+    <pubDate>Tue, 21 Jul 2026 00:00:00 +0200</pubDate>
+    <description>Un post su X dà la colpa alla mancanza di lavoro: l'Italia perde i suoi giovani. Ho preso i dati veri di tutta Europa e li ho rifatti uno per uno, con regressione, PCA, clustering e un giro a Montecarlo (centomila rimescolamenti). Spoiler: non è un esodo (i giovani calano perché sono nati in meno, e chi parte è l'uno per cento), non è il lavoro (la disoccupazione, coi numeri in mano, non spiega niente), e chi resta a casa è la spia di una cosa più grande: l'Italia è scivolata nel gruppo dei paesi deboli, insieme al Sud Europa. Il perché è la seconda metà: euro, delocalizzazione a Est, la Romania che vola coi fondi UE, i marchi venduti, il cuneo al 47 per cento, l'AI dove siamo fuori dal campo. Sedici grafici, ogni numero con fonte.</description>
+  </item>
+
+  <item>
     <title>Tre Ingressi, Una Sola Uscita</title>
     <link>https://pinperepette.github.io/signal.pirate/articoli/tre-ingressi-una-sola-uscita.html</link>
     <guid>https://pinperepette.github.io/signal.pirate/articoli/tre-ingressi-una-sola-uscita.html</guid>
     <pubDate>Mon, 20 Jul 2026 00:00:00 +0200</pubDate>
     <description>Una congettura di matematica, quella di Jacobi, resisteva dal 1939: una formula che non schiaccia mai le cose da vicino non puo' mandare due ingressi diversi sulla stessa uscita. Il 19 luglio 2026 Levent Alpoge pubblica su X una formula in tre variabili che rompe la regola: Jacobiano costante -2, mai zero, eppure tre punti distinti finiscono tutti in (-1/4, 0, 0). L'ha trovata con Claude Fable 5 durante la finale dei Mondiali. La spiegazione piu' semplice possibile, con l'analogia del foglio di gomma che non fa mai una grinza, e il motivo per cui questo controesempio e' speciale: non devi fidarti di nessuno, sono dieci righe di SymPy che rifai a mano. Ma la notizia vera non e' la formula, e' il metodo: verificare e' un secondo, trovare no. Un problema che era una dimostrazione da cercare diventa una caccia a un oggetto che rompe l'enunciato. Cosa ha fatto davvero l'AI, cosa non sappiamo ancora, e le cautele sulla revisione tra pari.</description>
+  </item>
+
+  <item>
+    <title>Non Esiste Il Contesto</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/non-esiste-il-contesto.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/non-esiste-il-contesto.html</guid>
+    <pubDate>Thu, 16 Jul 2026 00:00:00 +0200</pubDate>
+    <description>Un agente che risolve un task e' una funzione, A_Q. Due contesti che gli fanno dare la stessa risposta sono, per quel task, lo stesso contesto: la risposta induce una relazione di equivalenza, e all'agente non serve il repository, gli serve un rappresentante piccolo della sua classe. Da questa banalita' esce context-kernel, un plugin nativo per Claude Code che proietta il repo sul minimo indispensabile e misura di non aver spostato la risposta. Il kernel del task si spezza in due: quello sintattico si toglie ambientale (ANSI, duplicati, riletture identiche), quello semantico serve un sintomo. Quattro operatori: compressione con footer, repo slice deterministico con budget in token e discesa al simbolo, carta del task con citazioni file:riga, verifica di invarianza in sessione senza chiavi. pip3 list da 14.900 a 995 token (-93%), pandas -96%, lodash 30 file su 1048, sessanta guasti al cento per cento di sufficienza. L'inverso di una proiezione non esiste, esiste il page fault. E un canary che si e' morso la coda e ha trovato tre bug veri.</description>
   </item>
 
   <item>
@@ -436,6 +452,14 @@
     <guid>https://pinperepette.github.io/signal.pirate/articoli/la-password-e-morta.html</guid>
     <pubDate>Thu, 13 Mar 2026 00:00:00 +0100</pubDate>
     <description>Passkeys, WebAuthn e FIDO2: perche' la tua prossima password non sara' una password. ECDSA P-256, challenge-response, Secure Enclave, origin binding. Lab Node.js con @simplewebauthn + script Python ECDSA.</description>
+  </item>
+
+  <item>
+    <title>La Rete Neurale Sul Tavolo Operatorio</title>
+    <link>https://pinperepette.github.io/signal.pirate/articoli/la-rete-neurale-sul-tavolo-operatorio.html</link>
+    <guid>https://pinperepette.github.io/signal.pirate/articoli/la-rete-neurale-sul-tavolo-operatorio.html</guid>
+    <pubDate>Thu, 12 Mar 2026 00:00:00 +0200</pubDate>
+    <description>Mechanistic Interpretability: come aprire un LLM e leggere i suoi pensieri. GPT-2 small smontato pezzo per pezzo. 144 attention heads, circuito IOI a 26 head, Sparse Autoencoders con 24.576 feature, feature steering. 6 lab Python, tutto su CPU. Il nostro Golden Gate Claude.</description>
   </item>
 
   <item>
