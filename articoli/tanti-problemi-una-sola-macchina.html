@@ -22,6 +22,15 @@
   <link rel="stylesheet" href="../css/style.css">
 
   <style>
+    /* === Formule larghe: scorrono, non vengono tagliate === */
+    .formula-box { overflow: visible; }
+    .formula-box .formula-text { overflow-x: auto; overflow-y: hidden; padding: 0.25rem 0; }
+    .formula-box .katex-display { margin: 0.4em 0; }
+    @media (max-width: 640px) {
+      .formula-box { padding: 1.5rem 1rem; }
+      .formula-box .katex-display > .katex { font-size: 0.92em; }
+    }
+
     /* === Insight Box === */
     .insight-box {
       background: linear-gradient(135deg, rgba(124,77,255,0.1), rgba(0,255,136,0.05));
@@ -249,7 +258,9 @@
     <p>Bene. Adesso moltiplica quella seconda griglia per se stessa, cioe' ruota due volte di novanta gradi:</p>
 
     <div class="formula-box fade-in">
-      <div class="formula-text">$$\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix} = \begin{pmatrix} 0\cdot 0 + (-1)\cdot 1 & \ \ 0\cdot(-1) + (-1)\cdot 0 \\[4pt] 1\cdot 0 + 0\cdot 1 & \ \ 1\cdot(-1) + 0\cdot 0 \end{pmatrix} = \begin{pmatrix} -1 & 0 \\ 0 & -1 \end{pmatrix}$$</div>
+      <div class="formula-text">$$\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}\begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$$
+$$= \begin{pmatrix} 0\cdot 0 + (-1)\cdot 1 & \ \ 0\cdot(-1) + (-1)\cdot 0 \\[4pt] 1\cdot 0 + 0\cdot 1 & \ \ 1\cdot(-1) + 0\cdot 0 \end{pmatrix}$$
+$$= \begin{pmatrix} -1 & 0 \\ 0 & -1 \end{pmatrix}$$</div>
       <p class="formula-label">Riga per colonna: due moltiplicazioni e una somma per casella, otto prodotti in tutto. E' scritto tutto.</p>
     </div>
 
@@ -337,11 +348,12 @@
     <p>E' quasi comico: la formula piu' famosa della trigonometria, quella che ti hanno fatto imparare come un dogma, qui esce fuori come effetto collaterale del fatto ovvio che se giri un oggetto l'oggetto non diventa piu' grande. Ma il regalo vero e' un altro, ed e' questo. Ruotare di <span class="katex-inline">\( \alpha \)</span> e poi ruotare di <span class="katex-inline">\( \beta \)</span> e' come ruotare di <span class="katex-inline">\( \alpha + \beta \)</span>, no? Ovvio. Allora moltiplica le due griglie e guarda cosa ti esce nelle caselle:</p>
 
     <div class="formula-box fade-in">
-      <div class="formula-text">$$R(\alpha)R(\beta) = \begin{pmatrix} \cos\alpha\cos\beta - \sin\alpha\sin\beta & -(\sin\alpha\cos\beta + \cos\alpha\sin\beta) \\ \sin\alpha\cos\beta + \cos\alpha\sin\beta & \cos\alpha\cos\beta - \sin\alpha\sin\beta \end{pmatrix} = R(\alpha+\beta)$$</div>
-      <p class="formula-label">Il prodotto di due rotazioni. Guarda cosa c'e' scritto nelle caselle.</p>
+      <div class="formula-text">$$R(\alpha)R(\beta) = \begin{pmatrix} C & -S \\[4pt] S & C \end{pmatrix}$$
+$$\begin{aligned} C &= \cos\alpha\cos\beta - \sin\alpha\sin\beta \\[2pt] S &= \sin\alpha\cos\beta + \cos\alpha\sin\beta \end{aligned}$$</div>
+      <p class="formula-label">Il prodotto di due rotazioni. Ha di nuovo la forma di una rotazione, con C e S al posto di cos e sin. Guarda cosa sono C e S.</p>
     </div>
 
-    <p>Le formule di addizione. Quelle. <span class="katex-inline">\( \cos(\alpha+\beta) = \cos\alpha\cos\beta - \sin\alpha\sin\beta \)</span> e <span class="katex-inline">\( \sin(\alpha+\beta) = \sin\alpha\cos\beta + \cos\alpha\sin\beta \)</span>, i due mostri che tutti abbiamo mandato a memoria maledicendo, e che tutti abbiamo dimenticato entro l'estate successiva. Non devi per forza ricordarle come formule isolate. Sono <strong>quello che c'e' scritto nelle caselle quando moltiplichi due rotazioni</strong>, e la moltiplicazione fra griglie e' una procedura stupida che puoi rifare in trenta secondi su un foglio.</p>
+    <p>Ma ruotare di <span class="katex-inline">\( \alpha \)</span> e poi di <span class="katex-inline">\( \beta \)</span> e' ruotare di <span class="katex-inline">\( \alpha+\beta \)</span>, quindi quella griglia <em>e'</em> <span class="katex-inline">\( R(\alpha+\beta) \)</span>: <span class="katex-inline">\( C \)</span> dev'essere <span class="katex-inline">\( \cos(\alpha+\beta) \)</span> e <span class="katex-inline">\( S \)</span> dev'essere <span class="katex-inline">\( \sin(\alpha+\beta) \)</span>. Le formule di addizione. Quelle. <span class="katex-inline">\( \cos(\alpha+\beta) = \cos\alpha\cos\beta - \sin\alpha\sin\beta \)</span> e <span class="katex-inline">\( \sin(\alpha+\beta) = \sin\alpha\cos\beta + \cos\alpha\sin\beta \)</span>, i due mostri che tutti abbiamo mandato a memoria maledicendo, e che tutti abbiamo dimenticato entro l'estate successiva. Non devi per forza ricordarle come formule isolate. Sono <strong>quello che c'e' scritto nelle caselle quando moltiplichi due rotazioni</strong>, e la moltiplicazione fra griglie e' una procedura stupida che puoi rifare in trenta secondi su un foglio.</p>
 
     <p>Non hai memorizzato una formula: hai memorizzato il risultato di un conto che potevi rifare quando volevi. E' esattamente il tipo di fatica che una buona rappresentazione ti risparmia.</p>
 
@@ -407,7 +419,8 @@
     <p>Adesso prova a darle in pasto due frecce scelte bene, la diagonale <span class="katex-inline">\( (1,1) \)</span> e l'antidiagonale <span class="katex-inline">\( (1,-1) \)</span>. Sono due conti da dieci secondi ciascuno, falli:</p>
 
     <div class="formula-box fade-in">
-      <div class="formula-text">$$A\begin{pmatrix} 1 \\ 1 \end{pmatrix} = \begin{pmatrix} 3 \\ 3 \end{pmatrix} = \mathbf{3}\begin{pmatrix} 1 \\ 1 \end{pmatrix} \qquad\qquad A\begin{pmatrix} 1 \\ -1 \end{pmatrix} = \begin{pmatrix} 1 \\ -1 \end{pmatrix} = \mathbf{1}\begin{pmatrix} 1 \\ -1 \end{pmatrix}$$</div>
+      <div class="formula-text">$$A\begin{pmatrix} 1 \\ 1 \end{pmatrix} = \begin{pmatrix} 3 \\ 3 \end{pmatrix} = \mathbf{3}\begin{pmatrix} 1 \\ 1 \end{pmatrix}$$
+$$A\begin{pmatrix} 1 \\ -1 \end{pmatrix} = \begin{pmatrix} 1 \\ -1 \end{pmatrix} = \mathbf{1}\begin{pmatrix} 1 \\ -1 \end{pmatrix}$$</div>
       <p class="formula-label">Nessuna delle due frecce ha cambiato direzione. Una si e' allungata per 3, l'altra e' rimasta com'era.</p>
     </div>
 
